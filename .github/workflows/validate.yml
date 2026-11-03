@@ -1,0 +1,72 @@
+name: Validate
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  queue: ${{ github.ref == 'refs/heads/main' && 'max' || 'single' }}
+jobs:
+  tests:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      OPENPHYSICS_REQUIRE_CROSSCHECK: '1'
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - id: engine
+        shell: python
+        run: |
+          import json, os
+          pin = json.load(open('dependencies.json'))['development_source']['commit']
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('ref=' + pin + '\n')
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          repository: fieldalgo/openphysics
+          ref: ${{ steps.engine.outputs.ref }}
+          path: .validation/engine
+      - name: Install build and reference tools
+        run: python -m pip install setuptools==84.0.0 wheel pytest scikit-rf==2.2.0
+      - name: Build independent wheels and SIPI sdist
+        shell: python
+        run: |
+          import pathlib, subprocess, sys, tarfile
+          wheels = pathlib.Path('.validation/wheels').resolve()
+          wheels.mkdir(parents=True)
+          for name in ('galerkin', 'meshine', 'physmat', 'simcase'):
+              subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), '.'], cwd='.validation/engine/packages/' + name, check=True)
+          import setuptools.build_meta as build
+          archive = build.build_sdist(str(wheels))
+          extracted = pathlib.Path('.validation/sdist').resolve()
+          with tarfile.open(wheels / archive) as source:
+              source.extractall(extracted, filter='data')
+          subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), '.'], cwd=next(extracted.iterdir()), check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'install', *map(str, wheels.glob('*.whl'))], check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'check'], check=True)
+      - name: Source regression
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/sipi --junitxml=.validation/source.xml
+      - name: Installed regression and geometry contract
+        run: python tools/check_installed.py
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: validation-${{ matrix.os }}
+          path: .validation/*.xml

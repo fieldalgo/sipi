@@ -1,0 +1,606 @@
+{
+  "repository": "fieldalgo/openphysics",
+  "commit": "b8f7c0427b75362ed5e8298bc81682e7076abe4e",
+  "files": [
+    {
+      "source": "docs/third-party.md",
+      "destination": "docs/third-party.md",
+      "sha256": "4870080b8f1514815dcf84e0f9c3951887b6320f0cd26cbeb7be8f646bf497d1",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "packages/sipi/NOTICE",
+      "destination": "NOTICE",
+      "sha256": "d6c11793cc11ad2a779f9461b78a3d4fb9905d99fd2703fa91643a2df521b3b3",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/setup.py",
+      "destination": "setup.py",
+      "sha256": "ff85c04f866531b2961ddbe5eff04f6d1d146a2e852c1bd9d291738c96c6b368",
+      "extraction_status": "replaced by static README metadata in pyproject.toml"
+    },
+    {
+      "source": "packages/sipi/pyproject.toml",
+      "destination": "pyproject.toml",
+      "sha256": "c0362658799545382e2e740b088f815cfd590959b23ec875124e716dcb35bd5b",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "packages/sipi/README.md",
+      "destination": "README.md",
+      "sha256": "2a27650a3dc7911f6679bc175dba7899390d0570f6a5fbf281deb493bed47454",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "packages/sipi/LICENSE",
+      "destination": "LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/crosssection.py",
+      "destination": "src/sipi/crosssection.py",
+      "sha256": "59a70e852bbff00238c3342965e3bb71d2d64f8f5c4bf86e8254fb418ab41c8d",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/conductor.py",
+      "destination": "src/sipi/conductor.py",
+      "sha256": "ee7b5ab5373ab3eb4ac24cb39918aca153dea087f04f6db18f6e5ea20cc5fdf5",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/termination.py",
+      "destination": "src/sipi/termination.py",
+      "sha256": "b84de2e9ec046c9e64c1615dc2f8b4f766ab48726684546153dc949e43a68149",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/network.py",
+      "destination": "src/sipi/network.py",
+      "sha256": "0adad16aa59f7ab404feebd35af7b3f135ffa2d392558c1ef74b8b0f95abf6d9",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/circuit_document.py",
+      "destination": "src/sipi/circuit_document.py",
+      "sha256": "98cdded36471eb55be8605741323cffa6f07a2622ea8c6321c3960d3f65f547e",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/__init__.py",
+      "destination": "src/sipi/__init__.py",
+      "sha256": "afa31f1990ab18ce5a463c0c2070af97b721643609d5489aee3b182de35892c8",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/polygons.py",
+      "destination": "src/sipi/polygons.py",
+      "sha256": "79e23f4b2af535a697699a6e33931aea9259adc151d341a284e0114a5e5f5882",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/design.py",
+      "destination": "src/sipi/design.py",
+      "sha256": "499fae3c3d85a10757b6759fb1384981ef5196786dfab76313b2c6dc44cb3052",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/touchstone.py",
+      "destination": "src/sipi/touchstone.py",
+      "sha256": "ddefad9d807900dfe5c06e5c23ef4c56302e0c6faa4fb5082c52d3778180d3d7",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/dielectric.py",
+      "destination": "src/sipi/dielectric.py",
+      "sha256": "428243037c2010cc0aab8f40576427c08606478ca1e9b91d9b4424e0f3a8a830",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/study.py",
+      "destination": "src/sipi/study.py",
+      "sha256": "cb86ddfd5bcdd995c11f60ac56b902b91e9de71817ea5dc3eadb3e0c56fa1f14",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/line_model.py",
+      "destination": "src/sipi/line_model.py",
+      "sha256": "e64b9a4e40da566ea121a1fdf16a630235527b63d8eaf398cb4dfcfb1db88101",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/geometry_v1.py",
+      "destination": "src/sipi/geometry_v1.py",
+      "sha256": "5df297c44f41764ea2e55cb1bc92472fd5796b9f9aec9d121b35177189109d6b",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/conductor_mesh.py",
+      "destination": "src/sipi/conductor_mesh.py",
+      "sha256": "5b4e9b5161bec5cd60a4d3d3ecf5828a4ea4901ea059034457222d4cb3b3f7e0",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/document.py",
+      "destination": "src/sipi/document.py",
+      "sha256": "077be8f1b51eeb151c81946ad8f37268a7f9542058f9a66b130971522c1f2a07",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/templates.py",
+      "destination": "src/sipi/templates.py",
+      "sha256": "b55c441947d9fc3d1fd68b7380a908b9e4aab77490d4bb6234f52cdb698d7911",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/conductor_diffusion.py",
+      "destination": "src/sipi/conductor_diffusion.py",
+      "sha256": "047cc14c34703a5dfb97d24795cb974acf39e67014d6faea64f4ecc74224e406",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/volume_line.py",
+      "destination": "src/sipi/volume_line.py",
+      "sha256": "175fdbedabf8c1df5f31f936424c400927cda22061392d7c60527f40295bf724",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/plane.py",
+      "destination": "src/sipi/plane.py",
+      "sha256": "e40f555c60ac275df4637bf0d64f913be5bac3f2845da5d96bc66e6796069727",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/roughness.py",
+      "destination": "src/sipi/roughness.py",
+      "sha256": "c36cd9ac21ba685c89d2e7450c8c394844e3eeb9a815ca852e74d28780e672a0",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "packages/sipi/src/sipi/quasistatic.py",
+      "destination": "src/sipi/quasistatic.py",
+      "sha256": "b6de31e9c1d5267a224592dfb9cd4a606017e904144b9caf10be20e8705479e1",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tools/wheel_consumers/test_sipi_wheel.py",
+      "destination": "tests/wheel/test_sipi_wheel.py",
+      "sha256": "b17f24c3957ce98df8cb8317523aca962b1bab74da98d875c805eb21ccf6dac5",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/compare_networks.py",
+      "destination": "examples/sipi/compare_networks.py",
+      "sha256": "1bd91fa4bfe86c15965a2d1a1baca06474fde2ddf367d8205eb61b2bb466788a",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/loaded_rough_line.py",
+      "destination": "examples/sipi/loaded_rough_line.py",
+      "sha256": "c312498148a5491a049d5ffadad9fa1e27a57fa9f22c8879f5e3ecdc9c593b2d",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/circuit_document.py",
+      "destination": "examples/sipi/circuit_document.py",
+      "sha256": "4a946308b168fbb20b0b5ffdf0432dcb61be42bdc1a67ca46260d64623f7c0ba",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/design.py",
+      "destination": "examples/sipi/design.py",
+      "sha256": "7540f4cfbd532009b44ae1e84da7931e06fc27d28b95a5e9fca0444510af3a62",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/dispersive_line.py",
+      "destination": "examples/sipi/dispersive_line.py",
+      "sha256": "9d07a81dd1d8989747359922f7ea2c4c8264336aac3f88b32a73bfbb215314d2",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/pcb_lines.py",
+      "destination": "examples/sipi/pcb_lines.py",
+      "sha256": "d17ab32b7550baee34976a27c1c57d7090ce2905d1dc104a33975beb4a0e37e0",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/loaded_crosstalk.py",
+      "destination": "examples/sipi/loaded_crosstalk.py",
+      "sha256": "b5b0785e3f10a3d3a8dd33be4feb724dc28a4a16642f3c0612aa7764e454e1a8",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/frequency_line.py",
+      "destination": "examples/sipi/frequency_line.py",
+      "sha256": "b43290ba944df27ae47ff2e6d620d8637fbfe1a3bacdcbf11841251a3d237903",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/conductor_loss.py",
+      "destination": "examples/sipi/conductor_loss.py",
+      "sha256": "c3cc2008282b8c7b6c96dee9d6411d3efc846755c7494360538d9cb0be2cf73a",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/conductor_diffusion.py",
+      "destination": "examples/sipi/conductor_diffusion.py",
+      "sha256": "eee8ed5c8f2c64dd1d102ca78b1e0557db1aa2f9e43417b50ef9dff2314b1893",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/tolerance_study.py",
+      "destination": "examples/sipi/tolerance_study.py",
+      "sha256": "0693587ccca8451f6c88d8027e6fa9768855c523c8d7f033b700bca4847efc2a",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/plane_ir_drop.py",
+      "destination": "examples/sipi/plane_ir_drop.py",
+      "sha256": "2e855810cc2c93c26d6f5cf3b39a8f5f8d2d8555b8066e84ee0f617ea3f41d6a",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/coated_trace.py",
+      "destination": "examples/sipi/coated_trace.py",
+      "sha256": "c307bfc930e59fdbb6db306295477a34f2583d658929eec96e7f20dcfb7ed9ab",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/volume_line.py",
+      "destination": "examples/sipi/volume_line.py",
+      "sha256": "2631f3be3d5d1e120c91707b747f15b1a630d0d24a640feb97dfc5a5cd447a8a",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/causal_roughness.py",
+      "destination": "examples/sipi/causal_roughness.py",
+      "sha256": "630c500d9ea3800edb968d9b0d44c788c8634819fc4127a71c2e898e7f4ff713",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "examples/sipi/polygon_mask.py",
+      "destination": "examples/sipi/polygon_mask.py",
+      "sha256": "5a5ff7a61c6320a2fbb9ccf6d72ab04b0268f6fd86284390ef77dc1a090ab1a7",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/galerkin/crosscheck.py",
+      "destination": "tests/_support/crosscheck.py",
+      "sha256": "6c9218f8c4e440822e802adfb5b1ed4ebbe7b32d5d30360efd68d94d9aa22288",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/simcase/test_geometry_adapters.py",
+      "destination": "integration/test_geometry_adapters.py",
+      "sha256": "68219636126cb389f99fcfe5d671cd0947909c93a9c2f383ddc224059e782b0f",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_crosscheck_skrf_network.py",
+      "destination": "tests/sipi/test_crosscheck_skrf_network.py",
+      "sha256": "17f89e7e45be8d27f88a6aa2ee6ae3a24f1bf78a9864f665a7c3ee3f76df7f23",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_conductor_mesh.py",
+      "destination": "tests/sipi/test_conductor_mesh.py",
+      "sha256": "0219b0e80ab9ab260d2ce971c0f333428abed85ccf6d4ee8f959dde218eed986",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_conductor.py",
+      "destination": "tests/sipi/test_conductor.py",
+      "sha256": "d7c4c03c90590742188c928758cfad59a41de6b01cbd4d313028301d3ddf18b4",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_study.py",
+      "destination": "tests/sipi/test_study.py",
+      "sha256": "944fc9ea2b5676b1d8acf33773681c134bcbab959bad6712b41340f445175fca",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_polygon_sections.py",
+      "destination": "tests/sipi/test_polygon_sections.py",
+      "sha256": "936103ac22f66db57b0cd9180adc2526063e21a143bbb9d1b76e88b541a9ca3f",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_line_network.py",
+      "destination": "tests/sipi/test_line_network.py",
+      "sha256": "9c5a1e0abbfc2a6deb93d96a59236b16ce23bbe45f6d87633ed344a03a09f2b9",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_sipi_api.py",
+      "destination": "tests/sipi/test_sipi_api.py",
+      "sha256": "d6a0048db3a4148a7eed04439c29f69b09b607e373d19f4317f43088baba3c1d",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_circuit_document.py",
+      "destination": "tests/sipi/test_circuit_document.py",
+      "sha256": "3fc2fe4bf265a1757df05383a1af069ca654473a8b7c372bbd21d5a128b58f88",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_manufacturing_sections.py",
+      "destination": "tests/sipi/test_manufacturing_sections.py",
+      "sha256": "9350afa0f0b31eaafcb6f16028628bafaf1b7e44ba35901ed72394ebbe388142",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_volume_line.py",
+      "destination": "tests/sipi/test_volume_line.py",
+      "sha256": "476537b5b38d52ab9047b989d27846b2157d74073d76987b53665764048a1696",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_sipi_plane.py",
+      "destination": "tests/sipi/test_sipi_plane.py",
+      "sha256": "bfdc466487661b2ecac6df32ffdaa0b61b3571c1a0f6b1e27015307c5f62b2eb",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_touchstone.py",
+      "destination": "tests/sipi/test_touchstone.py",
+      "sha256": "1ed04efe90ddd223766d89b9d33cbf5149d17c09a44a42040c34d72cbbdaf17d",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_conductor_diffusion.py",
+      "destination": "tests/sipi/test_conductor_diffusion.py",
+      "sha256": "fcaf03845128e1f62fd13ee52ba8b580c54356c97344483a2f99b75e91c39930",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_sipi_references.py",
+      "destination": "tests/sipi/test_sipi_references.py",
+      "sha256": "544c2ea67ad4ee8c0e95073358a7a2a180df27d71c2c9b2207b2f7cbb4ee123d",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_default_mesh.py",
+      "destination": "tests/sipi/test_default_mesh.py",
+      "sha256": "9aaf933aab6f76025b340ce17f7565b6751e532b99c4f9945d42e290fad1efed",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_line_model.py",
+      "destination": "tests/sipi/test_line_model.py",
+      "sha256": "6b5da9a4ac53a18417204a4a2516736c40d5a0a258280f7ec08670c50345d230",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_roughness.py",
+      "destination": "tests/sipi/test_roughness.py",
+      "sha256": "4d9bfd2e452f7d8b5e35f8892b4102f67172bb4894030228369668eca55825f5",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_design_documents.py",
+      "destination": "tests/sipi/test_design_documents.py",
+      "sha256": "721b6a7de33426cfd97664f9ca6b95dccf10d57112fc49460f171a3f6fbdac07",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_termination.py",
+      "destination": "tests/sipi/test_termination.py",
+      "sha256": "b13d980a04cd955dcc11208282b2fde2bf940ea83ad511275b979c4d26f875ed",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "tests/sipi/test_dielectric.py",
+      "destination": "tests/sipi/test_dielectric.py",
+      "sha256": "530f5d6758662229a4a28a950e1ca806d6dfd0d4204625e67abf6061afdee7b0",
+      "extraction_status": "unchanged"
+    },
+    {
+      "source": "docs/packages/sipi/design.md",
+      "destination": "docs/packages/sipi/design.md",
+      "sha256": "17a9c589459348a00e49571557bb29b50f4f3fbd4dfa1de55d8fc8a7ca7bdec6",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/touchstone.md",
+      "destination": "docs/packages/sipi/touchstone.md",
+      "sha256": "04a18c6c1c3750614cae6ad58ab3c9a0aebb5a43618147a8aac85db2d455a3ed",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/overview.md",
+      "destination": "docs/packages/sipi/overview.md",
+      "sha256": "5aeab3c3ce4449a56401265914522d87df81a76bd9de38549a23f26cf2fb9866",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/network_validation.md",
+      "destination": "docs/packages/sipi/network_validation.md",
+      "sha256": "365ce085f5c08beea34a84dbc626e2389aa21cbd351a26676527682af9353198",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/volume_line.md",
+      "destination": "docs/packages/sipi/volume_line.md",
+      "sha256": "d7e458c56a165bc083e476811427fc92d4adab7bbb607473a4edc3c681912ad9",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/termination.md",
+      "destination": "docs/packages/sipi/termination.md",
+      "sha256": "6465201be95940a1447a5f541fc93fcedb374eb4b7ef52d3abf7c6c728a9e1f5",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/circuit_document.md",
+      "destination": "docs/packages/sipi/circuit_document.md",
+      "sha256": "19ea2c4f2877b674a1d79f23c0be666260afede965ea423c0d90909d4b8fe1d1",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/conductor_diffusion.md",
+      "destination": "docs/packages/sipi/conductor_diffusion.md",
+      "sha256": "c4b1d61161c1916698c2b9e9e9bfffffde45da531cf7311732fb5e3975322de7",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/roughness.md",
+      "destination": "docs/packages/sipi/roughness.md",
+      "sha256": "70e03c0dd7bc2ad8ee9f6032d68973f820cf09ee131afc487608d35866cd4718",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/conductor.md",
+      "destination": "docs/packages/sipi/conductor.md",
+      "sha256": "4326a65bbcdb51f00a074ed888cea95c96fc45ef5e7333bf1c286b6766177360",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/line_model.md",
+      "destination": "docs/packages/sipi/line_model.md",
+      "sha256": "1658bf29dc725ae6af9768acf3a9912aa47c2e0fd0395c71f6a665d9a8f27bb9",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/dielectrics.md",
+      "destination": "docs/packages/sipi/dielectrics.md",
+      "sha256": "a31053e85ffc70b59cc84005f6b8cab33659a5646c9c968aeb3ae615a28241ba",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/study.md",
+      "destination": "docs/packages/sipi/study.md",
+      "sha256": "84e96ed074baef62d2c03501dfed8ef1b6f256fcd1774ba4a3f37951f41d7b57",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/manufacturing_sections.md",
+      "destination": "docs/packages/sipi/manufacturing_sections.md",
+      "sha256": "399d4e011e060fc2d0b252fc3db0dfb2b7185592ef970bd35a26e73d07c072dc",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/default-mesh.md",
+      "destination": "docs/packages/sipi/default-mesh.md",
+      "sha256": "0388659daf453e99b89c8821966363e8c1119a1b97579d45589246490cf5202c",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/polygon_sections.md",
+      "destination": "docs/packages/sipi/polygon_sections.md",
+      "sha256": "385630af6929fd673c691eb1103234af5920fa0a56fa9c869c3a9fc8e21917df",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/packages/sipi/network.md",
+      "destination": "docs/packages/sipi/network.md",
+      "sha256": "43c5100ddb69745a11826a59c628e44ff6a3375c1e3147d73d6aee05de46cda7",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/design.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/design.md",
+      "sha256": "ecf6bc12be68ae41c583c45abc6ac8bc9c261bb1ef702e889a503312f711d2c8",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/touchstone.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/touchstone.md",
+      "sha256": "bdd22d6d985d9680892e78f6ba602d221687a2ce91003bc1f29b3d44668988d9",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/overview.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/overview.md",
+      "sha256": "5219197c69126ea4f7706869ba3fd1a92526a02e1a8278a7b9b95ac216d3cd46",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/network_validation.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/network_validation.md",
+      "sha256": "e0a42023dc562f27f66aedcde6fe674fc449c4519f9af969f1404cad4aba381c",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/volume_line.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/volume_line.md",
+      "sha256": "d64c41287f6ade5bdbdbdc2bc69978bed52624887a5e02fd3af745fd473aeaef",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/termination.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/termination.md",
+      "sha256": "eab8d3fd85b6883db26848e684478f3528d5178e3367b1e5671b8e37ee50a922",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/circuit_document.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/circuit_document.md",
+      "sha256": "9b1ac899e09290bc075257d2605cdc78035ddd93c9c2ebb6ae27cdc9036a9afb",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/conductor_diffusion.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/conductor_diffusion.md",
+      "sha256": "fb41b05c954a2dc061e767246c2b16a619d23e47a97e992a5aab047604e7f206",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/roughness.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/roughness.md",
+      "sha256": "158be892823066da7af46acfdf61de93b826d9efea8ef746f965d521b727ff3b",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/conductor.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/conductor.md",
+      "sha256": "975fb181cdc7b699b6b4e5763c79eaf58b72e788df11fdefc7eb2bddbd3405a9",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/line_model.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/line_model.md",
+      "sha256": "6c5da1b5737befa48a37cc0c939666fc6c0a2898b09695a2872b1af093d705b3",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/dielectrics.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/dielectrics.md",
+      "sha256": "250e89ede4b364bd13c368d8de6c8fe7093267a2c15d17fdc8e5723e76f84e37",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/study.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/study.md",
+      "sha256": "7731e1d2cffafceae970f20eff89d48955cbba4203583bf39edd891f3c43adad",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/manufacturing_sections.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/manufacturing_sections.md",
+      "sha256": "7e1ecc41e9f52ece9150b1973f02b216acc6b7bba93fb833da28a26c66f36198",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/default-mesh.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/default-mesh.md",
+      "sha256": "7e2015b77829c2a29f3b2fe2c6950b6051c53ae7cc718616957c42035ccdf463",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/polygon_sections.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/polygon_sections.md",
+      "sha256": "4651cace0a71aa8c6936fa9ee22e74a4bbc280d0af7b80532a6fba8d18cc85c8",
+      "extraction_status": "metadata or documentation links adapted"
+    },
+    {
+      "source": "docs/locales/ko/pages/packages/sipi/network.md",
+      "destination": "docs/locales/ko/pages/packages/sipi/network.md",
+      "sha256": "3b36f1ece61130f22b814c3f383195a0700724bb8b19583554942f8523890200",
+      "extraction_status": "metadata or documentation links adapted"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "development_source": {
+    "repository": "fieldalgo/openphysics",
+    "commit": "b8f7c0427b75362ed5e8298bc81682e7076abe4e"
+  },
+  "packages": [
+    "galerkin",
+    "meshine"
+  ],
+  "integration_only": [
+    "simcase"
+  ],
+  "published_release_compatibility": "not yet verified"
+}
