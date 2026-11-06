@@ -18,7 +18,7 @@ from .document import CrossSectionDocument, _keys, _unique_object
 from .dielectric import (DielectricSweep, dielectric_from_dict, dielectric_to_dict,
                          _material_samples, _dispersive_from_mesh)
 from .conductor import ConductorLoss, _surface_samples, _surface_from_mesh
-from .roughness import CausalHuray
+from .roughness import CausalHuray, GroissRMS
 from .network import LineNetwork, _frequencies, _scalar, rlgc_network
 
 __all__ = ['TransmissionLineDocument', 'TransmissionLineResult']
@@ -26,7 +26,7 @@ __all__ = ['TransmissionLineDocument', 'TransmissionLineResult']
 
 def _roughness(value):
     if not isinstance(value, dict):
-        raise ValueError('roughness must explicitly select smooth, hammerstad or causal-huray')
+        raise ValueError('roughness must explicitly select smooth, hammerstad, groiss or causal-huray')
     kind = value.get('kind')
     if kind == 'smooth':
         _keys(value, ('kind',), where='roughness')
@@ -40,6 +40,10 @@ def _roughness(value):
         model = CausalHuray(value['radii_m'],value['surface_ratios'])
         return dict(kind=kind,radii_m=list(model.radii_m),
                     surface_ratios=list(model.surface_ratios)), 0.0, model
+    if kind == 'groiss':
+        _keys(value, ('kind','rms_m'), where='roughness')
+        model = GroissRMS(value['rms_m'])
+        return dict(kind=kind, rms_m=model.rms_m), 0.0, model
     raise ValueError('unknown roughness kind')
 
 

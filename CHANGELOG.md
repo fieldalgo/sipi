@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an explicit noncausal Groiss RMS surface-impedance correction and strict saved model selection, preserving the existing resistance-only and causal roughness definitions.
+
 - Add planar-coated single and paired grounded-coplanar sections with finite grounds, independent field checks, JSON replay, tolerance sampling and saved impedance goals.
 
 - Install the required scikit-fem reference tool in the test extra and CI, and report its version during installed-artifact validation instead of relying on an enriched development environment.

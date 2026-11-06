@@ -1,5 +1,8 @@
 # Causal conductor surface roughness
 
+The separate [Groiss RMS option](groiss.md) is noncausal and multiplies the full
+surface impedance by a real factor. It does not change the definitions below.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/roughness.md)
 
 [Surface extraction](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/conductor.md) · [Frequency-line JSON](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/line_model.md)

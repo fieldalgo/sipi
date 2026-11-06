@@ -1,9 +1,9 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Causal Huray surface correction; exp(+j omega t), SI radii.
+"""Explicit surface corrections; exp(+j omega t), SI lengths.
 
-This is a constitutive half-space model, not a resolved rough surface or a
-finite-metal DC solve. The base matte/flat area ratio is fixed to one.
+These are constitutive half-space models, not resolved rough surfaces or
+finite-metal DC solves. CausalHuray fixes the base matte/flat area ratio to one.
 """
 from __future__ import annotations
 
@@ -12,9 +12,41 @@ import math
 
 import numpy as np
 
-from .network import _real
+from .network import _real, _scalar
 
-__all__ = ['CausalHuray']
+__all__ = ['CausalHuray', 'GroissRMS']
+
+
+@dataclass(frozen=True)
+class GroissRMS:
+    """Noncausal frequency-domain correction for a good-conductor half-space.
+
+    rms_m is the RMS height Rq, not Ra or Rz. The empirical real factor
+    1+exp(-(delta/(2*Rq))**1.6) multiplies the entire surface impedance.
+    It saturates at two and is intended for relatively polished conductors,
+    not a general rough-foil accuracy model. Zero RMS is exactly smooth.
+    """
+    rms_m: float
+
+    def __post_init__(self):
+        object.__setattr__(self, 'rms_m', _scalar('rms_m', self.rms_m, zero=True))
+
+    def factor(self, skin_depth):
+        """Real multiplier for nonempty positive one-dimensional depths (m)."""
+        delta = _real('skin_depth', skin_depth)
+        if delta.ndim != 1 or not delta.size or np.any(delta <= 0):
+            raise ValueError('skin_depth must be a nonempty positive one-dimensional array')
+        if self.rms_m == 0:
+            return np.ones(delta.shape)
+        # Logarithms avoid overflowing delta/Rq or 2*Rq. Overflow of the
+        # positive exponent gives the exact floating-point smooth limit.
+        power = 1.6*(np.log(delta)-math.log(self.rms_m)-math.log(2))
+        with np.errstate(over='ignore', under='ignore'):
+            return 1 + np.exp(-np.exp(power))
+
+    def _impedance_factors(self, skin_depth):
+        factor = self.factor(skin_depth)
+        return factor, factor.copy()
 
 
 @dataclass(frozen=True)

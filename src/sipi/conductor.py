@@ -17,7 +17,7 @@ from scipy.constants import epsilon_0, mu_0
 from galerkin import assemble_stiffness, solve_dirichlet
 from .network import _frequencies, _scalar, rlgc_network
 from .quasistatic import _node_set
-from .roughness import CausalHuray
+from .roughness import CausalHuray, GroissRMS
 
 __all__ = ['SurfaceCurrentFactors', 'ConductorLoss', 'surface_current_factors',
            'surface_impedance', 'surface_conductor_loss']
@@ -32,10 +32,10 @@ def _metal_samples(frequency, conductivity, relative_permeability, roughness_rms
     mu_r = _scalar('relative_permeability', relative_permeability)
     rms = _scalar('roughness_rms', roughness_rms, zero=True)
     if roughness is not None:
-        if not isinstance(roughness, CausalHuray):
-            raise TypeError('roughness must be a CausalHuray model or None')
+        if not isinstance(roughness, (CausalHuray, GroissRMS)):
+            raise TypeError('roughness must be a CausalHuray or GroissRMS model or None')
         if rms != 0:
-            raise ValueError('choose either roughness_rms or a causal roughness model')
+            raise ValueError('choose either roughness_rms or a roughness model')
     log_f = np.log(f)
     if np.any(np.log(sigma)-np.log(2*np.pi*epsilon_0)-log_f < np.log(1000)):
         raise ValueError('surface approximation requires sigma/(omega*eps0) >= 1000')
@@ -51,7 +51,7 @@ def _metal_samples(frequency, conductivity, relative_permeability, roughness_rms
     # roughness reactance or imply broadband causality for this correction.
     impedance = resistance*correction + 1j*resistance
     if roughness is not None:
-        # Re((1+j)*H) and Im((1+j)*H) are different corrections.
+        # Models explicitly define resistance and reactance multipliers.
         correction, reactance = roughness._impedance_factors(delta)
         with np.errstate(over='ignore', invalid='ignore'):
             impedance = resistance*correction + 1j*(resistance*reactance)
@@ -68,7 +68,9 @@ def surface_impedance(frequency, *, conductivity, relative_permeability=1.0,
     multiplies only its resistance by 1+(2/pi)*atan(1.4*(Rq/delta)^2).
     The correction is empirical, without an added causal reactance model.
     Alternatively roughness=CausalHuray(...) changes both resistance and
-    reactance; it cannot be combined with nonzero roughness_rms.
+    reactance. GroissRMS(...) multiplies both by the same real factor and
+    is noncausal, for frequency-domain use only. Neither model can be
+    combined with nonzero roughness_rms.
     Geometry/skin-depth validity is checked by surface_conductor_loss, not here.
     """
     return _metal_samples(frequency, conductivity, relative_permeability, roughness_rms,

@@ -1,5 +1,8 @@
 # 인과적 도체 표면 거칠기
 
+별도의 [Groiss RMS 옵션](groiss.md)은 비인과적이며 전체 표면 임피던스에 실수 계수를
+곱합니다. 아래 모델의 정의는 유지합니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/roughness.md) | **한국어**
 
 [표면 추출](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/conductor.md) · [주파수 선로 JSON](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/line_model.md)
