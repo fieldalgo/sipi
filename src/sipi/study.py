@@ -74,7 +74,9 @@ def _parameters(data, values):
     params = dict(data['parameters'])
     params.update(zip((v['name'] for v in data['sampling']['variables']), map(float, values)))
     if data['fixed_pitch_m'] is not None:
-        params['gap'] = data['fixed_pitch_m']-params['width']
+        half_widths = (params['left_width']/2+params['right_width']/2
+                       if data['template'] == 'asymmetric_coupled_microstrip' else params['width'])
+        params['gap'] = data['fixed_pitch_m']-half_widths
     spacing = data.get('fixed_plane_spacing_m')
     if spacing is not None:
         names = {v['name'] for v in data['sampling']['variables']}
@@ -232,11 +234,18 @@ class ImpedanceStudyDocument:
         pitch = data['fixed_pitch_m']
         if pitch is not None:
             pitch = _scalar(pitch, positive=True)
-            if template not in _HORIZONTAL_PAIRS or 'width' not in names or 'gap' in names:
-                raise ValueError('fixed pitch requires an edge-coupled pair with '
-                                 'width sampling, without gap sampling')
-            if abs(parameters['width']+parameters['gap']-pitch) > 1e-12*pitch:
-                raise ValueError('nominal width + gap must equal fixed pitch')
+            if template == 'asymmetric_coupled_microstrip':
+                if not {'left_width', 'right_width'}.intersection(names) or 'gap' in names:
+                    raise ValueError('fixed pitch requires left_width or right_width sampling, '
+                                     'without gap sampling')
+                nominal_width = parameters['left_width']/2+parameters['right_width']/2
+            else:
+                if template not in _HORIZONTAL_PAIRS or 'width' not in names or 'gap' in names:
+                    raise ValueError('fixed pitch requires an edge-coupled pair with '
+                                     'width sampling, without gap sampling')
+                nominal_width = parameters['width']
+            if abs(nominal_width+parameters['gap']-pitch) > 1e-12*pitch:
+                raise ValueError('nominal width (mean for unequal pairs) + gap must equal fixed pitch')
         canonical = dict(schema=data['schema'], template=template, parameters=parameters,
                          quantity=quantity, mesh=mesh, sampling=sampling, fixed_pitch_m=pitch)
         if evaluation is not None:

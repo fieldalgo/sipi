@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve physical centre spacing for unequal surface-pair width studies and refined goals, deriving bottom-edge gap while retaining invalid samples and legacy equal-width behavior.
+
 - Add independently dimensioned surface pairs and an explicit real forward-current differential impedance, with saved correlated tolerance studies and refined-mesh target design while preserving symmetric-mode semantics.
 
 - Expose power-dual differential/common characteristic matrices for asymmetric pairs, retaining cross-coupling, physical voltage/current normalization and existing forward-wave validity gates without another field solve.

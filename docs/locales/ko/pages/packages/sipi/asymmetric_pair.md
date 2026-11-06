@@ -66,8 +66,9 @@ assert abs(result.residual) <= 1 and abs(result.refined_residual) <= 1
 입력과 함께 정확한 엔진 커밋·wheel hash를 저장하세요.
 
 기존 sweep·corners·uniform·상관 normal 샘플링은 실패를 재추출하지 않고 보존하며,
-모든 행이 완료돼야 통계를 냅니다. 행별 메시 수렴을 보장하지 않습니다. 이 비대칭 쌍은
-fixed_pitch_m을 거부합니다. gap 고정 상태에서 폭이 바뀌면 중심 간격도 바뀝니다.
+모든 행이 완료돼야 통계를 냅니다. 행별 메시 수렴을 보장하지 않습니다. 선택적인
+[중심 거리 고정](asymmetric_pitch.md)은 두 밑면 폭에서 gap을 유도합니다.
+이 제약 없이 gap을 고정한 상태에서 폭이 바뀌면 중심 간격도 바뀝니다.
 기존 같은 폭 쌍의 고정 피치 규칙은 유지됩니다. 전체 평면 간격 고정은 해당하지 않습니다.
 
 [지정 주파수 재료](material_impedance.md)를 쓰는 공차/역산 변수는 여전히 기하만

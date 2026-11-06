@@ -92,6 +92,9 @@ maps, including derived parameters. No FEM solve runs in either method.
 
 ## Fixed pitch
 
+Unequal pairs have a separate [two-width centre-distance rule](asymmetric_pitch.md).
+The equal-width rules below remain unchanged.
+
 `fixed_pitch_m` is `None`, or a positive centre-to-centre pitch for
 `coupled_microstrip`, `coupled_stripline`, `coupled_grounded_coplanar`,
 `coupled_layered_stripline`, `coupled_coated_microstrip`,

@@ -75,9 +75,10 @@ new template or quantity. Save the exact engine commit/wheel hash with inputs.
 
 Existing sweep, corner, uniform and correlated normal sampling retain errors
 without resampling and produce a summary only if all rows complete. No per-row
-mesh convergence is implied. For this unequal pair, `fixed_pitch_m` is rejected;
-varying either width at fixed gap changes centre spacing. Existing equal-width
-pair fixed-pitch rules remain available. Fixed total plane spacing is inapplicable.
+mesh convergence is implied. Optional [fixed centre spacing](asymmetric_pitch.md)
+derives gap from both bottom widths; otherwise varying either width at fixed gap
+changes centre spacing. Existing equal-width pair fixed-pitch rules remain
+available. Fixed total plane spacing is inapplicable.
 
 [Fixed-frequency material overrides](material_impedance.md) remain geometry-only
 for sampled/optimized variables. Tilted transverse tensors are allowed for

@@ -83,6 +83,9 @@ NumPy `Generator(PCG64(seed))`를 사용합니다. 정규분포는 **비유계**
 
 ## 고정 피치
 
+비대칭 쌍에는 [두 폭으로 계산하는 중심 거리 규칙](asymmetric_pitch.md)을 적용합니다.
+아래 같은 폭 쌍의 기존 규칙은 그대로입니다.
+
 `fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_grounded_coplanar·coupled_layered_stripline·coupled_coated_microstrip·coupled_coated_grounded_coplanar·coupled_unbacked_coplanar·coupled_coated_unbacked_coplanar·coupled_conformal_coated_microstrip·coupled_conformal_coated_grounded_coplanar·coupled_conformal_coated_unbacked_coplanar의 양의 수평 중심 간 거리입니다.
 독립 변수에 width가 있어야 하고 gap을 독립적으로 샘플링할 수 없습니다.
 nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
