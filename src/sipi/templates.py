@@ -12,6 +12,7 @@ from .crosssection import CrossSection, Layer, Trace
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
+           'coupled_coated_microstrip',
            'with_surface_mask']
 
 
@@ -135,6 +136,29 @@ def coated_microstrip(*, width, substrate_height, eps_r, coating_height,
                     _positive('coating_tan_delta', coating_tan_delta, zero=True))
     return CrossSection([layers[0], coating, layers[1]],
                         [Trace('signal', 0.0, w, h, t, top_width=top_width)], box)
+
+
+def coupled_coated_microstrip(*, width, gap, substrate_height, eps_r, coating_height,
+                              coating_eps_r, thickness=0.0, tan_delta=0.0,
+                              coating_tan_delta=0.0, air_height=None, box_width=None,
+                              top_width=None):
+    """Equal-width surface pair embedded in a flat, full-width coating layer.
+
+    gap separates signal bottom edges. coating_height starts at the substrate
+    surface and includes copper; it must exceed thickness. air_height starts
+    above the coating, not the substrate. This is not a conformal mask model.
+    """
+    gap = _positive('gap', gap)
+    base = coated_microstrip(width=width, substrate_height=substrate_height, eps_r=eps_r,
+        coating_height=coating_height, coating_eps_r=coating_eps_r, thickness=thickness,
+        tan_delta=tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height,
+        box_width=box_width, top_width=top_width)
+    trace = base.traces[0]
+    offset = (trace.width+gap)/2
+    box = max(base.width,4*(2*trace.width+gap)) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [Trace('positive',-offset,trace.width,trace.y,trace.thickness,top_width=top_width),
+         Trace('negative',offset,trace.width,trace.y,trace.thickness,top_width=top_width)], box)
 
 
 def offset_stripline(*, width, plane_spacing, trace_height, eps_r, thickness=0.0,

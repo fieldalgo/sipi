@@ -35,17 +35,18 @@ Version `sipi.impedance-study/2` has the same fields plus required
 `fixed_plane_spacing_m` (null or a positive length). Existing constructors without
 that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
 retains v2 even when its constraint is null. Unknown versions are rejected.
-The eleven templates are `microstrip`, `stripline`, `coupled_microstrip`,
+The twelve templates are `microstrip`, `stripline`, `coupled_microstrip`,
 `grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline` and
-`coupled_layered_stripline`. Parameters follow their SI contracts;
+`coupled_layered_stripline`, plus `coupled_coated_microstrip`. Parameters follow their SI contracts;
 all template defaults and the nominal resolved mesh settings are saved. A saved
 `None` for an automatic template dimension retains its existing template rule,
 which can change the generated box size when another dimension changes. Supply
 explicit air/box dimensions when those must remain fixed.
 
 `quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`,
-`broadside_stripline`, `coupled_grounded_coplanar` and `coupled_layered_stripline`, otherwise `z0`.
+`broadside_stripline`, `coupled_grounded_coplanar`, `coupled_layered_stripline` and
+`coupled_coated_microstrip`, otherwise `z0`.
 This extends the supported template names
 without changing schema fields or existing plan semantics. Older readers reject
 the newly supported names; save the SIPI version alongside the input. Sampling uses

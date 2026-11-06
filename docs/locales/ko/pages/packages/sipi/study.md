@@ -36,13 +36,13 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `grounded_coplanar`,
 `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
 및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`
-총 11종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+및 `coupled_coated_microstrip` 총 12종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
 
 `quantity`는 `coupled_microstrip`, `coupled_stripline`, `broadside_stripline`,
-`coupled_grounded_coplanar`, `coupled_layered_stripline`에서 `z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
+`coupled_grounded_coplanar`, `coupled_layered_stripline`, `coupled_coated_microstrip`에서 `z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
 템플릿 이름을 확장합니다. 이전 판독기는 새 이름을 거부하므로 입력과 함께 SIPI 버전을 기록하세요.
 독립 변수는 템플릿 매개변수 이름 1–8개를 중복 없이 지정하고 나열 순서를 유지합니다.
 

@@ -19,11 +19,12 @@ __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 _TEMPLATES = {name: getattr(templates, name) for name in
               ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
-               'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline')}
+               'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
+               'coupled_coated_microstrip')}
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
-                         'coupled_grounded_coplanar', 'coupled_layered_stripline'))
+                         'coupled_grounded_coplanar', 'coupled_layered_stripline', 'coupled_coated_microstrip'))
 _HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar',
-                             'coupled_layered_stripline'))
+                             'coupled_layered_stripline', 'coupled_coated_microstrip'))
 
 
 def _numbers(value):
@@ -104,7 +105,7 @@ class ImpedanceStudy:
 
 
 class ImpedanceStudyDocument:
-    """Strict impedance-study/1 or /2, eleven templates and resolved nominal mesh.
+    """Strict impedance-study/1 or /2, twelve templates and resolved nominal mesh.
 
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.

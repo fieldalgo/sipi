@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Planar-coated paired traces](coated_pair.md) also support saved studies and width goals.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/manufacturing_sections.md)
 
 [Overview](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) · [Templates and JSON](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/design.md)

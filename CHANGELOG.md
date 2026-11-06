@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add planar-coated paired microstrip with independent electrostatic checks, section JSON replay, tolerance sampling and saved impedance design support.
+
 - Add single/symmetric-pair propagation and exact traveling-wave conductor/dielectric attenuation contributions, reusing extracted RLGC and explicitly excluding DC and asymmetric modes.
 
 - Add explicit near/far network cascade and removal of supplied known fixtures, with analytical and independent network checks and conditioning limits.
