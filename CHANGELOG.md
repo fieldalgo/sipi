@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit near/far network cascade and removal of supplied known fixtures, with analytical and independent network checks and conditioning limits.
+
 - Add immutable positive-real S-parameter reference changes with analytic open/short/through checks and independent scikit-rf comparisons.
 
 - Add strict JSON design requests that preserve impedance goals, search bounds, evaluation budgets and geometry constraints while reusing bounded search and refinement checks.

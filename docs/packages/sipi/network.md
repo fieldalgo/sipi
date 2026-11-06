@@ -1,5 +1,7 @@
 # Uniform transmission-line networks
 
+[Network connection and known-fixture removal](connection.md)
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)
 
 [Cross-section overview](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) · [Validation](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network_validation.md)

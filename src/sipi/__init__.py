@@ -39,10 +39,12 @@ from .plane import (COPPER_CONDUCTIVITY, IRDropResult, PowerPlane, Sink, Source,
 from .quasistatic import LineParameters, capacitance_matrix, line_parameters
 
 from .network import LineNetwork, rlgc_network, quasistatic_network
+from .connection import cascade_networks, deembed_network
 
 __version__ = "0.1.0"
 __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
            "LineNetwork", "rlgc_network", "quasistatic_network",
+           "cascade_networks", "deembed_network",
            "capacitance_matrix", "line_parameters", "CrossSectionDocument",
            "microstrip", "stripline", "coupled_microstrip", "grounded_coplanar",
            "coupled_grounded_coplanar",

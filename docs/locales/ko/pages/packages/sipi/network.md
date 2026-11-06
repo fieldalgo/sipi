@@ -1,5 +1,7 @@
 # 균일 전송선 네트워크
 
+[네트워크 연결과 알려진 fixture 제거](connection.md)
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network.md) | **한국어**
 
 [고주파 도체 표면 손실](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/conductor.md)은 별도 추출 API이며 외부·내부 L을 합쳐 네트워크에 전달합니다.
