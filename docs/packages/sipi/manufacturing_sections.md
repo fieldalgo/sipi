@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.
+
 [Coated unbacked coplanar sections](coated_unbacked.md) support saved studies and goals.
 
 [Unbacked coplanar sections](unbacked_coplanar.md) also support saved studies and goals.

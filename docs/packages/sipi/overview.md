@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.
+
 [Transverse tensor electrostatics](tensor_electrostatics.md) is available through the mesh APIs.
 
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/overview.md)

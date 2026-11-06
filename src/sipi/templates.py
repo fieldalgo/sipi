@@ -17,6 +17,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar',
            'unbacked_coplanar', 'coupled_unbacked_coplanar',
            'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar',
+           'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip',
            'with_surface_mask']
 
 
@@ -242,6 +243,80 @@ def coupled_coated_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
         thickness=thickness, tan_delta=tan_delta, coating_tan_delta=coating_tan_delta,
         air_height=air_height, box_width=box_width, top_width=top_width)
     return _unbacked_coplanar(base, lower_air_height)
+
+
+def _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height):
+    """Union a planar film and exact straight-side offset envelopes."""
+    from shapely.geometry import Polygon, box
+    from shapely.ops import unary_union
+    from .polygons import DielectricRegion
+
+    d = _positive('coating_thickness', coating_thickness)
+    eps = _positive('coating_eps_r', coating_eps_r)
+    loss = _positive('coating_tan_delta', coating_tan_delta, zero=True)
+    h, half = base.layers[0].thickness, base.width/2
+    thickness = max(trace.thickness for trace in base.traces)
+    air = base.layers[1].thickness if air_height is None else _positive('air_height', air_height)
+    if not (h+d > h and h+thickness+d > h+thickness):
+        raise ValueError('coating_thickness cannot be resolved at the substrate/trace height')
+    shapes = [box(-half, h, half, h+d)]
+    for trace in base.traces:
+        top = trace.width if trace.top_width is None else trace.top_width
+        if top > trace.width:
+            raise ValueError('conformal coating requires top_width <= width; overhangs are unsupported')
+        if trace.thickness == 0:
+            continue  # A thin strip has no raised surface; the film is planar.
+        # For side slope s=(width-top)/(2*t), delta=d/(sqrt(1+s*s)+s).
+        # The half-angle form avoids subtracting nearly equal large numbers.
+        delta = d*math.tan(.5*math.atan2(trace.thickness, (trace.width-top)/2))
+        left, right = trace.x-trace.width/2-delta, trace.x+trace.width/2+delta
+        if left < -half or right > half:
+            raise ValueError('conformal coating extends outside box_width; increase the box')
+        shapes.append(Polygon([(left,h+d), (right,h+d),
+            (trace.x+top/2+delta,h+trace.thickness+d),
+            (trace.x-top/2-delta,h+trace.thickness+d)]))
+    coating = unary_union(shapes)
+    if coating.geom_type != 'Polygon' or coating.interiors or coating.is_empty or not coating.is_valid:
+        raise ValueError('conformal coating must form one simple region without enclosed air pockets')
+    region = DielectricRegion('coating', tuple(coating.exterior.coords)[:-1], eps, loss)
+    section = CrossSection([base.layers[0], Layer('air', thickness+d+air)],
+                           base.traces, base.width, dielectric_regions=[region])
+    if section.height <= coating.bounds[3]:
+        raise ValueError('air_height cannot be resolved above the conformal coating')
+    return section
+
+
+def conformal_coated_microstrip(*, width, substrate_height, eps_r,
+                               coating_thickness, coating_eps_r, thickness=0.0,
+                               tan_delta=0.0, coating_tan_delta=0.0,
+                               air_height=None, box_width=None, top_width=None):
+    """One trace with a straight-sided, mitered conformal dielectric film.
+
+    coating_thickness is normal to the substrate, trace top and sloping sides;
+    corner offsets meet at miters. Only rectangles or narrowing-top trapezoids
+    are supported. Upper air starts above the highest coated trace. This is
+    not a meniscus, rounded-corner or measured deposition model.
+    """
+    base = microstrip(width=width, substrate_height=substrate_height, eps_r=eps_r,
+        thickness=thickness, tan_delta=tan_delta, air_height=None,
+        box_width=box_width, top_width=top_width)
+    return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
+
+
+def coupled_conformal_coated_microstrip(*, width, gap, substrate_height, eps_r,
+                                       coating_thickness, coating_eps_r, thickness=0.0,
+                                       tan_delta=0.0, coating_tan_delta=0.0,
+                                       air_height=None, box_width=None, top_width=None):
+    """Equal surface pair with a mitered normal-thickness dielectric film.
+
+    gap is the signal bottom-edge spacing. Meeting coating envelopes are
+    united as one material; no enclosed air pocket or implicit box clipping.
+    Top widths may not exceed bottom widths. Upper air starts above the film.
+    """
+    base = coupled_microstrip(width=width, gap=gap, substrate_height=substrate_height,
+        eps_r=eps_r, thickness=thickness, tan_delta=tan_delta, air_height=None,
+        box_width=box_width, top_width=top_width)
+    return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
 
 
 def coated_microstrip(*, width, substrate_height, eps_r, coating_height,

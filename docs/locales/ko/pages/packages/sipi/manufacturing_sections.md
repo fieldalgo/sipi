@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[법선 두께 코팅 단면](conformal_coating.md): 단일선·쌍과 저장형 공차·역산.
+
 [후면 접지면 없는 코팅 coplanar](coated_unbacked.md)도 저장형 공차·역산을 지원합니다.
 
 [후면 접지면 없는 coplanar](unbacked_coplanar.md)도 저장형 공차·역산을 지원합니다.

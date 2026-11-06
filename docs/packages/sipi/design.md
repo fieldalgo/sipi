@@ -1,5 +1,7 @@
 # Cross-section templates, documents and impedance design
 
+[Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/design.md)
 
 [SIPI overview](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md)

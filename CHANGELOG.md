@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add single and paired surface traces with mitered normal-thickness dielectric films, saved geometry/material studies and width goals, with independent field and convergence checks.
+
 - Add full conductor-coordinate characteristic and forward-transfer matrices for asymmetric reciprocal RLGC, with physical branch selection, independent modal references and power-balance checks.
 
 - Preserve fixed-frequency scalar/principal-axis materials in saved geometry-tolerance studies and bounded impedance goals, including refined-mesh replay and explicit real quasi-static impedance limits.

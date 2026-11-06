@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[법선 두께 코팅 단면](conformal_coating.md): 단일선·쌍과 저장형 공차·역산.
+
 메시 API에서 [횡방향 텐서 정전계](tensor_electrostatics.md)를 사용할 수 있습니다.
 
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) | **한국어**

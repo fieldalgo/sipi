@@ -1,5 +1,7 @@
 # 단면 템플릿·문서·목표 임피던스 설계
 
+[법선 두께 코팅 단면](conformal_coating.md): 단일선·쌍과 저장형 공차·역산.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/design.md) | **한국어**
 
 [SIPI 개요](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/overview.md)
