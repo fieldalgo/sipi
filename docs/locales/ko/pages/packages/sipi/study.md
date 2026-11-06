@@ -31,12 +31,15 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `from_dict`, `loads`, `to_dict`, `dumps`로 검사·복사·저장합니다.
 미등록/누락 필드, JSON 중복 키, NaN/Infinity, bool 수치와 잘못된 형상을 거부합니다.
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `grounded_coplanar`,
-`coated_microstrip`입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+`coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
+총 8종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
 
-`quantity`는 `coupled_microstrip`에서 `z_diff`, 나머지에서는 `z0`입니다.
+`quantity`는 `coupled_microstrip`, `coupled_stripline`, `broadside_stripline`에서
+`z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
+템플릿 이름을 확장합니다. 이전 판독기는 새 이름을 거부하므로 입력과 함께 SIPI 버전을 기록하세요.
 독립 변수는 템플릿 매개변수 이름 1–8개를 중복 없이 지정하고 나열 순서를 유지합니다.
 
 | `sampling.kind` | `kind` 외 필수 필드 | 변수 필드 |
@@ -67,13 +70,17 @@ NumPy `Generator(PCG64(seed))`를 사용합니다. 정규분포는 **비유계**
 
 ## 고정 피치
 
-`fixed_pitch_m`은 `None` 또는 coupled_microstrip의 양의 중심 간 거리입니다.
+`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline의 양의 수평 중심 간 거리입니다.
 독립 변수에 width가 있어야 하고 gap을 독립적으로 샘플링할 수 없습니다.
 nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 각 행의 `gap=pitch-width`로 두 선의 중심 위치를 유지합니다. 사다리꼴은 기존
 템플릿의 바닥 선폭을 기준으로 합니다. 유한 범위 모서리에서 gap<=0이면 생성 시
 거부하고, 정규 표본에서 발생하면 오류 행으로 보존합니다. 통계 상관 매개변수가
 아니라 결정적 형상 제약입니다.
+
+`broadside_stripline`의 `gap`은 금속 표면 사이 수직 간격이고 `offset`은 부호 있는
+수평 변위입니다. 각각 직접 샘플링하며 `fixed_pitch_m`은 거부합니다. 양의 도체
+두께와 접지면 이격 등 기존 템플릿의 형상 제약을 그대로 적용합니다.
 
 ## 계산·실패·통계
 
@@ -99,7 +106,7 @@ CrossSectionDocument·임피던스 Ω 또는 None·error_type/error가 있습니
 ## 검증
 
 ```sh
-OPENBLAS_NUM_THREADS=1 python -m pytest -q tests/sipi/test_study.py
+OPENBLAS_NUM_THREADS=1 PYTHONPATH=src python -m pytest -q tests/sipi/test_study.py tests/sipi/test_stripline_studies.py
 python examples/sipi/tolerance_study.py
 ```
 
@@ -115,3 +122,8 @@ sweep/corners 끝점·순서, uniform 범위, seed/JSON 재현을 검사합니�
 형상의 무재추출 보존, 해석 오류, budget, 잘못된 JSON·상관/shape/seed도 검사합니다.
 기존 단면 해석 기준과 수렴 한계를 유지합니다.
 [실행 예제](https://github.com/fieldalgo/sipi/blob/main/examples/sipi/tolerance_study.py).
+
+추가한 스트립라인 3종은 네 샘플링 방식 모두 JSON 저장·복원을 검사합니다.
+균일 유전체에서 형상을 고정하고 상대 유전율을 1에서 4로 바꾸면 임피던스가 절반이
+되는 해석적 관계를 실제 FEM 분석에서 상대 1e-9 이내로 요구합니다. 재료 스케일링과
+분석 연결 검증이며 절대 형상 정확도나 메시 수렴을 입증하지 않습니다.

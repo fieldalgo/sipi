@@ -31,14 +31,18 @@ The strict `sipi.impedance-study/1` object has exactly `schema`, `template`,
 `parameters`, `sampling`, `quantity`, `mesh`, `fixed_pitch_m`. Use `from_dict`,
 `loads`, `to_dict`, `dumps` to validate, copy and save it. Unknown/missing fields,
 duplicate JSON keys, NaN/Infinity, boolean numbers and invalid geometry are rejected.
-The five templates are `microstrip`, `stripline`, `coupled_microstrip`,
-`grounded_coplanar`, `coated_microstrip`. Parameters follow their SI contracts;
+The eight templates are `microstrip`, `stripline`, `coupled_microstrip`,
+`grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`
+and `broadside_stripline`. Parameters follow their SI contracts;
 all template defaults and the nominal resolved mesh settings are saved. A saved
 `None` for an automatic template dimension retains its existing template rule,
 which can change the generated box size when another dimension changes. Supply
 explicit air/box dimensions when those must remain fixed.
 
-`quantity` is `z_diff` for `coupled_microstrip`, otherwise `z0`. Sampling uses
+`quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline` and
+`broadside_stripline`, otherwise `z0`. This extends the supported template names
+without changing schema fields or existing plan semantics. Older readers reject
+the newly supported names; save the SIPI version alongside the input. Sampling uses
 1–8 distinct template parameter names, in the listed order:
 
 | `sampling.kind` | Required fields beyond `kind` | Variable fields |
@@ -71,13 +75,18 @@ maps, including derived parameters. No FEM solve runs in either method.
 ## Fixed pitch
 
 `fixed_pitch_m` is `None`, or a positive centre-to-centre pitch for
-`coupled_microstrip`. Fixed pitch requires `width` among the independent variables
+`coupled_microstrip` or `coupled_stripline`. Fixed pitch requires `width` among the independent variables
 and forbids independent `gap` sampling. Nominal width+gap must equal pitch within
 relative 1e-12. Every row derives `gap = pitch - width`, keeping both trace centres
 fixed. The gap follows the bottom widths used by the existing tapered template.
 Bounded corners with nonpositive gap are rejected at construction. Normal samples
 that cross zero gap are retained as invalid rows. This is a deterministic geometric
 constraint, not an additional statistical correlation parameter.
+
+In `broadside_stripline`, `gap` is the vertical metal-to-metal separation and
+`offset` is the signed horizontal displacement. Sample either directly;
+`fixed_pitch_m` is rejected for this template. Its positive conductor thickness
+and all ground-clearance requirements remain enforced by the template.
 
 ## Evaluation, failures and summaries
 
@@ -106,7 +115,7 @@ separate from this Python API.
 ## Validation
 
 ```sh
-OPENBLAS_NUM_THREADS=1 python -m pytest -q tests/sipi/test_study.py
+OPENBLAS_NUM_THREADS=1 PYTHONPATH=src python -m pytest -q tests/sipi/test_study.py tests/sipi/test_stripline_studies.py
 python examples/sipi/tolerance_study.py
 ```
 
@@ -125,3 +134,9 @@ independent accuracy claim. Tests also cover invalid normal geometries without
 resampling, retained solver failures, execution budgets, malformed JSON and
 invalid covariance/shape/seed inputs. Existing cross-section analytical references
 and convergence limits still apply. [Executable example](https://github.com/fieldalgo/sipi/blob/main/examples/sipi/tolerance_study.py).
+
+All three added stripline templates replay all four sampling modes through JSON.
+For unchanged geometry in a homogeneous dielectric, changing relative permittivity
+from 1 to 4 halves impedance; actual FEM studies must satisfy this analytical
+scaling law within relative 1e-9. This checks material scaling and study composition,
+not absolute geometry accuracy or mesh convergence.

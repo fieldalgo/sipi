@@ -17,7 +17,10 @@ from .document import CrossSectionDocument, _keys, _unique_object
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
 _TEMPLATES = {name: getattr(templates, name) for name in
-              ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip')}
+              ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
+               'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline')}
+_DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline'))
+_HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline'))
 
 
 def _numbers(value):
@@ -92,11 +95,12 @@ class ImpedanceStudy:
 
 
 class ImpedanceStudyDocument:
-    """Strict sipi.impedance-study/1, five templates and resolved nominal mesh.
+    """Strict sipi.impedance-study/1, eight templates and resolved nominal mesh.
 
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.
-    Fixed pitch applies only to the symmetric coupled_microstrip template.
+    Fixed horizontal pitch applies to coupled_microstrip and coupled_stripline.
+    The broadside gap is vertical and is never derived from horizontal pitch.
     """
     def __init__(self, template, parameters, *, sampling, quantity, mesh=None, fixed_pitch_m=None):
         self._data = self._validate(dict(schema='sipi.impedance-study/1', template=template,
@@ -127,7 +131,7 @@ class ImpedanceStudyDocument:
             raise ValueError('mesh must be an object')
         doc = CrossSectionDocument(section, mesh=data['mesh'])
         mesh = section.mesh_settings(**doc.mesh_options)
-        quantity = 'z_diff' if template == 'coupled_microstrip' else 'z0'
+        quantity = 'z_diff' if template in _DIFFERENTIAL else 'z0'
         if data['quantity'] != quantity:
             raise ValueError(f'this template requires quantity={quantity}')
         sampling = data['sampling']
@@ -178,8 +182,9 @@ class ImpedanceStudyDocument:
         pitch = data['fixed_pitch_m']
         if pitch is not None:
             pitch = _scalar(pitch, positive=True)
-            if template != 'coupled_microstrip' or 'width' not in names or 'gap' in names:
-                raise ValueError('fixed pitch requires coupled_microstrip width sampling, without gap sampling')
+            if template not in _HORIZONTAL_PAIRS or 'width' not in names or 'gap' in names:
+                raise ValueError('fixed pitch requires coupled_microstrip or coupled_stripline '
+                                 'width sampling, without gap sampling')
             if abs(parameters['width']+parameters['gap']-pitch) > 1e-12*pitch:
                 raise ValueError('nominal width + gap must equal fixed pitch')
         canonical = dict(schema=data['schema'], template=template, parameters=parameters,
