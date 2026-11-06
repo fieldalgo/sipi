@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Coated unbacked coplanar sections](coated_unbacked.md) support saved studies and goals.
+
 [Unbacked coplanar sections](unbacked_coplanar.md) also support saved studies and goals.
 
 [Planar-coated coplanar sections](coated_coplanar.md) support JSON, studies and goals.

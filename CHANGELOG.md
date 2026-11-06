@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add planar-coated single and paired coplanar sections without a backing ground plane, with saved studies, width goals and independent field/convergence checks.
+
 - Save explicit network assembly with ideal junctions, validated port metadata, one extraction per geometry component, and existing transformation/circuit integration.
 
 - Add explicit named port connections and ideal Kirchhoff junctions, with independent network checks and analytic one-dimensional shunt-stub validation.
