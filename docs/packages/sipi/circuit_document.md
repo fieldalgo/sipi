@@ -1,6 +1,7 @@
 # Saved circuit inputs
 
 [Saved network transformations](network_document.md) are also accepted as `network-transform` inputs.
+[Saved network assembly](network_assembly.md) is accepted as `network-assembly`.
 
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/circuit_document.md)
 
@@ -44,8 +45,10 @@ executed. `to_dict()` returns a fresh copy; construction snapshots all inputs.
 | `touchstone` | `text`, `ports`, `port_names` | Embedded supported single-ended Touchstone S text; positive integer count and explicit name array, in file order |
 | `transmission-line` | `document` | Complete [shared-mesh line document](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/line_model.md), including its schema; explicit perfect/surface conductor choice |
 | `volume-line` | `document` | Complete [matched finite-metal/dielectric document](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/volume_line.md), including its schema and all volume mesh settings |
+| `network-transform` | `document` | Complete [saved transformation sequence](network_document.md), including an optional assembly source |
+| `network-assembly` | `document` | Complete [saved explicit assembly](network_assembly.md), with final current port metadata |
 
-The first two kinds hold supplied network data. The last two retain the geometry,
+The first two kinds hold supplied network data. The two line kinds retain the geometry,
 materials, sampling, length and reference; they extract RLGC/S during `analyze()`.
 Resolved nested defaults are saved by the original document validators. Sources
 and loads are checked against the documented port names and frequency count
@@ -93,7 +96,8 @@ explicit real/imag objects; it never serializes language-specific complex syntax
 - `network`: that response's network snapshot.
 - `crosstalk`: `Crosstalk` for that excitation, otherwise `None`.
 - `extraction`: the line result for a geometry-backed kind, the transformation
-  result for network-transform, otherwise `None`; original line diagnostics remain nested.
+  result for network-transform, the assembly result for network-assembly, otherwise
+  `None`; original component diagnostics remain nested.
 
 Exceptions from mesh, material, skin-resolution, conditioning and residual checks
 remain failures; no partial-success fallback, extrapolation or silent model change

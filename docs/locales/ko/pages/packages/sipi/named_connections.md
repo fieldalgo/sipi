@@ -62,8 +62,8 @@ KCL·공통 전압·상호성·유니터리성·연결한 노드의 동등성·�
 검사합니다. 이는 회로 행렬 검증이며 FEM 메시 수렴이나 실측 기판 검증이 아닙니다.
 
 Python 함수는 기존 저장형 선로 입력의 네트워크를 받아 Touchstone을 만들 수
-있습니다. 이름 배선과 이상적인 노드의 저장형 조립 스키마는 아직 없으며
-`NetworkTransformDocument`는 기존 문서에 명시된 연산만 지원합니다.
+있습니다. [NetworkAssemblyDocument](network_assembly.md)는 이름 배선과 이상적인
+노드의 조립 순서를 저장하고 기존 변환·회로 입력으로 연결합니다.
 
 [near/far 연결](connection.md) · [포트 부하](port_reduction.md) ·
 [네트워크 모델](network.md) · [English](../../../../../packages/sipi/named_connections.md)

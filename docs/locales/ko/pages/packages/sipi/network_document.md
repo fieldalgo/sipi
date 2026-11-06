@@ -19,7 +19,8 @@ result = NetworkTransformDocument.loads(plan.dumps()).analyze()
 결과는 기준 75Ω의 near:trace 포트 하나입니다. 엄격 스키마
 `sipi.network-transforms/1`의 필드는 schema·network·operations뿐입니다.
 원본은 기존 [회로 네트워크 입력](circuit_document.md)의 rlgc·인라인 touchstone·
-transmission-line·volume-line 중 하나이며 전체 입력과 유효성 검사를 유지합니다.
+transmission-line·volume-line·[network-assembly](network_assembly.md) 중 하나이며
+전체 입력과 유효성 검사를 유지합니다.
 변환 문서를 다시 원본으로 넣을 수 없습니다. 재귀 계획·파일 경로·URL·표현식·
 네트워크 접근은 없습니다.
 
@@ -44,13 +45,13 @@ port_names는 최종 포트의 tuple입니다. to_dict는 새 맵을 반환합�
 
 analyze는 원본을 한 번 추출한 뒤 기존 LineNetwork.renormalized와 terminate_ports를
 순서대로 호출합니다. NetworkTransformResult는 network·source_network·정확한
-input_json·extraction(원래 선로 결과 또는 명시 네트워크이면 None)을 보존합니다.
+input_json·extraction(원래 선로/조립 결과 또는 명시 네트워크이면 None)을 보존합니다.
 특이 피드백·조건수·메시·재료 오류는 그대로 전달하며 부분 성공이나 단계 생략은 없습니다.
 
 기존 CircuitDocument에서
 `network={"kind":"network-transform", "document":plan.to_dict()}`로 연결합니다.
 소스·부하 이름은 최종 포트를 가리키며 제거한 이름은 추출 전에 거부합니다.
-CircuitResult.extraction은 변환 결과이며 그 extraction이 원래 기하 선로 결과를
+CircuitResult.extraction은 변환 결과이며 그 extraction이 원래 선로/조립 결과를
 보존합니다. 기존 회로 스키마의 의미는 유지합니다. 이전 판독기는 새 kind를
 거부하므로 SIPI 버전을 함께 기록하세요.
 

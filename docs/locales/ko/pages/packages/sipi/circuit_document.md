@@ -1,6 +1,7 @@
 # 회로 계산 입력 저장
 
 [저장형 네트워크 변환](network_document.md)을 `network-transform` 입력으로 사용할 수 있습니다.
+[저장형 네트워크 조립](network_assembly.md)은 `network-assembly`로 받습니다.
 
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/circuit_document.md) | **한국어**
 
@@ -43,8 +44,10 @@ NumPy 배열, 문자열이 아닌 객체 키는 거부합니다. 문자열 실�
 | `touchstone` | `text`, `ports`, `port_names` | 지원하는 single-ended S 본문, 양의 정수 포트 수와 파일 순서의 명시 이름 배열 |
 | `transmission-line` | `document` | 스키마까지 포함한 [공유 메시 선로 문서](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/line_model.md), perfect/surface 도체 선택 명시 |
 | `volume-line` | `document` | 스키마와 전체 메시 설정을 포함한 [동일 기하 금속·유전체 문서](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/volume_line.md) |
+| `network-transform` | `document` | 조립 원본을 포함할 수 있는 [저장형 변환 순서](network_document.md) 전체 |
+| `network-assembly` | `document` | 최종 포트 메타데이터가 있는 [저장형 명시 조립](network_assembly.md) 전체 |
 
-앞 두 종류는 주어진 네트워크 데이터입니다. 뒤 두 종류는 형상·재료·주파수·길이·
+앞 두 종류는 주어진 네트워크 데이터입니다. 두 선로 종류는 형상·재료·주파수·길이·
 기준 임피던스를 보존하고 `analyze()`에서 RLGC/S를 추출합니다. 기존 문서가
 해결한 기본값을 저장합니다. 소스/부하 이름과 주파수 길이는 **메시 생성 전에**
 검사하고 실제 추출된 포트 순서·주파수와도 일치해야 합니다.
@@ -88,7 +91,8 @@ bool·문자열·null은 수치가 아닙니다. 스칼라는 모든 주파수�
   기존 peak/DC 전력 정의를 유지합니다.
 - `network`: response가 보존한 네트워크 스냅샷.
 - `crosstalk`: 해당 구동 종류의 `Crosstalk`, 아니면 `None`.
-- `extraction`: 형상 기반 선로 결과(RLGC·기존 진단 포함), network-transform이면 변환 결과, 나머지는 `None`.
+- `extraction`: 형상 기반 선로 결과(RLGC·기존 진단 포함), network-transform이면 변환 결과,
+  network-assembly이면 조립 결과, 나머지는 `None`. 원래 구성 요소의 진단도 내부에 남습니다.
 
 메시·재료·표피 해상도·조건수·잔차 실패를 그대로 전달합니다. 부분 성공,
 외삽·자동 모델 변경을 하지 않습니다. 이 계약은 **입력** 스키마이며 결과 저장

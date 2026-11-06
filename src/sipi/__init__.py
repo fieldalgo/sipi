@@ -46,6 +46,7 @@ from .connection import cascade_networks, deembed_network, connect_networks, ide
 from .propagation import LinePropagation, rlgc_propagation
 from .termination import terminate_ports
 from .network_document import NetworkTransformDocument, NetworkTransformResult
+from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
 __version__ = "0.1.0"
 __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
@@ -54,6 +55,7 @@ __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion",
            "LinePropagation", "rlgc_propagation",
            "terminate_ports",
            "NetworkTransformDocument", "NetworkTransformResult",
+           "NetworkAssemblyDocument", "NetworkAssemblyResult",
            "capacitance_matrix", "line_parameters", "CrossSectionDocument",
            "microstrip", "stripline", "coupled_microstrip", "grounded_coplanar",
            "coupled_grounded_coplanar",

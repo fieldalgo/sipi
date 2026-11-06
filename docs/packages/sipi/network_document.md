@@ -20,7 +20,8 @@ result = NetworkTransformDocument.loads(plan.dumps()).analyze()
 The strict schema `sipi.network-transforms/1` has exactly `schema`, `network`
 and `operations`. The base network uses the existing [circuit network input
 contracts](circuit_document.md): `rlgc`, inline `touchstone`,
-`transmission-line`, or `volume-line`. Their complete input and validity
+`transmission-line`, `volume-line`, or [network-assembly](network_assembly.md).
+Their complete input and validity
 requirements are preserved. A transformation cannot itself be a base network;
 there are no recursive plans, file paths, URLs, expressions or network access.
 
@@ -48,15 +49,15 @@ RLGC/Touchstone parsing may perform numerical network construction.
 `analyze()` extracts the base network once, then applies
 `LineNetwork.renormalized` and `terminate_ports` in order. The returned
 `NetworkTransformResult` holds `network`, `source_network`, exact canonical
-`input_json`, and `extraction` (the original line result, or None for an explicit
-network). Singular feedback, conditioning, mesh and material errors propagate;
+`input_json`, and `extraction` (the original line or assembly result, or None for
+an explicit network). Singular feedback, conditioning, mesh and material errors propagate;
 there is no partial-success result or silent step removal.
 
 Existing `CircuitDocument` accepts
 `network={"kind":"network-transform", "document":plan.to_dict()}`. Its
 source/load names address the **final** ports; removed ports are rejected
 before extraction. `CircuitResult.extraction` then holds the transformation
-result, whose `extraction` holds any original geometry-based line result.
+result, whose `extraction` holds the original line or assembly result.
 Existing circuit schema/version semantics remain unchanged. Older readers
 reject the new kind; record the SIPI version with saved inputs.
 

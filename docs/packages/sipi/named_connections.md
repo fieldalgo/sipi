@@ -69,8 +69,8 @@ These are network-algebra checks; no FEM mesh-convergence or measured-board clai
 is attached to an ideal junction.
 
 The Python functions can consume networks from existing saved line inputs and
-produce Touchstone. Named wiring and ideal nodes do not yet have a saved assembly
-schema; `NetworkTransformDocument` still supports its documented operations only.
+produce Touchstone. [NetworkAssemblyDocument](network_assembly.md) saves ordered
+named wiring and ideal nodes, and feeds the existing transformations and circuits.
 
 [Near/far composition](connection.md) · [Port loads](port_reduction.md) ·
 [Network model](network.md) · [한국어](../../locales/ko/pages/packages/sipi/named_connections.md)

@@ -28,6 +28,36 @@ def ideal_junction(frequency, *, port_names, z_ref=50.0):
     return LineNetwork(f, np.broadcast_to(s, (len(f), *s.shape)), z, tuple(port_names))
 
 
+def _connection_layout(left_ports, left_refs, right_ports, right_refs, connections, port_names):
+    """Validate named wiring without constructing S or extracting geometry."""
+    if not isinstance(connections, (list, tuple)) or not connections:
+        raise ValueError('connections must list at least one pair of port names')
+    na, nb = len(left_ports), len(right_ports)
+    internal = []
+    for pair in connections:
+        if (not isinstance(pair, (list, tuple)) or len(pair) != 2
+                or any(not isinstance(p, str) for p in pair)
+                or pair[0] not in left_ports or pair[1] not in right_ports):
+            raise ValueError('each connection needs a known left and right port name')
+        a, b = left_ports.index(pair[0]), right_ports.index(pair[1])
+        if a in internal or na+b in internal:
+            raise ValueError('a port cannot participate in more than one connection')
+        _references_match(left_refs[a], right_refs[b])
+        internal.extend((a, na+b))
+    external = [i for i in range(na+nb) if i not in internal]
+    if not external:
+        raise ValueError('at least one external port must remain')
+    names = left_ports+right_ports
+    try:
+        names = tuple(names[i] for i in external) if port_names is None else tuple(port_names)
+    except TypeError as exc:
+        raise ValueError('port_names must contain one name per external port') from exc
+    if (len(names) != len(external) or any(not isinstance(p, str) or not p.strip()
+            or '\n' in p or '\r' in p for p in names) or len(set(names)) != len(names)):
+        raise ValueError('port_names must contain one unique single-line name per external port')
+    return internal, external, names, np.r_[left_refs, right_refs][external]
+
+
 def connect_networks(left, right, connections, *, port_names=None):
     """Join explicit (left port, right port) pairs in two single-ended networks.
 
@@ -48,26 +78,9 @@ def connect_networks(left, right, connections, *, port_names=None):
             raise ValueError('connections require single-ended networks')
     if not np.array_equal(left.frequency, right.frequency):
         raise ValueError('networks must have identical frequency samples')
-    if not isinstance(connections, (list, tuple)) or not connections:
-        raise ValueError('connections must list at least one pair of port names')
     na, nb = len(left.port_names), len(right.port_names)
-    internal = []
-    for pair in connections:
-        if (not isinstance(pair, (list, tuple)) or len(pair) != 2
-                or any(not isinstance(p, str) for p in pair)
-                or pair[0] not in left.port_names or pair[1] not in right.port_names):
-            raise ValueError('each connection needs a known left and right port name')
-        a, b = left.port_names.index(pair[0]), right.port_names.index(pair[1])
-        if a in internal or na+b in internal:
-            raise ValueError('a port cannot participate in more than one connection')
-        _references_match(left.z_ref[a], right.z_ref[b])
-        internal.extend((a, na+b))
-    external = [i for i in range(na+nb) if i not in internal]
-    if not external:
-        raise ValueError('at least one external port must remain')
-    names = left.port_names+right.port_names
-    names = tuple(names[i] for i in external) if port_names is None else port_names
-    references = np.r_[left.z_ref, right.z_ref][external]
+    internal, external, names, references = _connection_layout(
+        left.port_names, left.z_ref, right.port_names, right.z_ref, connections, port_names)
     swap = np.arange(len(internal)).reshape(-1, 2)[:, ::-1].ravel()
     result = []
     for a, b in zip(left.s, right.s):

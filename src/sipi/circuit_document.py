@@ -77,6 +77,11 @@ def _network_input(data):
         from .network_document import NetworkTransformDocument
         doc = NetworkTransformDocument.from_dict(data['document'])
         return doc, dict(kind=kind, document=doc.to_dict()), doc.frequency, doc.port_names
+    if kind == 'network-assembly':
+        _keys(data, ('kind', 'document'), where='network assembly input')
+        from .assembly_document import NetworkAssemblyDocument
+        doc = NetworkAssemblyDocument.from_dict(data['document'])
+        return doc, dict(kind=kind, document=doc.to_dict()), doc.frequency, doc.port_names
     raise ValueError('unsupported network kind')
 
 
@@ -121,7 +126,8 @@ class CircuitResult:
 
     ``crosstalk`` is present only for a crosstalk excitation. ``extraction`` is
     the existing line result for a geometry-backed input, a transformation
-    result for network-transform inputs, otherwise None.
+    result for network-transform inputs, an assembly result for network-assembly,
+    otherwise None.
     """
     input_json: str
     response: TerminatedNetwork
