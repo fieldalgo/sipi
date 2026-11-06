@@ -1,5 +1,7 @@
 # Saved circuit inputs
 
+[Saved network transformations](network_document.md) are also accepted as `network-transform` inputs.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/circuit_document.md)
 
 [Overview](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) · [Terminations](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/termination.md) · [Touchstone](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/touchstone.md)
@@ -90,8 +92,8 @@ explicit real/imag objects; it never serializes language-specific complex syntax
   arrays, power and residual diagnostics with the original peak/DC conventions.
 - `network`: that response's network snapshot.
 - `crosstalk`: `Crosstalk` for that excitation, otherwise `None`.
-- `extraction`: the underlying line result for either geometry-backed kind,
-  otherwise `None`; this retains RLGC and existing extraction diagnostics.
+- `extraction`: the line result for a geometry-backed kind, the transformation
+  result for network-transform, otherwise `None`; original line diagnostics remain nested.
 
 Exceptions from mesh, material, skin-resolution, conditioning and residual checks
 remain failures; no partial-success fallback, extrapolation or silent model change

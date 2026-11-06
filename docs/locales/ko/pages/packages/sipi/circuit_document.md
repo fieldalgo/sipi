@@ -1,5 +1,7 @@
 # 회로 계산 입력 저장
 
+[저장형 네트워크 변환](network_document.md)을 `network-transform` 입력으로 사용할 수 있습니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/circuit_document.md) | **한국어**
 
 [개요](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/overview.md) · [종단 회로](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/termination.md) · [Touchstone](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/touchstone.md)
@@ -86,7 +88,7 @@ bool·문자열·null은 수치가 아닙니다. 스칼라는 모든 주파수�
   기존 peak/DC 전력 정의를 유지합니다.
 - `network`: response가 보존한 네트워크 스냅샷.
 - `crosstalk`: 해당 구동 종류의 `Crosstalk`, 아니면 `None`.
-- `extraction`: 두 형상 기반 종류의 선로 결과(RLGC·기존 진단 포함), 아니면 `None`.
+- `extraction`: 형상 기반 선로 결과(RLGC·기존 진단 포함), network-transform이면 변환 결과, 나머지는 `None`.
 
 메시·재료·표피 해상도·조건수·잔차 실패를 그대로 전달합니다. 부분 성공,
 외삽·자동 모델 변경을 하지 않습니다. 이 계약은 **입력** 스키마이며 결과 저장

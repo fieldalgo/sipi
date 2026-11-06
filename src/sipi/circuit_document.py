@@ -72,6 +72,11 @@ def _network_input(data):
         names = tuple(t.name for t in doc.cross_section.section.traces if not t.ground)
         ports = tuple('near:'+name for name in names) + tuple('far:'+name for name in names)
         return doc, dict(kind=kind, document=canonical), np.array(canonical['frequency_hz']), ports
+    if kind == 'network-transform':
+        _keys(data, ('kind', 'document'), where='network transformation input')
+        from .network_document import NetworkTransformDocument
+        doc = NetworkTransformDocument.from_dict(data['document'])
+        return doc, dict(kind=kind, document=doc.to_dict()), doc.frequency, doc.port_names
     raise ValueError('unsupported network kind')
 
 
@@ -115,7 +120,8 @@ class CircuitResult:
     """Circuit output with exact canonical input and optional line extraction.
 
     ``crosstalk`` is present only for a crosstalk excitation. ``extraction`` is
-    the existing line result for a geometry-backed input, otherwise None.
+    the existing line result for a geometry-backed input, a transformation
+    result for network-transform inputs, otherwise None.
     """
     input_json: str
     response: TerminatedNetwork

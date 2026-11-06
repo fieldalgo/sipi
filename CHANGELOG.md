@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict saved sequences of network reference changes and passive port reductions, with one source extraction and existing circuit-document integration.
+
 - Add explicit open, short and finite passive port reduction while preserving retained port order, references and basis, with singular-feedback rejection and independent network checks.
 
 - Add an explicit noncausal Groiss RMS surface-impedance correction and strict saved model selection, preserving the existing resistance-only and causal roughness definitions.
