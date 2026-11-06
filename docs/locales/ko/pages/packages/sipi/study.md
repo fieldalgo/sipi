@@ -40,14 +40,17 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `coupled_coated_grounded_coplanar`, `unbacked_coplanar`,
 `coupled_unbacked_coplanar`, `coated_unbacked_coplanar`,
 `coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
-`coupled_conformal_coated_microstrip` 총 20종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+`coupled_conformal_coated_microstrip`,
+`conformal_coated_grounded_coplanar`, `coupled_conformal_coated_grounded_coplanar`,
+`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 24종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
 
 `quantity`는 `coupled_microstrip`, `coupled_stripline`, `broadside_stripline`,
 `coupled_grounded_coplanar`, `coupled_layered_stripline`, `coupled_coated_microstrip`,
-`coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`에서 `z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
+`coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar`,
+`coupled_conformal_coated_unbacked_coplanar`에서 `z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
 템플릿 이름을 확장합니다. 이전 판독기는 새 이름을 거부하므로 입력과 함께 SIPI 버전을 기록하세요.
 독립 변수는 템플릿 매개변수 이름 1–8개를 중복 없이 지정하고 나열 순서를 유지합니다.
 
@@ -79,7 +82,7 @@ NumPy `Generator(PCG64(seed))`를 사용합니다. 정규분포는 **비유계**
 
 ## 고정 피치
 
-`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_grounded_coplanar·coupled_layered_stripline·coupled_coated_microstrip·coupled_coated_grounded_coplanar·coupled_unbacked_coplanar·coupled_coated_unbacked_coplanar·coupled_conformal_coated_microstrip의 양의 수평 중심 간 거리입니다.
+`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_grounded_coplanar·coupled_layered_stripline·coupled_coated_microstrip·coupled_coated_grounded_coplanar·coupled_unbacked_coplanar·coupled_coated_unbacked_coplanar·coupled_conformal_coated_microstrip·coupled_conformal_coated_grounded_coplanar·coupled_conformal_coated_unbacked_coplanar의 양의 수평 중심 간 거리입니다.
 독립 변수에 width가 있어야 하고 gap을 독립적으로 샘플링할 수 없습니다.
 nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 각 행의 `gap=pitch-width`로 두 선의 중심 위치를 유지합니다. 사다리꼴은 기존

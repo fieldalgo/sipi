@@ -18,6 +18,8 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'unbacked_coplanar', 'coupled_unbacked_coplanar',
            'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar',
            'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip',
+           'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar',
+           'conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar',
            'with_surface_mask']
 
 
@@ -125,9 +127,14 @@ def coupled_grounded_coplanar(*, width, gap, ground_gap, ground_width,
 def _unbacked_coplanar(base, lower_air_height):
     lower = (10*base.layers[0].thickness if lower_air_height is None else
              _positive('lower_air_height', lower_air_height))
-    return CrossSection([Layer('lower_air', lower), *base.layers],
-                        [replace(t, y=t.y+lower) for t in base.traces],
-                        base.width, bottom='open')
+    section = CrossSection([Layer('lower_air', lower), *base.layers],
+                           [replace(t, y=t.y+lower) for t in base.traces],
+                           base.width, bottom='open',
+                           dielectric_regions=[replace(r, vertices=tuple((x,y+lower) for x,y in r.vertices))
+                                               for r in base.dielectric_regions])
+    if section.dielectric_regions:
+        _check_conformal_resolution(section)
+    return section
 
 
 def unbacked_coplanar(*, width, gap, ground_width, substrate_height, eps_r,
@@ -245,6 +252,21 @@ def coupled_coated_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
     return _unbacked_coplanar(base, lower_air_height)
 
 
+def _check_conformal_resolution(section):
+    """Reject unresolved features before automatic meshing; never snap a gap."""
+    tolerance = 1e-12*max(section.width, section.height)
+    features = [layer.thickness for layer in section.layers]
+    features.extend(r.minimum_dimension for r in section.dielectric_regions)
+    features.append(section.height-max(r._shape.bounds[3] for r in section.dielectric_regions))
+    for trace in section.traces:
+        features.extend((trace.width, trace.width if trace.top_width is None else trace.top_width))
+        if trace.thickness > 0:
+            features.append(trace.thickness)
+    if min(features) <= tolerance:
+        raise ValueError('conformal coating features must exceed 1e-12 times the box scale; '
+                         'increase the unresolved film, gap, air or metal dimension')
+
+
 def _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height):
     """Union a planar film and exact straight-side offset envelopes."""
     from shapely.geometry import Polygon, box
@@ -275,7 +297,9 @@ def _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta,
         shapes.append(Polygon([(left,h+d), (right,h+d),
             (trace.x+top/2+delta,h+trace.thickness+d),
             (trace.x-top/2-delta,h+trace.thickness+d)]))
-    coating = unary_union(shapes)
+    # Remove exactly collinear seam vertices after unions. Positive-width air
+    # slits remain intact; no tolerance-based simplification or snapping.
+    coating = unary_union(shapes).simplify(0, preserve_topology=True)
     if coating.geom_type != 'Polygon' or coating.interiors or coating.is_empty or not coating.is_valid:
         raise ValueError('conformal coating must form one simple region without enclosed air pockets')
     region = DielectricRegion('coating', tuple(coating.exterior.coords)[:-1], eps, loss)
@@ -283,6 +307,7 @@ def _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta,
                            base.traces, base.width, dielectric_regions=[region])
     if section.height <= coating.bounds[3]:
         raise ValueError('air_height cannot be resolved above the conformal coating')
+    _check_conformal_resolution(section)
     return section
 
 
@@ -317,6 +342,79 @@ def coupled_conformal_coated_microstrip(*, width, gap, substrate_height, eps_r,
         eps_r=eps_r, thickness=thickness, tan_delta=tan_delta, air_height=None,
         box_width=box_width, top_width=top_width)
     return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
+
+
+def conformal_coated_grounded_coplanar(*, width, gap, ground_width, substrate_height,
+                                      eps_r, coating_thickness, coating_eps_r,
+                                      thickness=0.0, tan_delta=0.0, coating_tan_delta=0.0,
+                                      air_height=None, box_width=None, top_width=None):
+    """Normal-thickness mitered film over one signal and both finite grounds.
+
+    A bottom ground plane remains. gap is signal-to-ground bottom-edge spacing;
+    only the signal can taper. Upper air starts above the highest film surface.
+    The film covers the substrate, signal and rectangular coplanar grounds.
+    """
+    base = grounded_coplanar(width=width, gap=gap, ground_width=ground_width,
+        substrate_height=substrate_height, eps_r=eps_r, thickness=thickness,
+        tan_delta=tan_delta, air_height=None, box_width=box_width, top_width=top_width)
+    return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
+
+
+def coupled_conformal_coated_grounded_coplanar(*, width, gap, ground_gap, ground_width,
+                                              substrate_height, eps_r, coating_thickness,
+                                              coating_eps_r, thickness=0.0, tan_delta=0.0,
+                                              coating_tan_delta=0.0, air_height=None,
+                                              box_width=None, top_width=None):
+    """Coated equal signal pair between finite grounds above a backing plane.
+
+    gap is signal-to-signal and ground_gap outer-signal-to-ground clearance.
+    All bottom-edge dimensions are preserved; there is no central ground.
+    Normal-thickness mitered film covers signals and both rectangular grounds.
+    """
+    base = coupled_grounded_coplanar(width=width, gap=gap, ground_gap=ground_gap,
+        ground_width=ground_width, substrate_height=substrate_height, eps_r=eps_r,
+        thickness=thickness, tan_delta=tan_delta, air_height=None,
+        box_width=box_width, top_width=top_width)
+    return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
+
+
+def conformal_coated_unbacked_coplanar(*, width, gap, ground_width, substrate_height,
+                                      eps_r, coating_thickness, coating_eps_r,
+                                      thickness=0.0, tan_delta=0.0, coating_tan_delta=0.0,
+                                      air_height=None, lower_air_height=None,
+                                      box_width=None, top_width=None):
+    """Coated signal and finite grounds, with air below the substrate.
+
+    The mitered film covers every trace and the substrate top. All outer
+    boundaries are open; only the coplanar grounds define the reference.
+    Lower air defaults to ten substrate heights. No backing plane is added.
+    """
+    base = conformal_coated_grounded_coplanar(width=width, gap=gap,
+        ground_width=ground_width, substrate_height=substrate_height, eps_r=eps_r,
+        coating_thickness=coating_thickness, coating_eps_r=coating_eps_r,
+        thickness=thickness, tan_delta=tan_delta, coating_tan_delta=coating_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
+    return _unbacked_coplanar(base, lower_air_height)
+
+
+def coupled_conformal_coated_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
+                                              substrate_height, eps_r, coating_thickness,
+                                              coating_eps_r, thickness=0.0, tan_delta=0.0,
+                                              coating_tan_delta=0.0, air_height=None,
+                                              lower_air_height=None, box_width=None,
+                                              top_width=None):
+    """Coated signal pair and finite grounds without a backing plane.
+
+    gap is signal-to-signal, ground_gap outer-signal-to-ground. All signals
+    and rectangular grounds receive the same normal-thickness mitered film.
+    Lower air translates the substrate, conductors and local film together.
+    """
+    base = coupled_conformal_coated_grounded_coplanar(width=width, gap=gap,
+        ground_gap=ground_gap, ground_width=ground_width, substrate_height=substrate_height,
+        eps_r=eps_r, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r,
+        thickness=thickness, tan_delta=tan_delta, coating_tan_delta=coating_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
+    return _unbacked_coplanar(base, lower_air_height)
 
 
 def coated_microstrip(*, width, substrate_height, eps_r, coating_height,

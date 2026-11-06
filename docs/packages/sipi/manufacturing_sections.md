@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Coplanar normal-thickness films](conformal_coplanar.md) cover finite grounds with or without a backing plane.
+
 [Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.
 
 [Coated unbacked coplanar sections](coated_unbacked.md) support saved studies and goals.

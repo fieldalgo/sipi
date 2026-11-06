@@ -1,5 +1,7 @@
 # Normal-thickness coating on surface traces
 
+[Coplanar normal-thickness films](conformal_coplanar.md) cover finite grounds with or without a backing plane.
+
 `conformal_coated_microstrip` and `coupled_conformal_coated_microstrip` add a
 dielectric film to a grounded substrate and one or two surface traces. The film
 has constant thickness normal to each straight face; adjacent offset faces meet
@@ -33,6 +35,13 @@ default is 10h+t. Default box widths follow the corresponding bare template.
 Explicit outer dimensions are recommended for convergence studies. A lateral
 film outside the box is rejected rather than clipped. Heights that cannot be
 represented separately in floating point are also rejected.
+
+The generated template also requires every positive film, air, layer and metal
+feature to exceed `1e-12 * max(box_width, total_height)`, matching the section's
+placement scale. Zero copper thickness remains an explicit supported limit.
+This rejects unresolved air slits before automatic meshing. Union seams lose
+only exactly collinear vertices (`simplify(0)`); a positive gap is never snapped
+closed. Resolvable thin features can still require expensive meshes.
 
 For t>0 and side slope s=(width-top_width)/(2t), the raised film envelope is
 the trace trapezoid shifted upward by d and widened at both sides by

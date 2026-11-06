@@ -36,6 +36,8 @@ from .templates import coated_grounded_coplanar, coupled_coated_grounded_coplana
 from .templates import unbacked_coplanar, coupled_unbacked_coplanar
 from .templates import coated_unbacked_coplanar, coupled_coated_unbacked_coplanar
 from .templates import conformal_coated_microstrip, coupled_conformal_coated_microstrip
+from .templates import conformal_coated_grounded_coplanar, coupled_conformal_coated_grounded_coplanar
+from .templates import conformal_coated_unbacked_coplanar, coupled_conformal_coated_unbacked_coplanar
 from .templates import layered_stripline, coupled_layered_stripline
 from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
 from .design_document import ImpedanceDesignDocument
@@ -68,6 +70,8 @@ __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion",
            "unbacked_coplanar", "coupled_unbacked_coplanar",
            "coated_unbacked_coplanar", "coupled_coated_unbacked_coplanar",
            "conformal_coated_microstrip", "coupled_conformal_coated_microstrip",
+           "conformal_coated_grounded_coplanar", "coupled_conformal_coated_grounded_coplanar",
+           "conformal_coated_unbacked_coplanar", "coupled_conformal_coated_unbacked_coplanar",
            "layered_stripline", "coupled_layered_stripline",
            "DesignEvaluation", "ImpedanceDesign", "GoalSeekError", "seek_impedance",
            "ImpedanceDesignDocument",

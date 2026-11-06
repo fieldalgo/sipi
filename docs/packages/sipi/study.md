@@ -35,14 +35,16 @@ Version `sipi.impedance-study/2` has the same fields plus required
 `fixed_plane_spacing_m` (null or a positive length). Existing constructors without
 that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
 retains v2 even when its constraint is null. Unknown versions are rejected.
-The twenty templates are `microstrip`, `stripline`, `coupled_microstrip`,
+The twenty-four templates are `microstrip`, `stripline`, `coupled_microstrip`,
 `grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline`,
 `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coated_grounded_coplanar`, `coupled_coated_grounded_coplanar`,
 `unbacked_coplanar`, `coupled_unbacked_coplanar`, `coated_unbacked_coplanar`,
-`coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip` and
-`coupled_conformal_coated_microstrip`. Parameters follow their SI contracts;
+`coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
+`coupled_conformal_coated_microstrip`,
+`conformal_coated_grounded_coplanar`, `coupled_conformal_coated_grounded_coplanar`,
+`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar`. Parameters follow their SI contracts;
 all template defaults and the nominal resolved mesh settings are saved. A saved
 `None` for an automatic template dimension retains its existing template rule,
 which can change the generated box size when another dimension changes. Supply
@@ -51,8 +53,9 @@ explicit air/box dimensions when those must remain fixed.
 `quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `coupled_layered_stripline`,
 `coupled_coated_microstrip`, `coupled_coated_grounded_coplanar`,
-`coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar` and
-`coupled_conformal_coated_microstrip`, otherwise `z0`.
+`coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`,
+`coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar` and
+`coupled_conformal_coated_unbacked_coplanar`, otherwise `z0`.
 This extends the supported template names
 without changing schema fields or existing plan semantics. Older readers reject
 the newly supported names; save the SIPI version alongside the input. Sampling uses
@@ -91,7 +94,8 @@ maps, including derived parameters. No FEM solve runs in either method.
 `coupled_microstrip`, `coupled_stripline`, `coupled_grounded_coplanar`,
 `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`,
-`coupled_coated_unbacked_coplanar` or `coupled_conformal_coated_microstrip`.
+`coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar` or
+`coupled_conformal_coated_unbacked_coplanar`.
 Fixed pitch requires `width` among the independent variables
 and forbids independent `gap` sampling. Nominal width+gap must equal pitch within
 relative 1e-12. Every row derives `gap = pitch - width`, keeping both trace centres
