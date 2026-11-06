@@ -1,5 +1,7 @@
 # 균일 전송선 네트워크
 
+[진행파 전파상수와 손실 기여](propagation.md)
+
 [네트워크 연결과 알려진 fixture 제거](connection.md)
 
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network.md) | **한국어**

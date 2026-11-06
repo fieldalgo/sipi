@@ -1,5 +1,7 @@
 # Uniform transmission-line networks
 
+[Traveling-wave propagation and loss contributions](propagation.md)
+
 [Network connection and known-fixture removal](connection.md)
 
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)

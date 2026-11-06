@@ -96,6 +96,20 @@ def test_perfect_metal_scalar_against_independent_abcd_and_dc():
     den = 2*a+b/50+cc*50
     np.testing.assert_allclose(result.network.s[1:,1,0],2/den,rtol=0,atol=1e-10)
     np.testing.assert_allclose(result.network.s[1:,0,0],(b/50-cc*50)/den,rtol=0,atol=1e-10)
+    with pytest.raises(ValueError,match='DC'):
+        result.propagation()
+
+
+def test_extracted_single_line_propagation_power_balance():
+    cs = CrossSectionDocument(stripline(width=.5e-3,plane_spacing=1e-3,
+        thickness=50e-6,eps_r=4,tan_delta=.02),mesh=MESH)
+    result = document(cross_section=cs,materials={}).analyze()
+    p = result.propagation()
+    np.testing.assert_allclose(p.alpha_conductor+p.alpha_dielectric,p.alpha,rtol=1e-10)
+    assert np.all(p.alpha_conductor > 0) and np.all(p.alpha_dielectric > 0)
+    np.testing.assert_allclose(p.gamma[:,0]**2,
+        (result.R[:,0,0]+2j*np.pi*F*result.L[:,0,0])*
+        (result.G[:,0,0]+2j*np.pi*F*result.C[:,0,0]),rtol=1e-12)
 
 
 def test_input_snapshot_and_resolved_mesh_are_isolated():

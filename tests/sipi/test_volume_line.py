@@ -71,6 +71,20 @@ def test_coax_complex_capacitance_analytic_and_same_volume_series():
     # Correct DC series-resistance network, not an ideal-through placeholder.
     rdc = result.R[0,0,0]*.1
     assert result.network.s[0,1,0] == pytest.approx(100/(100+rdc),rel=1e-12)
+    with pytest.raises(ValueError,match='DC'):
+        result.propagation()
+
+
+def test_volume_propagation_uses_existing_total_inductance_and_losses():
+    volume,_ = coax(8,64)
+    result = volume_line(volume,[1e3,1e5],materials={'dielectric':DebyeDielectric(2,[2],[1e4])},
+                         conductivity=SIGMA,length=.1)
+    p = result.propagation()
+    np.testing.assert_allclose(p.alpha_conductor+p.alpha_dielectric,p.alpha,rtol=1e-10)
+    assert np.all(p.alpha_conductor > 0) and np.all(p.alpha_dielectric > 0)
+    f=result.frequency
+    np.testing.assert_allclose(p.gamma[:,0]*p.z_characteristic[:,0],
+        result.R[:,0,0]+2j*np.pi*f*result.L[:,0,0],rtol=1e-12)
 
 
 def test_independent_complex_electric_assembly_on_matched_volume():

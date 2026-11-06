@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add single/symmetric-pair propagation and exact traveling-wave conductor/dielectric attenuation contributions, reusing extracted RLGC and explicitly excluding DC and asymmetric modes.
+
 - Add explicit near/far network cascade and removal of supplied known fixtures, with analytical and independent network checks and conditioning limits.
 
 - Add immutable positive-real S-parameter reference changes with analytic open/short/through checks and independent scikit-rf comparisons.

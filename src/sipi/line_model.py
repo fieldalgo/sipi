@@ -118,6 +118,14 @@ class TransmissionLineResult:
     def C(self):
         return self.dielectric.C
 
+    def propagation(self):
+        """Positive-frequency single/symmetric-pair traveling-wave diagnostics.
+
+        General asymmetric modes and DC are rejected; no new field solve occurs.
+        """
+        from .propagation import rlgc_propagation
+        return rlgc_propagation(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C)
+
 
 class TransmissionLineDocument:
     """Strict sipi.transmission-line/1 or /2; no file I/O or implicit metal.

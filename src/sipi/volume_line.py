@@ -96,6 +96,14 @@ class VolumeLineResult:
     def G(self):
         return -2*np.pi*self.frequency[:,None,None]*self.C_complex.imag
 
+    def propagation(self):
+        """Report existing RLGC for positive-frequency single/symmetric modes.
+
+        DC and asymmetric pairs require different analysis and are rejected.
+        """
+        from .propagation import rlgc_propagation
+        return rlgc_propagation(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C)
+
 
 def _material_samples(frequency,materials,names):
     if not isinstance(materials,Mapping) or set(materials) != set(names):
