@@ -9,6 +9,8 @@ An explicit empty mapping is allowed and uses the section's scalar defaults.
 
 The reported quantity remains the **real quasi-static impedance**: single-line
 `z0=sqrt(L_external/Re(C_complex))`, or `z_diff=2*z_odd` for a symmetric pair.
+Explicit [`z_diff_forward`](asymmetric_pair.md) instead uses the full real
+forward-current matrix and accepts asymmetric pairs, including tilted tensors.
 External L comes from the vacuum C0 problem. Complex dielectric loss affects the
 electrostatic field and C, but this is **not** the complex lossy characteristic
 impedance `sqrt((R+jωL)/(G+jωC))`, an attenuation target or a band optimization.

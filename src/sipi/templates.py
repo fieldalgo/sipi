@@ -11,6 +11,7 @@ from numbers import Real
 from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+           'asymmetric_coupled_microstrip',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'coupled_coated_microstrip',
@@ -76,6 +77,32 @@ def coupled_microstrip(*, width, gap, substrate_height, eps_r, thickness=0.0,
     offset = (w+gap)/2
     return CrossSection(layers, [Trace('positive', -offset, w, h, t, top_width=top_width),
                                 Trace('negative', offset, w, h, t, top_width=top_width)], box)
+
+
+def asymmetric_coupled_microstrip(*, left_width, right_width, gap, substrate_height, eps_r,
+                                 left_thickness=0.0, right_thickness=0.0, tan_delta=0.0,
+                                 air_height=None, box_width=None,
+                                 left_top_width=None, right_top_width=None):
+    """Unequal surface traces over a ground plane, positive left and negative right.
+
+    gap separates bottom edges. Both traces start at the substrate surface;
+    the entire bottom-width span is centred at x=0. Top widths and thicknesses
+    are independent. Default air is 10 substrate heights plus the larger
+    thickness; default box is max(20 heights, 4 total spans). Geometry guards
+    reject overlaps and clipping. No exchange symmetry or eigenmodes are assumed.
+    """
+    left = _positive('left_width', left_width)
+    right = _positive('right_width', right_width)
+    gap = _positive('gap', gap)
+    lt = _positive('left_thickness', left_thickness, zero=True)
+    rt = _positive('right_thickness', right_thickness, zero=True)
+    _, h, _, box, layers = _surface(max(left, right), substrate_height, eps_r,
+                                    max(lt, rt), tan_delta, air_height, box_width)
+    if box_width is None:
+        box = max(box, 4*(left+gap+right))
+    return CrossSection(layers,
+        [Trace('positive', -(gap+right)/2, left, h, lt, top_width=left_top_width),
+         Trace('negative', (gap+left)/2, right, h, rt, top_width=right_top_width)], box)
 
 
 def grounded_coplanar(*, width, gap, ground_width, substrate_height, eps_r,

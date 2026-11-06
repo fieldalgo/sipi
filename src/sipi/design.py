@@ -72,8 +72,9 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
                    mesh=None, max_evaluations=40, frequency=None, materials=None):
     """Bisect a positive parameter range, then check a refined mesh.
 
-    factory(parameter) returns a CrossSection. quantity is z0 (one signal) or
-    z_diff (a symmetric pair). bounds have the factory parameter's units;
+    factory(parameter) returns a CrossSection. quantity is z0 (one signal),
+    z_diff (a symmetric pair), or z_diff_forward (a pair's real lossless
+    forward-current launch, Icommon=0). bounds have the factory parameter's units;
     target/tolerance are ohms. Factory errors propagate unchanged.
 
     Both endpoints must be valid. Apart from an endpoint already within
@@ -90,8 +91,8 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     """
     if not callable(factory):
         raise TypeError('factory must be callable')
-    if quantity not in ('z0', 'z_diff'):
-        raise ValueError('quantity must be z0 or z_diff')
+    if quantity not in ('z0', 'z_diff', 'z_diff_forward'):
+        raise ValueError('quantity must be z0, z_diff or z_diff_forward')
     try:
         lower, upper = bounds
     except (TypeError, ValueError) as exc:
@@ -117,7 +118,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
         return value-target, doc
 
     def impedance(line):
-        value = line.z0 if quantity == 'z0' else line.even_odd()['z_diff']
+        value = line.even_odd()['z_diff'] if quantity == 'z_diff' else getattr(line, quantity)
         if not math.isfinite(value) or value <= 0:
             raise GoalSeekError('solver returned invalid impedance', history)
         return float(value)

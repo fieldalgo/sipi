@@ -165,6 +165,40 @@ class LineParameters:
         C, _, L = self._single()
         return float(np.sqrt(L / C))
 
+    def characteristic_impedance_matrix(self) -> np.ndarray:
+        """Real lossless forward Zc from L and Re(C), including asymmetric lines.
+
+        Zc C Zc = L, with the positive-definite physical branch. Reuse the
+        checked RLGC matrix solver at arbitrary reference 1 Hz; frequency
+        cancels for R=G=0. C_loss and conductor resistance are not included.
+        Return a read-only snapshot; no field solve or mode tracking.
+        """
+        from .characteristic import rlgc_characteristic
+        result = rlgc_characteristic([1.], R=np.zeros_like(self.L), L=self.L,
+            G=np.zeros_like(self.C), C=self.C, names=self.names).z_characteristic[0]
+        if np.max(abs(result.imag)) > 1e-10*np.max(abs(result.real)):
+            raise ValueError('lossless characteristic matrix has a non-negligible imaginary part')
+        out = np.array(result.real, copy=True)
+        out.setflags(write=False)
+        return out
+
+    @property
+    def z_diff_forward(self) -> float:
+        """Vdiff/Idiff for a lossless forward pair launch with Icommon=0, ohms.
+
+        I=[Idiff,-Idiff], Vdiff=V1-V2. This retains asymmetric coupling and
+        does not assert independent differential/common eigenmodes. C_loss
+        and conductor resistance are excluded, as for the real z0 diagnostic.
+        """
+        if len(self.names) != 2:
+            raise ValueError('z_diff_forward requires exactly two signal conductors')
+        d = np.array([1., -1.])
+        with np.errstate(over='ignore', invalid='ignore'):
+            value = float(d@self.characteristic_impedance_matrix()@d)
+        if not np.isfinite(value) or value <= 0:
+            raise ValueError('forward differential impedance is not positive and representable')
+        return value
+
     @property
     def eps_eff(self) -> float:
         """Effective relative permittivity C / C0 of a single line."""

@@ -157,7 +157,9 @@ print(result.parameter, result.impedance, result.refined_impedance)
 `factory(parameter)` returns a valid `CrossSection`. Bounds must be positive,
 finite and increasing, in the parameter's units. `quantity="z0"` selects a
 single signal; `"z_diff"` selects a symmetric pair through `even_odd()`, including
-its symmetry checks. Target and tolerance must be positive finite ohms.
+its symmetry checks. Explicit [`z_diff_forward`](asymmetric_pair.md) selects
+the real forward-current pair launch without assuming exchange symmetry.
+Target and tolerance must be positive finite ohms.
 
 The search evaluates both endpoints and accepts an endpoint within tolerance;
 otherwise opposite endpoint residual signs are required. Bisection stops only

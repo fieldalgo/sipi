@@ -143,7 +143,9 @@ print(result.parameter, result.impedance, result.refined_impedance)
 
 `factory(parameter)`는 유효한 `CrossSection`을 반환해야 합니다. 범위는 파라미터 단위의
 양수·유한·오름차순 값입니다. `quantity="z0"`는 단일 신호, `"z_diff"`는 대칭 쌍을
-`even_odd()`의 대칭 검사까지 포함해 사용합니다. 목표와 허용값은 양수·유한 Ω입니다.
+`even_odd()`의 대칭 검사까지 포함해 사용합니다. 명시적
+[`z_diff_forward`](asymmetric_pair.md)는 교환 대칭을 가정하지 않는 실수 전방 전류 쌍 입력입니다.
+목표와 허용값은 양수·유한 Ω입니다.
 
 양 끝점을 계산하고 허용값 안의 끝점이 있으면 선택합니다. 그렇지 않으면 양 끝 잔차 부호가
 반대여야 합니다. 실제 임피던스 잔차가 허용값 안에 들어와야 이분법을 끝냅니다. 마지막 한 번은

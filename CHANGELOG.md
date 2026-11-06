@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add independently dimensioned surface pairs and an explicit real forward-current differential impedance, with saved correlated tolerance studies and refined-mesh target design while preserving symmetric-mode semantics.
+
 - Expose power-dual differential/common characteristic matrices for asymmetric pairs, retaining cross-coupling, physical voltage/current normalization and existing forward-wave validity gates without another field solve.
 
 - Save ordered cascades and known-fixture removal in explicit network-transforms v2, validating every intermediate port/reference before meshing and preserving per-occurrence extraction diagnostics; keep v1 input bytes and numerical gates.

@@ -19,7 +19,7 @@ from .impedance_material import (_material_input, _validate_material_input,
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
 _TEMPLATES = {name: getattr(templates, name) for name in
-              ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
+              ('microstrip', 'stripline', 'coupled_microstrip', 'asymmetric_coupled_microstrip', 'grounded_coplanar',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
                'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
                'coupled_coated_microstrip', 'coated_grounded_coplanar',
@@ -175,9 +175,11 @@ class ImpedanceStudyDocument:
             raise ValueError('mesh must be an object')
         doc = CrossSectionDocument(section, mesh=data['mesh'])
         mesh = section.mesh_settings(**doc.mesh_options)
-        quantity = 'z_diff' if template in _DIFFERENTIAL else 'z0'
-        if data['quantity'] != quantity:
-            raise ValueError(f'this template requires quantity={quantity}')
+        allowed = (('z_diff_forward',) if template == 'asymmetric_coupled_microstrip' else
+                   ('z_diff', 'z_diff_forward') if template in _DIFFERENTIAL else ('z0',))
+        quantity = data['quantity']
+        if not isinstance(quantity, str) or quantity not in allowed:
+            raise ValueError('this template requires quantity='+' or '.join(allowed))
         evaluation = (_validate_material_input(data['material_evaluation'], section, quantity)
                       if data['schema'] == 'sipi.impedance-study/3' else None)
         sampling = data['sampling']
@@ -326,7 +328,8 @@ class ImpedanceStudyDocument:
                 evaluation = data.get('material_evaluation')
                 line = (doc.analyze() if evaluation is None
                         else _analyze_material(doc, evaluation, data['quantity']))
-                value = float(line.z0 if data['quantity'] == 'z0' else line.even_odd()['z_diff'])
+                value = float(line.even_odd()['z_diff'] if data['quantity'] == 'z_diff'
+                              else getattr(line, data['quantity']))
                 if not np.isfinite(value) or value <= 0:
                     raise ValueError('solver returned a nonpositive or nonfinite impedance')
                 rows.append(StudyRow(i, values, doc, value, None, None))
