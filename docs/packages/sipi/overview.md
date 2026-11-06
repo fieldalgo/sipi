@@ -61,9 +61,15 @@ not mirror-symmetric, and refuses a pair whose self terms differ by more than
 `rtol` (1 %). `modes()` gives the modal effective permittivities and voltage
 eigenvectors of any N-conductor line.
 
-The capacitance entries are the discrete energy `eps0 V_i^T K V_j`, so the
-matrices are symmetric and the conforming finite-element solution approaches
-the exact `C` from above.
+The capacitance entries are the discrete bilinear energy `eps0 V_i^T K V_j`,
+so reciprocal dielectric coefficients give symmetric matrices. For **lossless,
+real positive-definite permittivity on the same geometry and boundary data**,
+conforming electrostatic FEM bounds the exact energy from above: the capacitance
+quadratic form is an upper bound, not an element-by-element ordering. Nested
+trial-space refinement cannot increase that bound. Complex lossy coefficients,
+changes in approximated geometry and independently generated non-nested meshes
+do not carry this monotonicity guarantee. Check mesh and domain convergence
+separately; the coaxial example below also has polygonal-geometry error.
 
 ## Model
 

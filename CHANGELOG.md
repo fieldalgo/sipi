@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Clarify the lossless fixed-geometry energy bound and nested-space assumptions behind electrostatic FEM convergence; do not imply entrywise monotonicity for complex or independently remeshed cases.
+
 - Preserve physical centre spacing for unequal surface-pair width studies and refined goals, deriving bottom-edge gap while retaining invalid samples and legacy equal-width behavior.
 
 - Add independently dimensioned surface pairs and an explicit real forward-current differential impedance, with saved correlated tolerance studies and refined-mesh target design while preserving symmetric-mode semantics.
