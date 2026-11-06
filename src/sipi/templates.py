@@ -13,6 +13,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'coupled_coated_microstrip',
+           'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar',
            'with_surface_mask']
 
 
@@ -115,6 +116,51 @@ def coupled_grounded_coplanar(*, width, gap, ground_gap, ground_width,
          Trace('negative', offset, w, h, t, top_width=top_width),
          Trace('ground_left', -ground_offset, gw, h, t, ground=True),
          Trace('ground_right', ground_offset, gw, h, t, ground=True)], box)
+
+
+def _coated_coplanar(base, coating_height, coating_eps_r, coating_tan_delta, air_height):
+    height = _positive('coating_height', coating_height)
+    if height <= max(t.thickness for t in base.traces):
+        raise ValueError('coating_height must exceed the conductor thickness')
+    coating = Layer('coating', height, _positive('coating_eps_r', coating_eps_r),
+                    _positive('coating_tan_delta', coating_tan_delta, zero=True))
+    air = base.layers[1] if air_height is None else Layer('air', _positive('air_height', air_height))
+    return CrossSection([base.layers[0], coating, air], base.traces, base.width)
+
+
+def coated_grounded_coplanar(*, width, gap, ground_width, substrate_height, eps_r,
+                            coating_height, coating_eps_r, thickness=0.0, tan_delta=0.0,
+                            coating_tan_delta=0.0, air_height=None, box_width=None,
+                            top_width=None):
+    """One signal and finite coplanar grounds in a flat full-width coating.
+
+    gap is signal-bottom-edge to ground-edge on each side. coating_height
+    starts at the substrate, includes all metal and must exceed thickness.
+    air_height starts above the coating. Only the signal has optional taper.
+    """
+    # Validate the uncoated scaffold with its automatic air clearance; the
+    # requested air height belongs above the coating, not above the substrate.
+    base = grounded_coplanar(width=width, gap=gap, ground_width=ground_width,
+        substrate_height=substrate_height, eps_r=eps_r, thickness=thickness,
+        tan_delta=tan_delta, air_height=None, box_width=box_width, top_width=top_width)
+    return _coated_coplanar(base, coating_height, coating_eps_r, coating_tan_delta, air_height)
+
+
+def coupled_coated_grounded_coplanar(*, width, gap, ground_gap, ground_width,
+                                    substrate_height, eps_r, coating_height, coating_eps_r,
+                                    thickness=0.0, tan_delta=0.0, coating_tan_delta=0.0,
+                                    air_height=None, box_width=None, top_width=None):
+    """A surface pair between finite coplanar grounds, all in a planar coating.
+
+    gap separates signal bottom edges; ground_gap separates outer signal
+    bottom edges from the grounds. No central ground. Coating spans the whole
+    box and includes copper height; air starts above it. Grounds stay rectangular.
+    """
+    base = coupled_grounded_coplanar(width=width, gap=gap, ground_gap=ground_gap,
+        ground_width=ground_width, substrate_height=substrate_height, eps_r=eps_r,
+        thickness=thickness, tan_delta=tan_delta, air_height=None,
+        box_width=box_width, top_width=top_width)
+    return _coated_coplanar(base, coating_height, coating_eps_r, coating_tan_delta, air_height)
 
 
 def coated_microstrip(*, width, substrate_height, eps_r, coating_height,

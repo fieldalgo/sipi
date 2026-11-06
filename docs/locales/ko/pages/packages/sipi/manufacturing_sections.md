@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[평탄 코팅 coplanar 단면](coated_coplanar.md)도 JSON·공차·역산을 지원합니다.
+
 [평탄 코팅 차동선](coated_pair.md)은 공차·목표 폭 설정 저장도 지원합니다.
 
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/manufacturing_sections.md) | **한국어**

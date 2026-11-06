@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Planar-coated coplanar sections](coated_coplanar.md) support JSON, studies and goals.
+
 [Planar-coated paired traces](coated_pair.md) also support saved studies and width goals.
 
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/manufacturing_sections.md)
