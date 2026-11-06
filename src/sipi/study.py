@@ -19,10 +19,11 @@ __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 _TEMPLATES = {name: getattr(templates, name) for name in
               ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
-               'coupled_grounded_coplanar')}
+               'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline')}
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
-                         'coupled_grounded_coplanar'))
-_HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'))
+                         'coupled_grounded_coplanar', 'coupled_layered_stripline'))
+_HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar',
+                             'coupled_layered_stripline'))
 
 
 def _numbers(value):
@@ -97,11 +98,11 @@ class ImpedanceStudy:
 
 
 class ImpedanceStudyDocument:
-    """Strict sipi.impedance-study/1, nine templates and resolved nominal mesh.
+    """Strict sipi.impedance-study/1, eleven templates and resolved nominal mesh.
 
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.
-    Fixed horizontal pitch applies to edge-coupled microstrip, stripline and
+    Fixed horizontal pitch applies to edge-coupled microstrip, stripline (including layered) and
     grounded coplanar pairs. Outer coplanar grounds retain ground_gap, not position.
     The broadside gap is vertical and is never derived from horizontal pitch.
     """

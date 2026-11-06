@@ -31,6 +31,7 @@ from .polygons import PolygonTrace, DielectricRegion
 from .document import CrossSectionDocument
 from .templates import microstrip, stripline, coupled_microstrip, grounded_coplanar
 from .templates import coupled_grounded_coplanar
+from .templates import layered_stripline, coupled_layered_stripline
 from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
 from .plane import (COPPER_CONDUCTIVITY, IRDropResult, PowerPlane, Sink, Source, circle, edge,
                     rectangle_outline)
@@ -44,6 +45,7 @@ __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion",
            "capacitance_matrix", "line_parameters", "CrossSectionDocument",
            "microstrip", "stripline", "coupled_microstrip", "grounded_coplanar",
            "coupled_grounded_coplanar",
+           "layered_stripline", "coupled_layered_stripline",
            "DesignEvaluation", "ImpedanceDesign", "GoalSeekError", "seek_impedance",
            "PowerPlane", "Source", "Sink", "IRDropResult", "circle", "edge", "rectangle_outline",
            "COPPER_CONDUCTIVITY", "__version__"]

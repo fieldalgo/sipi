@@ -31,16 +31,17 @@ The strict `sipi.impedance-study/1` object has exactly `schema`, `template`,
 `parameters`, `sampling`, `quantity`, `mesh`, `fixed_pitch_m`. Use `from_dict`,
 `loads`, `to_dict`, `dumps` to validate, copy and save it. Unknown/missing fields,
 duplicate JSON keys, NaN/Infinity, boolean numbers and invalid geometry are rejected.
-The nine templates are `microstrip`, `stripline`, `coupled_microstrip`,
+The eleven templates are `microstrip`, `stripline`, `coupled_microstrip`,
 `grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
-`broadside_stripline` and `coupled_grounded_coplanar`. Parameters follow their SI contracts;
+`broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline` and
+`coupled_layered_stripline`. Parameters follow their SI contracts;
 all template defaults and the nominal resolved mesh settings are saved. A saved
 `None` for an automatic template dimension retains its existing template rule,
 which can change the generated box size when another dimension changes. Supply
 explicit air/box dimensions when those must remain fixed.
 
 `quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`,
-`broadside_stripline` and `coupled_grounded_coplanar`, otherwise `z0`.
+`broadside_stripline`, `coupled_grounded_coplanar` and `coupled_layered_stripline`, otherwise `z0`.
 This extends the supported template names
 without changing schema fields or existing plan semantics. Older readers reject
 the newly supported names; save the SIPI version alongside the input. Sampling uses
@@ -76,7 +77,7 @@ maps, including derived parameters. No FEM solve runs in either method.
 ## Fixed pitch
 
 `fixed_pitch_m` is `None`, or a positive centre-to-centre pitch for
-`coupled_microstrip`, `coupled_stripline` or `coupled_grounded_coplanar`.
+`coupled_microstrip`, `coupled_stripline`, `coupled_grounded_coplanar` or `coupled_layered_stripline`.
 Fixed pitch requires `width` among the independent variables
 and forbids independent `gap` sampling. Nominal width+gap must equal pitch within
 relative 1e-12. Every row derives `gap = pitch - width`, keeping both trace centres
@@ -93,6 +94,11 @@ In `broadside_stripline`, `gap` is the vertical metal-to-metal separation and
 `offset` is the signed horizontal displacement. Sample either directly;
 `fixed_pitch_m` is rejected for this template. Its positive conductor thickness
 and all ground-clearance requirements remain enforced by the template.
+
+The [layered stripline templates](layered_stripline.md) keep lower/upper dielectric
+properties and heights separate. Sampling one permittivity does not change the
+other. `upper_height` includes the metal thickness; bounded corners must retain
+positive clearance above the copper. Invalid normal samples remain failed rows.
 
 ## Evaluation, failures and summaries
 

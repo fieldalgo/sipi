@@ -43,6 +43,10 @@ v2에서는 모든 도체에 필수 `top_width`를 추가하며, 아래 표의 �
 표의 다섯 번째 항목의 치수·기본 영역·독립 기준·수렴 한계는
 [차동 coplanar](coupled_coplanar.md)를 참조하세요.
 
+[2유전체 stripline](layered_stripline.md)의 `layered_stripline`과
+`coupled_layered_stripline`은 위아래 재료를 각각 지정합니다.
+경계에서 위 접지면까지의 높이는 구리 두께를 포함합니다.
+
 ## 입력 문서
 
 ```python

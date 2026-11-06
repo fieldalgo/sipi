@@ -11,7 +11,8 @@ from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
-           'coupled_grounded_coplanar', 'with_surface_mask']
+           'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
+           'with_surface_mask']
 
 
 def _positive(name, value, *, zero=False):
@@ -179,6 +180,53 @@ def broadside_stripline(*, width, gap, plane_spacing, eps_r, thickness,
     return CrossSection(base.layers,
         [Trace('positive', -offset/2, width, plane_spacing/2-gap/2-t, t),
          Trace('negative', offset/2, width, plane_spacing/2+gap/2, t)], box_width, top='ground')
+
+
+def layered_stripline(*, width, lower_height, upper_height, lower_eps_r, upper_eps_r,
+                      thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0,
+                      box_width=None, top_width=None):
+    """Trace at a two-dielectric interface between two grounded planes.
+
+    lower_height is the bottom-plane to interface/trace-bottom distance.
+    upper_height is the interface to top-plane distance, INCLUDING copper.
+    Copper extends into the upper dielectric; its top clearance is
+    upper_height - thickness. Each dielectric has its own permittivity/loss.
+    """
+    w = _positive('width', width)
+    low = _positive('lower_height', lower_height)
+    high = _positive('upper_height', upper_height)
+    t = _positive('thickness', thickness, zero=True)
+    if t >= high:
+        raise ValueError('thickness must be below upper_height to clear the top ground')
+    box = max(12*(low+high), 4*w) if box_width is None else _positive('box_width', box_width)
+    layers = [Layer('lower', low, _positive('lower_eps_r', lower_eps_r),
+                    _positive('lower_tan_delta', lower_tan_delta, zero=True)),
+              Layer('upper', high, _positive('upper_eps_r', upper_eps_r),
+                    _positive('upper_tan_delta', upper_tan_delta, zero=True))]
+    return CrossSection(layers, [Trace('signal', 0.0, w, low, t, top_width=top_width)],
+                        box, top='ground')
+
+
+def coupled_layered_stripline(*, width, gap, lower_height, upper_height, lower_eps_r,
+                              upper_eps_r, thickness=0.0, lower_tan_delta=0.0,
+                              upper_tan_delta=0.0, box_width=None, top_width=None):
+    """Equal-width edge-coupled pair at the layered_stripline dielectric interface.
+
+    gap is between signal bottom edges. Both traces extend into the upper
+    dielectric. There is no averaging of permittivities or layer thicknesses.
+    """
+    gap = _positive('gap', gap)
+    base = layered_stripline(width=width, lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        box_width=box_width, top_width=top_width)
+    trace = base.traces[0]
+    offset = (trace.width+gap)/2
+    box = max(base.width, 4*(2*trace.width+gap)) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [Trace('positive', -offset, trace.width, trace.y, trace.thickness, top_width=top_width),
+         Trace('negative', offset, trace.width, trace.y, trace.thickness, top_width=top_width)],
+        box, top='ground')
 
 
 def with_surface_mask(section, *, thickness, eps_r, tan_delta=0.0, gap_fill_height=0.0):

@@ -32,13 +32,14 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 미등록/누락 필드, JSON 중복 키, NaN/Infinity, bool 수치와 잘못된 형상을 거부합니다.
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `grounded_coplanar`,
 `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
-및 `coupled_grounded_coplanar` 총 9종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`
+총 11종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
 
 `quantity`는 `coupled_microstrip`, `coupled_stripline`, `broadside_stripline`,
-`coupled_grounded_coplanar`에서 `z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
+`coupled_grounded_coplanar`, `coupled_layered_stripline`에서 `z_diff`, 나머지에서는 `z0`입니다. 기존 스키마 필드·입력 의미를 유지하며 지원
 템플릿 이름을 확장합니다. 이전 판독기는 새 이름을 거부하므로 입력과 함께 SIPI 버전을 기록하세요.
 독립 변수는 템플릿 매개변수 이름 1–8개를 중복 없이 지정하고 나열 순서를 유지합니다.
 
@@ -70,7 +71,7 @@ NumPy `Generator(PCG64(seed))`를 사용합니다. 정규분포는 **비유계**
 
 ## 고정 피치
 
-`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_grounded_coplanar의 양의 수평 중심 간 거리입니다.
+`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_grounded_coplanar·coupled_layered_stripline의 양의 수평 중심 간 거리입니다.
 독립 변수에 width가 있어야 하고 gap을 독립적으로 샘플링할 수 없습니다.
 nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 각 행의 `gap=pitch-width`로 두 선의 중심 위치를 유지합니다. 사다리꼴은 기존
@@ -85,6 +86,11 @@ nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 `broadside_stripline`의 `gap`은 금속 표면 사이 수직 간격이고 `offset`은 부호 있는
 수평 변위입니다. 각각 직접 샘플링하며 `fixed_pitch_m`은 거부합니다. 양의 도체
 두께와 접지면 이격 등 기존 템플릿의 형상 제약을 그대로 적용합니다.
+
+[2유전체 stripline](layered_stripline.md)은 위아래 재료·높이를 분리합니다. 한쪽
+유전율의 샘플링이 다른 쪽 값을 바꾸지 않습니다. `upper_height`는 금속 두께를
+포함하며 유계 표본의 모든 모서리에서 구리 위 이격이 양수여야 합니다.
+잘못된 정규 표본은 오류 행으로 보존합니다.
 
 ## 계산·실패·통계
 

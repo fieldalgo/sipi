@@ -47,6 +47,10 @@ are available from `sipi.templates`.
 See [coupled coplanar geometry and validation](coupled_coplanar.md) for the fifth
 table entry's dimensions, default box, independent reference and convergence limits.
 
+[Two-dielectric striplines](layered_stripline.md) add `layered_stripline` and
+`coupled_layered_stripline`, with independent lower/upper material properties.
+Their interface-to-plane heights include the copper in the upper layer.
+
 ## Input document
 
 ```python
