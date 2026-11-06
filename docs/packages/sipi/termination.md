@@ -1,5 +1,8 @@
 # Terminated networks and frequency crosstalk
 
+[Passive port reduction](port_reduction.md) separately supports explicit open/short
+loads and returns S-parameters for retained ports.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/termination.md)
 
 [Overview](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) · [Line networks](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network.md)

@@ -1,5 +1,8 @@
 # 종단 네트워크와 주파수 누화
 
+별도의 [수동 부하 포트 축약](port_reduction.md)은 명시적 개방·단락을 지원하고
+남은 포트의 S를 반환합니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/termination.md) | **한국어**
 
 [개요](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/overview.md) · [선로 네트워크](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)

@@ -14,7 +14,8 @@ import numpy as np
 
 from .network import LineNetwork
 
-__all__ = ['TerminatedNetwork', 'Crosstalk', 'terminate_network', 'loaded_crosstalk']
+__all__ = ['TerminatedNetwork', 'Crosstalk', 'terminate_network', 'loaded_crosstalk',
+           'terminate_ports']
 
 
 def _snapshot(value):
@@ -42,6 +43,78 @@ def _values(network, values, name, default, *, passive=False):
             raise ValueError('terminations must be passive: real part >= 0')
         result[:, network.port_names.index(port)] = raw
     return result
+
+
+def terminate_ports(network, loads):
+    """Remove named ports after applying explicit passive loads in their basis.
+
+    Each value is 'open', 'short', or a finite passive impedance (ohms),
+    scalar or one complex value per frequency. At least one loaded and one
+    retained port are required. Retained ports keep their original order,
+    positive real references and basis; no geometry or topology is inferred.
+    Reject singular feedback, condition number >1e12 or residual >1e-10.
+    This returns a reduced LineNetwork, not a driven terminal solution.
+    """
+    if not isinstance(network, LineNetwork):
+        raise TypeError('network must be a LineNetwork')
+    if not isinstance(loads, Mapping) or not loads:
+        raise ValueError('loads must be a nonempty mapping from port names to loads')
+    if any(not isinstance(p, str) or p not in network.port_names for p in loads):
+        raise ValueError('loads contains an unknown port')
+    if len(loads) == len(network.port_names):
+        raise ValueError('at least one port must remain')
+    finite, opened = {}, set()
+    for p, value in loads.items():
+        if isinstance(value, str):
+            if value == 'open':
+                opened.add(p)
+            elif value == 'short':
+                finite[p] = 0.
+            else:
+                raise ValueError('string loads must be open or short')
+        else:
+            finite[p] = value
+    impedance = _values(network, finite, 'loads', 0, passive=True)
+    loaded = [i for i,p in enumerate(network.port_names) if p in loads]
+    retained = [i for i,p in enumerate(network.port_names) if p not in loads]
+    z, reference = impedance[:, loaded], network.z_ref[loaded]
+    # Normalize components before adding/subtracting the reference: even a
+    # finite passive load and reference near float max must not overflow.
+    scale = np.maximum(np.maximum(abs(z.real), abs(z.imag)), reference)
+    u, v, r = z.real/scale, z.imag/scale, reference/scale
+    gamma = ((u-r)+1j*v)/((u+r)+1j*v)
+    for column, i in enumerate(loaded):
+        if network.port_names[i] in opened:
+            gamma[:, column] = 1.
+    s = network.s
+    ll = s[:, loaded][:, :, loaded]
+    lr = s[:, loaded][:, :, retained]
+    rl = s[:, retained][:, :, loaded]
+    rr = s[:, retained][:, :, retained]
+    with np.errstate(over='ignore', invalid='ignore'):
+        system = np.eye(len(loaded)) - gamma[:, :, None]*ll
+        drive = gamma[:, :, None]*lr
+    if not np.all(np.isfinite(system)) or not np.all(np.isfinite(drive)):
+        raise ValueError('nonfinite load feedback system')
+    try:
+        condition = np.linalg.cond(system)
+        if np.any(~np.isfinite(condition)) or np.any(condition > 1e12):
+            raise ValueError('singular or ill-conditioned load feedback (limit=1e12)')
+        incident = np.linalg.solve(system, drive)
+    except np.linalg.LinAlgError as exc:
+        raise ValueError('singular load feedback') from exc
+    with np.errstate(over='ignore', invalid='ignore'):
+        reconstructed = system @ incident
+        error = reconstructed-drive
+        reduced = rr+rl @ incident
+    if not all(np.all(np.isfinite(x)) for x in (incident, reconstructed, error, reduced)):
+        raise ValueError('nonfinite reduced network')
+    scale = np.maximum(np.max(abs(reconstructed),axis=(1,2)), np.max(abs(drive),axis=(1,2)))
+    residual = np.max(abs(error),axis=(1,2))/np.maximum(scale,np.finfo(float).tiny)
+    if np.any(residual > 1e-10):
+        raise ValueError('load feedback residual exceeds 1e-10')
+    return LineNetwork(network.frequency, reduced, network.z_ref[retained],
+                       tuple(network.port_names[i] for i in retained), network.basis)
 
 
 @dataclass(frozen=True)
