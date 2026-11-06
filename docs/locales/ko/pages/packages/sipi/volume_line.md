@@ -115,3 +115,5 @@ Python 3.12.14, NumPy 2.5.4, SciPy 1.18.1, 시험 전용 scikit-fem 12.0.2를
 미구현입니다. 재료 fit도 별도의 실측 검증이 필요합니다.
 
 [주축 방향별 분산 재료](principal_dielectrics.md)는 저장 선로의 재료 매핑을 재사용합니다.
+
+[전체 전방파 행렬 진단](characteristic.md)은 기존 스칼라 모드 계약을 유지하며 비대칭 상호 RLGC를 지원합니다.

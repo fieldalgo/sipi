@@ -128,3 +128,5 @@ roughness, radiation, arbitrary mask contours, and 3D transitions are not
 implemented. Material fits still need independent measured validation.
 
 [Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.
+
+[Full-matrix forward-wave diagnostics](characteristic.md) support asymmetric reciprocal RLGC without changing the scalar-mode contract.

@@ -45,6 +45,7 @@ from .quasistatic import LineParameters, capacitance_matrix, line_parameters
 from .network import LineNetwork, rlgc_network, quasistatic_network
 from .connection import cascade_networks, deembed_network, connect_networks, ideal_junction
 from .propagation import LinePropagation, rlgc_propagation
+from .characteristic import LineCharacteristic, rlgc_characteristic
 from .termination import terminate_ports
 from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
@@ -54,6 +55,7 @@ __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion",
            "LineNetwork", "rlgc_network", "quasistatic_network",
            "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",
            "LinePropagation", "rlgc_propagation",
+           "LineCharacteristic", "rlgc_characteristic",
            "terminate_ports",
            "NetworkTransformDocument", "NetworkTransformResult",
            "NetworkAssemblyDocument", "NetworkAssemblyResult",

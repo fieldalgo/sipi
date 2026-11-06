@@ -54,3 +54,5 @@ use `OPENPHYSICS_CROSSCHECK_DIR`. Surface/volume extraction checks confirm reuse
 of their RLGC and exclude DC; they do not establish new absolute field accuracy.
 
 [Networks](network.md) · [한국어](../../locales/ko/pages/packages/sipi/propagation.md)
+
+[Full-matrix forward-wave diagnostics](characteristic.md) support asymmetric reciprocal RLGC without changing the scalar-mode contract.

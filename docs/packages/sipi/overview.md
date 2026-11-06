@@ -237,3 +237,5 @@ material and conductor extraction with RLGC/S.
 [Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.
 
 [Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.
+
+[Full-matrix forward-wave diagnostics](characteristic.md) support asymmetric reciprocal RLGC without changing the scalar-mode contract.

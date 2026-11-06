@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add full conductor-coordinate characteristic and forward-transfer matrices for asymmetric reciprocal RLGC, with physical branch selection, independent modal references and power-balance checks.
+
 - Preserve fixed-frequency scalar/principal-axis materials in saved geometry-tolerance studies and bounded impedance goals, including refined-mesh replay and explicit real quasi-static impedance limits.
 
 - Save fixed principal-axis dispersive dielectrics and reuse them in shared-mesh and volume line extraction, network assembly and driven circuits, with scalar material compatibility and independent tensor-field checks.

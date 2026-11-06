@@ -130,6 +130,11 @@ class TransmissionLineResult:
         from .propagation import rlgc_propagation
         return rlgc_propagation(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C)
 
+    def characteristic(self):
+        """Full conductor-coordinate forward-wave matrices; no new field solve."""
+        from .characteristic import rlgc_characteristic
+        return rlgc_characteristic(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C,names=self.names)
+
 
 class TransmissionLineDocument:
     """Strict sipi.transmission-line/1 or /2; no file I/O or implicit metal.
