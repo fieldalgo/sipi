@@ -42,7 +42,7 @@ jobs:
           ref: ${{ steps.engine.outputs.ref }}
           path: .validation/engine
       - name: Install build and reference tools
-        run: python -m pip install setuptools==84.0.0 wheel pytest scikit-rf==2.2.0
+        run: python -m pip install setuptools==84.0.0 wheel pytest scikit-rf==2.2.0 scikit-fem==12.0.2
       - name: Build independent wheels and SIPI sdist
         shell: python
         run: |

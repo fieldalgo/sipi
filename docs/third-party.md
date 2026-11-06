@@ -167,7 +167,7 @@ torch's own dependencies and are neither installed by CI nor listed here.
 | `certifi` | httpx, requests | MPL-2.0 | CA bundle used unmodified (certifi's bundle is itself derived from Mozilla's); test and tool only |
 | `scikit-rf` | `sipi[test]` (`==2.2.0`) | BSD-3-Clause | Network/Touchstone reference only. Wheel/sdist omit LICENSE.txt; exact v2.2.0 tag text verified. Not a shipped/runtime dependency |
 | `pandas` | scikit-rf, CI 3.0.3 | BSD-3-Clause | Test-only; exact sdist license and vendored permissive notices checked; not redistributed |
-| `scikit-fem` | `galerkin[crosscheck]` (`>=12,<13`) | BSD-3-Clause | Reference tool for [solver comparisons](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/reference-comparisons.md); pure Python, needs only numpy and scipy |
+| `scikit-fem` | `sipi[test]` (`==12.0.2`); upstream `galerkin[crosscheck]` (`>=12,<13`) | BSD-3-Clause | Test-only reference for electrostatic/diffusion comparisons; 12.0.2 installed LICENSE retains copyright, redistribution conditions and disclaimer. Pure Python, requires numpy/scipy; not bundled in the SIPI runtime wheel |
 | `symfem` | `galerkin[crosscheck]` (`==2025.12.0`) | MIT | Exact element definitions for [element comparisons](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/reference-comparisons.md#element-definitions); pure Python. Its wheel metadata has no license field; the MIT text ships as its license file |
 | `sympy` | symfem | BSD-3-Clause AND MIT | Pure Python. Metadata says BSD; the license file adds code from Diofant, multipledispatch and PyDy (BSD-3-Clause) and latex2sympy (MIT) |
 | `mpmath` | sympy | BSD-3-Clause | Pure Python |

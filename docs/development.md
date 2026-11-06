@@ -8,7 +8,12 @@ not evidence that equivalent packages have been published to PyPI.
 Run `PYTHONPATH=src python -m pytest -q tests/sipi` for the source suite (set
 `$env:PYTHONPATH="src"` first in PowerShell). Build a wheel and install it in a clean
 environment, copy tests outside the checkout and run the same suite there. Include
-scikit-rf 2.2.0 for independent network checks. `integration/test_geometry_adapters.py`
+scikit-rf 2.2.0 for independent network checks and scikit-fem 12.0.2 for
+independent finite-element comparisons. Both are test-only dependencies in
+`sipi[test]` and explicitly installed by CI. Installing ordinary galerkin wheels
+does not install their reference-tool extras. Set `OPENPHYSICS_REQUIRE_CROSSCHECK=1`
+to reject missing reference tools instead of skipping those checks.
+`integration/test_geometry_adapters.py`
 checks the versioned geometry contract with the matching simcase reader; run it explicitly.
 
 `provenance.json` identifies every imported file and its original SHA-256. Numerical

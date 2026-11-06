@@ -39,8 +39,9 @@ def main():
             checked = subprocess.run([sys.executable, '-c', code, str(args.wheels.resolve())],
                                      cwd=outside, env=env, check=True, text=True, capture_output=True)
             outcome['artifacts'] = json.loads(checked.stdout)
+            outcome['phase'] = 'reference-audit'
             outcome['dependencies'] = {name: metadata.version(name) for name in
-                                       ('numpy', 'scipy', 'shapely', 'scikit-rf')}
+                                       ('numpy', 'scipy', 'shapely', 'scikit-rf', 'scikit-fem')}
             for name in ('tests', 'integration'):
                 shutil.copytree(root / name, outside / name)
             shutil.copy2(root / 'pyproject.toml', outside / 'pyproject.toml')

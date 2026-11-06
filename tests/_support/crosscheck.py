@@ -34,7 +34,7 @@ TOOLS = {
     # Exact versions come from the installed metadata at run time.
     "scikit-fem": {"module": "skfem", "license": "BSD-3-Clause",
                    "source": "https://github.com/kinnala/scikit-fem",
-                   "use": "imported in-process from the galerkin[crosscheck] test extra"},
+                   "use": "imported in-process from the sipi[test] test extra"},
     "symfem": {"module": "symfem", "license": "MIT",
                "source": "https://github.com/mscroggs/symfem",
                "use": "imported in-process from the galerkin[crosscheck] test extra"},

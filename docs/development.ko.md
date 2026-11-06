@@ -7,7 +7,11 @@ SIPI는 외부 설치된 galerkin·meshine을 사용합니다. 공동 개발 시
 `PYTHONPATH=src python -m pytest -q tests/sipi`로 소스 시험을 실행합니다.
 PowerShell에서는 먼저 `$env:PYTHONPATH="src"`를 설정합니다. 휠을 만들어 별도 환경에 설치한 뒤
 시험을 체크아웃 밖으로 복사해 동일한 전체 시험을 실행합니다. 독립 네트워크 비교에는
-scikit-rf 2.2.0이 필요합니다. 기하 계약은 해당 simcase reader와 함께
+scikit-rf 2.2.0, 독립 유한요소 비교에는 scikit-fem 12.0.2가 필요합니다.
+둘 다 `sipi[test]`의 시험 전용 의존성이며 CI에서도 명시적으로 설치합니다.
+일반 galerkin 휠 설치만으로 비교 도구 extra가 설치되지는 않습니다.
+`OPENPHYSICS_REQUIRE_CROSSCHECK=1`로 누락된 도구를 skip 대신 오류로 처리합니다.
+기하 계약은 해당 simcase reader와 함께
 `integration/test_geometry_adapters.py`를 명시적으로 실행합니다.
 
 provenance.json은 이전한 파일과 원본 SHA-256을 기록합니다. 수치 구현·기준값은
