@@ -17,10 +17,10 @@ import numpy as np
 from scipy.constants import epsilon_0, mu_0
 
 from .network import _frequencies, _real, _scalar, rlgc_network
-from .quasistatic import capacitance_matrix
+from .quasistatic import capacitance_matrix, _permittivity
 
 __all__ = ['ConstantDielectric', 'DebyeDielectric', 'WidebandDielectric',
-           'TabulatedDielectric', 'dielectric_to_dict', 'dielectric_from_dict',
+           'TabulatedDielectric', 'PrincipalAxisDielectric', 'dielectric_to_dict', 'dielectric_from_dict',
            'DielectricSweep', 'dispersive_line']
 
 
@@ -172,8 +172,42 @@ _MODELS = {'constant': ConstantDielectric, 'debye': DebyeDielectric,
            'wideband': WidebandDielectric, 'table': TabulatedDielectric}
 
 
+@dataclass(frozen=True)
+class PrincipalAxisDielectric:
+    """Two scalar dielectric models on fixed orthogonal transverse axes.
+
+    Axis 1 makes angle_rad counterclockwise from the mesh global x axis;
+    axis 2 is perpendicular. The rotation is real and frequency independent.
+    Scalar frequency returns (2,2), a vector returns (F,2,2). This is a
+    reciprocal transverse constitutive tensor, not a longitudinal/full-wave
+    material. The constituent models retain their validity/causality limits.
+    """
+    axis1: object
+    axis2: object
+    angle_rad: float = 0.0
+
+    def __post_init__(self):
+        if any(type(axis) not in _MODELS.values() for axis in (self.axis1, self.axis2)):
+            raise ValueError('principal axes require supported scalar dielectric models')
+        angle = _real('angle_rad', self.angle_rad)
+        if angle.ndim != 0:
+            raise ValueError('angle_rad must be a finite real scalar')
+        object.__setattr__(self, 'angle_rad', float(angle))
+
+    def permittivity(self, frequency):
+        f = _samples(frequency)
+        c, s = np.cos(self.angle_rad), np.sin(self.angle_rad)
+        a, b = np.array([c, s]), np.array([-s, c])
+        return (self.axis1.permittivity(f)[..., None, None]*np.outer(a, a)
+                + self.axis2.permittivity(f)[..., None, None]*np.outer(b, b))
+
+
 def dielectric_to_dict(model):
     """Versioned, JSON-safe model input; no code paths or implicit units."""
+    if type(model) is PrincipalAxisDielectric:
+        return dict(schema='sipi.dielectric/2', kind='principal-axes', parameters=dict(
+            axis1=dielectric_to_dict(model.axis1), axis2=dielectric_to_dict(model.axis2),
+            angle_rad=model.angle_rad))
     for kind, cls in _MODELS.items():
         if type(model) is cls:
             parameters = {k: list(v) if isinstance(v, tuple) else v for k, v in asdict(model).items()}
@@ -186,6 +220,17 @@ def dielectric_from_dict(value):
     if not isinstance(value, dict) or set(value) != {'schema', 'kind', 'parameters'}:
         raise ValueError('dielectric document needs exactly schema, kind and parameters')
     kind = value['kind']
+    if value['schema'] == 'sipi.dielectric/2' and kind == 'principal-axes':
+        parameters = value['parameters']
+        if not isinstance(parameters, dict) or set(parameters) != {'axis1', 'axis2', 'angle_rad'}:
+            raise ValueError('principal axes need exactly axis1, axis2 and angle_rad')
+        axes = []
+        for name in ('axis1', 'axis2'):
+            child = parameters[name]
+            if not isinstance(child, dict) or child.get('schema') != 'sipi.dielectric/1':
+                raise ValueError('principal axes require scalar dielectric/1 documents')
+            axes.append(dielectric_from_dict(child))
+        return PrincipalAxisDielectric(*axes, angle_rad=parameters['angle_rad'])
     if value['schema'] != 'sipi.dielectric/1' or not isinstance(kind, str) or kind not in _MODELS:
         raise ValueError('unsupported dielectric schema or kind')
     cls, parameters = _MODELS[kind], value['parameters']
@@ -200,7 +245,8 @@ class DielectricSweep:
 
     C_complex=C-j*C_loss in F/m; G=2*pi*f*C_loss. R and internal conductor L
     are not extracted here. Arrays are copied/read-only. Layer permittivities
-    preserve the actual complex samples used for every solve.
+    preserve the actual complex samples used for every solve: shape (F,) for
+    scalar materials and (F,2,2) for tensors in mesh global x/y coordinates.
     """
     frequency: np.ndarray
     names: tuple[str, ...]
@@ -228,7 +274,9 @@ class DielectricSweep:
         samples = {}
         for key, value in self.layer_permittivity.items():
             a = np.array(value, dtype=complex, copy=True)
-            if a.shape != f.shape or not np.all(np.isfinite(a)) or np.any(a.real < 1) or np.any(a.imag > 0):
+            if a.shape == (len(f), 2, 2):
+                a = np.array(_permittivity(value, len(f)), dtype=complex, copy=True)
+            elif a.shape != f.shape or not np.all(np.isfinite(a)) or np.any(a.real < 1) or np.any(a.imag > 0):
                 raise ValueError('invalid layer permittivity samples')
             a.setflags(write=False)
             samples[key] = a
@@ -287,7 +335,10 @@ def _dispersive_from_mesh(meshed, f, samples, *, c0=None):
     inductance = mu_0*epsilon_0*np.linalg.inv(c0)
     regions = [mesh.region_names[r] for r in mesh.regions]
     complex_c = []
+    tensor = any(value.ndim == 3 for value in samples.values())
     for index in range(len(f)):
-        eps = np.array([samples[name][index] for name in regions])
+        values = {name: (value[index]*np.eye(2) if tensor and value.ndim == 1 else value[index])
+                  for name, value in samples.items()}
+        eps = np.array([values[name] for name in regions])
         complex_c.append(capacitance_matrix(mesh, eps, signals, ground))
     return DielectricSweep(f, tuple(signals), complex_c, c0, inductance, samples)

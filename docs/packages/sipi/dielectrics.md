@@ -35,7 +35,9 @@ are Hz, strengths and relative permittivities are dimensionless. Models reject
 boolean, complex, nonfinite and invalid-sign inputs. `permittivity` accepts a
 nonnegative scalar or nonempty one-dimensional real frequency array; arrays
 need not be sorted for a material evaluation. Extraction requires strictly
-increasing samples. Real permittivity is at least one in these models.
+increasing samples. Real permittivity is at least one in the scalar models below.
+[Principal-axis materials](principal_dielectrics.md) combine two of these models
+into a rotated transverse tensor with independent directional loss/dispersion.
 
 | Model | Inputs and behavior |
 |---|---|
@@ -56,7 +58,7 @@ at those frequencies. No DC conductivity or magnetic dispersion is included.
 
 ## Strict material JSON
 
-`dielectric_to_dict(model)` and `dielectric_from_dict(value)` use exactly:
+For scalar models, `dielectric_to_dict(model)` and `dielectric_from_dict(value)` use exactly:
 
 ```json
 {

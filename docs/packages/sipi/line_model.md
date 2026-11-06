@@ -121,3 +121,5 @@ physical accuracy claim, runtime dependency or browser/EXE deployment.
 ```sh
 OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_line_model.py tests/sipi/test_dielectric.py tests/sipi/test_conductor.py
 ```
+
+[Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.

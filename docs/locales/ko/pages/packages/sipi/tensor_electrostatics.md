@@ -43,9 +43,10 @@ parameters.C, parameters.C0, parameters.L, parameters.G(1e9)
 ```
 
 메시 API에 계수를 명시적으로 전달하는 예제입니다. section.analyze()는 여전히
-원래 scalar 층 재료를 사용합니다. Layer·템플릿 eps_r·기하 JSON·주파수 재료
-문서는 아직 텐서를 받지 않습니다. 입력 텐서장과 정확한 메시/빌드 식별자를 따로
-보존해야 하며, 새 저장 스키마를 뜻하지 않습니다. LineParameters는 기존 진공 C0와
+원래 scalar 층 재료를 사용합니다. Layer·템플릿 eps_r·기하 JSON은 스칼라를 유지합니다.
+[주축 재료 문서](principal_dielectrics.md)는 주파수 선로 해석의 텐서 재료 지정을 저장합니다.
+임의의 메시 입력 텐서장과 정확한 메시/빌드 식별자는 여전히 따로
+보존해야 합니다. 저수준 함수만으로 저장 스키마가 생기지는 않습니다. LineParameters는 기존 진공 C0와
 비자성 준TEM `L=μ0 ε0 C0⁻¹` 근사를 유지합니다. 비대칭 재료/기하 쌍에 정확한
 even/odd 모드를 추정하지 마세요. 종방향 z 결합 성분·비상호성·자기 이방성·
 full-wave 전파는 이 2차원 계약 밖입니다.

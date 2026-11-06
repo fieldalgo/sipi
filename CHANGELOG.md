@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save fixed principal-axis dispersive dielectrics and reuse them in shared-mesh and volume line extraction, network assembly and driven circuits, with scalar material compatibility and independent tensor-field checks.
+
 - Accept reciprocal passive transverse permittivity tensors in mesh capacitance extraction and real tensors with local loss tangents in quasi-TEM line parameters, using existing shared P1 kernels.
 
 - Add planar-coated single and paired coplanar sections without a backing ground plane, with saved studies, width goals and independent field/convergence checks.

@@ -45,10 +45,11 @@ parameters.C, parameters.C0, parameters.L, parameters.G(1e9)
 ```
 
 This explicitly supplies coefficients to the mesh API. `section.analyze()` still
-uses the original scalar layer materials. `Layer`, template `eps_r`, geometry
-JSON and frequency-dependent material documents do **not** yet accept tensors.
-Save the supplied tensor field and exact mesh/build identity separately; no new
-saved tensor schema is implied by this API. Returned `LineParameters` retains
+uses the original scalar layer materials. `Layer`, template `eps_r` and geometry
+JSON remain scalar. [Principal-axis material documents](principal_dielectrics.md)
+provide saved tensor overrides for frequency-line extraction. Arbitrary mesh
+tensor fields still require their coefficients and exact mesh/build identity to
+be stored separately. Returned `LineParameters` retains
 the usual vacuum `C0` and nonmagnetic quasi-TEM `L=μ0 ε0 C0⁻¹` approximation.
 Do not infer exact even/odd modes for an asymmetric material/geometry pair.
 Tensor entries involving longitudinal z, nonreciprocity, magnetic anisotropy

@@ -148,10 +148,13 @@ def volume_line(volume,frequency,*,materials,conductivity,length,z_ref=50.0,
     series = volume.impedance(f,conductivity=conductivity,
         relative_permeability=relative_permeability,keep_fields=keep_fields)
     complex_c = []
+    tensor = any(value.ndim == 3 for value in samples.values())
     for index in range(len(f)):
-        eps = np.ones(volume.mesh.num_triangles,dtype=complex)
+        eps = (np.tile(np.eye(2,dtype=complex),(volume.mesh.num_triangles,1,1))
+               if tensor else np.ones(volume.mesh.num_triangles,dtype=complex))
         for name,ids in layer_ids.items():
-            eps[ids] = samples[name][index]
+            value = samples[name][index]
+            eps[ids] = value*np.eye(2) if tensor and samples[name].ndim == 1 else value
         complex_c.append(capacitance_matrix(mesh,eps[nonmetal],signals,ground))
     complex_c = np.asarray(complex_c)
     conductance = -2*np.pi*f[:,None,None]*complex_c.imag

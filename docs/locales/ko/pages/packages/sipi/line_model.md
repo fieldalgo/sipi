@@ -100,3 +100,5 @@ Linux, Python 3.12.14, NumPy 2.5.4, SciPy 1.18.1(2026-10-30)에서 신규 23개�
 ```sh
 OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_line_model.py tests/sipi/test_dielectric.py tests/sipi/test_conductor.py
 ```
+
+[주축 방향별 분산 재료](principal_dielectrics.md)는 저장 선로의 재료 매핑을 재사용합니다.

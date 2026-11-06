@@ -126,3 +126,5 @@ must not be silently interchanged. This document is separate from surface-model
 input contracts. Nonuniform conductor conductivity/permeability, conductor
 roughness, radiation, arbitrary mask contours, and 3D transitions are not
 implemented. Material fits still need independent measured validation.
+
+[Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.
