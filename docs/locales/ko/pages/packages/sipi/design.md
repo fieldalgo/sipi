@@ -86,6 +86,48 @@ JSON 최상위에는 아래 필드가 모두 필요하며 다른 필드는 허�
 
 ## 목표 임피던스
 
+### 역산 요청 저장
+
+`ImpedanceDesignDocument`는 결과 단면과 별도로 목표·탐색 설정을 저장합니다.
+등록된 템플릿만 받으며 코드나 직렬화한 Python callable은 받지 않습니다.
+읽을 때 매개변수·끝점 형상을 검사하지만 메시·해석은 실행하지 않습니다.
+
+```python
+from sipi import ImpedanceDesignDocument
+
+plan = ImpedanceDesignDocument('stripline',
+    dict(width=.5e-3, plane_spacing=1e-3, eps_r=4),
+    variable='width', bounds=[.3e-3, .8e-3], target=50,
+    tolerance=.2, max_evaluations=20,
+    mesh=dict(edge_size=.5e-6, far_size=.125e-3, grade=.075))
+saved_goal = plan.dumps()
+result = ImpedanceDesignDocument.loads(saved_goal).solve()
+saved_section = result.document.dumps()
+```
+
+strict `sipi.impedance-design/1`은 정확히 `schema`, `template`, `parameters`,
+`variable`, `bounds`, `target_ohm`, `quantity`, `tolerance_ohm`, `max_evaluations`,
+`mesh`, `fixed_pitch_m`, `fixed_plane_spacing_m`을 갖습니다. 마지막 두 필드는
+미사용 시 명시적 null입니다. bounds는 선택한 템플릿 변수 단위의 양수 2개이며
+증가해야 합니다. 목표·허용오차는 양의 Ω입니다. 기본 계산 예산은 40이고 정수
+3–10000을 허용합니다. 생성기의 `target`, `tolerance`는 JSON의 `_ohm` 필드가 됩니다.
+템플릿 기본값과 nominal에서 해결한 메시 설정을 저장합니다. 보관 시 JSON과 함께
+엔진 버전도 기록하세요.
+
+`from_dict`, `loads`, `to_dict`, `dumps`는 입력을 복사하고 미등록 버전/필드·필드
+누락·중복 키·비유한 수·수치 필드의 bool을 거부합니다. 한 변수 역산이며 형상과
+quantity는 [공차 템플릿 계약](study.md)을 따릅니다. 폭 역산은 고정 피치, 층 높이
+역산은 고정 접지면 간격을 사용할 수 있습니다. 다른 독립 변수를 요구하는 제약은
+거부하며 탐색하지 않는 치수는 이미 저장값으로 고정됩니다.
+
+`solve()`는 후보 단면과 계산 이력을 가진 기존 `ImpedanceDesign`을 반환합니다.
+아래의 동일한 유계 탐색·별도 메시 확인을 사용하며 `GoalSeekError`와 완료 이력을
+그대로 전달합니다. 실패를 성공으로 저장하지 않습니다. 목표와 결과 입력을 모두
+보관하려면 `plan.dumps()`와 `result.document.dumps()`를 함께 저장하세요.
+두 문서 형식 모두 파일을 자동으로 쓰지 않습니다.
+
+### 직접 factory 인터페이스
+
 ```python
 from sipi import seek_impedance, stripline
 
@@ -114,6 +156,13 @@ print(result.parameter, result.impedance, result.refined_impedance)
 전파하며 실패를 성공 설계로 반환하지 않습니다. 세분 검사 실패 시 메시를 더 촘촘하게 설정해
 다시 탐색하세요. 이는 수치적 목표 검사이지 제조 공차 보장이나 임의 factory의 단조성 증명이
 아닙니다. 영역·재료 불확실성은 별도로 분석해야 합니다.
+
+## 저장 요청 검증
+
+`tests/sipi/test_impedance_design_document.py`는 저장·복원한 50 Ω 목표를 독립 Cohn
+폭과 비교합니다(폭 1%, 두 메시 잔차 0.2 Ω). 파싱 시 미해석, 입력 복사·격리,
+잘못된 입력, 제약·메시·예산 전달과 실패 이력 보존도 검사합니다. 요청 경로 검증이며
+기존 물리 모델의 유효범위를 확대하지 않습니다.
 
 ## 검증
 

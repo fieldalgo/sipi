@@ -94,6 +94,53 @@ can change between versions.
 
 ## Target impedance
 
+### Save a design request
+
+`ImpedanceDesignDocument` saves the goal and search settings, separately from the
+resulting cross-section input. It accepts named templates only, never code or a
+serialized Python callable. Loading validates parameters and endpoint geometry
+but does not mesh or solve.
+
+```python
+from sipi import ImpedanceDesignDocument
+
+plan = ImpedanceDesignDocument('stripline',
+    dict(width=.5e-3, plane_spacing=1e-3, eps_r=4),
+    variable='width', bounds=[.3e-3, .8e-3], target=50,
+    tolerance=.2, max_evaluations=20,
+    mesh=dict(edge_size=.5e-6, far_size=.125e-3, grade=.075))
+saved_goal = plan.dumps()
+result = ImpedanceDesignDocument.loads(saved_goal).solve()
+saved_section = result.document.dumps()
+```
+
+Strict `sipi.impedance-design/1` has exactly `schema`, `template`, `parameters`,
+`variable`, `bounds`, `target_ohm`, `quantity`, `tolerance_ohm`, `max_evaluations`,
+`mesh`, `fixed_pitch_m`, `fixed_plane_spacing_m`. The last two fields are explicit
+nulls when unused. Bounds are two positive increasing numbers in the chosen
+template parameter's units; target and tolerance are positive ohms. The default
+budget is 40, with accepted integer range 3–10000. Constructor arguments `target`
+and `tolerance` map to the explicit `_ohm` JSON fields. All template defaults and
+the resolved nominal mesh settings are saved. Record the engine version with
+the JSON when archiving a calculation.
+
+`from_dict`, `loads`, `to_dict`, `dumps` snapshot/copy inputs and reject unknown
+versions/fields, missing fields, duplicate keys, nonfinite numbers and booleans
+in numeric fields. This is a single-variable request; geometry and quantity
+follow the [study template contracts](study.md). A width search may use fixed
+pitch, and a layered-height search may use fixed plane spacing. Constraints
+requiring another independent variable are rejected; dimensions that are not
+being searched already remain fixed at their saved values.
+
+`solve()` returns the existing `ImpedanceDesign`, including its saved candidate
+section and evaluation history. It calls the same bounded search and separate
+mesh confirmation described below. `GoalSeekError` and its completed history
+propagate; a failed search is never represented as a successful saved design.
+Save `plan.dumps()` alongside `result.document.dumps()` to retain both the goal
+and the result input. Neither document format writes files automatically.
+
+### Direct factory interface
+
 ```python
 from sipi import seek_impedance, stripline
 
@@ -140,5 +187,11 @@ The 47 tests passed on Linux, Python 3.12.14, NumPy 2.5.4 and SciPy 1.18.1;
 platform and installed-package acceptance is handled separately by required CI.
 Existing physical reference thresholds are unchanged. No new external dependency
 or independent validation of coplanar physics is claimed by template equivalence.
+
+`tests/sipi/test_impedance_design_document.py` adds a saved/reloaded 50-ohm Cohn
+width comparison (1% width, both mesh residuals at most 0.2 ohm), no-solve parsing,
+snapshot isolation, strict malformed-input checks, constraint/mesh/budget
+forwarding and retained failures. This verifies the request path; it does not
+expand the underlying models' physical validity.
 
 [Correlated tolerance studies and fixed-pitch sampling](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/study.md).
