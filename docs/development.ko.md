@@ -4,6 +4,10 @@ SIPI는 외부 설치된 galerkin·meshine을 사용합니다. 공동 개발 시
 커밋으로 만든 휠을 설치하고 `python -m pip install --no-deps .`로 SIPI를 설치합니다.
 이 커밋은 개발 기준선이며 PyPI 게시 완료를 의미하지 않습니다.
 
+미출시 개발 커밋은 같은 패키지 버전을 쓸 수 있습니다. 수치 결과와 함께 정확한
+SIPI 커밋·wheel SHA-256·의존 패키지 산출물을 기록하세요. 버전 문자열만으로
+해당 개발 빌드를 식별할 수 없습니다.
+
 `PYTHONPATH=src python -m pytest -q tests/sipi`로 소스 시험을 실행합니다.
 PowerShell에서는 먼저 `$env:PYTHONPATH="src"`를 설정합니다. 휠을 만들어 별도 환경에 설치한 뒤
 시험을 체크아웃 밖으로 복사해 동일한 전체 시험을 실행합니다. 독립 네트워크 비교에는

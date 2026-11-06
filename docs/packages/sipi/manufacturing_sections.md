@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Unbacked coplanar sections](unbacked_coplanar.md) also support saved studies and goals.
+
 [Planar-coated coplanar sections](coated_coplanar.md) support JSON, studies and goals.
 
 [Planar-coated paired traces](coated_pair.md) also support saved studies and width goals.

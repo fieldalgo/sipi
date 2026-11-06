@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add single and paired unbacked coplanar templates with finite substrates and grounds, independent free-space references, saved studies and impedance goals.
+
 - Add strict saved sequences of network reference changes and passive port reductions, with one source extraction and existing circuit-document integration.
 
 - Add explicit open, short and finite passive port reduction while preserving retained port order, references and basis, with singular-feedback rejection and independent network checks.

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
@@ -14,6 +15,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'coupled_coated_microstrip',
            'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar',
+           'unbacked_coplanar', 'coupled_unbacked_coplanar',
            'with_surface_mask']
 
 
@@ -116,6 +118,47 @@ def coupled_grounded_coplanar(*, width, gap, ground_gap, ground_width,
          Trace('negative', offset, w, h, t, top_width=top_width),
          Trace('ground_left', -ground_offset, gw, h, t, ground=True),
          Trace('ground_right', ground_offset, gw, h, t, ground=True)], box)
+
+
+def _unbacked_coplanar(base, lower_air_height):
+    lower = (10*base.layers[0].thickness if lower_air_height is None else
+             _positive('lower_air_height', lower_air_height))
+    return CrossSection([Layer('lower_air', lower), *base.layers],
+                        [replace(t, y=t.y+lower) for t in base.traces],
+                        base.width, bottom='open')
+
+
+def unbacked_coplanar(*, width, gap, ground_width, substrate_height, eps_r,
+                     thickness=0.0, tan_delta=0.0, air_height=None,
+                     lower_air_height=None, box_width=None, top_width=None):
+    """Surface signal and finite coplanar grounds, with no backing ground plane.
+
+    A finite substrate lies between lower and upper air regions. All outer
+    boundaries are open; the two coplanar ground traces define the reference.
+    gap separates signal bottom edges from grounds. Only the signal can taper.
+    lower_air_height defaults to ten substrate heights and needs convergence.
+    """
+    base = grounded_coplanar(width=width, gap=gap, ground_width=ground_width,
+        substrate_height=substrate_height, eps_r=eps_r, thickness=thickness,
+        tan_delta=tan_delta, air_height=air_height, box_width=box_width, top_width=top_width)
+    return _unbacked_coplanar(base, lower_air_height)
+
+
+def coupled_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
+                             substrate_height, eps_r, thickness=0.0, tan_delta=0.0,
+                             air_height=None, lower_air_height=None,
+                             box_width=None, top_width=None):
+    """Equal surface pair between finite coplanar grounds without a backing plane.
+
+    gap separates signal bottom edges; ground_gap separates the outer signal
+    edges from the grounds. No central ground. Lower air separates the finite
+    substrate from the open bottom boundary. Grounds remain rectangular.
+    """
+    base = coupled_grounded_coplanar(width=width, gap=gap, ground_gap=ground_gap,
+        ground_width=ground_width, substrate_height=substrate_height, eps_r=eps_r,
+        thickness=thickness, tan_delta=tan_delta, air_height=air_height,
+        box_width=box_width, top_width=top_width)
+    return _unbacked_coplanar(base, lower_air_height)
 
 
 def _coated_coplanar(base, coating_height, coating_eps_r, coating_tan_delta, air_height):

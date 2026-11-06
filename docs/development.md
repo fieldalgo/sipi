@@ -5,6 +5,10 @@ install their wheels built from the commit in `dependencies.json`, then install 
 with `python -m pip install --no-deps .`. The pinned commit is a development baseline,
 not evidence that equivalent packages have been published to PyPI.
 
+Unreleased development commits can share a package version. Record the exact
+SIPI commit and wheel SHA-256, plus the dependency artifacts, with numerical
+results; a version string alone cannot identify such a build.
+
 Run `PYTHONPATH=src python -m pytest -q tests/sipi` for the source suite (set
 `$env:PYTHONPATH="src"` first in PowerShell). Build a wheel and install it in a clean
 environment, copy tests outside the checkout and run the same suite there. Include
