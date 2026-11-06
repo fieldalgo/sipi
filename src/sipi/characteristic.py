@@ -42,24 +42,30 @@ def _freeze(value):
 
 @dataclass(frozen=True)
 class LineCharacteristic:
-    """Forward-wave matrices in conductor coordinates, shape (F,N,N).
+    """Forward-wave matrices in explicit voltage/current coordinates, (F,N,N).
 
     dV/dz=-gamma_voltage V; I=y_characteristic V and V=z_characteristic I.
     z is longitudinal distance; I is positive in the forward +z direction.
     Gamma is in 1/m, Zc in ohms and Yc in siemens. These are matrices, not
     per-conductor scalar impedances or tracked modes. Arrays are snapshots.
+    The default basis is single-ended; mixed-mode is differential/common for
+    exactly two conductors, with power-dual voltage/current normalization.
     """
     frequency: np.ndarray
     names: tuple[str, ...]
     gamma_voltage: np.ndarray
     z_characteristic: np.ndarray
     y_characteristic: np.ndarray
+    basis: str = 'single-ended'
 
     def __post_init__(self):
         f = _frequencies(self.frequency)
         if np.any(f <= 0):
             raise ValueError('characteristic matrices require positive frequency; DC is excluded')
         names = tuple(self.names)
+        if (not isinstance(self.basis, str) or self.basis not in ('single-ended', 'mixed-mode')
+                or (self.basis == 'mixed-mode' and len(names) != 2)):
+            raise ValueError('basis must be single-ended, or mixed-mode for a two-conductor pair')
         if (not names or any(not isinstance(n, str) or not n.strip() or '\n' in n or '\r' in n
                              for n in names) or len(set(names)) != len(names)):
             raise ValueError('conductor names must be unique nonempty single-line strings')
@@ -84,6 +90,26 @@ class LineCharacteristic:
                 raise ValueError('forward roots require positive phase and nonnegative attenuation within roundoff')
         object.__setattr__(self, 'frequency', _freeze(f))
         object.__setattr__(self, 'names', names)
+
+    def mixed_mode(self):
+        """Return differential/common forward matrices for this ordered pair.
+
+        First conductor is +, second is -: Vd=V1-V2, Vc=(V1+V2)/2,
+        Id=(I1-I2)/2, Ic=I1+I2. Complex power is preserved. Off-diagonal
+        coupling remains; this is a coordinate change, not mode extraction,
+        tracking or a symmetry assumption. Reject other counts/repeated use.
+        """
+        if self.basis != 'single-ended' or len(self.names) != 2:
+            raise ValueError('mixed_mode requires two single-ended conductor coordinates')
+        voltage = np.array([[1., -1.], [.5, .5]])
+        inverse = np.array([[.5, 1.], [-.5, 1.]])
+        current = inverse.T
+        with np.errstate(over='ignore', invalid='ignore'):
+            gamma = voltage@self.gamma_voltage@inverse
+            impedance = voltage@self.z_characteristic@voltage.T
+            admittance = current@self.y_characteristic@current.T
+        return LineCharacteristic(self.frequency, ('differential', 'common'),
+                                  gamma, impedance, admittance, basis='mixed-mode')
 
     def voltage_transfer(self, length):
         """Return exp(-Gamma*length) for a pure forward wave, not terminal S.

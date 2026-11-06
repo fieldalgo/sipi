@@ -1,5 +1,7 @@
 # 전체 행렬을 사용하는 전방파 전파
 
+[차동·공통 좌표](mixed_characteristic.md)에서도 쌍의 전체 결합 행렬을 보존합니다.
+
 `rlgc_characteristic(frequency, R=..., L=..., G=..., C=..., names=None)`는 **원래
 도체 전압·전류 좌표**에서 전방파 행렬을 계산합니다. 짝/홀 쌍으로 투영하지 않고
 비대칭 상호 다도체 RLGC를 지원합니다. 입력은 `rlgc_network`와 같은 실수 대칭

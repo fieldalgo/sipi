@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Expose power-dual differential/common characteristic matrices for asymmetric pairs, retaining cross-coupling, physical voltage/current normalization and existing forward-wave validity gates without another field solve.
+
 - Save ordered cascades and known-fixture removal in explicit network-transforms v2, validating every intermediate port/reference before meshing and preserving per-occurrence extraction diagnostics; keep v1 input bytes and numerical gates.
 
 - Add passive lumped series/shunt RLC branches and strict saved inputs, with exact DC limits, scaled scattering, independent circuit/reference checks, and assembly/transformation/driven-circuit integration.

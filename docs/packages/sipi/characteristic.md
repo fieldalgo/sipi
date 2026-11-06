@@ -1,5 +1,7 @@
 # Full-matrix forward-wave propagation
 
+[Differential/common coordinates](mixed_characteristic.md) retain the full coupling matrix for a pair.
+
 `rlgc_characteristic(frequency, R=..., L=..., G=..., C=..., names=None)` computes
 forward-wave matrices in the **original conductor voltage/current coordinates**.
 It supports asymmetric reciprocal multiconductor RLGC without projecting onto
