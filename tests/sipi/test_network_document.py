@@ -124,7 +124,7 @@ def test_snapshots_and_operation_order_are_preserved():
 
 
 @pytest.mark.parametrize('mutate',[
-    lambda d:d.update(schema='sipi.network-transforms/2'),lambda d:d.update(extra=1),
+    lambda d:d.update(schema='sipi.network-transforms/3'),lambda d:d.update(extra=1),
     lambda d:d.pop('network'),lambda d:d.pop('operations'),
     lambda d:d.update(operations=[]),lambda d:d.update(operations=None),
     lambda d:d.update(operations=[dict(kind='renormalize',reference_ohms=50)]*33),

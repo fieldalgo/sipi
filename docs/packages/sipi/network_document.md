@@ -1,5 +1,8 @@
 # Saved network transformations
 
+Explicit [version 2](saved_fixtures.md) also saves cascade and known-fixture removal.
+Version 1 below remains the constructor default and keeps its canonical inputs.
+
 `NetworkTransformDocument` stores one network input and an ordered sequence of
 reference changes and passive port reductions. Existing line extraction and
 network APIs perform the calculations; saving a sequence adds no new physics.
@@ -41,7 +44,7 @@ There is no automatic reorder, interpolation, model selection or port mapping.
 
 Unknown/missing fields, duplicate JSON keys, nonfinite values, boolean numbers,
 unsupported versions and malformed intermediate port selections are errors.
-Inputs and accessor outputs are copied; `frequency` is read-only and
+Inputs and accessor outputs are copied; `frequency` and final `z_ref` are read-only and
 `port_names` is a tuple for the final network. `to_dict` returns a fresh map.
 Parsing validates input metadata without a geometry mesh. Existing explicit
 RLGC/Touchstone parsing may perform numerical network construction.

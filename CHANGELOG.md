@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save ordered cascades and known-fixture removal in explicit network-transforms v2, validating every intermediate port/reference before meshing and preserving per-occurrence extraction diagnostics; keep v1 input bytes and numerical gates.
+
 - Add passive lumped series/shunt RLC branches and strict saved inputs, with exact DC limits, scaled scattering, independent circuit/reference checks, and assembly/transformation/driven-circuit integration.
 
 - Extend normal-thickness films to single and paired finite coplanar grounds, with and without a backing plane, preserving local materials in lower-air translation and saved studies/goals; reject unresolved film features before automatic meshing.
