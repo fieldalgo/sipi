@@ -19,7 +19,7 @@ result = NetworkTransformDocument.loads(plan.dumps()).analyze()
 결과는 기준 75Ω의 near:trace 포트 하나입니다. 엄격 스키마
 `sipi.network-transforms/1`의 필드는 schema·network·operations뿐입니다.
 원본은 기존 [회로 네트워크 입력](circuit_document.md)의 rlgc·인라인 touchstone·
-transmission-line·volume-line·[network-assembly](network_assembly.md) 중 하나이며
+transmission-line·volume-line·[lumped-network](lumped_network.md)·[network-assembly](network_assembly.md) 중 하나이며
 전체 입력과 유효성 검사를 유지합니다.
 변환 문서를 다시 원본으로 넣을 수 없습니다. 재귀 계획·파일 경로·URL·표현식·
 네트워크 접근은 없습니다.

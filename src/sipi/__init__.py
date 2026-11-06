@@ -23,7 +23,7 @@ copper plane fed by voltage sources and loaded by current sinks.
 High-frequency conductor loss is available in ``sipi.conductor`` with explicit
 skin-depth and mesh validity checks.
 Finite-metal current diffusion is available in ``sipi.conductor_diffusion``.
-AC PDN impedance and 3D structures are not implemented.
+Distributed AC power-plane impedance and 3D structures are not implemented.
 """
 
 from .crosssection import CrossSection, Layer, MeshedCrossSection, Trace
@@ -46,6 +46,7 @@ from .plane import (COPPER_CONDUCTIVITY, IRDropResult, PowerPlane, Sink, Source,
 from .quasistatic import LineParameters, capacitance_matrix, line_parameters
 
 from .network import LineNetwork, rlgc_network, quasistatic_network
+from .lumped import lumped_network, LumpedNetworkDocument
 from .connection import cascade_networks, deembed_network, connect_networks, ideal_junction
 from .propagation import LinePropagation, rlgc_propagation
 from .characteristic import LineCharacteristic, rlgc_characteristic
@@ -56,6 +57,7 @@ from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 __version__ = "0.1.0"
 __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
            "LineNetwork", "rlgc_network", "quasistatic_network",
+           "lumped_network", "LumpedNetworkDocument",
            "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",
            "LinePropagation", "rlgc_propagation",
            "LineCharacteristic", "rlgc_characteristic",

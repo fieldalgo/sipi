@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add passive lumped series/shunt RLC branches and strict saved inputs, with exact DC limits, scaled scattering, independent circuit/reference checks, and assembly/transformation/driven-circuit integration.
+
 - Extend normal-thickness films to single and paired finite coplanar grounds, with and without a backing plane, preserving local materials in lower-air translation and saved studies/goals; reject unresolved film features before automatic meshing.
 
 - Add single and paired surface traces with mitered normal-thickness dielectric films, saved geometry/material studies and width goals, with independent field and convergence checks.

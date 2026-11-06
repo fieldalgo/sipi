@@ -47,6 +47,7 @@ executed. `to_dict()` returns a fresh copy; construction snapshots all inputs.
 | `volume-line` | `document` | Complete [matched finite-metal/dielectric document](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/volume_line.md), including its schema and all volume mesh settings |
 | `network-transform` | `document` | Complete [saved transformation sequence](network_document.md), including an optional assembly source |
 | `network-assembly` | `document` | Complete [saved explicit assembly](network_assembly.md), with final current port metadata |
+| `lumped-network` | `document` | Complete [passive RLC branch input](lumped_network.md); no geometry extraction |
 
 The first two kinds hold supplied network data. The two line kinds retain the geometry,
 materials, sampling, length and reference; they extract RLGC/S during `analyze()`.

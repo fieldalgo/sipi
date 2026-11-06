@@ -46,6 +46,7 @@ NumPy 배열, 문자열이 아닌 객체 키는 거부합니다. 문자열 실�
 | `volume-line` | `document` | 스키마와 전체 메시 설정을 포함한 [동일 기하 금속·유전체 문서](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/volume_line.md) |
 | `network-transform` | `document` | 조립 원본을 포함할 수 있는 [저장형 변환 순서](network_document.md) 전체 |
 | `network-assembly` | `document` | 최종 포트 메타데이터가 있는 [저장형 명시 조립](network_assembly.md) 전체 |
+| `lumped-network` | `document` | [수동 RLC 가지 입력](lumped_network.md) 전체, 기하 추출 없음 |
 
 앞 두 종류는 주어진 네트워크 데이터입니다. 두 선로 종류는 형상·재료·주파수·길이·
 기준 임피던스를 보존하고 `analyze()`에서 RLGC/S를 추출합니다. 기존 문서가

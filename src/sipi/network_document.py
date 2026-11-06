@@ -14,12 +14,12 @@ from .network import LineNetwork, _references
 from .termination import terminate_ports
 
 __all__ = ['NetworkTransformDocument', 'NetworkTransformResult']
-_BASE_KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line', 'network-assembly')
+_BASE_KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line', 'network-assembly', 'lumped-network')
 
 
 def _source(value):
     if not isinstance(value, dict) or value.get('kind') not in _BASE_KINDS:
-        raise ValueError('network requires rlgc, touchstone, transmission-line, volume-line or network-assembly')
+        raise ValueError('network requires rlgc, touchstone, transmission-line, volume-line, network-assembly or lumped-network')
     return _network_input(value)
 
 

@@ -60,6 +60,12 @@ def _network_input(data):
             raise ValueError('Touchstone ports must match the explicit names count')
         net = loads_touchstone(data['text'], ports=data['ports'], port_names=data['port_names'])
         return net, data, net.frequency, net.port_names
+    if kind == 'lumped-network':
+        _keys(data, ('kind', 'document'), where='lumped network input')
+        from .lumped import LumpedNetworkDocument
+        doc = LumpedNetworkDocument.from_dict(data['document'])
+        net = doc.analyze()
+        return net, dict(kind=kind, document=doc.to_dict()), net.frequency, net.port_names
     if kind in ('transmission-line', 'volume-line'):
         _keys(data, ('kind', 'document'), where='line extraction network')
         if kind == 'transmission-line':

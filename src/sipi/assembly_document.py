@@ -14,7 +14,7 @@ from .document import _keys, _unique_object
 from .network import LineNetwork, _references
 
 __all__ = ['NetworkAssemblyDocument', 'NetworkAssemblyResult']
-_KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line')
+_KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line', 'lumped-network')
 
 
 def _component(data):

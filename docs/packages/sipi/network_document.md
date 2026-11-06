@@ -20,7 +20,7 @@ result = NetworkTransformDocument.loads(plan.dumps()).analyze()
 The strict schema `sipi.network-transforms/1` has exactly `schema`, `network`
 and `operations`. The base network uses the existing [circuit network input
 contracts](circuit_document.md): `rlgc`, inline `touchstone`,
-`transmission-line`, `volume-line`, or [network-assembly](network_assembly.md).
+`transmission-line`, `volume-line`, [lumped-network](lumped_network.md), or [network-assembly](network_assembly.md).
 Their complete input and validity
 requirements are preserved. A transformation cannot itself be a base network;
 there are no recursive plans, file paths, URLs, expressions or network access.

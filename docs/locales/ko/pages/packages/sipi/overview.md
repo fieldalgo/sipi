@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[수동 집중정수 RLC 가지](lumped_network.md)를 저장형 회로·조립 입력에 연결합니다.
+
 [법선 두께 코팅 단면](conformal_coating.md): 단일선·쌍과 저장형 공차·역산.
 
 메시 API에서 [횡방향 텐서 정전계](tensor_electrostatics.md)를 사용할 수 있습니다.
@@ -9,7 +11,7 @@
 [문서 홈](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/locales/ko/pages/index.md)
 
 `sipi`는 인쇄회로기판(PCB) 전송선의 단위길이 파라미터를 단면에서 계산합니다. 단면은 유전체 층을
-쌓고 직사각형 트레이스를 놓은 것입니다. `sipi`는 이를 [meshine](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/locales/ko/pages/packages/meshine/overview.md)으로 메시하고
+쌓고 국소 유전체 영역과 직사각형·사다리꼴·다각형 트레이스를 놓은 것입니다. `sipi`는 이를 [meshine](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/locales/ko/pages/packages/meshine/overview.md)으로 메시하고
 [galerkin](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/locales/ko/pages/packages/galerkin/overview.md) 엔진으로 2차원 정전 문제를 풉니다. 의존성은 numpy, scipy,
 galerkin, meshine입니다.
 

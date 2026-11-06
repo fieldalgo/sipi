@@ -20,10 +20,12 @@ to reject missing reference tools instead of skipping those checks.
 `integration/test_geometry_adapters.py`
 checks the versioned geometry contract with the matching simcase reader; run it explicitly.
 
-`provenance.json` identifies every imported file and its original SHA-256. Numerical
-implementation and fixtures are unchanged. This extraction does not publish the website,
-create a Windows EXE, or establish new platform support. Source history remains available
-at the recorded upstream commit; this repository starts with a traceable snapshot.
+`provenance.json` identifies every file in the original extraction snapshot and its
+upstream SHA-256. That snapshot preserved the numerical implementation and fixtures;
+subsequent commits extend the independent engine. Use the exact commit and wheel
+hash to identify later builds, without rewriting the original provenance record.
+The extraction did not publish the website, create a Windows EXE or establish new
+platform support. Original source history remains at the recorded upstream commit.
 
 [한국어](development.ko.md)
 

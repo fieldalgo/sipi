@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Passive lumped RLC branches](lumped_network.md) connect to saved circuit and assembly inputs.
+
 [Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.
 
 [Transverse tensor electrostatics](tensor_electrostatics.md) is available through the mesh APIs.
@@ -10,7 +12,7 @@
 
 `sipi` computes the per-unit-length parameters of printed-circuit-board
 transmission lines from their cross-section. A cross-section is a stack of
-dielectric layers with rectangular traces; `sipi` meshes it with
+dielectric layers and local regions with rectangular, tapered or polygonal traces; `sipi` meshes it with
 [meshine](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/packages/meshine/overview.md) and solves two-dimensional electrostatic
 problems with the [galerkin](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/packages/galerkin/overview.md) engine. It depends on
 numpy, scipy, galerkin and meshine.

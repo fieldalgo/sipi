@@ -28,7 +28,7 @@ result = NetworkTransformDocument.loads(loaded.dumps()).analyze()
 ## 계약
 
 `sipi.network-assembly/1` 스키마의 필드는 schema·network·connections뿐입니다.
-구성 요소는 기존 rlgc·인라인 touchstone·transmission-line·volume-line
+구성 요소는 기존 rlgc·인라인 touchstone·transmission-line·volume-line·[lumped-network](lumped_network.md)
 [네트워크 입력](circuit_document.md), 또는 ideal-junction입니다. 분기점의 필드는
 kind·frequency_hz·port_names·reference_ohms이며 두 개 이상의 고유 이름 배열이
 필요합니다. 양의 실수 기준은 scalar 또는 포트별 배열이고 전체 배열로 저장합니다.

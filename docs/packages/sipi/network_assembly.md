@@ -28,7 +28,8 @@ result = NetworkTransformDocument.loads(loaded.dumps()).analyze()
 
 The schema is `sipi.network-assembly/1`, with exactly `schema`, `network` and
 `connections`. A component is an existing `rlgc`, inline `touchstone`,
-`transmission-line` or `volume-line` [network input](circuit_document.md), or an
+`transmission-line`, `volume-line` or [lumped-network](lumped_network.md)
+[network input](circuit_document.md), or an
 `ideal-junction` with exactly `kind`, `frequency_hz`, `port_names` and
 `reference_ohms`. A junction needs an explicit array of at least two unique names;
 the positive real reference is a scalar or per-port array, saved as a full array.
