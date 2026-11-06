@@ -59,14 +59,18 @@ jobs:
           subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), '.'], cwd=next(extracted.iterdir()), check=True)
           subprocess.run([sys.executable, '-m', 'pip', 'install', *map(str, wheels.glob('*.whl'))], check=True)
           subprocess.run([sys.executable, '-m', 'pip', 'check'], check=True)
+      - name: Validation tool regression
+        run: python -m pytest -q tools/tests --junitxml=.validation/tools.xml
       - name: Source regression
         env:
           PYTHONPATH: src
         run: python -m pytest -q tests/sipi --junitxml=.validation/source.xml
       - name: Installed regression and geometry contract
-        run: python tools/check_installed.py
+        run: python tools/check_installed.py --wheels .validation/wheels
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: validation-${{ matrix.os }}
-          path: .validation/*.xml
+          path: |
+            .validation/*.xml
+            .validation/installed.json
