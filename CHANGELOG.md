@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept reciprocal passive transverse permittivity tensors in mesh capacitance extraction and real tensors with local loss tangents in quasi-TEM line parameters, using existing shared P1 kernels.
+
 - Add planar-coated single and paired coplanar sections without a backing ground plane, with saved studies, width goals and independent field/convergence checks.
 
 - Save explicit network assembly with ideal junctions, validated port metadata, one extraction per geometry component, and existing transformation/circuit integration.

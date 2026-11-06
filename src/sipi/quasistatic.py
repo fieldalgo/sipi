@@ -51,12 +51,56 @@ def _node_set(name, nodes, num_nodes):
     return idx
 
 
+def _has_boolean(value):
+    if isinstance(value, np.ndarray) and value.dtype.kind != 'O':
+        return value.dtype.kind == 'b'
+    return any(isinstance(x, (bool, np.bool_)) for x in np.asarray(value, dtype=object).flat)
+
+
+def _permittivity(eps_r, triangles):
+    """Scalar isotropic or reciprocal passive transverse tensor coefficients."""
+    eps = np.asarray(eps_r)
+    if eps.ndim in (0, 1):
+        if eps.ndim == 1 and eps.shape != (triangles,):
+            raise ValueError('eps_r must have one value per triangle')
+        if not np.all(np.isfinite(eps)) or np.any(np.real(eps) <= 0):
+            raise ValueError('eps_r must be finite with a positive real part')
+        if np.any(np.imag(eps) > 0):
+            raise ValueError("a passive dielectric has Im(eps_r) <= 0 (eps' (1 - j tan d))")
+        return eps
+    if eps.shape == (2, 2):
+        eps = np.broadcast_to(eps, (triangles, 2, 2))
+    if eps.shape != (triangles, 2, 2) or eps.dtype.kind not in 'iufc' or _has_boolean(eps_r):
+        raise ValueError('tensor eps_r needs finite numeric shape (2,2) or (triangles,2,2)')
+    if not np.all(np.isfinite(eps)):
+        raise ValueError('tensor eps_r must be finite')
+    scale = np.maximum(np.max(abs(eps.real), axis=(1, 2)),
+                       np.max(abs(eps.imag), axis=(1, 2)))
+    normalized = eps/np.where(scale > 0, scale, 1)[:, None, None]
+    if np.any(np.max(abs(normalized-normalized.swapaxes(-1, -2)), axis=(1, 2)) > 1e-12):
+        raise ValueError('relative permittivity tensors must be symmetric (reciprocal)')
+    # Average only accepted roundoff, without overflowing the sum of large entries.
+    eps = .5*eps+.5*eps.swapaxes(-1, -2)
+    real_eigenvalues = np.linalg.eigvalsh(eps.real)
+    loss_eigenvalues = np.linalg.eigvalsh(-eps.imag)
+    if not np.all(np.isfinite(real_eigenvalues)) or np.any(real_eigenvalues <= 0):
+        raise ValueError('real permittivity tensor must be positive definite')
+    loss_scale = np.max(abs(eps.imag), axis=(1, 2))
+    if (not np.all(np.isfinite(loss_eigenvalues))
+            or np.any(loss_eigenvalues < -1e-12*loss_scale[:, None])):
+        raise ValueError('passive permittivity requires -Im(tensor) positive semidefinite')
+    return eps
+
+
 def capacitance_matrix(mesh: Mesh, eps_r, signals: dict, ground) -> np.ndarray:
     """Maxwell capacitance matrix (F/m) of the signal conductors.
 
     mesh:    galerkin ``Mesh`` of the dielectric around the conductors, in metres
-    eps_r:   relative permittivity, a scalar or one value per triangle; complex
-             values eps' (1 - j tan d) give a complex matrix C - j C_loss
+    eps_r:   relative permittivity, scalar/(T,) or transverse tensor (2,2)/(T,2,2).
+             Complex coefficients give C - j C_loss. Tensors must be reciprocal,
+             with positive-definite real part and positive-semidefinite -imaginary
+             part; relative symmetry/passivity roundoff tolerance is 1e-12.
+             Tensor axes are global mesh x/y; no longitudinal coupling is modeled.
     signals: {name: node indices} for each signal conductor, in matrix order
     ground:  node indices held at 0 V (reference conductors). Mesh boundary
              nodes in neither set are insulated (zero normal D).
@@ -73,13 +117,7 @@ def capacitance_matrix(mesh: Mesh, eps_r, signals: dict, ground) -> np.ndarray:
                              "or the ground; conductors must not touch")
         seen = np.union1d(seen, idx)
 
-    eps_r = np.asarray(eps_r)
-    if eps_r.ndim not in (0, 1) or (eps_r.ndim == 1 and eps_r.shape[0] != mesh.num_triangles):
-        raise ValueError("eps_r must be a scalar or one value per triangle")
-    if not np.all(np.isfinite(eps_r)) or np.any(np.real(eps_r) <= 0):
-        raise ValueError("eps_r must be finite with a positive real part")
-    if np.any(np.imag(eps_r) > 0):
-        raise ValueError("a passive dielectric has Im(eps_r) <= 0 (eps' (1 - j tan d))")
+    eps_r = _permittivity(eps_r, mesh.num_triangles)
 
     K = assemble_stiffness(mesh, eps_r)
     zero = np.zeros(n, dtype=K.dtype)
@@ -192,15 +230,32 @@ def line_parameters(mesh: Mesh, eps_r, signals: dict, ground,
                     tan_delta=0.0) -> LineParameters:
     """Solve C, C0, L and C_loss on one mesh.
 
-    eps_r and tan_delta are scalars or one value per triangle. The dielectric
-    is eps0 eps_r (1 - j tan_delta); the vacuum problem uses eps_r = 1.
+    eps_r is real scalar/(T,) or a real positive-definite transverse tensor
+    (2,2)/(T,2,2). tan_delta is scalar or (T,): one local loss tangent multiplies
+    the entire local tensor, not separate axis loss tangents. For a general
+    complex tensor use capacitance_matrix explicitly. The vacuum problem uses
+    eps_r = 1; the usual nonmagnetic quasi-TEM inductance approximation is retained.
     """
-    eps_r = np.asarray(eps_r, dtype=float)
+    raw = np.asarray(eps_r)
+    tensor = raw.ndim >= 2
+    if tensor:
+        if np.iscomplexobj(raw):
+            raise ValueError('line_parameters requires real tensor eps_r; use capacitance_matrix for complex tensors')
+        eps_r = _permittivity(eps_r, mesh.num_triangles)
+        tangent = np.asarray(tan_delta)
+        if (tangent.dtype.kind not in 'iuf' or _has_boolean(tan_delta) or tangent.ndim not in (0, 1)
+                or (tangent.ndim == 1 and tangent.shape != (mesh.num_triangles,))):
+            raise ValueError('tensor tan_delta must be a real scalar or one value per triangle')
+    else:
+        eps_r = np.asarray(eps_r, dtype=float)
     tan_delta = np.asarray(tan_delta, dtype=float)
     if np.any(tan_delta < 0) or not np.all(np.isfinite(tan_delta)):
         raise ValueError("tan_delta must be finite and >= 0")
     lossy = np.any(tan_delta > 0)
-    eps = eps_r * (1.0 - 1j * tan_delta) if lossy else eps_r
+    factor = 1.0 - 1j * tan_delta
+    if tensor:
+        factor = np.asarray(factor)[..., None, None]
+    eps = eps_r * factor if lossy else eps_r
     Cc = capacitance_matrix(mesh, eps, signals, ground)
     C0 = capacitance_matrix(mesh, 1.0, signals, ground)
     L = mu_0 * epsilon_0 * np.linalg.inv(C0)

@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+메시 API에서 [횡방향 텐서 정전계](tensor_electrostatics.md)를 사용할 수 있습니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) | **한국어**
 
 [문서 홈](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/locales/ko/pages/index.md)
