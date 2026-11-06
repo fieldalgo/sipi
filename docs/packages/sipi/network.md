@@ -79,6 +79,35 @@ impedances are `2*Zref, 2*Zref, Zref/2, Zref/2`. Power-wave transformation is
 orthogonal and preserves power. Unequal reference impedances are rejected;
 conversion does not assume the pair is geometrically symmetric.
 
+## Change reference impedances
+
+`network.renormalized(z_ref)` returns a new immutable `LineNetwork` with S
+expressed at the requested positive real references. Supply one scalar or one
+constant value per port. Frequency-dependent and complex references are rejected.
+Frequencies, port order, names and single-ended/mixed-mode basis are preserved.
+The physical network is unchanged; this operation does not fit materials,
+de-embed fixtures, infer port correspondence or repair nonpassive measurements.
+
+```python
+at_75_ohm = network.renormalized(75)
+per_port = network.renormalized([25, 100])  # a two-port example
+restored = per_port.renormalized(network.z_ref)
+```
+
+For real-reference power waves, put `D=diag(sqrt(Zold/Znew))`. At each frequency,
+new incident and reflected waves obey `a_new=A*a_old`, `b_new=B*a_old`, with
+`A=(D*(I+S)+D^-1*(I-S))/2` and `B=(D*(I+S)-D^-1*(I-S))/2`.
+The new scattering matrix is `B*A^-1`, evaluated by a transposed linear solve.
+Grouping `I+S` and `I-S` preserves ideal open/short ports. Singular or nonfinite
+changes raise `ValueError`; there is no regularization or silent clipping.
+Extreme numerical scales still require independent conditioning assessment.
+
+Measured/calculated networks can be explicitly brought to the same references
+before [comparison](touchstone.md). Comparison itself remains strict and does
+not perform this conversion automatically. Mixed-mode reference changes retain
+the existing basis; to perform `.mixed_mode()` on unequal single-ended
+references, explicitly renormalize those references to a common value first.
+
 ## Touchstone output
 
 `.touchstone()` returns Touchstone **2.0**, Hz, S, real/imaginary, full matrix,

@@ -18,6 +18,8 @@ The existing cross-section accuracy and mesh-convergence criteria are unchanged.
 | Matched alpha*length=4000 | finite output, absolute S <=1e-10 |
 | scikit-rf DistributedCircuit single line and odd/even line, se2gmm | absolute S difference <=1e-10 |
 | Touchstone 2.0 independent reader, deliberately nonreciprocal 2/4-port samples | absolute 1e-14 and exact frequencies |
+| Reference change: complex loads, ideal through, open/short, identity/roundtrip, reciprocity/passivity | absolute error/excess <=1e-12 |
+| Reference change vs scikit-rf 2.2.0, 1/2/4 ports, scalar/per-port references, nonreciprocal samples and lossy line | absolute S difference <=1e-10 |
 
 `tests/sipi/test_line_network.py` covers the analytical checks, actual lossy
 stripline extraction bridge, strict input validation and snapshots.
@@ -47,3 +49,9 @@ comparison from analytical acceptance. No stored reference or golden values are
 regenerated. DC with zero R/G is covered analytically, avoiding a reference-tool
 0/0 characteristic impedance. No high-frequency dispersion, full-wave, skin-effect,
 roughness, measurement-coupon, browser or Windows application acceptance is inferred.
+
+`tests/sipi/test_renormalization.py` verifies explicit positive-real reference
+changes, metadata/immutability and strict singular/invalid-input rejection.
+Its lazy test-only `scikit-rf` calls emit separate `s-renormalization-*` records.
+The comparisons concern wave normalization of identical S arrays, not physical
+accuracy of the line or validity of external measurements.

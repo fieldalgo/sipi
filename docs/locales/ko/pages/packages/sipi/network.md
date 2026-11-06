@@ -67,6 +67,32 @@ V를 sqrt(Zref)로 나누고 I에 sqrt(Zref)를 곱해 정규화합니다. 짧�
 기준 임피던스는 `2*Zref, 2*Zref, Zref/2, Zref/2`입니다. 전력파의 직교 변환이므로 전력을 보존합니다.
 서로 다른 기준 임피던스는 거부하며, 도체 쌍의 형상 대칭은 가정하지 않습니다.
 
+## 기준 임피던스 변경
+
+`network.renormalized(z_ref)`는 지정한 양의 실수 기준에서 S를 표현한 새 불변
+`LineNetwork`를 반환합니다. 스칼라 또는 포트별 상수를 받으며 주파수별·복소 기준은
+거부합니다. 주파수·포트 순서/이름·single-ended/mixed-mode basis를 보존합니다.
+물리적 네트워크는 같으며 재료 fitting·fixture de-embedding·포트 추정·비수동 데이터
+보정은 수행하지 않습니다.
+
+```python
+at_75_ohm = network.renormalized(75)
+per_port = network.renormalized([25, 100])  # a two-port example
+restored = per_port.renormalized(network.z_ref)
+```
+
+실수 기준 전력파에서 `D=diag(sqrt(Zold/Znew))`라 두면 각 주파수에서
+`a_new=A*a_old`, `b_new=B*a_old`이며
+`A=(D*(I+S)+D^-1*(I-S))/2`, `B=(D*(I+S)-D^-1*(I-S))/2`입니다.
+새 S는 `B*A^-1`이며 전치 선형 풀이로 계산합니다. `I+S`, `I-S`를 먼저 묶어
+이상적인 open/short를 보존합니다. 특이하거나 비유한 변환은 `ValueError`이며
+regularization·clipping을 하지 않습니다. 극단적 수치 범위는 별도 조건수 평가가 필요합니다.
+
+[측정 비교](touchstone.md) 전에 명시적으로 기준을 맞출 수 있지만 비교 함수가
+자동 변환하지는 않습니다. mixed-mode 기준 변경도 현재 basis를 유지합니다.
+서로 다른 single-ended 기준을 `.mixed_mode()`로 변환하려면 먼저 공통 기준으로
+명시적으로 renormalize하세요.
+
 ## Touchstone 출력
 
 `.touchstone()`은 포트·주파수 수와 포트별 실수 기준 임피던스를 명시한 Touchstone **2.0**

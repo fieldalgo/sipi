@@ -41,6 +41,15 @@ def _frequencies(value):
     return f
 
 
+def _references(value, ports):
+    z = _real('z_ref', value)
+    if z.ndim == 0:
+        z = np.full(ports, float(z))
+    if z.shape != (ports,) or np.any(z <= 0):
+        raise ValueError('z_ref must be positive, scalar or one real value per port')
+    return z
+
+
 def _matrix(name, value, count, n=None):
     m = _real(name, value)
     if m.ndim == 2:
@@ -86,17 +95,44 @@ class LineNetwork:
             raise ValueError('port_names must be unique nonempty single-line strings')
         if s.shape != (len(f), n, n) or not np.all(np.isfinite(s)):
             raise ValueError('s must be finite with shape (frequencies,ports,ports)')
-        z = _real('z_ref', self.z_ref)
-        if z.ndim == 0:
-            z = np.full(n, float(z))
-        if z.shape != (n,) or np.any(z <= 0):
-            raise ValueError('z_ref must be positive, scalar or one real value per port')
+        z = _references(self.z_ref, n)
         if self.basis not in ('single-ended', 'mixed-mode'):
             raise ValueError('unsupported port basis')
         for key, value in (('frequency', f), ('s', s), ('z_ref', z)):
             value.setflags(write=False)
             object.__setattr__(self, key, value)
         object.__setattr__(self, 'port_names', names)
+
+    def renormalized(self, z_ref):
+        """Return S at new positive real, frequency-independent port references.
+
+        Preserve frequencies, port order, names and basis. Direct wave-coordinate
+        conversion avoids an intermediate impedance matrix, including for ideal
+        open/short ports. It does not change the physical network, repair invalid
+        measurements, reorder ports or infer passivity/causality. Numerically
+        singular or unrepresentable reference changes raise ValueError.
+        """
+        target = _references(z_ref, len(self.port_names))
+        if np.array_equal(target, self.z_ref):
+            return LineNetwork(self.frequency, self.s, target, self.port_names, self.basis)
+        eye = np.eye(len(self.port_names))
+        with np.errstate(over='ignore', invalid='ignore', divide='ignore'):
+            ratio = np.sqrt(self.z_ref)/np.sqrt(target)
+            # V and I contributions to new incident/reflected power waves.
+            # Group I +/- S before multiplying to preserve exact open/shorts.
+            voltage = (.5*ratio)[:, None]*(eye+self.s)
+            current = (.5/ratio)[:, None]*(eye-self.s)
+            incident, reflected = voltage+current, voltage-current
+        if not np.all(np.isfinite(incident)) or not np.all(np.isfinite(reflected)):
+            raise ValueError('reference change is not representable at this numeric scale')
+        try:
+            transformed = np.linalg.solve(incident.swapaxes(-1, -2),
+                                          reflected.swapaxes(-1, -2)).swapaxes(-1, -2)
+        except np.linalg.LinAlgError as exc:
+            raise ValueError('reference change is singular for this S matrix') from exc
+        if not np.all(np.isfinite(transformed)):
+            raise ValueError('reference change produced nonfinite S values')
+        return LineNetwork(self.frequency, transformed, target, self.port_names, self.basis)
 
     def mixed_mode(self):
         """Convert near+/near-/far+/far- to d_near,d_far,c_near,c_far.

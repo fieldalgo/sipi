@@ -60,7 +60,10 @@ export round-trips with explicitly supplied labels.
 `compare_networks(measured, model, interpolation='none')` requires two
 `LineNetwork` objects. Port names/order, basis and reference impedances must
 match exactly. The caller must resolve any port permutation, calibration or
-reference renormalization before comparison. A returned `NetworkComparison`
+reference renormalization before comparison. When physical port order and basis
+already match, pass `measured.renormalized(model.z_ref)` to explicitly align
+positive-real references. The comparison never renormalizes implicitly.
+A returned `NetworkComparison`
 contains aligned `measured`, unchanged `model`, the chosen `interpolation`,
 read-only `delta_s = model.s - measured.s` and scalar `max_abs_error` across all
 frequencies and matrix elements. The factory validates these conditions;

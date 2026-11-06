@@ -50,7 +50,9 @@ print(comparison.max_abs_error)  # maximum absolute complex-S difference
 ## 비교 계약
 
 `compare_networks(measured, model, interpolation='none')`는 두 `LineNetwork`를
-받습니다. 포트 이름·순서·basis·기준 임피던스가 정확히 일치해야 합니다. 포트 순열,
+받습니다. 포트 이름·순서·basis·기준 임피던스가 정확히 일치해야 합니다. 물리적 포트
+순서와 basis가 이미 같으면 `measured.renormalized(model.z_ref)`를 전달해 양의 실수
+기준을 명시적으로 맞출 수 있습니다. 비교 함수는 자동 재정규화하지 않습니다. 포트 순열,
 교정, 임피던스 재정규화는 호출자가 먼저 해결해야 합니다. `NetworkComparison`에는
 주파수가 맞춰진 `measured`, 원래 `model`, 선택한 `interpolation`, 읽기 전용
 `delta_s = model.s - measured.s`, 모든 주파수·행렬 원소에 대한 스칼라

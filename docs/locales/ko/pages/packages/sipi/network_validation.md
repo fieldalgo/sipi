@@ -1,5 +1,12 @@
 # 전송선 네트워크 검증
 
+기준 임피던스 변환은 `tests/sipi/test_renormalization.py`에서 별도로 검사합니다.
+복소 부하·이상 through·open/short·동일/왕복 변환·상반성/수동성의 절대 오차/초과는
+1e-12 이하입니다. 1/2/4포트 scalar/포트별 기준, 비상호 데이터와 손실 선로를
+test-only scikit-rf 2.2.0과 대조하며 최대 절대 S 차이 기준은 1e-10입니다.
+`s-renormalization-*` 비교 기록을 남기며 입력 거부·특이 변환 실패·불변 metadata도
+확인합니다. 같은 S의 전력파 정규화 검증이며 선로/실측의 물리 정확도 근거가 아닙니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network_validation.md) | **한국어**
 
 [계약](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)

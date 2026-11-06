@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add immutable positive-real S-parameter reference changes with analytic open/short/through checks and independent scikit-rf comparisons.
+
 - Add strict JSON design requests that preserve impedance goals, search bounds, evaluation budgets and geometry constraints while reusing bounded search and refinement checks.
 
 - Add strict impedance-study JSON v2 for fixed total plane spacing, preserving v1 serialization and retaining invalid derived samples as failures.
