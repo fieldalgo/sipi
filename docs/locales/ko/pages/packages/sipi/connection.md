@@ -1,5 +1,8 @@
 # 네트워크 연결과 알려진 fixture 제거
 
+임의 포트 쌍의 명시적 연결과 이상적인 분기점은
+[이름 지정 연결](named_connections.md)을 참고하세요.
+
 `cascade_networks(left, right)`는 왼쪽 far 포트를 오른쪽 near 포트에 도체
 순서대로 연결합니다. 입력은 single-ended `LineNetwork`이며 **near 전체 다음
 far 전체** 순서의 2N포트입니다. 포트 이름으로 배선을 추정하지 않습니다.

@@ -42,7 +42,7 @@ from .plane import (COPPER_CONDUCTIVITY, IRDropResult, PowerPlane, Sink, Source,
 from .quasistatic import LineParameters, capacitance_matrix, line_parameters
 
 from .network import LineNetwork, rlgc_network, quasistatic_network
-from .connection import cascade_networks, deembed_network
+from .connection import cascade_networks, deembed_network, connect_networks, ideal_junction
 from .propagation import LinePropagation, rlgc_propagation
 from .termination import terminate_ports
 from .network_document import NetworkTransformDocument, NetworkTransformResult
@@ -50,7 +50,7 @@ from .network_document import NetworkTransformDocument, NetworkTransformResult
 __version__ = "0.1.0"
 __all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
            "LineNetwork", "rlgc_network", "quasistatic_network",
-           "cascade_networks", "deembed_network",
+           "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",
            "LinePropagation", "rlgc_propagation",
            "terminate_ports",
            "NetworkTransformDocument", "NetworkTransformResult",

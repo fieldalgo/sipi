@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit named port connections and ideal Kirchhoff junctions, with independent network checks and analytic one-dimensional shunt-stub validation.
+
 - Add single and paired unbacked coplanar templates with finite substrates and grounds, independent free-space references, saved studies and impedance goals.
 
 - Add strict saved sequences of network reference changes and passive port reductions, with one source extraction and existing circuit-document integration.

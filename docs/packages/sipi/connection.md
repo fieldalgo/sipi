@@ -1,5 +1,8 @@
 # Network connection and known-fixture removal
 
+For explicit arbitrary port pairs and ideal branching nodes, see
+[named connections](named_connections.md).
+
 `cascade_networks(left, right)` connects left far ports to right near ports in
 conductor order. Inputs are single-ended `LineNetwork` objects with **all near
 then all far** 2N-port ordering. Names label ports; they do not determine wiring.
