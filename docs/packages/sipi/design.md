@@ -195,3 +195,5 @@ forwarding and retained failures. This verifies the request path; it does not
 expand the underlying models' physical validity.
 
 [Correlated tolerance studies and fixed-pitch sampling](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/study.md).
+
+[Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.

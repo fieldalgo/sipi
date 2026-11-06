@@ -13,6 +13,8 @@ import numpy as np
 
 from . import templates
 from .document import CrossSectionDocument, _keys, _unique_object
+from .impedance_material import (_material_input, _validate_material_input,
+                                 _analyze_material, _is_material_parameter)
 
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
@@ -112,7 +114,7 @@ class ImpedanceStudy:
 
 
 class ImpedanceStudyDocument:
-    """Strict impedance-study/1 or /2, eighteen templates and resolved nominal mesh.
+    """Strict impedance-study/1, /2 or /3, with resolved nominal mesh settings.
 
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.
@@ -121,14 +123,21 @@ class ImpedanceStudyDocument:
     The broadside gap is vertical and is never derived from horizontal pitch.
     Version 2 adds fixed total plane spacing for the two-dielectric templates;
     exactly one layer height is sampled and the other is derived.
+    Version 3 adds fixed-frequency scalar/principal-axis material overrides;
+    only geometry variables are sampled. Its full input_json is required to
+    replay a row: the row's document contains geometry, not these overrides.
     """
     def __init__(self, template, parameters, *, sampling, quantity, mesh=None, fixed_pitch_m=None,
-                 fixed_plane_spacing_m=None):
+                 fixed_plane_spacing_m=None, frequency=None, materials=None):
         data = dict(schema='sipi.impedance-study/1', template=template,
             parameters=parameters, sampling=sampling, quantity=quantity,
             mesh={} if mesh is None else mesh, fixed_pitch_m=fixed_pitch_m)
         if fixed_plane_spacing_m is not None:
             data.update(schema='sipi.impedance-study/2', fixed_plane_spacing_m=fixed_plane_spacing_m)
+        evaluation = _material_input(frequency, materials)
+        if evaluation is not None:
+            data.update(schema='sipi.impedance-study/3', fixed_plane_spacing_m=fixed_plane_spacing_m,
+                        material_evaluation=evaluation)
         self._data = self._validate(data)
 
     @staticmethod
@@ -136,11 +145,13 @@ class ImpedanceStudyDocument:
         data = _copy(data)
         if not isinstance(data, dict):
             raise ValueError('impedance study must be an object')
-        if data.get('schema') not in ('sipi.impedance-study/1', 'sipi.impedance-study/2'):
+        if data.get('schema') not in ('sipi.impedance-study/1', 'sipi.impedance-study/2', 'sipi.impedance-study/3'):
             raise ValueError('unsupported impedance-study schema')
         fields = ['schema', 'template', 'parameters', 'sampling', 'quantity', 'mesh', 'fixed_pitch_m']
-        if data['schema'] == 'sipi.impedance-study/2':
+        if data['schema'] in ('sipi.impedance-study/2', 'sipi.impedance-study/3'):
             fields.append('fixed_plane_spacing_m')
+        if data['schema'] == 'sipi.impedance-study/3':
+            fields.append('material_evaluation')
         _keys(data, fields, where='impedance study')
         template = data['template']
         if not isinstance(template, str) or template not in _TEMPLATES:
@@ -162,6 +173,8 @@ class ImpedanceStudyDocument:
         quantity = 'z_diff' if template in _DIFFERENTIAL else 'z0'
         if data['quantity'] != quantity:
             raise ValueError(f'this template requires quantity={quantity}')
+        evaluation = (_validate_material_input(data['material_evaluation'], section, quantity)
+                      if data['schema'] == 'sipi.impedance-study/3' else None)
         sampling = data['sampling']
         if not isinstance(sampling, dict):
             raise ValueError('sampling must be an object')
@@ -188,6 +201,8 @@ class ImpedanceStudyDocument:
             name = variable['name']
             if not isinstance(name, str) or name not in parameters or name in names:
                 raise ValueError('variables must be distinct template parameter names')
+            if evaluation is not None and _is_material_parameter(name):
+                raise ValueError('material-evaluated studies sample geometry parameters only')
             names.append(name)
             for key in fields[1:]:
                 variable[key] = _scalar(variable[key], positive=key == 'std')
@@ -217,7 +232,9 @@ class ImpedanceStudyDocument:
                 raise ValueError('nominal width + gap must equal fixed pitch')
         canonical = dict(schema=data['schema'], template=template, parameters=parameters,
                          quantity=quantity, mesh=mesh, sampling=sampling, fixed_pitch_m=pitch)
-        if data['schema'] == 'sipi.impedance-study/2':
+        if evaluation is not None:
+            canonical['material_evaluation'] = evaluation
+        if data['schema'] in ('sipi.impedance-study/2', 'sipi.impedance-study/3'):
             spacing = data['fixed_plane_spacing_m']
             if spacing is not None:
                 spacing = _scalar(spacing, positive=True)
@@ -301,7 +318,9 @@ class ImpedanceStudyDocument:
             try:
                 section = _TEMPLATES[data['template']](**values)
                 doc = CrossSectionDocument(section, mesh=data['mesh'])
-                line = doc.analyze()
+                evaluation = data.get('material_evaluation')
+                line = (doc.analyze() if evaluation is None
+                        else _analyze_material(doc, evaluation, data['quantity']))
                 value = float(line.z0 if data['quantity'] == 'z0' else line.even_odd()['z_diff'])
                 if not np.isfinite(value) or value <= 0:
                     raise ValueError('solver returned a nonpositive or nonfinite impedance')

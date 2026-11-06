@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve fixed-frequency scalar/principal-axis materials in saved geometry-tolerance studies and bounded impedance goals, including refined-mesh replay and explicit real quasi-static impedance limits.
+
 - Save fixed principal-axis dispersive dielectrics and reuse them in shared-mesh and volume line extraction, network assembly and driven circuits, with scalar material compatibility and independent tensor-field checks.
 
 - Accept reciprocal passive transverse permittivity tensors in mesh capacitance extraction and real tensors with local loss tangents in quasi-TEM line parameters, using existing shared P1 kernels.

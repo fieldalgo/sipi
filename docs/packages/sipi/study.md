@@ -192,3 +192,5 @@ For unchanged geometry in a homogeneous dielectric, changing relative permittivi
 from 1 to 4 halves impedance; actual FEM studies must satisfy this analytical
 scaling law within relative 1e-9. This checks material scaling and study composition,
 not absolute geometry accuracy or mesh convergence.
+
+[Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.

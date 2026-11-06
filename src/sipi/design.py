@@ -6,10 +6,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+import json
 from numbers import Real
 
 from .crosssection import CrossSection
 from .document import CrossSectionDocument
+from .impedance_material import _material_input, _analyze_material
 
 __all__ = ['ImpedanceDesign', 'DesignEvaluation', 'GoalSeekError', 'seek_impedance']
 
@@ -28,6 +30,8 @@ class ImpedanceDesign:
     impedances and residuals are in ohms; parameter has the units of the
     caller's factory. document is the requested-mesh input, not the refined
     one. This is a numerical check, not a certified manufacturing tolerance.
+    material_evaluation_json, when present, stores the fixed frequency/models
+    and must accompany document to reproduce the impedance.
     """
     parameter: float
     target: float
@@ -36,6 +40,7 @@ class ImpedanceDesign:
     quantity: str
     document: CrossSectionDocument
     history: tuple[DesignEvaluation, ...]
+    material_evaluation_json: str | None = None
 
     @property
     def residual(self):
@@ -64,7 +69,7 @@ def _positive(name, value):
 
 
 def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
-                   mesh=None, max_evaluations=40):
+                   mesh=None, max_evaluations=40, frequency=None, materials=None):
     """Bisect a positive parameter range, then check a refined mesh.
 
     factory(parameter) returns a CrossSection. quantity is z0 (one signal) or
@@ -77,6 +82,11 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     refined impedances must be within tolerance of target, or GoalSeekError is
     raised. Tighten mesh options and rerun if refinement misses the target.
     No function promises monotonicity for an arbitrary factory.
+
+    Supply frequency (Hz) and materials together to evaluate fixed scalar or
+    principal-axis models. Impedance still uses Re(C_complex) and vacuum L,
+    not conductor R or a complex lossy characteristic impedance. The result's
+    material_evaluation_json must accompany its geometry document for replay.
     """
     if not callable(factory):
         raise TypeError('factory must be callable')
@@ -93,6 +103,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     if isinstance(max_evaluations, bool) or not isinstance(max_evaluations, int) or max_evaluations < 3:
         raise ValueError('max_evaluations must be an integer >= 3')
     options = {} if mesh is None else dict(mesh)
+    material = _material_input(frequency, materials)
     history = []
 
     def evaluate(parameter):
@@ -100,7 +111,8 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             raise GoalSeekError('evaluation limit reached before target convergence', history)
         section = factory(parameter)
         doc = CrossSectionDocument(section, mesh=options)
-        value = impedance(doc.analyze())
+        line = doc.analyze() if material is None else _analyze_material(doc, material, quantity)
+        value = impedance(line)
         history.append(DesignEvaluation(parameter, value, 'search'))
         return value-target, doc
 
@@ -133,8 +145,11 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     fine = section.mesh_settings(**doc.mesh_options)
     for key in ('edge_size', 'far_size', 'grade'):
         fine[key] /= 2
-    refined = impedance(section.analyze(**fine))
+    refined_line = (section.analyze(**fine) if material is None
+                    else _analyze_material(CrossSectionDocument(section, mesh=fine), material, quantity))
+    refined = impedance(refined_line)
     history.append(DesignEvaluation(x, refined, 'refinement'))
     if abs(refined-target) > tolerance:
         raise GoalSeekError('refined mesh misses target; tighten mesh settings and rerun', history)
-    return ImpedanceDesign(x, target, residual+target, refined, quantity, doc, tuple(history))
+    saved = None if material is None else json.dumps(material, sort_keys=True, allow_nan=False)
+    return ImpedanceDesign(x, target, residual+target, refined, quantity, doc, tuple(history), saved)

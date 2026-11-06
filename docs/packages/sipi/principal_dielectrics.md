@@ -83,10 +83,11 @@ volume-line schemas embed the new **material** version. Existing assembly,
 network transformation and circuit documents preserve and replay those inputs;
 older readers reject the new nested material schema.
 
-`Layer`, template `eps_r`, geometry JSON, impedance-study JSON and width-goal
-documents still have scalar material inputs. Apply tensor overrides through
-the frequency-line material mapping; `section.analyze()` alone uses the scalar
-section defaults. Browser/portable interfaces have not been connected here.
+`Layer`, template `eps_r` and geometry JSON still have scalar material inputs.
+Apply tensor overrides through the frequency-line material mapping or the
+[fixed-frequency material study/goal contract](material_impedance.md).
+`section.analyze()` alone uses the scalar section defaults. Browser/portable
+interfaces have not been connected here.
 
 ## Validation
 

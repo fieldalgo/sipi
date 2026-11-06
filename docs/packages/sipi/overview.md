@@ -235,3 +235,5 @@ material and conductor extraction with RLGC/S.
 [Saved circuit inputs: extraction/network, sources, loads and crosstalk](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/circuit_document.md).
 
 [Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.
+
+[Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.

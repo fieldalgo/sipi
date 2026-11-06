@@ -199,3 +199,5 @@ CPU 강하는 13.2 mV, 판 손실은 0.17 W입니다.
 [회로 입력 저장: 형상/네트워크·소스·부하·누화](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/circuit_document.md).
 
 [주축 방향별 분산 재료](principal_dielectrics.md)는 저장 선로의 재료 매핑을 재사용합니다.
+
+[지정 주파수 재료 공차·역산](material_impedance.md)은 스칼라·주축 재료 지정을 기하와 함께 보존합니다.

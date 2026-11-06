@@ -8,6 +8,7 @@ import json
 from .design import seek_impedance
 from .document import _keys, _unique_object
 from .study import ImpedanceStudyDocument, _copy, _integer, _parameters, _scalar, _TEMPLATES
+from .impedance_material import _material_input, _models
 
 __all__ = ['ImpedanceDesignDocument']
 
@@ -23,29 +24,43 @@ class ImpedanceDesignDocument:
     Loading validates geometry but never meshes or solves. solve() uses the
     existing bounded design routine and returns its ImpedanceDesign unchanged.
     Save this input JSON separately from the result's cross-section document.
+    Version 2 preserves fixed-frequency material overrides; its named variable
+    is geometry-only and its target retains the real quasi-static definition.
     """
     def __init__(self, template, parameters, *, variable, bounds, target, quantity='z0',
                  tolerance=.1, max_evaluations=40, mesh=None, fixed_pitch_m=None,
-                 fixed_plane_spacing_m=None):
-        self._data = self._validate(dict(schema=_SCHEMA, template=template, parameters=parameters,
+                 fixed_plane_spacing_m=None, frequency=None, materials=None):
+        data = dict(schema=_SCHEMA, template=template, parameters=parameters,
             variable=variable, bounds=bounds, target_ohm=target, quantity=quantity,
             tolerance_ohm=tolerance, max_evaluations=max_evaluations,
             mesh={} if mesh is None else mesh, fixed_pitch_m=fixed_pitch_m,
-            fixed_plane_spacing_m=fixed_plane_spacing_m))
+            fixed_plane_spacing_m=fixed_plane_spacing_m)
+        evaluation = _material_input(frequency, materials)
+        if evaluation is not None:
+            data.update(schema='sipi.impedance-design/2', material_evaluation=evaluation)
+        self._data = self._validate(data)
 
     @staticmethod
     def _study(data):
+        evaluation = data.get('material_evaluation')
+        kwargs = ({} if evaluation is None else
+                  dict(frequency=evaluation['frequency_hz'], materials=_models(evaluation)))
         return ImpedanceStudyDocument(data['template'], data['parameters'], quantity=data['quantity'],
             sampling=dict(kind='sweep', count=2, variables=[dict(name=data['variable'],
                           lower=data['bounds'][0], upper=data['bounds'][1])]), mesh=data['mesh'],
-            fixed_pitch_m=data['fixed_pitch_m'], fixed_plane_spacing_m=data['fixed_plane_spacing_m'])
+            fixed_pitch_m=data['fixed_pitch_m'], fixed_plane_spacing_m=data['fixed_plane_spacing_m'], **kwargs)
 
     @classmethod
     def _validate(cls, data):
         data = _copy(data)
-        _keys(data, _FIELDS, where='impedance design')
-        if data['schema'] != _SCHEMA:
+        version2 = isinstance(data, dict) and data.get('schema') == 'sipi.impedance-design/2'
+        _keys(data, (*_FIELDS, 'material_evaluation') if version2 else _FIELDS, where='impedance design')
+        if data['schema'] not in (_SCHEMA, 'sipi.impedance-design/2'):
             raise ValueError('unsupported impedance-design schema')
+        if version2:
+            _keys(data['material_evaluation'], ('frequency_hz', 'materials'), where='material evaluation')
+            if not isinstance(data['material_evaluation']['materials'], dict):
+                raise ValueError('materials must be an object')
         if not isinstance(data['bounds'], list) or len(data['bounds']) != 2:
             raise ValueError('bounds must contain two positive numbers')
         data['bounds'] = [_scalar(x, positive=True) for x in data['bounds']]
@@ -58,6 +73,8 @@ class ImpedanceDesignDocument:
         for key in ('parameters', 'mesh', 'quantity', 'fixed_pitch_m'):
             data[key] = study[key]
         data['fixed_plane_spacing_m'] = study.get('fixed_plane_spacing_m')
+        if version2:
+            data['material_evaluation'] = study['material_evaluation']
         return data
 
     @classmethod
@@ -88,5 +105,8 @@ class ImpedanceDesignDocument:
         study = self._study(data).to_dict()
         def factory(value):
             return _TEMPLATES[data['template']](**_parameters(study, [value]))
+        evaluation = data.get('material_evaluation')
+        kwargs = ({} if evaluation is None else
+                  dict(frequency=evaluation['frequency_hz'], materials=_models(evaluation)))
         return seek_impedance(factory, data['bounds'], data['target_ohm'], quantity=data['quantity'],
-            tolerance=data['tolerance_ohm'], max_evaluations=data['max_evaluations'], mesh=data['mesh'])
+            tolerance=data['tolerance_ohm'], max_evaluations=data['max_evaluations'], mesh=data['mesh'], **kwargs)
