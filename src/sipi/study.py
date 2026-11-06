@@ -60,6 +60,12 @@ def _parameters(data, values):
     params.update(zip((v['name'] for v in data['sampling']['variables']), map(float, values)))
     if data['fixed_pitch_m'] is not None:
         params['gap'] = data['fixed_pitch_m']-params['width']
+    spacing = data.get('fixed_plane_spacing_m')
+    if spacing is not None:
+        names = {v['name'] for v in data['sampling']['variables']}
+        independent = 'lower_height' if 'lower_height' in names else 'upper_height'
+        derived = 'upper_height' if independent == 'lower_height' else 'lower_height'
+        params[derived] = spacing-params[independent]
     return params
 
 
@@ -98,26 +104,36 @@ class ImpedanceStudy:
 
 
 class ImpedanceStudyDocument:
-    """Strict sipi.impedance-study/1, eleven templates and resolved nominal mesh.
+    """Strict impedance-study/1 or /2, eleven templates and resolved nominal mesh.
 
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.
     Fixed horizontal pitch applies to edge-coupled microstrip, stripline (including layered) and
     grounded coplanar pairs. Outer coplanar grounds retain ground_gap, not position.
     The broadside gap is vertical and is never derived from horizontal pitch.
+    Version 2 adds fixed total plane spacing for the two-dielectric templates;
+    exactly one layer height is sampled and the other is derived.
     """
-    def __init__(self, template, parameters, *, sampling, quantity, mesh=None, fixed_pitch_m=None):
-        self._data = self._validate(dict(schema='sipi.impedance-study/1', template=template,
+    def __init__(self, template, parameters, *, sampling, quantity, mesh=None, fixed_pitch_m=None,
+                 fixed_plane_spacing_m=None):
+        data = dict(schema='sipi.impedance-study/1', template=template,
             parameters=parameters, sampling=sampling, quantity=quantity,
-            mesh={} if mesh is None else mesh, fixed_pitch_m=fixed_pitch_m))
+            mesh={} if mesh is None else mesh, fixed_pitch_m=fixed_pitch_m)
+        if fixed_plane_spacing_m is not None:
+            data.update(schema='sipi.impedance-study/2', fixed_plane_spacing_m=fixed_plane_spacing_m)
+        self._data = self._validate(data)
 
     @staticmethod
     def _validate(data):
         data = _copy(data)
-        _keys(data, ('schema', 'template', 'parameters', 'sampling', 'quantity', 'mesh',
-                     'fixed_pitch_m'), where='impedance study')
-        if data['schema'] != 'sipi.impedance-study/1':
+        if not isinstance(data, dict):
+            raise ValueError('impedance study must be an object')
+        if data.get('schema') not in ('sipi.impedance-study/1', 'sipi.impedance-study/2'):
             raise ValueError('unsupported impedance-study schema')
+        fields = ['schema', 'template', 'parameters', 'sampling', 'quantity', 'mesh', 'fixed_pitch_m']
+        if data['schema'] == 'sipi.impedance-study/2':
+            fields.append('fixed_plane_spacing_m')
+        _keys(data, fields, where='impedance study')
         template = data['template']
         if not isinstance(template, str) or template not in _TEMPLATES:
             raise ValueError('unsupported study template')
@@ -193,6 +209,17 @@ class ImpedanceStudyDocument:
                 raise ValueError('nominal width + gap must equal fixed pitch')
         canonical = dict(schema=data['schema'], template=template, parameters=parameters,
                          quantity=quantity, mesh=mesh, sampling=sampling, fixed_pitch_m=pitch)
+        if data['schema'] == 'sipi.impedance-study/2':
+            spacing = data['fixed_plane_spacing_m']
+            if spacing is not None:
+                spacing = _scalar(spacing, positive=True)
+                if (template not in ('layered_stripline', 'coupled_layered_stripline')
+                        or len({'lower_height', 'upper_height'} & set(names)) != 1):
+                    raise ValueError('fixed plane spacing requires a layered stripline '
+                                     'and exactly one sampled layer height')
+                if abs(parameters['lower_height']+parameters['upper_height']-spacing) > 1e-12*spacing:
+                    raise ValueError('nominal lower_height + upper_height must equal fixed plane spacing')
+            canonical['fixed_plane_spacing_m'] = spacing
         # Check the requested finite bounds before any solves. This does not
         # establish worst-case impedance or validate an unbounded normal domain.
         if kind != 'normal':

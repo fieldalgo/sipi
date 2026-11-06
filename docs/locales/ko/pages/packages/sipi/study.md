@@ -30,6 +30,9 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `parameters`, `sampling`, `quantity`, `mesh`, `fixed_pitch_m`입니다.
 `from_dict`, `loads`, `to_dict`, `dumps`로 검사·복사·저장합니다.
 미등록/누락 필드, JSON 중복 키, NaN/Infinity, bool 수치와 잘못된 형상을 거부합니다.
+`sipi.impedance-study/2`는 같은 필드에 필수 `fixed_plane_spacing_m`(null 또는 양의 길이)을
+추가합니다. 이 제약을 사용하지 않는 기존 생성기는 계속 v1을 출력하고 v1은 새 필드를
+거부합니다. 읽은 v2는 제약이 null이어도 v2를 유지합니다. 미등록 버전은 거부합니다.
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `grounded_coplanar`,
 `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
 및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`
@@ -91,6 +94,31 @@ nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 유전율의 샘플링이 다른 쪽 값을 바꾸지 않습니다. `upper_height`는 금속 두께를
 포함하며 유계 표본의 모든 모서리에서 구리 위 이격이 양수여야 합니다.
 잘못된 정규 표본은 오류 행으로 보존합니다.
+
+## 전체 접지면 간격 고정(v2)
+
+`fixed_plane_spacing_m`은 `layered_stripline`과 `coupled_layered_stripline`에서
+지원합니다. `lower_height`, `upper_height` 중 정확히 하나를 독립 변수로 지정하면
+다른 높이는 전체 간격에서 표본 높이를 뺀 값입니다. nominal 높이의 합은 지정
+간격과 상대 1e-12 이내로 같아야 합니다. 두 높이 동시 지정·높이 미지정·지원하지
+않는 템플릿은 거부하며 null이면 제약을 적용하지 않습니다.
+
+```python
+plan = ImpedanceStudyDocument('layered_stripline',
+    dict(width=.5e-3, lower_height=.4e-3, upper_height=.6e-3,
+         lower_eps_r=2, upper_eps_r=6, thickness=.035e-3),
+    quantity='z0', fixed_plane_spacing_m=1e-3,
+    sampling=dict(kind='sweep', count=3,
+                  variables=[dict(name='lower_height', lower=.3e-3, upper=.7e-3)]))
+saved = plan.dumps()  # sipi.impedance-study/2
+```
+
+위 높이는 구리를 포함하므로 `thickness`보다 커야 합니다. 다른 높이를 유도한 뒤
+유계 영역의 모든 모서리를 검사합니다. 음의 유도 높이 등 잘못된 정규 표본은
+표본값·유도값을 포함한 실패 행으로 보존합니다. 결정적 형상 제약이며 상관행렬에
+새 독립 변수를 추가하는 의미가 아닙니다. 차동쌍에서 폭도 샘플링하면 수평 고정
+피치와 함께 적용할 수 있습니다. `samples()`는 독립 변수만, `sample_parameters()`와
+결과 행은 유도값까지 포함한 형상을 반환합니다.
 
 ## 계산·실패·통계
 

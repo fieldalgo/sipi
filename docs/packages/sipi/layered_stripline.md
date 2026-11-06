@@ -60,9 +60,9 @@ positions. No schema change is required. `sipi.impedance-study/1` adds names
 (`quantity='z_diff'`). All four sampling modes support either material/height
 independently. Earlier readers reject these new names; record the engine version.
 
-Changing one height also changes total ground-plane spacing. A fixed total
-spacing constraint needs an explicit factory deriving the other height; it is
-not implicit in sampling. Paired `fixed_pitch_m` instead derives
+Changing one height normally also changes total ground-plane spacing. Study v2
+adds explicit `fixed_plane_spacing_m`, deriving the other height to keep their
+sum fixed; it is never implicit in sampling. Paired `fixed_pitch_m` instead derives
 `gap = pitch - width`, preserving horizontal signal centres. Bounded inputs
 validate all corner geometries; invalid unbounded normal samples remain failed
 rows without resampling or partial summaries.

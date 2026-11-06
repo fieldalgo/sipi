@@ -31,6 +31,10 @@ The strict `sipi.impedance-study/1` object has exactly `schema`, `template`,
 `parameters`, `sampling`, `quantity`, `mesh`, `fixed_pitch_m`. Use `from_dict`,
 `loads`, `to_dict`, `dumps` to validate, copy and save it. Unknown/missing fields,
 duplicate JSON keys, NaN/Infinity, boolean numbers and invalid geometry are rejected.
+Version `sipi.impedance-study/2` has the same fields plus required
+`fixed_plane_spacing_m` (null or a positive length). Existing constructors without
+that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
+retains v2 even when its constraint is null. Unknown versions are rejected.
 The eleven templates are `microstrip`, `stripline`, `coupled_microstrip`,
 `grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline` and
@@ -99,6 +103,34 @@ The [layered stripline templates](layered_stripline.md) keep lower/upper dielect
 properties and heights separate. Sampling one permittivity does not change the
 other. `upper_height` includes the metal thickness; bounded corners must retain
 positive clearance above the copper. Invalid normal samples remain failed rows.
+
+## Fixed total plane spacing (v2)
+
+`fixed_plane_spacing_m` supports `layered_stripline` and
+`coupled_layered_stripline`. Sample exactly one of `lower_height` and
+`upper_height`; the other is derived as total spacing minus the sampled height.
+The nominal heights must sum to the specified spacing within relative 1e-12.
+Sampling both heights, neither height, or using this constraint on another
+template is rejected. A null value disables the constraint.
+
+```python
+plan = ImpedanceStudyDocument('layered_stripline',
+    dict(width=.5e-3, lower_height=.4e-3, upper_height=.6e-3,
+         lower_eps_r=2, upper_eps_r=6, thickness=.035e-3),
+    quantity='z0', fixed_plane_spacing_m=1e-3,
+    sampling=dict(kind='sweep', count=3,
+                  variables=[dict(name='lower_height', lower=.3e-3, upper=.7e-3)]))
+saved = plan.dumps()  # sipi.impedance-study/2
+```
+
+The upper height includes copper, so it must remain greater than `thickness`.
+Every bounded corner is validated after deriving the other height. Invalid
+normal samples, including negative derived heights, remain failed rows with both
+the sampled and derived values. This is a deterministic geometric constraint,
+not an extra independent variable in the correlation matrix. It can combine
+with fixed horizontal pitch when width is also sampled in a layered pair.
+`samples()` returns independent variables only; `sample_parameters()` and result
+rows retain the full derived geometry.
 
 ## Evaluation, failures and summaries
 
