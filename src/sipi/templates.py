@@ -10,7 +10,8 @@ from numbers import Real
 from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
-           'offset_stripline', 'coupled_stripline', 'broadside_stripline', 'with_surface_mask']
+           'offset_stripline', 'coupled_stripline', 'broadside_stripline',
+           'coupled_grounded_coplanar', 'with_surface_mask']
 
 
 def _positive(name, value, *, zero=False):
@@ -85,6 +86,33 @@ def grounded_coplanar(*, width, gap, ground_width, substrate_height, eps_r,
     return CrossSection(layers, [Trace('signal', 0.0, w, h, t, top_width=top_width),
                                 Trace('ground_left', -offset, gw, h, t, ground=True),
                                 Trace('ground_right', offset, gw, h, t, ground=True)], box)
+
+
+def coupled_grounded_coplanar(*, width, gap, ground_gap, ground_width,
+                             substrate_height, eps_r, thickness=0.0, tan_delta=0.0,
+                             air_height=None, box_width=None, top_width=None):
+    """Equal-width surface pair between finite coplanar grounds, over a ground plane.
+
+    gap separates the two signal bottom edges. ground_gap separates each outer
+    signal bottom edge from its adjacent ground. There is no central ground.
+    Both grounds are rectangular and share the signals' thickness. Only the
+    signals use top_width. All four conductors lie on the substrate surface.
+    Ground width and open-domain size require separate convergence checks.
+    """
+    gap = _positive('gap', gap)
+    gg = _positive('ground_gap', ground_gap)
+    gw = _positive('ground_width', ground_width)
+    w, h, t, box, layers = _surface(width, substrate_height, eps_r, thickness,
+                                   tan_delta, air_height, box_width)
+    if box_width is None:
+        box = max(box, 2*w+gap+2*gg+2*gw+4*h)
+    offset = (w+gap)/2
+    ground_offset = w+gap/2+gg+gw/2
+    return CrossSection(layers,
+        [Trace('positive', -offset, w, h, t, top_width=top_width),
+         Trace('negative', offset, w, h, t, top_width=top_width),
+         Trace('ground_left', -ground_offset, gw, h, t, ground=True),
+         Trace('ground_right', ground_offset, gw, h, t, ground=True)], box)
 
 
 def coated_microstrip(*, width, substrate_height, eps_r, coating_height,

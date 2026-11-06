@@ -17,6 +17,7 @@
 | `stripline` | `width`, `plane_spacing`, `eps_r` | 균일 유전체 안 두 접지면 중앙의 신호선 |
 | `coupled_microstrip` | `width`, `gap`, `substrate_height`, `eps_r` | 같은 폭의 표면 신호선 쌍; `gap`은 가장자리 사이 거리 |
 | `grounded_coplanar` | `width`, `gap`, `ground_width`, `substrate_height`, `eps_r` | 유한 폭의 양옆 접지와 아래 접지면을 가진 표면 신호선 |
+| `coupled_grounded_coplanar` | `width`, `gap`, `ground_gap`, `ground_width`, `substrate_height`, `eps_r` | 두 신호선과 양옆 유한 접지; 신호 사이 간격과 외측 접지 간격을 분리 |
 
 모두 `thickness=0`, `tan_delta=0`, `box_width=None`을 받습니다. 표면 템플릿은
 `air_height=None`도 받으며 기본값은 `10 * substrate_height + thickness`입니다.
@@ -31,13 +32,16 @@
 `positive`, `negative`, 공면 접지 이름은 `ground_left`, `ground_right`입니다.
 층 이름은 `substrate`, `air` 또는 `dielectric`입니다.
 
-기존4템플릿은 `top_width`도 받으며 `sipi.templates.coated_microstrip`은 평탄 코팅을 더합니다.
+위 템플릿은 `top_width`도 받으며 `sipi.templates.coated_microstrip`은 평탄 코팅을 더합니다.
 [제조 형상과 JSONv2](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/manufacturing_sections.md)에 형상·간격·스키마 변경을 정의합니다.
 v2에서는 모든 도체에 필수 `top_width`를 추가하며, 아래 표의 도체 필드는 기존v1 기준입니다.
 
 추가 단면은 [다각형·국소 마스크·JSONv3](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/polygon_sections.md)를 참고하십시오.
 `offset_stripline`, `coupled_stripline`, `broadside_stripline`, `with_surface_mask`는
 `sipi.templates`에서 제공합니다.
+
+표의 다섯 번째 항목의 치수·기본 영역·독립 기준·수렴 한계는
+[차동 coplanar](coupled_coplanar.md)를 참조하세요.
 
 ## 입력 문서
 

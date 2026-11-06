@@ -18,14 +18,15 @@ Each function returns a `CrossSection`. Required arguments are keyword-only.
 | `stripline` | `width`, `plane_spacing`, `eps_r` | Signal centred between two ground planes in one dielectric |
 | `coupled_microstrip` | `width`, `gap`, `substrate_height`, `eps_r` | Two equal-width surface signals; `gap` is edge to edge |
 | `grounded_coplanar` | `width`, `gap`, `ground_width`, `substrate_height`, `eps_r` | Surface signal between finite-width grounds, with a bottom ground plane |
+| `coupled_grounded_coplanar` | `width`, `gap`, `ground_gap`, `ground_width`, `substrate_height`, `eps_r` | Equal-width signal pair between two finite grounds; separate inter-signal and outer-ground gaps |
 
 All accept `thickness=0`, `tan_delta=0` and `box_width=None`. Surface templates
 also accept `air_height=None`, defaulting to `10 * substrate_height + thickness`.
 Stripline plane spacing includes the conductor thickness. Every side wall is
 open (zero normal displacement); the stripline top is grounded and other tops
 are open. Default box widths are `max(20*h, 4*w)` for microstrip,
-`max(12*b, 4*w)` for stripline, `max(20*h, 4*(2*w+gap))` for a pair and
-`max(20*h, 4*w, w+2*gap+2*ground_width+4*h)` for coplanar geometry.
+`max(12*b, 4*w)` for stripline, `max(20*h, 4*(2*w+gap))` for coupled microstrip and
+`max(20*h, 4*w, w+2*gap+2*ground_width+4*h)` for single-signal coplanar geometry.
 
 These defaults are starting domains, not truncation guarantees. Enlarge the box
 and air independently to check truncation; also enlarge coplanar ground width.
@@ -34,7 +35,7 @@ positive. Invalid or overlapping geometry raises before meshing. Names are
 `signal`, or the ordered pair `positive`, `negative`; coplanar reference traces
 are `ground_left`, `ground_right`. Layers are `substrate`, `air`, or `dielectric`.
 
-The four templates additionally accept `top_width`; `sipi.templates.coated_microstrip`
+These templates additionally accept `top_width`; `sipi.templates.coated_microstrip`
 adds a planar coating. See [manufacturing geometry and JSON v2](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/manufacturing_sections.md)
 for the exact geometry, clearance and schema changes. In v2 every trace adds required
 `top_width`; the table below lists the unchanged v1 fields.
@@ -42,6 +43,9 @@ for the exact geometry, clearance and schema changes. In v2 every trace adds req
 See [polygons, local masks and JSON v3](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/polygon_sections.md) for additional sections:
 `offset_stripline`, `coupled_stripline`, `broadside_stripline` and `with_surface_mask`
 are available from `sipi.templates`.
+
+See [coupled coplanar geometry and validation](coupled_coplanar.md) for the fifth
+table entry's dimensions, default box, independent reference and convergence limits.
 
 ## Input document
 
