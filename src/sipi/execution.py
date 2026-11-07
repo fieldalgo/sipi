@@ -33,7 +33,7 @@ __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
 _REGISTRY = {
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
-    **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3)},
+    **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
     **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2)},
     'sipi.circular-aperture/1': ApertureDocument,
     'sipi.aperture-section/1': ApertureSectionDocument,
@@ -121,7 +121,9 @@ def _study(result, value, unit):
         summary=None if result.summary is None else dict(result.summary),
         rows=[dict(index=row.index, parameters=dict(row.parameters),
             document=None if row.document is None else row.document.to_dict(),
-            value=getattr(row, value), error_type=row.error_type, error=row.error)
+            value=getattr(row, value), error_type=row.error_type, error=row.error,
+            **({} if getattr(row, 'material_evaluation_json', None) is None else
+               {'material_evaluation': json.loads(row.material_evaluation_json)}))
             for row in result.rows])
 
 

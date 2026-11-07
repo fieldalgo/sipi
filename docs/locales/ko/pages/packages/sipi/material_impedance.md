@@ -125,3 +125,5 @@ assert np.isclose(replayed_z0, row.impedance, rtol=1e-10, atol=0)
 
 [Study](study.md) · [역산](design.md) · [재료](principal_dielectrics.md) ·
 [English](../../../../../packages/sipi/material_impedance.md)
+
+[재료 파라미터 공차 분석(v4)](material_variables.md)은 명시한 재료 모델 항목의 변동을 지원합니다.

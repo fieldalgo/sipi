@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Internal fixed-frequency material contract for real quasi-static impedance."""
 from collections.abc import Mapping
+from copy import deepcopy
 
 import numpy as np
 
@@ -59,3 +60,50 @@ def _analyze_material(document, value, quantity):
 def _is_material_parameter(name):
     # All supported templates use these names for scalar constitutive inputs.
     return 'eps_r' in name or 'tan_delta' in name
+
+
+def _material_leaf(evaluation, binding):
+    """Resolve an explicit numeric leaf below a canonical model's parameters."""
+    _keys(binding, ('region', 'path'), where='material variable')
+    region, path = binding['region'], binding['path']
+    if not isinstance(region, str) or region not in evaluation['materials']:
+        raise ValueError('material variable must name an overridden region')
+    if not isinstance(path, list) or not path:
+        raise ValueError('material variable path must be a nonempty list')
+    node = evaluation['materials'][region]['parameters']
+    for key in path:
+        parent = node
+        if isinstance(parent, dict) and isinstance(key, str) and key in parent:
+            node = parent[key]
+        elif isinstance(parent, list) and type(key) is int and 0 <= key < len(parent):
+            node = parent[key]
+        else:
+            raise ValueError('material variable path does not select an existing field')
+    if type(node) not in (int, float) or not np.isfinite(node):
+        raise ValueError('material variable must select a finite numeric leaf')
+    return parent, path[-1]
+
+
+def _material_bindings(bindings, evaluation, geometry_names):
+    if evaluation is None or not isinstance(bindings, dict) or not 1 <= len(bindings) <= 8:
+        raise ValueError('material_variables needs 1 to 8 bindings and material evaluation')
+    targets = set()
+    for alias, binding in bindings.items():
+        if not isinstance(alias, str) or not alias.strip() or alias in geometry_names:
+            raise ValueError('material aliases must be nonempty and distinct from template parameters')
+        _material_leaf(evaluation, binding)
+        target = (binding['region'], tuple(binding['path']))
+        if target in targets:
+            raise ValueError('material variables must select distinct targets')
+        targets.add(target)
+    return deepcopy(bindings)
+
+
+def _sample_material(data, values):
+    evaluation = deepcopy(data.get('material_evaluation'))
+    bindings = data.get('material_variables', {})
+    for variable, value in zip(data['sampling']['variables'], values):
+        if variable['name'] in bindings:
+            parent, key = _material_leaf(evaluation, bindings[variable['name']])
+            parent[key] = float(value)
+    return evaluation

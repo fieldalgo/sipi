@@ -15,7 +15,8 @@ from . import templates
 from .sampling import _numbers, _scalar, _integer, _copy, _validate_sampling, _sample_values
 from .document import CrossSectionDocument, _keys, _unique_object
 from .impedance_material import (_material_input, _validate_material_input,
-                                 _analyze_material, _is_material_parameter)
+                                 _analyze_material, _is_material_parameter,
+                                 _material_bindings, _sample_material)
 
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
@@ -44,7 +45,8 @@ _HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline', 'coupl
 
 def _parameters(data, values):
     params = dict(data['parameters'])
-    params.update(zip((v['name'] for v in data['sampling']['variables']), map(float, values)))
+    params.update((v['name'], float(value)) for v, value in zip(data['sampling']['variables'], values)
+                  if v['name'] not in data.get('material_variables', {}))
     if data['fixed_pitch_m'] is not None:
         half_widths = (params['left_width']/2+params['right_width']/2
                        if data['template'] == 'asymmetric_coupled_microstrip' else params['width'])
@@ -66,6 +68,7 @@ class StudyRow:
     impedance: float | None
     error_type: str | None
     error: str | None
+    material_evaluation_json: str | None = None
 
     def __post_init__(self):
         object.__setattr__(self, 'parameters', MappingProxyType(dict(self.parameters)))
@@ -93,7 +96,7 @@ class ImpedanceStudy:
 
 
 class ImpedanceStudyDocument:
-    """Strict impedance-study/1, /2 or /3, with resolved nominal mesh settings.
+    """Strict impedance-study/1 through /4, with resolved nominal mesh settings.
 
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.
@@ -105,9 +108,12 @@ class ImpedanceStudyDocument:
     Version 3 adds fixed-frequency scalar/principal-axis material overrides;
     only geometry variables are sampled. Its full input_json is required to
     replay a row: the row's document contains geometry, not these overrides.
+    Version 4 adds explicit aliases bound to numeric material-model leaves.
+    Sampling can combine geometry and material variables; each row preserves
+    its actual material_evaluation_json, including invalid sampled values.
     """
     def __init__(self, template, parameters, *, sampling, quantity, mesh=None, fixed_pitch_m=None,
-                 fixed_plane_spacing_m=None, frequency=None, materials=None):
+                 fixed_plane_spacing_m=None, frequency=None, materials=None, material_variables=None):
         data = dict(schema='sipi.impedance-study/1', template=template,
             parameters=parameters, sampling=sampling, quantity=quantity,
             mesh={} if mesh is None else mesh, fixed_pitch_m=fixed_pitch_m)
@@ -117,6 +123,9 @@ class ImpedanceStudyDocument:
         if evaluation is not None:
             data.update(schema='sipi.impedance-study/3', fixed_plane_spacing_m=fixed_plane_spacing_m,
                         material_evaluation=evaluation)
+        if material_variables is not None:
+            data.update(schema='sipi.impedance-study/4', fixed_plane_spacing_m=fixed_plane_spacing_m,
+                        material_evaluation=evaluation, material_variables=material_variables)
         self._data = self._validate(data)
 
     @staticmethod
@@ -124,13 +133,15 @@ class ImpedanceStudyDocument:
         data = _copy(data)
         if not isinstance(data, dict):
             raise ValueError('impedance study must be an object')
-        if data.get('schema') not in ('sipi.impedance-study/1', 'sipi.impedance-study/2', 'sipi.impedance-study/3'):
+        if data.get('schema') not in ('sipi.impedance-study/1', 'sipi.impedance-study/2', 'sipi.impedance-study/3', 'sipi.impedance-study/4'):
             raise ValueError('unsupported impedance-study schema')
         fields = ['schema', 'template', 'parameters', 'sampling', 'quantity', 'mesh', 'fixed_pitch_m']
-        if data['schema'] in ('sipi.impedance-study/2', 'sipi.impedance-study/3'):
+        if data['schema'] in ('sipi.impedance-study/2', 'sipi.impedance-study/3', 'sipi.impedance-study/4'):
             fields.append('fixed_plane_spacing_m')
-        if data['schema'] == 'sipi.impedance-study/3':
+        if data['schema'] in ('sipi.impedance-study/3', 'sipi.impedance-study/4'):
             fields.append('material_evaluation')
+        if data['schema'] == 'sipi.impedance-study/4':
+            fields.append('material_variables')
         _keys(data, fields, where='impedance study')
         template = data['template']
         if not isinstance(template, str) or template not in _TEMPLATES:
@@ -155,9 +166,13 @@ class ImpedanceStudyDocument:
         if not isinstance(quantity, str) or quantity not in allowed:
             raise ValueError('this template requires quantity='+' or '.join(allowed))
         evaluation = (_validate_material_input(data['material_evaluation'], section, quantity)
-                      if data['schema'] == 'sipi.impedance-study/3' else None)
+                      if data['schema'] in ('sipi.impedance-study/3', 'sipi.impedance-study/4') else None)
         forbidden = {name for name in parameters if _is_material_parameter(name)} if evaluation is not None else ()
-        sampling = _validate_sampling(data['sampling'], parameters, forbidden=forbidden)
+        bindings = (_material_bindings(data['material_variables'], evaluation, parameters)
+                    if data['schema'] == 'sipi.impedance-study/4' else {})
+        sampling = _validate_sampling(data['sampling'], set(parameters) | set(bindings), forbidden=forbidden)
+        if not set(bindings) <= {v['name'] for v in sampling['variables']}:
+            raise ValueError('every material binding must be sampled')
         kind, variables = sampling['kind'], sampling['variables']
         names = [v['name'] for v in variables]
         pitch = data['fixed_pitch_m']
@@ -177,9 +192,11 @@ class ImpedanceStudyDocument:
                 raise ValueError('nominal width (mean for unequal pairs) + gap must equal fixed pitch')
         canonical = dict(schema=data['schema'], template=template, parameters=parameters,
                          quantity=quantity, mesh=mesh, sampling=sampling, fixed_pitch_m=pitch)
+        if bindings:
+            canonical['material_variables'] = bindings
         if evaluation is not None:
             canonical['material_evaluation'] = evaluation
-        if data['schema'] in ('sipi.impedance-study/2', 'sipi.impedance-study/3'):
+        if data['schema'] in ('sipi.impedance-study/2', 'sipi.impedance-study/3', 'sipi.impedance-study/4'):
             spacing = data['fixed_plane_spacing_m']
             if spacing is not None:
                 spacing = _scalar(spacing, positive=True)
@@ -195,7 +212,9 @@ class ImpedanceStudyDocument:
         if kind != 'normal':
             bounds = [(v['lower'], v['upper']) for v in variables]
             for corner in product(*bounds):
-                factory(**_parameters(canonical, corner))
+                corner_section = factory(**_parameters(canonical, corner))
+                if bindings:
+                    _validate_material_input(_sample_material(canonical, corner), corner_section, quantity)
         return canonical
 
     @classmethod
@@ -224,6 +243,14 @@ class ImpedanceStudyDocument:
         """Fresh full template arguments per sample, including any derived gap."""
         return [_parameters(self._data, row) for row in self.samples()]
 
+    def sample_material_evaluations(self):
+        """Detached actual material inputs per row; invalid normal values remain.
+
+        Returns None entries for legacy studies without material overrides.
+        Physical validation takes place during analyze(), not by resampling.
+        """
+        return [_sample_material(self._data, row) for row in self.samples()]
+
     def analyze(self, *, max_evaluations=128):
         """Evaluate every planned sample, retaining errors; no partial statistics.
 
@@ -236,21 +263,24 @@ class ImpedanceStudyDocument:
         if len(parameters) > budget:
             raise ValueError('sample count exceeds max_evaluations before any solve')
         data, rows = self._data, []
+        samples = self.samples()
         for i, values in enumerate(parameters):
             doc = None
+            evaluation = _sample_material(data, samples[i])
+            saved = (None if data['schema'] != 'sipi.impedance-study/4' else
+                     json.dumps(evaluation, sort_keys=True, allow_nan=False))
             try:
                 section = _TEMPLATES[data['template']](**values)
                 doc = CrossSectionDocument(section, mesh=data['mesh'])
-                evaluation = data.get('material_evaluation')
                 line = (doc.analyze() if evaluation is None
                         else _analyze_material(doc, evaluation, data['quantity']))
                 value = float(line.even_odd()['z_diff'] if data['quantity'] == 'z_diff'
                               else getattr(line, data['quantity']))
                 if not np.isfinite(value) or value <= 0:
                     raise ValueError('solver returned a nonpositive or nonfinite impedance')
-                rows.append(StudyRow(i, values, doc, value, None, None))
+                rows.append(StudyRow(i, values, doc, value, None, None, saved))
             except Exception as exc:
-                rows.append(StudyRow(i, values, doc, None, type(exc).__name__, str(exc)))
+                rows.append(StudyRow(i, values, doc, None, type(exc).__name__, str(exc), saved))
         summary = None
         if all(row.complete for row in rows):
             z = np.array([row.impedance for row in rows])

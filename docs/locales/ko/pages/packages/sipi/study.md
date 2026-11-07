@@ -179,3 +179,5 @@ sweep/corners 끝점·순서, uniform 범위, seed/JSON 재현을 검사합니�
 분석 연결 검증이며 절대 형상 정확도나 메시 수렴을 입증하지 않습니다.
 
 [지정 주파수 재료 공차·역산](material_impedance.md)은 스칼라·주축 재료 지정을 기하와 함께 보존합니다.
+
+[재료 파라미터 공차 분석(v4)](material_variables.md)은 명시한 재료 모델 항목의 변동을 지원합니다.

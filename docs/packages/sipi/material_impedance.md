@@ -135,3 +135,5 @@ propagation, new platform, browser or portable interface is certified by this wo
 
 [Studies](study.md) · [Design](design.md) · [Materials](principal_dielectrics.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/material_impedance.md)
+
+[Material parameter tolerance studies (v4)](material_variables.md) add explicit numeric model bindings.

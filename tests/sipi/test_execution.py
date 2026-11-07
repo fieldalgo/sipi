@@ -105,6 +105,10 @@ def documents():
     base.append(TransmissionLineDocument.from_dict(data))
     base.append(NetworkTransformDocument(source(), operations=[dict(kind='renormalize', reference_ohms=75)],
         schema='sipi.network-transforms/2'))
+    base.append(ImpedanceStudyDocument('stripline', dict(width=.5e-3, plane_spacing=1e-3, eps_r=1),
+        quantity='z0', frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
+        material_variables={'dk':dict(region='dielectric',path=['eps_r'])},
+        sampling=dict(kind='sweep',count=2,variables=[dict(name='dk',lower=3,upper=5)])))
     base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
                                     ground=mesh.boundary['z0']))
     return base

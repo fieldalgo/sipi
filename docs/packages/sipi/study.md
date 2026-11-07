@@ -205,3 +205,5 @@ scaling law within relative 1e-9. This checks material scaling and study composi
 not absolute geometry accuracy or mesh convergence.
 
 [Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.
+
+[Material parameter tolerance studies (v4)](material_variables.md) add explicit numeric model bindings.
