@@ -14,6 +14,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
            'asymmetric_coupled_grounded_coplanar',
+           'asymmetric_coupled_unbacked_coplanar',
            'asymmetric_coupled_coated_grounded_coplanar',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_layered_coplanar_stripline',
@@ -237,6 +238,32 @@ def coupled_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
         ground_width=ground_width, substrate_height=substrate_height, eps_r=eps_r,
         thickness=thickness, tan_delta=tan_delta, air_height=air_height,
         box_width=box_width, top_width=top_width)
+    return _unbacked_coplanar(base, lower_air_height)
+
+
+def asymmetric_coupled_unbacked_coplanar(*, left_width, right_width, gap,
+                                        ground_gap, ground_width, substrate_height,
+                                        eps_r, left_thickness=0.0, right_thickness=0.0,
+                                        ground_thickness=0.0, tan_delta=0.0,
+                                        air_height=None, lower_air_height=None,
+                                        box_width=None, left_top_width=None,
+                                        right_top_width=None):
+    """Unequal surface signals and finite grounds without a backing plane.
+
+    Signals have independent widths, thicknesses and tapers; rectangular ground
+    thickness is explicit and defaults to zero. The finite substrate has air
+    below and above it. All outer boundaries are insulated; only the coplanar
+    ground traces define the reference. Copper bottom faces lie at
+    lower_air_height+substrate_height. Lower air defaults to ten substrate
+    heights and requires a separate truncation check. No central ground or
+    exchange symmetry is assumed; gaps refer to bottom-edge clearances.
+    """
+    base = asymmetric_coupled_grounded_coplanar(left_width=left_width,
+        right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width,
+        substrate_height=substrate_height, eps_r=eps_r, left_thickness=left_thickness,
+        right_thickness=right_thickness, ground_thickness=ground_thickness,
+        tan_delta=tan_delta, air_height=air_height, box_width=box_width,
+        left_top_width=left_top_width, right_top_width=right_top_width)
     return _unbacked_coplanar(base, lower_air_height)
 
 

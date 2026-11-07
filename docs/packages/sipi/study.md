@@ -1,5 +1,7 @@
 # Impedance tolerance studies
 
+[Unequal unbacked coplanar pairs](asymmetric_unbacked_coplanar.md) retain finite ground references and independent upper/lower air truncations.
+
 [Unequal coated coplanar pairs](asymmetric_coated_coplanar.md) retain independent signal/ground copper and explicit film/upper-air dimensions.
 
 [Unequal layered buried coplanar pairs](asymmetric_layered_coplanar_stripline.md) compose two-width pitch and total stack height with separate dielectric regions.

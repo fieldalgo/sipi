@@ -1,5 +1,7 @@
 # 임피던스 공차 분석
 
+[뒷면 접지판 없는 비대칭 coplanar 쌍](asymmetric_unbacked_coplanar.md)은 유한 접지 기준과 위·아래 공기 외곽을 각각 보존합니다.
+
 [평면 코팅 비대칭 코플래너 쌍](asymmetric_coated_coplanar.md)은 독립 신호·접지 금속과 코팅·상부 공기 치수를 보존합니다.
 
 [두 유전체 비대칭 매립 코플래너 쌍](asymmetric_layered_coplanar_stripline.md)은 두 폭 피치와 전체 적층 두께를 별도 재료 영역에 연결합니다.
