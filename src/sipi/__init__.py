@@ -27,6 +27,7 @@ Distributed AC power-plane impedance and 3D structures are not implemented.
 """
 
 from .crosssection import CrossSection, Layer, MeshedCrossSection, Trace
+from .aperture import CircularAperture, ApertureDocument
 from .polygons import PolygonTrace, DielectricRegion
 from .document import CrossSectionDocument
 from .templates import microstrip, stripline, coupled_microstrip, grounded_coplanar
@@ -56,7 +57,8 @@ from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
 __version__ = "0.1.0"
-__all__ = ["CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
+__all__ = ["CircularAperture", "ApertureDocument",
+           "CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
            "LineNetwork", "rlgc_network", "quasistatic_network",
            "lumped_network", "LumpedNetworkDocument",
            "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",

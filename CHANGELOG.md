@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add local homogeneous circular-aperture capacitance with eccentric conductors, explicit radial/angular refinement, strict saved input and independent eccentric-circle/FEM validation; no finite-pad or 3D transition interpretation.
+
 - Clarify the lossless fixed-geometry energy bound and nested-space assumptions behind electrostatic FEM convergence; do not imply entrywise monotonicity for complex or independently remeshed cases.
 
 - Preserve physical centre spacing for unequal surface-pair width studies and refined goals, deriving bottom-edge gap while retaining invalid samples and legacy equal-width behavior.

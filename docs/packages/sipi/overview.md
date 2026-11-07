@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Local circular-aperture capacitance](circular_aperture.md) supports eccentric conductors and strict saved inputs.
+
 [Passive lumped RLC branches](lumped_network.md) connect to saved circuit and assembly inputs.
 
 [Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.
