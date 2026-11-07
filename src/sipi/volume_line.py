@@ -109,6 +109,11 @@ class VolumeLineResult:
         from .characteristic import rlgc_characteristic
         return rlgc_characteristic(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C,names=self.names)
 
+    def modes(self):
+        """Distinct tracked forward modes and power losses; no new field solve."""
+        from .modes import rlgc_modes
+        return rlgc_modes(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C,names=self.names)
+
 
 def _material_samples(frequency,materials,names):
     if not isinstance(materials,Mapping) or set(materials) != set(names):

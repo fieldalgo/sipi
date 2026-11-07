@@ -1,6 +1,7 @@
 # Full-matrix forward-wave propagation
 
 [Differential/common coordinates](mixed_characteristic.md) retain the full coupling matrix for a pair.
+[Distinct tracked modes](modes.md) add an opt-in power-normalized basis and per-mode loss contributions.
 
 `rlgc_characteristic(frequency, R=..., L=..., G=..., C=..., names=None)` computes
 forward-wave matrices in the **original conductor voltage/current coordinates**.

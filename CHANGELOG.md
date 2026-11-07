@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add distinct forward-mode tracking with one-watt normalization, conductor/dielectric power-loss contributions and explicit degeneracy/assignment rejection, reusing extracted RLGC without another field solve.
+
 - Add an explicit ten-point Rz Cannonball surface input mapped to the existing causal Huray law, with strict saved selection and independent packing, relaxation and extraction checks.
 
 - Add saved local-capacitance tolerance studies and bounded goals with shared deterministic sampling, preserved invalid rows and mandatory target checks on requested and refined meshes.

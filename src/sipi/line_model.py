@@ -139,6 +139,11 @@ class TransmissionLineResult:
         from .characteristic import rlgc_characteristic
         return rlgc_characteristic(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C,names=self.names)
 
+    def modes(self):
+        """Distinct tracked forward modes and power losses; no new field solve."""
+        from .modes import rlgc_modes
+        return rlgc_modes(self.frequency,R=self.R,L=self.L,G=self.G,C=self.C,names=self.names)
+
 
 class TransmissionLineDocument:
     """Strict sipi.transmission-line/1 or /2; no file I/O or implicit metal.

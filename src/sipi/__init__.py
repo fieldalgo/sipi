@@ -55,6 +55,7 @@ from .lumped import lumped_network, LumpedNetworkDocument
 from .connection import cascade_networks, deembed_network, connect_networks, ideal_junction
 from .propagation import LinePropagation, rlgc_propagation
 from .characteristic import LineCharacteristic, rlgc_characteristic
+from .modes import LineModes, ModeTrackingError, rlgc_modes
 from .termination import terminate_ports
 from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
@@ -70,6 +71,7 @@ __all__ = ["CircularAperture", "ApertureDocument",
            "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",
            "LinePropagation", "rlgc_propagation",
            "LineCharacteristic", "rlgc_characteristic",
+           "LineModes", "ModeTrackingError", "rlgc_modes",
            "terminate_ports",
            "NetworkTransformDocument", "NetworkTransformResult",
            "NetworkAssemblyDocument", "NetworkAssemblyResult",
