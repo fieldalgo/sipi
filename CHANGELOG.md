@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add a bounded Gaussian conductivity-profile half-space kernel with explicit exterior-port position, displacement current and independent field/energy/reference-plane checks.
 - Clarify common-metal surface scope and link existing Groiss, Cannonball, diffusion and individual face assignments in English and Korean.
 - Add unequal planar-coated coplanar pairs with explicit ground copper, coating material studies, fixed-pitch width targets and independent field/limit checks.
 - Add an unequal two-dielectric buried coplanar pair with explicit ground copper, composed pitch/stack constraints, material studies, and independently checked fields and width targets.

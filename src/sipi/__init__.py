@@ -37,6 +37,7 @@ from .aperture_study import (ApertureStudyDocument, CapacitanceStudy, Capacitanc
 from .polygons import PolygonTrace, DielectricRegion
 from .document import CrossSectionDocument
 from .templates import microstrip, stripline, coupled_microstrip, grounded_coplanar
+from .conductivity_profile import GaussianConductivityProfile, ConductivityProfileResult
 from .templates import asymmetric_coupled_microstrip
 from .templates import asymmetric_coupled_stripline
 from .templates import asymmetric_coupled_layered_stripline
@@ -79,7 +80,8 @@ from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
 __version__ = "0.1.0"
-__all__ = ["CircularAperture", "ApertureDocument",
+__all__ = ["GaussianConductivityProfile", "ConductivityProfileResult",
+           "CircularAperture", "ApertureDocument",
            "RoundConductor", "EllipticalAperture", "MeshedAperture", "ApertureSectionDocument",
            "ApertureStudyDocument", "CapacitanceStudy", "CapacitanceStudyRow",
            "ApertureDesignDocument", "CapacitanceDesign", "CapacitanceEvaluation", "CapacitanceGoalError",

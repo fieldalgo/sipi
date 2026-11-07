@@ -211,7 +211,7 @@ def test_v2_smooth_and_hammerstad_reproduce_legacy_v1(rms):
 
 
 @pytest.mark.parametrize('mutate',[
-    lambda d:d.update(schema='sipi.transmission-line/3'),
+    lambda d:d.update(schema='sipi.transmission-line/999'),
     lambda d:d['conductor'].update(roughness_rms=0),
     lambda d:d['conductor'].pop('roughness'),
     lambda d:d['conductor'].update(roughness=None),
@@ -233,6 +233,18 @@ def test_invalid_v2_rejected_before_meshing(monkeypatch,mutate):
     mutate(raw)
     with pytest.raises(ValueError):
         TransmissionLineDocument.from_dict(raw)
+
+
+@pytest.mark.parametrize('version',[2,3,4,5,6])
+def test_common_surface_record_remains_valid_in_supported_versions(version,monkeypatch):
+    def forbidden(*args,**kwargs):
+        pytest.fail('document parsing reached meshing')
+    monkeypatch.setattr(CrossSection,'mesh',forbidden)
+    raw=line().to_dict()
+    raw['schema']=f'sipi.transmission-line/{version}'
+    parsed=TransmissionLineDocument.from_dict(raw)
+    assert parsed.to_dict()==raw
+    assert TransmissionLineDocument.loads(parsed.dumps()).to_dict()==raw
 
 
 def test_perfect_v2_preserves_version_and_duplicate_fields_rejected():

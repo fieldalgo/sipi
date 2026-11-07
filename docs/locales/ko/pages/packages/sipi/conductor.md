@@ -46,6 +46,8 @@ loss.R, loss.L_internal, loss.skin_depth, loss.factors.current_error
   전체 임피던스에 실수인 비인과적 주파수영역 계수를 곱합니다.
   [Cannonball Huray](cannonball.md)는 명시적 10점 Rz를 인과적 구형 법칙에 연결합니다.
   이 표면 어댑터는 Gradient 거칠기를 지원하지 않습니다.
+  별도 [Gaussian 전도율 프로파일 커널](conductivity_profile.md)은 명시적 기준면의
+  1D 외측 포트 임피던스를 반환하며 이 어댑터의 승수나 선로 인덕턴스 보정이 아닙니다.
 - 잘못된 재료·표피 깊이 입력은 메시 전에 거부합니다. 적분한 단위 전류 행렬의 최대 차이가
   0.05를 넘으면 세분을 요구하는 `ValueError`를 냅니다. **저항 오차 5% 보장이 아닙니다.**
   R 자체의 세분 변화와 상자 크기 영향은 별도로 확인해야 합니다.

@@ -55,6 +55,9 @@ All values are SI. A runnable example is
   noncausal frequency-domain factor. [Cannonball Huray](cannonball.md) maps
   explicit ten-point Rz to the causal sphere law. Gradient roughness is not
   supported by this surface adapter.
+  A separate [Gaussian conductivity-profile kernel](conductivity_profile.md)
+  returns a 1D exterior-port impedance with an explicit reference plane;
+  it is not a multiplier or a line-inductance correction for this adapter.
 - Invalid material/skin inputs are rejected before meshing. A discrepancy of
   more than 0.05 in the integrated unit-current matrix raises `ValueError`
   requesting refinement. This flux check is **not a 5% resistance guarantee**.
