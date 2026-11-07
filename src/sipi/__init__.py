@@ -41,6 +41,7 @@ from .templates import asymmetric_coupled_microstrip
 from .templates import asymmetric_coupled_stripline
 from .templates import asymmetric_coupled_layered_stripline
 from .templates import asymmetric_coupled_grounded_coplanar
+from .templates import asymmetric_coupled_coated_grounded_coplanar
 from .templates import asymmetric_coupled_layered_coplanar_stripline
 from .templates import asymmetric_coupled_coplanar_stripline
 from .templates import coupled_grounded_coplanar
@@ -104,6 +105,7 @@ __all__ = ["CircularAperture", "ApertureDocument",
            "asymmetric_coupled_stripline",
            "asymmetric_coupled_layered_stripline",
            "asymmetric_coupled_grounded_coplanar",
+           "asymmetric_coupled_coated_grounded_coplanar",
            "asymmetric_coupled_coplanar_stripline",
            "asymmetric_coupled_layered_coplanar_stripline",
            "coupled_grounded_coplanar",
