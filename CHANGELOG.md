@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add unequal buried coplanar signal pairs with independent copper, explicit ground dimensions, fixed-pitch studies and forward-impedance goals.
 - Add saved periodic mixed source circuits with explicit real waveforms, sample budgets, shared harmonic diagnostics and mean power execution.
 - Add real periodic mixed voltage/current sources, ideal terminal combinations and reactive load time responses with harmonic power diagnostics.
 - Add versioned mixed circuit documents with explicit per-port source kinds, frequency budgets and finite shared execution results.

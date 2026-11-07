@@ -15,6 +15,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_layered_stripline',
            'asymmetric_coupled_grounded_coplanar',
            'coplanar_stripline', 'coupled_coplanar_stripline',
+           'asymmetric_coupled_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'layered_broadside_stripline',
@@ -623,6 +624,45 @@ def coupled_coplanar_stripline(*, width, gap, ground_gap, ground_width, plane_sp
     return CrossSection(base.layers,
         [left, right, Trace('ground_left', -offset, gw, y, left.thickness, ground=True),
          Trace('ground_right', offset, gw, y, left.thickness, ground=True)], box, top='ground')
+
+
+def asymmetric_coupled_coplanar_stripline(*, left_width, right_width, gap,
+                                         ground_gap, ground_width, plane_spacing,
+                                         trace_height, eps_r, left_thickness=0.0,
+                                         right_thickness=0.0, ground_thickness=0.0,
+                                         tan_delta=0.0, box_width=None,
+                                         left_top_width=None, right_top_width=None):
+    """Unequal buried pair and finite side grounds with a shared bottom height.
+
+    Uniform dielectric between grounded planes; sides are insulated. All four
+    bottom faces lie at explicit trace_height. Signal widths/thicknesses/tapers
+    are independent; rectangular grounds share explicit width/thickness, never
+    inferred from a signal. gap and ground_gap are bottom-edge clearances. The
+    complete signal bottom span is centred, positive left and negative right.
+    No central ground or exchange/eigenmode symmetry is assumed. Ground width
+    is physical; box width is a separate outer-domain parameter.
+    """
+    left = _positive('left_width', left_width)
+    right = _positive('right_width', right_width)
+    gap = _positive('gap', gap)
+    gg = _positive('ground_gap', ground_gap)
+    gw = _positive('ground_width', ground_width)
+    lt = _positive('left_thickness', left_thickness, zero=True)
+    rt = _positive('right_thickness', right_thickness, zero=True)
+    gt = _positive('ground_thickness', ground_thickness, zero=True)
+    y = _positive('trace_height', trace_height)
+    base = offset_stripline(width=max(left, right), plane_spacing=plane_spacing,
+        trace_height=y, eps_r=eps_r, thickness=max(lt, rt, gt),
+        tan_delta=tan_delta, box_width=box_width)
+    x_left, x_right = -(gap+right)/2, (gap+left)/2
+    offset = x_right+right/2+gg+gw/2
+    box = (max(base.width, 4*(left+right+gap), 2*(offset+gw/2)+4*base.height)
+           if box_width is None else base.width)
+    return CrossSection(base.layers,
+        [Trace('positive', x_left, left, y, lt, top_width=left_top_width),
+         Trace('negative', x_right, right, y, rt, top_width=right_top_width),
+         Trace('ground_left', -offset, gw, y, gt, ground=True),
+         Trace('ground_right', offset, gw, y, gt, ground=True)], box, top='ground')
 
 
 def broadside_stripline(*, width, gap, plane_spacing, eps_r, thickness,

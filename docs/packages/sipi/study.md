@@ -1,5 +1,7 @@
 # Impedance tolerance studies
 
+[Unequal buried coplanar pairs](asymmetric_coplanar_stripline.md) use independent signal copper, explicit finite grounds and the two-width pitch contract.
+
 [Unequal coplanar pairs](asymmetric_coplanar.md) retain finite ground dimensions and independent signal thicknesses.
 
 [Unequal two-dielectric pairs](asymmetric_layered_stripline.md) compose fixed pitch and total plane spacing.
@@ -49,7 +51,7 @@ Version `sipi.impedance-study/2` has the same fields plus required
 `fixed_plane_spacing_m` (null or a positive length). Existing constructors without
 that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
 retains v2 even when its constraint is null. Unknown versions are rejected.
-The thirty-three templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `asymmetric_coupled_stripline`, `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_grounded_coplanar`,
+The thirty-four templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `asymmetric_coupled_stripline`, `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_grounded_coplanar`, `asymmetric_coupled_coplanar_stripline`,
 `grounded_coplanar`, `coplanar_stripline`, `coupled_coplanar_stripline`, `layered_coplanar_stripline`, `coupled_layered_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline`,
 `coupled_layered_stripline`, `layered_broadside_stripline`, `coupled_coated_microstrip`,
@@ -70,7 +72,7 @@ explicit air/box dimensions when those must remain fixed.
 `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`,
 `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar` and
 `coupled_conformal_coated_unbacked_coplanar`. These pair templates also accept
-explicit `z_diff_forward`; `asymmetric_coupled_microstrip`, `asymmetric_coupled_stripline`, `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_grounded_coplanar` and `layered_broadside_stripline` require that quantity.
+explicit `z_diff_forward`; `asymmetric_coupled_microstrip`, `asymmetric_coupled_stripline`, `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_grounded_coplanar`, `asymmetric_coupled_coplanar_stripline` and `layered_broadside_stripline` require that quantity.
 Single-signal templates require `z0`.
 This extends the supported template names
 without changing schema fields or existing plan semantics. Older readers reject
