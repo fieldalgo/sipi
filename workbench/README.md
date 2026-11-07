@@ -76,7 +76,7 @@ model limits; a local aperture capacitance is not a complete 3D transition.
 
 The topic-only `workbench-candidate.yml` workflow builds exact first-party
 wheels, checks adapter behavior, audits installed payloads and invokes Nuitka
-2.8.10 with CPython 3.12.14 and the installed Visual Studio 2022 compiler. It
+2.8.10 with CPython 3.13.17 and the installed Visual Studio 2022 compiler. It
 uploads reports and notices only, never the EXE or third-party runtime binaries.
 For a matching prepared Windows environment:
 

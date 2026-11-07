@@ -2,6 +2,25 @@
 
 [English](THIRD_PARTY.md)
 
+현재 Windows 후보는 공식 Actions manifest에 있는 **CPython 3.13.17**을 고정합니다.
+이전 3.12.14는 Windows 배포본이 없어 setup-python에서 실패했습니다.
+[3.13.17 원본 LICENSE](https://github.com/python/cpython/blob/v3.13.17/LICENSE)의
+PSF-2.0·고지 보존·포함 구성 조건을 확인했고 Nuitka 2.8.10 metadata는 Python 3.13
+지원을 명시합니다. 실제 컴파일·실행은 별도로 통과해야 합니다.
+
+현재 cp313/x64 입력 wheel의 PyPI 해시를 다운로드 후 대조했습니다.
+
+| Wheel | 바이트 | SHA-256 |
+|---|---:|---|
+| NumPy 2.5.4 cp313 | 12,566,113 | `8b4d2fd2d34e5f8c9235ee787de5631a37a28402b15cb80814df973d2be54129` |
+| SciPy 1.18.1 cp313 | 36,622,841 | `559ed65f60c1af5a03f3912605a1b5114f522c7c32fb23c3376ae8f03219fe28` |
+| Shapely 2.2.0 cp313 | 1,790,191 | `1eaa2cb64cdedaf65d6bc86f2819c9cd7d6d68f969aa3ebfdc93743ab581f437` |
+| zstandard 0.25.0 cp313 | 506,232 | `1f830a0dac88719af0ae43b8b2d6aef487d437036468ef3c2ea59c51f9d55fd5` |
+
+native 파일 수는 각각 21·107·6·2개이고 BSD·LGPL·runtime 고지 구분은 유지됩니다.
+아래 cp312 목록은 과거 확인 이력이며 현재 빌드 산출물의 식별 근거는 아닙니다.
+입력 wheel 크기를 EXE 용량으로 해석하지 않습니다.
+
 확인일 2026-11-07. 정확 pin은 `packaging/requirements-windows.txt`입니다.
 독립 SIPI는 `packaging/engine-ref.txt`, galerkin·meshine은 해당 엔진의
 `dependencies.json`에 기록한 공유 소스 커밋을 사용합니다. 후보 workflow는
@@ -30,7 +49,7 @@ CDN 스크립트·브라우저 엔진을 포함하지 않습니다.
 | 구성 | 용도 | 버전·조건·근거 |
 |---|---|---|
 | SIPI, galerkin, meshine | 실행 엔진 | `packaging/engine-ref.txt`, Apache-2.0; 각 배포물 LICENSE·NOTICE 보존 |
-| CPython | 내장 인터프리터 | 3.12.14, PSF/Python 및 포함 구성 조건; 설치된 LICENSE.txt 보존 |
+| CPython | 내장 인터프리터 | 3.13.17, PSF/Python 및 포함 구성 조건; 설치된 LICENSE.txt 보존 |
 | NumPy | 배열 | 2.5.4, BSD-3-Clause 및 wheel의 구성 라이선스 |
 | SciPy | 수치 계산 | 1.18.1, BSD-3-Clause 및 wheel의 구성 라이선스 |
 | array-api-compat | 배열 호환 | 1.16.0, MIT |

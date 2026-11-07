@@ -13,7 +13,7 @@ framework, web font, CDN script or browser engine is bundled.
 | Component | Use | Version / terms / evidence |
 |---|---|---|
 | SIPI, galerkin, meshine | Runtime engine | `packaging/engine-ref.txt`, Apache-2.0; preserve each distribution's LICENSE and NOTICE |
-| CPython | Embedded interpreter | 3.12.14, PSF/Python license and bundled-component terms; preserve installed `LICENSE.txt` |
+| CPython | Embedded interpreter | 3.13.17, PSF/Python license and bundled-component terms; preserve installed `LICENSE.txt` |
 | NumPy | Runtime arrays | 2.5.4; BSD-3-Clause and component licenses in wheel |
 | SciPy | Runtime numerical routines | 1.18.1; BSD-3-Clause and component licenses in wheel |
 | Shapely | Geometry operations | 2.2.0; BSD-3-Clause, bundled GEOS 3.14.1 under LGPL-2.1 and Microsoft runtime notice; closure/relinking review incomplete |
@@ -54,6 +54,28 @@ the corresponding source/wheel license files, and the pinned OpenPhysics
 not include Pyodide. The separate browser preview uses the inventory below.
 
 ## Windows wheel inspection
+
+The current Windows candidate uses CPython **3.13.17**, available in the
+official [Actions manifest](https://github.com/actions/python-versions/blob/main/versions-manifest.json).
+The earlier 3.12.14 candidate stopped in setup-python because that Windows
+distribution was unavailable. The exact [CPython 3.13.17 license](https://github.com/python/cpython/blob/v3.13.17/LICENSE)
+was checked: PSF-2.0 with retained notices and incorporated-component terms.
+Nuitka 2.8.10 metadata explicitly lists Python 3.13 support. Actual compilation
+and Windows execution must still validate this combination.
+
+Downloaded current cp313/x64 wheels match their versioned PyPI hashes:
+
+| Wheel | Bytes | SHA-256 |
+|---|---:|---|
+| NumPy 2.5.4 cp313 | 12,566,113 | `8b4d2fd2d34e5f8c9235ee787de5631a37a28402b15cb80814df973d2be54129` |
+| SciPy 1.18.1 cp313 | 36,622,841 | `559ed65f60c1af5a03f3912605a1b5114f522c7c32fb23c3376ae8f03219fe28` |
+| Shapely 2.2.0 cp313 | 1,790,191 | `1eaa2cb64cdedaf65d6bc86f2819c9cd7d6d68f969aa3ebfdc93743ab581f437` |
+| zstandard 0.25.0 cp313 | 506,232 | `1f830a0dac88719af0ae43b8b2d6aef487d437036468ef3c2ea59c51f9d55fd5` |
+
+Their native file counts are 21, 107, 6 and 2 respectively. Component notices
+retain the same BSD, LGPL and runtime distinctions below. These input sizes
+still do not measure an EXE. The following cp312 inventory is historical;
+it is not the current Windows build's artifact identity.
 
 The exact CPython 3.12 / Windows x64 input wheels were downloaded from their
 versioned PyPI records and checked against the published SHA-256 values:

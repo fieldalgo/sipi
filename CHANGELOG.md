@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Pin the Windows candidate to available CPython 3.13.17 after the 3.12.14 setup failure, verify the matching cp313 wheel notices/hashes and collect only explicitly listed reports from the hidden validation directory.
+
 - Add an independent workbench source candidate with strict saved-analysis JSON execution, retained failures, cancellation/export guards and reproducible browser/Windows packaging inputs; Windows executable and redistribution acceptance remain explicit verification gates.
 
 - Fix extraction's SI constants to the published CODATA 2022 values so older SciPy runtimes cannot silently select a different physical reference; retain tabulation rounding and document the change from earlier runtime-dependent values.

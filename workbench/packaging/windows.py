@@ -37,9 +37,9 @@ def wheel_inventory(directory):
 
 def main():
     if sys.platform != 'win32' or platform.machine().lower() not in ('amd64', 'x86_64'):
-        raise SystemExit('Build with CPython 3.12 on Windows x64; cross-compilation is not claimed.')
-    if sys.version_info[:3] != (3, 12, 14):
-        raise SystemExit('Use the reviewed CPython 3.12.14 build environment.')
+        raise SystemExit('Build with CPython 3.13 on Windows x64; cross-compilation is not claimed.')
+    if sys.version_info[:3] != (3, 13, 17):
+        raise SystemExit('Use the reviewed CPython 3.13.17 build environment.')
     for line in (ROOT / 'workbench/packaging/requirements-windows.txt').read_text().splitlines():
         if not line.strip() or line.startswith('#'):
             continue

@@ -67,7 +67,7 @@ C0 norm 차이가 약 1.03e-5였습니다. CODATA 2022 고정 이후 동일 메�
 ## Windows 후보 검증
 
 topic 전용 `workbench-candidate.yml`은 정확한 자체 wheel 설치·adapter 검증·설치 파일
-대조 후 CPython 3.12.14/Nuitka 2.8.10/설치된 Visual Studio 2022로 빌드합니다.
+대조 후 CPython 3.13.17/Nuitka 2.8.10/설치된 Visual Studio 2022로 빌드합니다.
 보고서·고지만 업로드하고 EXE·제3자 런타임 바이너리는 업로드하지 않습니다.
 같은 준비를 마친 Windows 환경의 명령은 다음과 같습니다.
 
