@@ -34,8 +34,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.constants import c as SPEED_OF_LIGHT
-from scipy.constants import epsilon_0, mu_0
+from .constants import SPEED_OF_LIGHT, epsilon_0, mu_0
 
 from galerkin import Mesh, assemble_stiffness, solve_dirichlet
 

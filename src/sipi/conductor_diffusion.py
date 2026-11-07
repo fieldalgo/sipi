@@ -13,7 +13,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.constants import epsilon_0, mu_0
+from .constants import epsilon_0, mu_0
 from scipy.sparse.linalg import splu
 
 from galerkin import assemble_load, assemble_mass, assemble_stiffness

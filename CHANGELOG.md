@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix extraction's SI constants to the published CODATA 2022 values so older SciPy runtimes cannot silently select a different physical reference; retain tabulation rounding and document the change from earlier runtime-dependent values.
+
 - Add a shared strict saved-input execution adapter with finite complex JSON results, explicit budgets, retained study/goal failures and optional line diagnostics for browser and local application transports.
 
 - Add distinct forward-mode tracking with one-watt normalization, conductor/dielectric power-loss contributions and explicit degeneracy/assignment rejection, reusing extracted RLGC without another field solve.

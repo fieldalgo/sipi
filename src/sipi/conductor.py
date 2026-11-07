@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.constants import epsilon_0, mu_0
+from .constants import epsilon_0, mu_0
 
 from galerkin import assemble_stiffness, solve_dirichlet
 from .network import _frequencies, _scalar, rlgc_network

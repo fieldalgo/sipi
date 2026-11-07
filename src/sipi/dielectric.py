@@ -14,7 +14,7 @@ from dataclasses import asdict, dataclass
 from types import MappingProxyType
 
 import numpy as np
-from scipy.constants import epsilon_0, mu_0
+from .constants import epsilon_0, mu_0
 
 from .network import _frequencies, _real, _scalar, rlgc_network
 from .quasistatic import capacitance_matrix, _permittivity

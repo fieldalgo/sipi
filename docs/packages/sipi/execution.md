@@ -4,6 +4,8 @@
 entry point to the existing engine documents. It performs no file, network,
 browser or process operations and introduces no new numerical model.
 
+[Physical constants](constants.md) have an explicit CODATA revision independent of the runtime.
+
 ```python
 import json
 from sipi import LumpedNetworkDocument

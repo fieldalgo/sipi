@@ -4,6 +4,8 @@
 진입점으로 처리하도록 합니다. 파일·네트워크·브라우저·프로세스를 조작하지
 않으며 새 수치 모델을 도입하지 않습니다.
 
+[물리 상수](constants.md)는 런타임과 독립적인 CODATA 버전을 명시합니다.
+
 ```python
 import json
 from sipi import LumpedNetworkDocument
