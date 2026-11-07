@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Ground-trace face laws](ground_faces.md) separate four finite ground surfaces in the Python API.
+
 [Two-dielectric buried coplanar lines](layered_coplanar_stripline.md) retain layer materials and compose fixed pitch with stack-height tolerances.
 
 [Buried coplanar single and differential lines](coplanar_stripline.md) include finite side grounds, saved studies and fixed-pitch impedance goals.

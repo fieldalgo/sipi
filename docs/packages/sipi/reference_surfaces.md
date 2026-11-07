@@ -6,7 +6,9 @@
 top, side-wall and named ground-trace metals. The older single `SurfaceMetal`
 reference still combines all grounds and retains its output shape. Saved line/4
 continues to accept that common reference only; [line/5](reference_line.md) saves
-the explicit reference groups and reuses the same extraction API.
+the explicit reference groups with one whole-perimeter law per ground trace.
+The Python API additionally supports [individual ground faces](ground_faces.md);
+line/5 continues to reject that newer assignment.
 
 ```python
 import numpy as np
@@ -32,7 +34,8 @@ np.testing.assert_allclose(result.resistance_parts.sum(axis=1), result.R, rtol=1
 All four constructor fields are explicit. A `bottom`, `top` or `sides` boundary
 needs a `SurfaceMetal` exactly when the cross-section marks it as ground; an open
 boundary requires `None`. Both side walls share the `sides` law. `conductors` maps
-exactly every explicit ground-trace name to one law over its complete perimeter.
+exactly every explicit ground-trace name to one `SurfaceMetal` over its complete
+perimeter or [four face laws](ground_faces.md) for a finite rectangular/tapered trace.
 Signal assignments remain separate `TraceFaceMetals`. Unknown/missing names and
 unused boundary assignments reject before meshing. The ground mapping is copied
 and made read-only; changing the caller's mapping cannot change the assignment.
@@ -49,7 +52,7 @@ dimensions. These gates are necessary checks, not a model-accuracy guarantee.
 One vacuum current solution is partitioned into four faces per signal followed by
 the active references: bottom, top, sides, then ground traces in cross-section
 order. Labels are `reference:bottom`, `reference:top`, `reference:sides` and
-`reference:ground:<name>`. Every ground boundary edge must map to exactly one
+`reference:ground:<name>`, or the documented four-face expansion. Every ground boundary edge must map to exactly one
 nonempty group. Plane/wall endpoints use the section boundary tolerance; ground
 trace endpoints use their geometry. Overlap or a missing group rejects.
 
@@ -76,8 +79,8 @@ fixture criteria, not universal bounds for arbitrary cross-sections.
 
 This remains first-order PEC surface perturbation. Different laws do not imply a
 physically realizable coating stack, finite-metal current redistribution or a
-measured foil calibration. Ground-trace faces are not separated; each trace has
-one law. Perform independent mesh and outer-domain convergence for the actual
+measured foil calibration. Whole-trace laws retain their original semantics;
+the optional face expansion is described separately. Perform independent mesh and outer-domain convergence for the actual
 geometry and frequencies. No new application pin or platform acceptance is implied.
 
 ```sh

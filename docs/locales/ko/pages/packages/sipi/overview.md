@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[접지 도체의 면별 표면 법칙](ground_faces.md)은 Python API에서 유한 ground trace의 네 면을 분리합니다.
+
 [두 유전체 매립 coplanar 선로](layered_coplanar_stripline.md)는 층별 재료와 고정 pitch·전체 높이 공차를 함께 지원합니다.
 
 [매립 coplanar 단일·차동 선로](coplanar_stripline.md)는 두 접지면 사이의 유한 측면 접지와 공차·고정 pitch 역산을 지원합니다.

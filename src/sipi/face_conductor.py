@@ -47,26 +47,27 @@ class TraceFaceMetals:
 
 @dataclass(frozen=True)
 class ReferenceSurfaceMetals:
-    """Explicit laws for grounded planes/walls and complete ground traces.
+    """Explicit laws for grounded planes/walls and whole or face-resolved traces.
 
     An open bottom/top/sides boundary must be None. Both side walls share one
-    law. ``conductors`` maps exactly the grounded trace names to surface laws;
-    each such trace shares one law over its complete perimeter. These local
-    perturbative laws do not model coatings or current diffusion inside metal.
+    law. ``conductors`` maps exactly the grounded trace names to SurfaceMetal
+    (whole perimeter) or TraceFaceMetals (four finite rectangular/tapered faces).
+    Whole-perimeter polygon grounds remain supported. These local perturbative
+    laws do not model coatings or current diffusion inside metal.
     """
     bottom: SurfaceMetal | None
     top: SurfaceMetal | None
     sides: SurfaceMetal | None
-    conductors: Mapping[str, SurfaceMetal]
+    conductors: Mapping[str, SurfaceMetal | TraceFaceMetals]
 
     def __post_init__(self):
         if any(m is not None and not isinstance(m, SurfaceMetal)
                for m in (self.bottom, self.top, self.sides)):
             raise ValueError('reference boundary must be a SurfaceMetal or None')
         if (not isinstance(self.conductors, Mapping)
-                or any(not isinstance(k, str) or not k or not isinstance(m, SurfaceMetal)
+                or any(not isinstance(k, str) or not k or not isinstance(m, (SurfaceMetal, TraceFaceMetals))
                        for k, m in self.conductors.items())):
-            raise ValueError('reference conductors must map names to SurfaceMetal objects')
+            raise ValueError('reference conductors must map names to SurfaceMetal or TraceFaceMetals objects')
         object.__setattr__(self, 'conductors', MappingProxyType(dict(self.conductors)))
 
 
@@ -175,8 +176,18 @@ def _reference_parts(section, reference, thickness):
             dimensions.append(min(thickness, section.width, section.height))
             surfaces.append(('reference:'+name, name, coordinate))
     for trace in grounded:
-        metals.append(reference.conductors[trace.name]); dimensions.append(trace.minimum_dimension)
-        surfaces.append(('reference:ground:'+trace.name, 'trace', trace))
+        law = reference.conductors[trace.name]
+        if isinstance(law, TraceFaceMetals):
+            if not isinstance(trace, Trace) or trace.thickness <= 0:
+                raise ValueError('ground faces require finite rectangular or tapered Trace conductors')
+            for face, metal in zip(_FACES, law.metals):
+                metals.append(metal); dimensions.append(trace.minimum_dimension)
+                surfaces.append(('reference:ground:'+trace.name+':'+face, 'trace-face', (trace, face)))
+        else:
+            metals.append(law); dimensions.append(trace.minimum_dimension)
+            surfaces.append(('reference:ground:'+trace.name, 'trace', trace))
+    if len({surface[0] for surface in surfaces}) != len(surfaces):
+        raise ValueError('reference surface labels collide; use distinct ground trace names')
     return tuple(metals), dimensions, tuple(surfaces)
 
 
@@ -209,6 +220,13 @@ def _face_samples(section, frequency, conductors, reference, ground_thickness):
             np.column_stack([s[3] for s in samples]), surfaces)
 
 
+def _trace_face_mask(trace, x, y, face, tolerance):
+    if face == 'bottom': return np.all(abs(y-trace.y) <= tolerance, axis=1)
+    if face == 'top': return np.all(abs(y-trace.y1) <= tolerance, axis=1)
+    sign = -1 if face == 'left' else 1
+    return np.all(abs(x-(trace.x+sign*trace.width_at(y)/2)) <= tolerance, axis=1)
+
+
 def _face_from_mesh(meshed, traces, tolerance, f, metals, depth, correction, zs, reference_surfaces=None):
     base, edges, owners, lengths, currents = _surface_current_data(meshed.mesh, meshed.signals, meshed.ground)
     if base.names != tuple(t.name for t in traces):
@@ -221,10 +239,7 @@ def _face_from_mesh(meshed, traces, tolerance, f, metals, depth, correction, zs,
         selected = np.flatnonzero(owners == i)
         xy = meshed.mesh.nodes[edges[selected]]
         x, y = xy[:, :, 0], xy[:, :, 1]
-        hits = np.column_stack([np.all(abs(y-trace.y) <= tolerance, axis=1),
-                                np.all(abs(y-trace.y1) <= tolerance, axis=1),
-                                np.all(abs(x-(trace.x-trace.width_at(y)/2)) <= tolerance, axis=1),
-                                np.all(abs(x-(trace.x+trace.width_at(y)/2)) <= tolerance, axis=1)])
+        hits = np.column_stack([_trace_face_mask(trace, x, y, face, tolerance) for face in _FACES])
         if np.any(hits.sum(axis=1) != 1) or not np.all(hits.any(axis=0)):
             raise ValueError('signal edges must partition uniquely into four nonempty trace faces')
         groups[selected] = 4*i+np.argmax(hits, axis=1)
@@ -239,6 +254,10 @@ def _face_from_mesh(meshed, traces, tolerance, f, metals, depth, correction, zs,
                 mask = np.all(abs(y-geometry) <= tolerance, axis=1)
             elif kind == 'sides':
                 mask = np.all(abs(abs(x)-geometry) <= tolerance, axis=1)
+            elif kind == 'trace-face':
+                trace, face = geometry
+                mask = (np.all(trace.distance(x, y) <= tolerance, axis=1)
+                        & _trace_face_mask(trace, x, y, face, tolerance))
             else:
                 mask = np.all(geometry.distance(x, y) <= tolerance, axis=1)
             masks.append(mask)
@@ -267,9 +286,11 @@ def surface_conductor_loss_by_face(section, frequency, *, conductors, reference,
     solve is partitioned without missing/duplicated edges. The whole-conductor
     5% current-flux gate is unchanged; resistance/box convergence is separate.
     ReferenceSurfaceMetals selects active planes/walls and named ground traces;
-    each ground trace still has one law for its entire perimeter. Plane/wall skin
-    depth uses ground_thickness and box dimensions; a ground trace uses its own
-    minimum dimension. Signal polygons and zero-thickness strips are unsupported.
+    a trace takes one whole-perimeter law or four explicit TraceFaceMetals laws.
+    Plane/wall skin depth uses ground_thickness and box dimensions; every ground
+    face uses its trace's minimum dimension. Signal polygons and face-resolved
+    polygon/zero-thickness grounds are unsupported. Colliding expanded reference
+    labels are rejected before meshing rather than changing existing label names.
     This first-order surface model is not finite-metal diffusion.
     """
     samples = _face_samples(section, frequency, conductors, reference, ground_thickness)

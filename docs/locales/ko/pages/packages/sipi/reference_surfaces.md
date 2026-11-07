@@ -6,7 +6,8 @@
 이름별 접지 도체 금속을 각각 지정합니다. 기존 단일 `SurfaceMetal` reference는
 모든 접지를 합친 의미와 출력 형식을 유지합니다. 저장 line/4는 여전히 공통
 reference만 받습니다. [line/5](reference_line.md)는 명시적인 reference 그룹을
-저장하고 같은 추출 API를 재사용합니다.
+저장하되 접지 도체에는 전체 둘레 법칙 하나를 사용합니다. Python API는 추가로
+[접지 도체의 면별 법칙](ground_faces.md)을 지원하지만 line/5는 이 새 지정을 거부합니다.
 
 ```python
 import numpy as np
@@ -32,7 +33,8 @@ np.testing.assert_allclose(result.resistance_parts.sum(axis=1), result.R, rtol=1
 생성자의 네 필드는 모두 명시합니다. 단면의 `bottom`, `top`, `sides`가 ground일
 때만 `SurfaceMetal`을 지정하고 열린 경계에는 `None`을 넣습니다. 양 측벽은 하나의
 `sides` 법칙을 공유합니다. `conductors`에는 모든 명시적 ground trace의 이름을
-정확히 넣고 각 도체 둘레 전체에 하나의 법칙을 적용합니다. 신호 도체에는 별도의
+정확히 넣고 전체 둘레용 `SurfaceMetal` 또는 유한 직사각형·사다리꼴의
+[4면 법칙](ground_faces.md)을 적용합니다. 신호 도체에는 별도의
 `TraceFaceMetals`를 사용합니다. 누락·알 수 없는 이름·사용하지 않는 경계 지정은
 메시 전에 거부합니다. ground mapping은 복사 후 읽기 전용으로 만들어 호출자가
 원래 mapping을 수정해도 배정이 바뀌지 않습니다.
@@ -47,7 +49,7 @@ np.testing.assert_allclose(result.resistance_parts.sum(axis=1), result.R, rtol=1
 
 한 번의 진공 전류 해를 신호별 네 면, 활성 bottom·top·sides, 단면 순서의
 ground trace로 나눕니다. reference label은 `reference:bottom`, `reference:top`,
-`reference:sides`, `reference:ground:<name>`입니다. 모든 접지 경계 edge는
+`reference:sides`, `reference:ground:<name>` 또는 명시한 4면 확장입니다. 모든 접지 경계 edge는
 정확히 하나의 비어 있지 않은 그룹에 속해야 합니다. plane/측벽 양 끝점에는 단면
 경계 tolerance를, ground trace 양 끝점에는 그 기하를 사용합니다. 중복·누락은 거부합니다.
 
@@ -70,8 +72,8 @@ stripline에서는 메시 세분과 두 배 영역의 저항 변화가 각각 5%
 이는 특정 검증 사례의 기준이며 임의 단면의 보편적 정확도 상한이 아닙니다.
 
 모델은 PEC 표면의 일차 섭동입니다. 서로 다른 법칙 지정이 실현 가능한 도금 적층,
-금속 내부 전류 재분포나 동박 실측 보정을 뜻하지 않습니다. ground trace의 면은
-분리하지 않고 도체마다 하나의 법칙을 적용합니다. 실제 기하·주파수에서 메시와
+금속 내부 전류 재분포나 동박 실측 보정을 뜻하지 않습니다. 전체 둘레 법칙의
+기존 의미를 유지하며 선택적인 면별 확장은 별도 문서에 설명합니다. 실제 기하·주파수에서 메시와
 외곽 수렴을 각각 확인해야 합니다. 앱 pin이나 플랫폼 수락 범위는 확대하지 않습니다.
 
 ```sh

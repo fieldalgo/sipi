@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Extend reference surface assignments with four laws per finite ground trace, conserved face-current partitions, pre-mesh skin/label guards and unchanged whole-trace behavior.
+
 - Add two-dielectric buried coplanar templates with separate material coefficients, composed pitch/stack-height constraints and saved tolerance and impedance goals.
 
 - Add single and differential buried coplanar stripline templates with finite side grounds, saved material/tolerance studies and fixed-pitch impedance goals.
