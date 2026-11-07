@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Scalar lossy geometry/material sampling with complete failure accounting."""
+"""Explicit lossy geometry/material sampling with complete failure accounting."""
 from dataclasses import dataclass
 import json
 from types import MappingProxyType
@@ -91,13 +91,17 @@ class LineQuantityStudy:
 
 
 class LineQuantityStudyDocument:
-    """sipi.line-quantity-study/1: sample scalar full-loss line quantities.
+    """Sample full-loss line quantities with explicit saved versions 1 and 2.
 
     The nested study/3 or /4 supplies scalar template inputs, fixed positive
     frequency, sampling and geometry/material constraints. Its z0 selects the
     source contract; the old quasi-static study is not analyzed. Each sample
     instead creates a zero-length line/6 at a fixed 50-ohm reference with the
     supplied fixed conductor. Re(Zc) or Re(gamma) is independent of that reference.
+    Version 1 is the constructor default and remains scalar-only. Explicit
+    version 2 also accepts a z_diff_forward pair source and the quantity
+    differential_forward_impedance_real. It targets Re(Zdd) with launch Ic=0,
+    retaining asymmetric coupling rather than asserting an independent mode.
 
     Every generated sample is attempted in order, including after failures.
     Failed rows retain their sample values and all representable intermediate
@@ -106,20 +110,23 @@ class LineQuantityStudyDocument:
     Nominal resolved mesh settings are reused, not a single geometric mesh or
     a per-row convergence guarantee. This is not a yield confidence interval.
     """
-    def __init__(self, study, *, conductor, quantity):
+    def __init__(self, study, *, conductor, quantity, schema='sipi.line-quantity-study/1'):
         if isinstance(study, ImpedanceStudyDocument):
             study = study.to_dict()
-        self._assign(dict(schema='sipi.line-quantity-study/1', study=study,
+        self._assign(dict(schema=schema, study=study,
                           conductor=conductor, quantity=quantity))
 
     def _assign(self, data):
         data = _copy(data)
         _keys(data, ('schema', 'study', 'conductor', 'quantity'), where='line quantity study')
-        if data['schema'] != 'sipi.line-quantity-study/1':
+        if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
             raise ValueError('unsupported line-quantity-study schema')
-        if not isinstance(data['quantity'], str) or data['quantity'] not in ('impedance_real', 'attenuation'):
-            raise ValueError('quantity must be impedance_real or attenuation')
-        study = _source_study(data['study'])
+        allowed = ('impedance_real', 'attenuation')
+        if data['schema'] == 'sipi.line-quantity-study/2':
+            allowed += ('differential_forward_impedance_real',)
+        if not isinstance(data['quantity'], str) or data['quantity'] not in allowed:
+            raise ValueError('quantity must be '+' or '.join(allowed))
+        study = _source_study(data['study'], paired=data['quantity'] == 'differential_forward_impedance_real')
         nominal = _line_from_values(study, data['conductor'])
         self._data = dict(schema=data['schema'], study=study,
             conductor=nominal.to_dict()['conductor'], quantity=data['quantity'])
@@ -163,14 +170,21 @@ class LineQuantityStudyDocument:
                 line = doc.analyze()
                 names = tuple(trace.name for trace in doc.cross_section.section.traces if not trace.ground)
                 if tuple(line.names) != names or tuple(line.frequency) != (evaluation['frequency_hz'],):
-                    raise ValueError('extraction changed scalar signal name or frequency')
+                    raise ValueError('extraction changed signal names or frequency')
                 phase = 'diagnostic'
-                propagation = line.propagation()
-                if propagation.modes != ('single',) or tuple(propagation.frequency) != tuple(line.frequency):
-                    raise ValueError('propagation changed scalar mode or frequency')
-                value = float(propagation.z_characteristic[0, 0].real if data['quantity'] == 'impedance_real'
-                              else propagation.gamma[0, 0].real)
-                if not np.isfinite(value) or value < 0 or (data['quantity'] == 'impedance_real' and value == 0):
+                if data['quantity'] == 'differential_forward_impedance_real':
+                    characteristic = line.characteristic()
+                    if (characteristic.basis != 'single-ended' or tuple(characteristic.names) != names
+                            or tuple(characteristic.frequency) != tuple(line.frequency)):
+                        raise ValueError('characteristic changed signal coordinates or frequency')
+                    value = float(characteristic.mixed_mode().z_characteristic[0, 0, 0].real)
+                else:
+                    propagation = line.propagation()
+                    if propagation.modes != ('single',) or tuple(propagation.frequency) != tuple(line.frequency):
+                        raise ValueError('propagation changed scalar mode or frequency')
+                    value = float(propagation.z_characteristic[0, 0].real if data['quantity'] == 'impedance_real'
+                                  else propagation.gamma[0, 0].real)
+                if not np.isfinite(value) or value < 0 or (data['quantity'] != 'attenuation' and value == 0):
                     raise ValueError('solver returned an invalid line quantity')
                 phase = 'complete'
             except Exception as exc:

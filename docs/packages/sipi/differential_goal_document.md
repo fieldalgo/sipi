@@ -69,7 +69,8 @@ The Python result retains full matrices, which can also be obtained by replaying
 the saved selected lines. Limits on one-dimensional search, physical model
 validity and outer-domain convergence remain the API's responsibility split.
 Saved `line-quantity-study/1` is still scalar-only; this is a goal schema, not
-a paired tolerance or yield schema.
+a paired tolerance or yield schema. Use separate
+[study /2](differential_line_study.md) for paired descriptive sampling.
 
 Validation compares the unequal-width/thickness/metal fixed-pitch 100-ohm goal
 with the direct API: exact histories/inputs, RLGC/Zc within 1e-10 and both target

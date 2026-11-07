@@ -124,7 +124,9 @@ def documents():
         conductor=dict(kind='perfect'), quantity='impedance_real', target=50., tolerance=.5))
     base.append(LineQuantityStudyDocument(base[-1].to_dict()['study'],
                                          conductor=dict(kind='perfect'), quantity='attenuation'))
-    scalar_goal = base[-2].to_dict(); scalar_goal['schema'] = 'sipi.line-quantity-design/2'
+    scalar_study = base[-1].to_dict(); scalar_study['schema'] = 'sipi.line-quantity-study/2'
+    base.append(LineQuantityStudyDocument.from_dict(scalar_study))
+    scalar_goal = base[-3].to_dict(); scalar_goal['schema'] = 'sipi.line-quantity-design/2'
     base.append(LineQuantityDesignDocument.from_dict(scalar_goal))
     base.append(ImpedanceStudyDocument('stripline', dict(width=.5e-3, plane_spacing=1e-3, eps_r=1),
         quantity='z0', frequency=1e8, materials={'dielectric':ConstantDielectric(4)},

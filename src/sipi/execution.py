@@ -67,6 +67,7 @@ _REGISTRY = {
     'sipi.line-quantity-design/1': LineQuantityDesignDocument,
     'sipi.line-quantity-design/2': LineQuantityDesignDocument,
     'sipi.line-quantity-study/1': LineQuantityStudyDocument,
+    'sipi.line-quantity-study/2': LineQuantityStudyDocument,
 }
 
 
