@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Advance the workbench engine pin to the explicit-mesh 3D saved contract and exercise 3D input replay, result export and bounded capacitance in native, Worker and executable acceptance paths.
+
 - Validate shared layered tetrahedral meshing against the closed coaxial capacitance limit, with curved-boundary/radial refinement and explicit axial-resolution checks.
 
 - Add strict explicit-mesh 3D capacitance JSON replay and compact shared execution, preserving conductor order and boundary meaning without field solving during normalization.

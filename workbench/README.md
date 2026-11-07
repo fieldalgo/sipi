@@ -11,14 +11,17 @@ Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
 The basic workspace offers five cross-section forms, mesh controls, impedance
 targeting, tolerance samples, saved section JSON and line/circuit results.
-**Saved analysis** opens raw JSON for all 20 versioned contracts registered by
+**Saved analysis** opens raw JSON for all 21 versioned contracts registered by
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
 canonical inputs, runs calculations and exports finite complex-valued results.
 Failed study rows and target-search histories remain visible and downloadable;
 incomplete studies do not receive a summary. Optional characteristic/mode
 diagnostics can fail without discarding the base line result. Editing inputs
 or cancelling invalidates displayed/exportable results. Dedicated forms for
-every saved contract are not implemented.
+every saved contract are not implemented. Explicit-mesh bounded static 3D
+capacitance inputs return total C in farads, with their saved insulating
+boundary and conductor order. They do not imply a geometry editor, via
+transition L/S or open-space fringing.
 
 ## Run from source
 

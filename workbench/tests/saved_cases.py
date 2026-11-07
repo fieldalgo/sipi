@@ -17,5 +17,24 @@ line = TransmissionLineDocument(CrossSectionDocument(microstrip(width=.4e-3,
     substrate_height=.5e-3, eps_r=4, air_height=.5e-3, box_width=2e-3),
     mesh=dict(edge_size=20e-6, far_size=.2e-3, grade=.2)), [0, 1e3],
     materials={}, conductor={'kind':'perfect'}, length=.01)
+from galerkin.mesh3d import box_mesh
+from sipi.capacitance3d_document import Capacitance3DDocument
+import numpy as np
+mesh = box_mesh(.004, .003, .002, 4, 4, 4)
+capacitance3d = []
+for layered in (False, True):
+    eps = np.where(mesh.nodes[mesh.tets].mean(axis=1)[:, 2] < .001, 2., 6.) if layered else 3.8
+    doc = Capacitance3DDocument(mesh, eps_r=eps,
+        conductors={'top': mesh.boundary['z1']}, ground=mesh.boundary['z0'])
+    text = json.dumps(doc.to_dict(), separators=(',', ':'))
+    capacitance3d.append(dict(name='layered' if layered else 'uniform', text=text, expected=execute_saved(text)))
+x, y, z = mesh.nodes.T
+signals = {'right': np.flatnonzero(np.isclose(x, .003)&np.isclose(y, .0015)&np.isclose(z, .001)),
+           'left': np.flatnonzero(np.isclose(x, .001)&np.isclose(y, .0015)&np.isclose(z, .001))}
+doc = Capacitance3DDocument(mesh, eps_r=3.8, conductors=signals,
+    ground=np.unique(np.concatenate(list(mesh.boundary.values()))))
+text = json.dumps(doc.to_dict(), separators=(',', ':'))
+capacitance3d.append(dict(name='two-internal-nodal-electrodes', text=text, expected=execute_saved(text)))
 print(json.dumps(dict(lumped=lumped.dumps(), study=study.dumps(), goal=goal.dumps(),
-                     line=line.dumps(), expected=execute_saved(lumped.dumps())), allow_nan=False))
+                     line=line.dumps(), expected=execute_saved(lumped.dumps()),
+                     capacitance3d=capacitance3d), allow_nan=False))

@@ -114,6 +114,26 @@ def exercise(source, report):
             assert abs(execution['result']['network']['s']['real'][0][1][0]-100/110) < 1e-12
             assert result['result']['engine']['build'] == report['build']
             report['saved_analysis'] = execution
+            report['phase'] = 'saved bounded 3D capacitance'
+            from galerkin.mesh3d import box_mesh
+            from sipi.capacitance3d_document import Capacitance3DDocument
+            mesh = box_mesh(.004, .003, .002, 2, 2, 2)
+            doc = Capacitance3DDocument(mesh, eps_r=3.8,
+                conductors={'top': mesh.boundary['z1']}, ground=mesh.boundary['z0'])
+            request('/api/job', dict(action='saved-analyze', text=doc.dumps()))
+            deadline = time.monotonic() + 60
+            while time.monotonic() < deadline:
+                result = json.loads(request('/api/job'))
+                if result['status'] != 'running':
+                    break
+                time.sleep(.2)
+            assert result['status'] == 'complete', result
+            execution = result['result']['execution']
+            assert execution['status'] == 'complete' and execution['input'] == doc.to_dict()
+            assert execution['result']['model'] == 'bounded-static-3d'
+            exact = 8.8541878188e-12*3.8*.004*.003/.002
+            assert abs(execution['result']['capacitance_f'][0][0]/exact-1) < 1e-11
+            report['saved_capacitance3d'] = execution
             report['phase'] = 'shutdown'
             request('/api/shutdown', {})
             process.wait(timeout=20)

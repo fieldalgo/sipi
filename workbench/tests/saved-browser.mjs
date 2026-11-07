@@ -99,6 +99,29 @@ try {
   const downloaded=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-result.json'),'utf8'));}catch{}},'result download');
   assert.deepEqual(downloaded.execution,result);
   await writeFile(join(output,'saved-analysis.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+  const capacitance3d = [];
+  for (const item of cases.capacitance3d) {
+    await input(item.text);
+    await cdp.evaluate('document.querySelector("#check").click()');
+    await until(async()=>(await status()).startsWith('Input checked'),'3D normalization',180000);
+    const got = await calculate(), expected = item.expected;
+    assert.deepEqual(got.input,expected.input);
+    assert.equal(got.status,'complete'); assert.equal(got.result.model,'bounded-static-3d');
+    assert.deepEqual(got.result.names,expected.result.names);
+    const ratios = {};
+    for (const key of ['capacitance_f','energy_capacitance_f','ground_charge_c_at_unit_voltage']) {
+      const a=[got.result[key]].flat(3), b=[expected.result[key]].flat(3);
+      assert.equal(a.length,b.length);
+      const ratio=Math.max(...a.map((v,i)=>Math.abs(v-b[i])))/Math.max(...b.map(Math.abs));
+      assert.ok(Number.isFinite(ratio)&&ratio<=1e-11,key+': '+ratio); ratios[key]=ratio;
+    }
+    for (const value of Object.values(got.result.consistency)) assert.ok(value>=0&&value<=1e-8);
+    await rm(join(downloads,'sipi-result.json'));
+    await cdp.evaluate('document.querySelector("#save-result").click()');
+    const exported=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-result.json'),'utf8'));}catch{}},'3D result export');
+    assert.deepEqual(exported.execution,got);
+    capacitance3d.push({name:item.name,ratios});
+  }
   await input('{"schema":"sipi.lumped-network/1","schema":"invalid"}');
   assert.equal(await cdp.evaluate('document.querySelector("#save-result").disabled'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
@@ -142,8 +165,8 @@ try {
   if(!webRoot) await until(()=>server.exitCode===0,'server exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',
-    externalRequests:remoteRequests,errors,workerTargets,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
-      'result download','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
+    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
+      'result download','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
       'pending-start cancellation and restart','stale completion rejection','mobile width','shutdown']},null,2));
   console.log('Saved analysis browser acceptance passed.');
 } catch(error) {

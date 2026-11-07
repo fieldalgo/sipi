@@ -62,3 +62,20 @@ def test_failed_study_rows_reach_the_client_unchanged():
     assert report == execute_saved(doc.dumps())
     assert report['status'] == 'incomplete' and report['result']['summary'] is None
     assert len(report['result']['rows']) == 3 and report['result']['failed'] > 0
+
+
+def test_saved_3d_capacitance_runs_in_spawned_process(server):
+    from galerkin.mesh3d import box_mesh
+    from sipi.capacitance3d_document import Capacitance3DDocument
+    mesh = box_mesh(.004, .003, .002, 2, 2, 2)
+    doc = Capacitance3DDocument(mesh, eps_r=3.8,
+        conductors={'top': mesh.boundary['z1']}, ground=mesh.boundary['z0'])
+    normalized = execute(dict(action='saved-normalize', text=doc.dumps()))
+    assert normalized['document_text'] == doc.dumps()
+    assert call(server, 'POST', '/api/job', dict(action='saved-analyze', text=doc.dumps()))[0] == 202
+    output = finish(server)
+    assert output['status'] == 'complete'
+    assert output['result']['execution'] == execute_saved(doc.dumps())
+    bad = doc.to_dict(); bad['ground'] = bad['conductors'][0]['nodes']
+    with pytest.raises(ValueError, match='disjoint'):
+        execute(dict(action='saved-normalize', text=json.dumps(bad)))
