@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Elliptical-aperture matrices](elliptical_aperture.md) retain coupling for single or paired round conductors.
+
 [Local circular-aperture capacitance](circular_aperture.md) supports eccentric conductors and strict saved inputs.
 
 [Passive lumped RLC branches](lumped_network.md) connect to saved circuit and assembly inputs.

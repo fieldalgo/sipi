@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add local elliptical-aperture Maxwell and power-dual differential/common capacitance matrices for one or two round conductors, with independent panel/FEM references, strict saved inputs and explicit geometry/transition limits.
+
 - Add local homogeneous circular-aperture capacitance with eccentric conductors, explicit radial/angular refinement, strict saved input and independent eccentric-circle/FEM validation; no finite-pad or 3D transition interpretation.
 
 - Clarify the lossless fixed-geometry energy bound and nested-space assumptions behind electrostatic FEM convergence; do not imply entrywise monotonicity for complex or independently remeshed cases.

@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[타원형 개구 행렬](elliptical_aperture.md)은 원형 도체 1개 또는 쌍의 결합 성분을 보존합니다.
+
 [원형 개구의 국소 정전용량](circular_aperture.md)은 편심 도체와 엄격한 저장 입력을 지원합니다.
 
 [수동 집중정수 RLC 가지](lumped_network.md)를 저장형 회로·조립 입력에 연결합니다.
