@@ -1,0 +1,165 @@
+{
+  "status": "Supplemental notices; static closure audit incomplete",
+  "components": [
+    {
+      "name": "libffi",
+      "version": "f08493d249d2067c8b3207ba46693dd858f95db3",
+      "license": "MIT",
+      "file": "ffi.txt",
+      "source": "https://raw.githubusercontent.com/libffi/libffi/f08493d249d2067c8b3207ba46693dd858f95db3/LICENSE",
+      "scope": "browser",
+      "sha256": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388"
+    },
+    {
+      "name": "hiwire",
+      "version": "6a1e67280a15d929ebeceee54a6358c9c8d5f697",
+      "license": "MPL-2.0",
+      "file": "hiwire.txt",
+      "source": "https://raw.githubusercontent.com/pyodide/hiwire/6a1e67280a15d929ebeceee54a6358c9c8d5f697/LICENSE",
+      "scope": "browser",
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    {
+      "name": "Emscripten",
+      "version": "4.0.9",
+      "license": "MIT OR NCSA",
+      "file": "emlicense.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-core/emscripten/4.0.9/LICENSE",
+      "scope": "browser",
+      "sha256": "51aea7641f81d560eb039bc97ce35e2517e2656fe8731eb49ce6a18498eb22fe"
+    },
+    {
+      "name": "musl",
+      "version": "vendored by Emscripten 4.0.9",
+      "license": "MIT and included notices",
+      "file": "musl.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-core/emscripten/4.0.9/system/lib/libc/musl/COPYRIGHT",
+      "scope": "browser",
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    },
+    {
+      "name": "libc++",
+      "version": "vendored by Emscripten 4.0.9",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "file": "libcxx.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-core/emscripten/4.0.9/system/lib/libcxx/LICENSE.TXT",
+      "scope": "browser",
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+    },
+    {
+      "name": "libc++abi",
+      "version": "vendored by Emscripten 4.0.9",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "file": "libcxxabi.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-core/emscripten/4.0.9/system/lib/libcxxabi/LICENSE.TXT",
+      "scope": "browser",
+      "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+    },
+    {
+      "name": "compiler-rt",
+      "version": "vendored by Emscripten 4.0.9",
+      "license": "Apache-2.0 WITH LLVM-exception",
+      "file": "compiler-rt.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-core/emscripten/4.0.9/system/lib/compiler-rt/LICENSE.TXT",
+      "scope": "browser",
+      "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+    },
+    {
+      "name": "zlib",
+      "version": "1.3.1",
+      "license": "Zlib",
+      "file": "zlib-license.txt",
+      "source": "https://raw.githubusercontent.com/madler/zlib/v1.3.1/LICENSE",
+      "scope": "browser",
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+    },
+    {
+      "name": "bzip2",
+      "version": "1.0.6",
+      "license": "bzip2-1.0.6",
+      "file": "bzip2-license.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-ports/bzip2/1.0.6/LICENSE",
+      "scope": "browser",
+      "sha256": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204"
+    },
+    {
+      "name": "MiniLZ4",
+      "version": "vendored by Emscripten 4.0.9",
+      "license": "MIT",
+      "file": "lz4.txt",
+      "source": "https://raw.githubusercontent.com/emscripten-core/emscripten/4.0.9/third_party/mini-lz4.js",
+      "scope": "browser",
+      "excerpt": "Leading license comment, unchanged",
+      "sha256": "d27097e98c94f60e7f96e31e90296f32789738c1f8f271df785fe1dda9d52baa"
+    },
+    {
+      "name": "Expat",
+      "version": "vendored by CPython 3.13.2",
+      "license": "MIT",
+      "file": "python-expat.txt",
+      "source": "https://raw.githubusercontent.com/python/cpython/v3.13.2/Modules/expat/COPYING",
+      "scope": "browser",
+      "sha256": "122f2c27000472a201d337b9b31f7eb2b52d091b02857061a8880371612d9534"
+    },
+    {
+      "name": "HACL*",
+      "version": "vendored by CPython 3.13.2",
+      "license": "MIT",
+      "file": "hacl-header.txt",
+      "source": "https://raw.githubusercontent.com/python/cpython/v3.13.2/Modules/_hacl/Hacl_Hash_SHA2.c",
+      "scope": "browser",
+      "excerpt": "Leading license comment, unchanged",
+      "sha256": "998ce04fb8ad9dedb0bc1b44938f8c3dcf1089780fa105ce1c8c30fb5554d78c"
+    },
+    {
+      "name": "libmpdec",
+      "version": "vendored by CPython 3.13.2",
+      "license": "BSD-2-Clause",
+      "file": "decimal-header.txt",
+      "source": "https://raw.githubusercontent.com/python/cpython/v3.13.2/Modules/_decimal/libmpdec/mpdecimal.c",
+      "scope": "browser",
+      "excerpt": "Leading license comment, unchanged",
+      "sha256": "b07528d8b1dbf1e2d2741052996f0876e23342ce2d30d0effa39c5457716c25a"
+    },
+    {
+      "name": "OpenBLAS",
+      "version": "0.3.26",
+      "license": "BSD-3-Clause",
+      "file": "openblas-license.txt",
+      "source": "https://raw.githubusercontent.com/OpenMathLib/OpenBLAS/v0.3.26/LICENSE",
+      "scope": "browser",
+      "sha256": "190b5a9c8d9723fe958ad33916bd7346d96fab3c5ea90832bb02d854f620fcff"
+    },
+    {
+      "name": "LAPACK",
+      "version": "vendored by OpenBLAS 0.3.26",
+      "license": "BSD-3-Clause",
+      "file": "lapack-license.txt",
+      "source": "https://raw.githubusercontent.com/OpenMathLib/OpenBLAS/v0.3.26/lapack-netlib/LICENSE",
+      "scope": "browser",
+      "sha256": "978539245c405775bf347b1256c36df4daf8b69a64b099e94b1d53742201621e"
+    },
+    {
+      "name": "array-api-compat",
+      "version": "1.16.0",
+      "license": "MIT",
+      "file": "array-api-compat.txt",
+      "scope": "both",
+      "source": "https://files.pythonhosted.org/packages/da/88/d7b0f89b1ad0f42ef94b8440fff87b7c0b69701b3c30a5b160fdbc850f25/array_api_compat-1.16.0.tar.gz",
+      "archive_sha256": "c8117cb4d6c7aacaec38c2705f72509e342c20b1a716a04cb5397a611f122d51",
+      "archive_member": "array_api_compat-1.16.0/LICENSE",
+      "sha256": "4ffd978e3fa18d058d98c66771cfea7ed634aaf7023cf9612b8b55eee9a8f0fe"
+    },
+    {
+      "name": "GEOS",
+      "version": "3.12.1",
+      "license": "LGPL-2.1",
+      "file": "geos-3.12.1.txt",
+      "scope": "browser",
+      "source": "https://github.com/libgeos/geos/blob/3.12.1/COPYING",
+      "source_archive": "https://github.com/libgeos/geos/releases/download/3.12.1/geos-3.12.1.tar.bz2",
+      "source_archive_sha256": "d6ea7e492224b51193e8244fe3ec17c4d44d0777f3c32ca4fb171140549a0d03",
+      "sha256": "7c6699c75f87b52bdc542db26d6b1b92892577cda46e20eceb79e2790a1c291b"
+    }
+  ]
+}

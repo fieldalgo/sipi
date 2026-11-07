@@ -1,0 +1,12 @@
+# Reviewed build pins; no floating compiler or packaging upgrades.
+Nuitka==2.8.10
+ordered-set==4.1.0
+zstandard==0.25.0
+pefile==2024.8.26
+setuptools==80.9.0
+wheel==0.45.1
+numpy==2.5.4
+scipy==1.18.1
+shapely==2.2.0
+array-api-compat==1.16.0
+pytest==8.4.2

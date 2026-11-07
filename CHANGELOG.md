@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an independent workbench source candidate with strict saved-analysis JSON execution, retained failures, cancellation/export guards and reproducible browser/Windows packaging inputs; Windows executable and redistribution acceptance remain explicit verification gates.
+
 - Fix extraction's SI constants to the published CODATA 2022 values so older SciPy runtimes cannot silently select a different physical reference; retain tabulation rounding and document the change from earlier runtime-dependent values.
 
 - Add a shared strict saved-input execution adapter with finite complex JSON results, explicit budgets, retained study/goal failures and optional line diagnostics for browser and local application transports.
