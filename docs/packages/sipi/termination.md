@@ -1,5 +1,7 @@
 # Terminated networks and frequency crosstalk
 
+[Norton sources and open terminals](norton_termination.md) separately retain every port voltage/current with finite parallel admittances.
+
 [Passive port reduction](port_reduction.md) separately supports explicit open/short
 loads and returns S-parameters for retained ports.
 
