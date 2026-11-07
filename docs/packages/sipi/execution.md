@@ -27,7 +27,7 @@ network validators perform small algebraic calculations. `saved_schemas()`
 lists the closed registry: cross-section/1–3, impedance-study/1–3,
 impedance-design/1–2, circular-aperture/1, aperture-section/1,
 aperture-study/1, aperture-design/1, transmission-line/1–2, volume-line/1,
-lumped-network/1, network-assembly/1, network-transforms/1–2 and circuit/1.
+lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1 and capacitance-3d/1.
 Each name has the `sipi.` prefix. Unknown versions, duplicate keys, nonfinite
 numbers (including exponent overflow) and non-text inputs are rejected.
 
@@ -49,6 +49,7 @@ must separately record the exact engine commit and wheel/runtime hashes.
 | Goal | quantity/unit, parameter, target/value/refined value, both residuals, completed history and resulting geometry; impedance material evaluation retained |
 | Transmission/volume line | conductor names, frequency in Hz, R/L/G/C in ohm/m, H/m, S/m, F/m; network and requested diagnostics |
 | Lumped/assembly/transform | final network; assembly component networks and transform source/fixture networks also retained |
+| Bounded static 3D | model, ordered names, total C/energy-C in F, unit-voltage ground charge in C, mesh counts and consistency ratios; see [contract](capacitance3d.md) |
 | Circuit | final network, terminal response, source/load inputs, conditioning/residuals and optional NEXT/FEXT |
 
 A network contains `frequency_hz`, ordered `port_names`, `basis`, real positive

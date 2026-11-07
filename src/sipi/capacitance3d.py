@@ -81,17 +81,8 @@ def _node_set(value, count, name):
     return np.array(nodes, dtype=int, copy=True)
 
 
-def extract_capacitance_3d(mesh, *, eps_r=1., conductors, ground):
-    """Extract static Maxwell C[F] using the shared galerkin P1 3D assembler.
-
-    ``eps_r`` is finite positive real, scalar or one value per tetrahedron.
-    ``conductors`` is an ordered name -> node-index mapping; all prescribed
-    node sets must be disjoint. Every connected mesh component needs ground.
-    Unprescribed exterior faces are insulating (zero normal displacement).
-    The caller supplies a conforming mesh and chooses/refines the boundary;
-    an arbitrary enclosing box is not automatically an open-space model.
-    Geometric overlap/T-junction detection and meshing are not provided here.
-    """
+def _prepare_inputs(mesh, eps_r, conductors, ground):
+    """Validate detached inputs without assembling or solving the field."""
     mesh = _snapshot(mesh)
     relative = np.asarray(eps_r)
     if (relative.dtype.kind not in 'fiu' or relative.shape not in ((), (len(mesh.tets),))
@@ -114,6 +105,22 @@ def extract_capacitance_3d(mesh, *, eps_r=1., conductors, ground):
     components, labels = connected_components(graph, directed=False)
     if len(np.unique(labels[ground])) != components:
         raise ValueError('every connected mesh component must contain ground')
+    return mesh, relative, names, signals, ground, fixed
+
+
+def extract_capacitance_3d(mesh, *, eps_r=1., conductors, ground):
+    """Extract static Maxwell C[F] using the shared galerkin P1 3D assembler.
+
+    ``eps_r`` is finite positive real, scalar or one value per tetrahedron.
+    ``conductors`` is an ordered name -> node-index mapping; all prescribed
+    node sets must be disjoint. Every connected mesh component needs ground.
+    Unprescribed exterior faces are insulating (zero normal displacement).
+    The caller supplies a conforming mesh and chooses/refines the boundary;
+    an arbitrary enclosing box is not automatically an open-space model.
+    Geometric overlap/T-junction detection and meshing are not provided here.
+    """
+    mesh, relative, names, signals, ground, fixed = _prepare_inputs(mesh, eps_r, conductors, ground)
+    tets = mesh.tets
     with np.errstate(over='ignore', invalid='ignore', divide='ignore'):
         k = assemble_stiffness_3d(mesh, eps=epsilon_0*relative)
     if not np.isfinite(k.data).all():

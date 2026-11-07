@@ -27,7 +27,7 @@ print(saved_schemas())
 impedance-study/1–3, impedance-design/1–2, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–2,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
+circuit/1, capacitance-3d/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
 
 ## 결과 계약
@@ -47,6 +47,7 @@ wheel/런타임 해시를 별도로 기록해야 합니다.
 | 목표 역산 | quantity/unit, parameter, 목표/결과/세분 결과, 두 잔차, 완료 이력과 결과 기하; 임피던스 재료 평가 보존 |
 | transmission/volume 선로 | 도체 이름, 주파수(Hz), R/L/G/C(ohm/m, H/m, S/m, F/m), 네트워크와 선택 진단 |
 | lumped/assembly/transform | 최종 네트워크; assembly의 성분 망, transform의 원본/fixture 망도 보존 |
+| 유한 3D 정전장 | 모델·도체 순서, 전체 C/에너지 C(F), 1V 구동 접지 전하(C), 메시 수·일관성 비율; [계약](capacitance3d.md) 참조 |
 | 회로 | 최종 망, 종단 응답, 소스/부하, 조건수/잔차와 선택 NEXT/FEXT |
 
 네트워크는 `frequency_hz`, 순서 있는 `port_names`, `basis`, 양의 실수

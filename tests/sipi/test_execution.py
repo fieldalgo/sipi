@@ -74,6 +74,9 @@ def network_equal(output, expected):
 
 
 def documents():
+    from galerkin.mesh3d import box_mesh
+    from sipi.capacitance3d_document import Capacitance3DDocument
+    mesh = box_mesh(.004, .003, .002, 2, 2, 2)
     base = [cross(), ApertureDocument(CircularAperture(.28e-3, .8e-3, eps_r=3.96)), aperture(),
         *studies(), *goals(), line(), line(True), lumped(),
         NetworkAssemblyDocument(source(), connections=[dict(network=dict(kind='lumped-network',
@@ -102,6 +105,8 @@ def documents():
     base.append(TransmissionLineDocument.from_dict(data))
     base.append(NetworkTransformDocument(source(), operations=[dict(kind='renormalize', reference_ohms=75)],
         schema='sipi.network-transforms/2'))
+    base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
+                                    ground=mesh.boundary['z0']))
     return base
 
 

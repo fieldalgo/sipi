@@ -7,7 +7,8 @@ matrix **in farads** in an explicitly supplied tetrahedral dielectric domain.
 It reuses galerkin's P1 3D stiffness assembly and a grounded sparse solve.
 This is a static field API, not a transmission-line parameter set or a complete
 via/transition model. It does not generate geometry, L, R, loss, radiation,
-impedance, propagation or S-parameters. It has no saved JSON/UI adapter yet.
+impedance, propagation or S-parameters. Strict JSON replay is available through
+`Capacitance3DDocument`; no geometry-editor or application support is implied.
 
 ```python
 from galerkin.mesh3d import box_mesh
@@ -84,3 +85,47 @@ Choose and converge the boundary for the intended physical problem. No
 unbounded-space extrapolation, pad/antipad mesher, full-wave reference,
 measurement agreement or frequency-validity range is established here.
 In particular, a static C matrix alone does not establish via or stub behavior.
+
+## Saved explicit-mesh input
+
+`sipi.capacitance3d_document.Capacitance3DDocument` stores schema
+`sipi.capacitance-3d/1`, `length_unit="m"`, and the required
+`unprescribed_boundary="insulating"`. `mesh.nodes` contains coordinates and
+`mesh.tetrahedra` contains zero-based integer node indices. `eps_r` is a real
+positive scalar or an array following tetrahedron order. `ground` is a node
+list; `conductors` is an **ordered list** of `{name, nodes}` objects so sorting
+JSON keys never changes the matrix order. Mesh boundary tags are not saved:
+only the explicit PEC node sets determine the prescribed potentials.
+
+```python
+from sipi.capacitance3d_document import Capacitance3DDocument
+from sipi.execution import normalize_saved, execute_saved
+
+document = Capacitance3DDocument(
+    mesh, eps_r=3.8, conductors={"top": mesh.boundary["z1"]},
+    ground=mesh.boundary["z0"],
+)
+text = normalize_saved(document.dumps())
+restored = Capacitance3DDocument.loads(text)
+assert restored.dumps() == text
+output = execute_saved(text)
+assert output["result"]["model"] == "bounded-static-3d"
+assert output["result"]["capacitance_f"][0][0] == restored.analyze().C[0, 0]
+```
+
+Constructors and loaders snapshot and validate the mesh, material and boundary
+sets without assembling a field operator or solving. Unknown/missing keys,
+versions or units, repeated object keys/names, bool/fractional node indices,
+nonfinite numbers and exponent overflow are rejected. No remeshing, unit
+conversion, filesystem or code execution occurs. `to_dict()` returns a detached
+copy. `analyze()` returns the same full `Capacitance3D` result as the direct API.
+
+[Shared execution](execution.md) preserves the entire input for replay but its
+result omits the nodal field and a second mesh copy. It includes C/energy-C in F,
+ground charge in C for one-volt drives, node/tetrahedron counts and the four
+numerical consistency ratios. It does not infer transmission-line quantities.
+The input-byte limit can reject large meshes; increasing it does not limit
+sparse-solver memory or runtime. Callers still need process isolation and their
+own budgets. This explicit mesh is not a parametric geometry or a study/goal
+input. Existing application candidates must update and validate their exact
+engine pin before claiming this schema is supported.

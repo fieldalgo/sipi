@@ -27,6 +27,7 @@ from .assembly_document import NetworkAssemblyDocument
 from .network_document import NetworkTransformDocument
 from .circuit_document import CircuitDocument
 from .modes import ModeTrackingError
+from .capacitance3d_document import Capacitance3DDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -44,6 +45,7 @@ _REGISTRY = {
     'sipi.network-assembly/1': NetworkAssemblyDocument,
     **{f'sipi.network-transforms/{v}': NetworkTransformDocument for v in (1, 2)},
     'sipi.circuit/1': CircuitDocument,
+    'sipi.capacitance-3d/1': Capacitance3DDocument,
 }
 
 
@@ -214,6 +216,14 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         elif isinstance(doc, (ApertureDocument, ApertureSectionDocument)):
             names = ['signal'] if isinstance(doc, ApertureDocument) else list(doc.section.names)
             out['result'] = dict(names=names, capacitance_f_per_m=_array(result))
+        elif isinstance(doc, Capacitance3DDocument):
+            out['result'] = dict(model='bounded-static-3d', names=list(result.names),
+                capacitance_f=_array(result.C), energy_capacitance_f=_array(result.energy_C),
+                ground_charge_c_at_unit_voltage=_array(result.ground_charge),
+                mesh=dict(nodes=len(result.potentials), tetrahedra=result.num_tets),
+                consistency={key: getattr(result, key) for key in
+                    ('free_residual_relative', 'charge_balance_relative',
+                     'energy_charge_relative', 'symmetry_relative')})
         elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
             out['result'] = dict(names=list(result.names), frequency_hz=_array(result.frequency),
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),

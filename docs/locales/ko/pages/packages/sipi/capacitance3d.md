@@ -6,7 +6,8 @@
 Maxwell 정전용량 행렬을 **패럿(F)**으로 계산합니다. galerkin의 P1 3D 조립과
 접지된 희소 선형 풀이를 재사용합니다. 정전장 API이며 전송선 파라미터나 완전한
 비아·전이 모델은 아닙니다. 기하 생성, L·R·손실·방사·임피던스·전파·S 파라미터를
-추정하지 않습니다. 이 API의 저장 JSON·UI 연결은 아직 없습니다.
+추정하지 않습니다. `Capacitance3DDocument`로 엄격한 JSON 저장·재생을 제공합니다.
+기하 편집기나 기존 앱의 지원을 뜻하지는 않습니다.
 
 ```python
 from galerkin.mesh3d import box_mesh
@@ -74,3 +75,43 @@ assert abs(result.C[0, 0] / expected - 1) < 1e-11
 목표 물리 문제에 맞게 경계를 선택하고 수렴시켜야 합니다. 무한 영역 외삽, pad/antipad
 메시 생성, full-wave 기준, 실측 일치와 유효 주파수 범위는 여기서 확립하지 않았습니다.
 정적 C 행렬만으로 비아·stub 동작을 지원한다고 주장할 수 없습니다.
+
+## 명시적 메시 입력 저장
+
+`sipi.capacitance3d_document.Capacitance3DDocument`는 schema
+`sipi.capacitance-3d/1`, `length_unit="m"`, 필수
+`unprescribed_boundary="insulating"`을 저장합니다. `mesh.nodes`는 좌표,
+`mesh.tetrahedra`는 0부터 시작하는 정수 노드 번호입니다. `eps_r`는 양의 실수
+스칼라 또는 사면체 순서의 배열입니다. `ground`는 노드 목록이며 `conductors`는
+`{name, nodes}`의 **순서 있는 목록**입니다. JSON 키 정렬로 행렬 순서가 바뀌지
+않습니다. 메시의 경계 태그는 저장하지 않으며 명시한 PEC 노드 집합만 전위를 정합니다.
+
+```python
+from sipi.capacitance3d_document import Capacitance3DDocument
+from sipi.execution import normalize_saved, execute_saved
+
+document = Capacitance3DDocument(
+    mesh, eps_r=3.8, conductors={"top": mesh.boundary["z1"]},
+    ground=mesh.boundary["z0"],
+)
+text = normalize_saved(document.dumps())
+restored = Capacitance3DDocument.loads(text)
+assert restored.dumps() == text
+output = execute_saved(text)
+assert output["result"]["model"] == "bounded-static-3d"
+assert output["result"]["capacitance_f"][0][0] == restored.analyze().C[0, 0]
+```
+
+생성·복원 시 메시·재료·경계를 복사하고 검증하며 필드 연산자 조립이나 계산은
+하지 않습니다. 알 수 없거나 누락한 키·버전·단위, 중복 객체 키·이름,
+bool/소수 노드 번호, 비유한 수와 지수 overflow를 거부합니다. 자동 메시 생성,
+단위 변환, 파일 접근, 코드 실행은 없습니다. `to_dict()`는 독립 복사본을 반환하고
+`analyze()`는 직접 API와 같은 전체 `Capacitance3D` 결과를 반환합니다.
+
+[공통 실행](execution.md)은 재생할 전체 입력을 보존하며 결과에서는 노드 전위와
+메시의 중복 복사를 제외합니다. C·에너지 C(F), 1V 구동 시 접지 전하(C),
+노드·사면체 수, 4가지 수치 일관성 비율을 반환합니다. 전송선 값을 추론하지 않습니다.
+큰 메시가 입력 바이트 제한을 넘을 수 있습니다. 이를 늘려도 희소 계산의 메모리나
+시간을 제한하지 못하므로 호출 측의 격리·자원 제한이 필요합니다. 이 명시적 메시는
+파라미터 기하나 공차·역산 입력이 아닙니다. 기존 앱 후보는 정확한 엔진 버전을
+갱신하고 별도로 검증한 뒤에 이 스키마의 지원을 주장해야 합니다.
