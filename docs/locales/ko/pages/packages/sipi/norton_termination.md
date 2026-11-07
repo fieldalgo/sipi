@@ -1,5 +1,7 @@
 # 전류원과 개방 단자 경계
 
+[혼합 종단](mixed_termination.md)은 이상 전압원·단락과 개방·전류원 포트를 한 번에 풉니다.
+
 [Norton 회로 저장](norton_circuit.md)은 별도 버전 입력과 공통 실행 계약을 제공합니다.
 
 `terminate_norton_network`는 `LineNetwork`에 명시한 Norton 전류원을 적용하고

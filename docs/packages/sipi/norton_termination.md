@@ -1,5 +1,7 @@
 # Current sources and open terminal boundaries
 
+[Mixed terminal boundaries](mixed_termination.md) combine ideal voltage/short and open/current ports in one solve.
+
 [Saved Norton circuits](norton_circuit.md) add a separate versioned input and shared execution contract.
 
 `terminate_norton_network` solves explicit Norton sources on a `LineNetwork`,

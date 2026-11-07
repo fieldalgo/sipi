@@ -70,6 +70,7 @@ from .modes import LineModes, ModeTrackingError, rlgc_modes
 from .termination import terminate_ports
 from .norton_termination import NortonTerminatedNetwork, terminate_norton_network
 from .periodic_norton import PeriodicNortonResponse, periodic_norton_response
+from .mixed_termination import MixedTerminatedNetwork, terminate_mixed_network
 from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
@@ -90,6 +91,7 @@ __all__ = ["CircularAperture", "ApertureDocument",
            "terminate_ports",
            "NortonTerminatedNetwork", "terminate_norton_network",
            "PeriodicNortonResponse", "periodic_norton_response",
+           "MixedTerminatedNetwork", "terminate_mixed_network",
            "NetworkTransformDocument", "NetworkTransformResult",
            "NetworkAssemblyDocument", "NetworkAssemblyResult",
            "capacitance_matrix", "line_parameters", "CrossSectionDocument",

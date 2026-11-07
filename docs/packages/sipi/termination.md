@@ -1,5 +1,7 @@
 # Terminated networks and frequency crosstalk
 
+[Mixed terminal boundaries](mixed_termination.md) combine ideal voltage/short and open/current ports in one solve.
+
 [Norton sources and open terminals](norton_termination.md) separately retain every port voltage/current with finite parallel admittances.
 
 [Passive port reduction](port_reduction.md) separately supports explicit open/short
