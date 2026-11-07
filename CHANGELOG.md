@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add parameter-dependent material factories to pair impedance targets, retaining per-attempt model snapshots, frozen refinement and independently checked width/material recovery.
 - Add strict named two-parameter pair goals, constraint/material snapshots and shared execution with pre-solve budgets and complete failure context.
 - Add bounded two-parameter symmetric-pair impedance targets with actual attempt budgets, frozen refinement, failure histories and independent field checks.
 - Add unequal unbacked coplanar pairs with finite ground references, paired-width studies/goals and independent free-space and field checks.

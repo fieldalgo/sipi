@@ -8,7 +8,7 @@ import numpy as np
 from scipy.optimize import least_squares
 
 from .document import CrossSectionDocument, _mesh
-from .impedance_material import _material_input, _analyze_material
+from .impedance_material import _material_input, _analyze_material, _frequency
 from .sampling import _numbers, _integer
 
 __all__ = ['PairImpedanceEvaluation', 'PairImpedanceDesign',
@@ -21,10 +21,14 @@ class PairImpedanceEvaluation:
     impedances: tuple[float, float]
     stage: str
     input_json: str
+    material_evaluation_json: str | None = None
 
     def to_dict(self):
-        return dict(parameters=list(self.parameters), impedances_ohm=list(self.impedances),
-                    stage=self.stage, input=json.loads(self.input_json))
+        out = dict(parameters=list(self.parameters), impedances_ohm=list(self.impedances),
+                   stage=self.stage, input=json.loads(self.input_json))
+        if self.material_evaluation_json is not None:
+            out['material_evaluation'] = json.loads(self.material_evaluation_json)
+        return out
 
 
 class PairImpedanceGoalError(RuntimeError):
@@ -82,7 +86,8 @@ class PairImpedanceDesign:
 
 
 def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
-                         mesh=None, max_evaluations=64, frequency=None, materials=None):
+                         mesh=None, max_evaluations=64, frequency=None, materials=None,
+                         material_factory=None):
     """Seek (z_diff, z_common) with two positive bounded factory parameters.
 
     factory(p0, p1) returns a CrossSection with two ordered symmetric signals.
@@ -91,12 +96,16 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
     initial point is the midpoint. Fixed frequency/materials use Re(C_complex)
     and vacuum L, not a complex lossy or terminal characteristic impedance.
 
+    Alternatively supply material_factory(p0,p1), a fixed frequency, and no
+    materials. Each completed row freezes its actual mapping. Refinement reuses
+    both the chosen geometry and chosen mapping without calling either factory.
+
     Parameters are normalized to [0,1] and residuals by tolerances. Bounded
     least_squares uses 1%-range central/one-sided difference probes, xtol=ftol
     1e-4 and gtol=1e-3. Local convergence does not establish feasibility,
     uniqueness, a global optimum or outer-domain/physical accuracy.
 
-    Every uncached factory/extraction attempt, including failures and Jacobian
+    Every uncached geometry/material/extraction attempt, including failures and Jacobian
     probes, consumes the budget. Cache hits do not. Reserve one final attempt
     at the frozen selected input with edge_size/far_size/grade halved, keeping
     min_angle and all physical inputs. Both meshes must satisfy both targets.
@@ -117,7 +126,13 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
             raise ValueError(f'{name} must contain two positive finite numbers')
     budget = _integer(max_evaluations, 2, 10000)
     options = _mesh({} if mesh is None else mesh)
-    material = _material_input(frequency, materials)
+    if material_factory is not None:
+        if not callable(material_factory) or materials is not None or frequency is None:
+            raise ValueError('material_factory requires a fixed frequency, is callable, and excludes materials')
+        frequency = _frequency(frequency)
+        material = None
+    else:
+        material = _material_input(frequency, materials)
     material_text = None if material is None else json.dumps(material, sort_keys=True, allow_nan=False)
     lower, upper = ranges[:, 0], ranges[:, 1]
     span = upper-lower
@@ -129,19 +144,22 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
     identity = None
     cache = {}
 
-    def failure(message, stage, parameters=None, *, cause=None, text=None):
+    def failure(message, stage, parameters=None, *, cause=None, text=None, material_json=None):
         return PairImpedanceGoalError(message, history, attempts=attempts, stage=stage,
             failed_parameters=parameters, cause_type=None if cause is None else type(cause).__name__,
-            input_json=text, material_evaluation_json=material_text)
+            input_json=text, material_evaluation_json=(material_text if material_factory is None
+                                                      and material_json is None else material_json))
 
     def evaluate(parameters, selected=None):
         nonlocal attempts, identity
         stage = 'search' if selected is None else 'refinement'
         if attempts >= (budget-1 if selected is None else budget):
-            raise failure('evaluation budget exhausted before target verification', 'budget', parameters)
+            raise failure('evaluation budget exhausted before target verification', 'budget', parameters,
+                          material_json=None if selected is None else selected.material_evaluation_json)
         attempts += 1
         phase = 'factory' if selected is None else 'input'
         text = None
+        current_text = material_text if selected is None else selected.material_evaluation_json
         try:
             if selected is None:
                 section = factory(*parameters)
@@ -159,8 +177,15 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
             if len(names) != 2 or (identity is not None and names != identity):
                 raise ValueError('two ordered signal names must stay fixed across inputs')
             identity = names
+            phase = 'material'
+            if selected is None:
+                current = (material if material_factory is None else
+                           _material_input(frequency, material_factory(*parameters)))
+                current_text = None if current is None else json.dumps(current, sort_keys=True, allow_nan=False)
+            else:
+                current = None if current_text is None else json.loads(current_text)
             phase = 'extraction'
-            line = doc.analyze() if material is None else _analyze_material(doc, material, 'z_diff')
+            line = doc.analyze() if current is None else _analyze_material(doc, current, 'z_diff')
             phase = 'diagnostic'
             if tuple(line.names) != names:
                 raise ValueError('extraction changed ordered signal names')
@@ -174,8 +199,8 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
                 raise ValueError('normalized residuals must remain finite')
         except Exception as exc:
             raise failure(f'{stage} {phase} failed: {exc}', stage+'/'+phase, parameters,
-                          cause=exc, text=text) from exc
-        row = PairImpedanceEvaluation(parameters, tuple(float(v) for v in values), stage, text)
+                          cause=exc, text=text, material_json=current_text) from exc
+        row = PairImpedanceEvaluation(parameters, tuple(float(v) for v in values), stage, text, current_text)
         history.append(row)
         return row, normalized
 
@@ -209,16 +234,20 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
         except Exception as exc:
             raise failure(f'optimizer failed: {exc}', 'optimizer', cause=exc) from exc
         if not result.success:
-            raise failure('optimizer did not converge: '+str(result.message), 'convergence', physical(result.x))
+            parameters = physical(result.x)
+            row = cache.get(parameters, (None, None))[0]
+            raise failure('optimizer did not converge: '+str(result.message), 'convergence', parameters,
+                          text=None if row is None else row.input_json,
+                          material_json=None if row is None else row.material_evaluation_json)
         u = result.x
         residual = objective(u)
     chosen = cache[physical(u)][0]
     if np.any(abs(residual) > 1):
         raise failure('stationary candidate misses one or both targets', 'convergence', chosen.parameters,
-                      text=chosen.input_json)
+                      text=chosen.input_json, material_json=chosen.material_evaluation_json)
     refined, residual = evaluate(chosen.parameters, selected=chosen)
     if np.any(abs(residual) > 1):
         raise failure('refined mesh misses target; tighten mesh settings and rerun', 'refinement/target',
-                      chosen.parameters, text=refined.input_json)
+                      chosen.parameters, text=refined.input_json, material_json=refined.material_evaluation_json)
     return PairImpedanceDesign(chosen.parameters, tuple(target), tuple(tolerance), chosen.impedances,
-        refined.impedances, chosen.input_json, refined.input_json, tuple(history), material_text)
+        refined.impedances, chosen.input_json, refined.input_json, tuple(history), chosen.material_evaluation_json)

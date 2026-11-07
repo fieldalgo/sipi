@@ -68,7 +68,11 @@ Jacobian 탐색점과 실패를 포함해 모두 계산합니다. 같은 물리 
 재사용합니다. 임피던스는 `Re(C_complex)`와 진공 L을 사용하며 도체 R이나 복소 유손실
 전파가 아닙니다. 기울어진 횡방향 이방성은 기존 대칭쌍 재료 계약에 따라 거부합니다.
 재실행에는 기하와 함께 `material_evaluation_json`이 필요하며 탐색·세분 사이에서
-같은 값을 유지합니다. 변수에 따라 바뀌는 material factory는 지원하지 않습니다.
+같은 값을 유지합니다. 또는 고정 `frequency`와 `material_factory(p0,p1)`를 주고
+`materials`는 생략합니다. 각 완료 행은 자신의 재료 snapshot을 보존하며 세분 검사는
+선택 기하와 모델을 재사용하고 두 factory 모두 다시 호출하지 않습니다.
+[기하·재료 목표](pair_material_design.md)에 계약·실패 문맥·독립 수락을 설명합니다.
+저장 `pair-impedance-design/1` 문서는 여전히 고정 재료 매핑만 받습니다.
 
 ## 독립 수락
 

@@ -76,8 +76,13 @@ principal-axis dielectric models. Impedance uses `Re(C_complex)` and vacuum L;
 it excludes conductor R and complex lossy propagation. Transversely tilted
 anisotropy is rejected by the existing symmetric-pair material contract.
 `material_evaluation_json` must accompany the geometry for replay and remains
-unchanged between search and refinement. Parameter-dependent material factories
-are not supported by this API.
+unchanged between search and refinement. Alternatively, supply
+`material_factory(p0,p1)` with a fixed `frequency` and omit `materials`.
+Each completed row retains its own material snapshot; refinement reuses the
+selected geometry and mapping without calling either factory again. See
+[geometry and material targets](pair_material_design.md) for the contract,
+failure context and independent acceptance. Saved `pair-impedance-design/1`
+documents continue to accept fixed material mappings only.
 
 ## Independent acceptance
 
