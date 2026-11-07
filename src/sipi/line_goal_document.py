@@ -6,7 +6,7 @@ import json
 from .document import _keys, _unique_object
 from .study import ImpedanceStudyDocument
 from .sampling import _copy, _integer
-from .line_goal import seek_line_quantity, _UNITS
+from .line_goal import seek_line_quantity
 from .line_input import _source_study, _line_from_values
 from .network import _scalar
 
@@ -43,7 +43,7 @@ class LineQuantityDesignDocument:
         if data['schema'] != 'sipi.line-quantity-design/1':
             raise ValueError('unsupported line-quantity-design schema')
         quantity = data['quantity']
-        if not isinstance(quantity, str) or quantity not in _UNITS:
+        if not isinstance(quantity, str) or quantity not in ('impedance_real', 'attenuation'):
             raise ValueError('quantity must be impedance_real or attenuation')
         target = _scalar('target', data['target'], zero=quantity == 'attenuation')
         tolerance = _scalar('tolerance', data['tolerance'])

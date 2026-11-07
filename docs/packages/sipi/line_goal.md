@@ -1,4 +1,6 @@
-# Goals using lossy scalar-line quantities
+# Goals using lossy line quantities
+
+[Differential forward goals](differential_line_goal.md) define the lossy launch for asymmetric pairs.
 
 [Saved goal JSON](line_goal_document.md) reuses existing geometry/material study inputs.
 
@@ -6,12 +8,13 @@
 
 `sipi.line_goal.seek_line_quantity` varies one positive parameter of a caller's
 `TransmissionLineDocument` factory. It uses the extracted conductor and
-dielectric R/L/G/C, including the selected surface laws, to target either:
+dielectric R/L/G/C, including the selected surface laws, to target an explicit quantity:
 
 | Quantity | Definition | Unit |
 |---|---|---|
-| `impedance_real` | real part of forward traveling-wave Zc | ohm |
-| `attenuation` | real part of forward propagation constant gamma | Np/m |
+| `impedance_real` | real part of forward traveling-wave Zc; one signal | ohm |
+| `attenuation` | real part of forward propagation constant gamma; one signal | Np/m |
+| `differential_forward_impedance_real` | real part of Zdd for a two-signal forward launch with Ic=0 | ohm |
 
 Re(Zc) is neither its magnitude nor a terminal load. Attenuation is amplitude
 decay per length, not finite-line insertion loss, which also depends on mismatch.
@@ -43,12 +46,13 @@ assert width_goal.value == complex_z.real
 saved_selected_line = width_goal.document.dumps()
 ```
 
-The factory may change geometry or material parameters. Every document must
-have exactly one signal, an unchanged signal name, one unchanged positive
-frequency and `length_m=0`. Bounds are positive in the factory parameter's units.
-Pairs and general multiconductor modal targets are rejected: geometric symmetry
-alone does not establish exact RLGC symmetry or mode identity across geometry.
-The API does not project away coupling.
+The factory may change geometry or material parameters. Scalar quantities require
+exactly one signal; the explicit differential quantity requires exactly two.
+Ordered signal names, one positive frequency and `length_m=0` stay fixed.
+Bounds are positive in the factory parameter's units. No arbitrary modal target
+or tracking is inferred from geometry. The API does not project away coupling.
+The existing saved `line-quantity-design/1` and `line-quantity-study/1` schemas
+remain scalar-only; use this Python factory API for the paired quantity.
 
 Both endpoints must be valid. An endpoint within tolerance can be selected;
 otherwise residual signs must bracket zero. Bisection does not prove continuity,

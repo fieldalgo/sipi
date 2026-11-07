@@ -117,7 +117,7 @@ class LineQuantityStudyDocument:
         _keys(data, ('schema', 'study', 'conductor', 'quantity'), where='line quantity study')
         if data['schema'] != 'sipi.line-quantity-study/1':
             raise ValueError('unsupported line-quantity-study schema')
-        if not isinstance(data['quantity'], str) or data['quantity'] not in _UNITS:
+        if not isinstance(data['quantity'], str) or data['quantity'] not in ('impedance_real', 'attenuation'):
             raise ValueError('quantity must be impedance_real or attenuation')
         study = _source_study(data['study'])
         nominal = _line_from_values(study, data['conductor'])

@@ -1,4 +1,6 @@
-# 유손실 단일 선로의 목표 역산
+# 유손실 선로의 목표 역산
+
+[차동 순방향 목표](differential_line_goal.md)는 비대칭 두 신호의 유손실 입력 조건을 명시합니다.
 
 [목표 JSON 저장](line_goal_document.md)은 기존 geometry/material study 입력을 재사용합니다.
 
@@ -10,8 +12,9 @@ factory의 양수 매개변수 하나를 바꿉니다. 지정한 표면 법칙�
 
 | Quantity | 정의 | 단위 |
 |---|---|---|
-| `impedance_real` | 순방향 진행파 Zc의 실수부 | ohm |
-| `attenuation` | 순방향 전파상수 gamma의 실수부 | Np/m |
+| `impedance_real` | 단일 신호의 순방향 진행파 Zc 실수부 | ohm |
+| `attenuation` | 단일 신호의 순방향 전파상수 gamma 실수부 | Np/m |
+| `differential_forward_impedance_real` | 두 신호의 Ic=0 순방향 입력 Zdd 실수부 | ohm |
 
 Re(Zc)는 크기나 종단 부하와 다릅니다. 감쇠량은 길이당 진폭 감소이며 부정합도
 포함하는 유한 선로 삽입손실과 다릅니다. 기존 `seek_impedance`는 실수 준정적
@@ -42,11 +45,13 @@ assert width_goal.value == complex_z.real
 saved_selected_line = width_goal.document.dumps()
 ```
 
-factory는 기하 또는 재료 매개변수를 바꿀 수 있습니다. 각 문서는 신호가 하나이고
-이름이 유지되며, 양수 주파수 하나가 고정되고 `length_m=0`이어야 합니다. bounds는
-양수이고 factory 매개변수의 단위를 따릅니다. 차동 쌍과 일반 다도체 모드 목표는
-거부합니다. 기하 대칭만으로 정확한 RLGC 대칭이나 기하 변화 사이의 모드 동일성을
-보장할 수 없으며 이 API는 결합 성분을 투영해 없애지 않습니다.
+factory는 기하 또는 재료 매개변수를 바꿀 수 있습니다. 단일 선로 물리량은 신호
+하나, 명시적 차동 물리량은 정확히 두 신호를 요구합니다. 순서가 있는 신호 이름과
+양수 주파수 하나를 유지하고 `length_m=0`이어야 합니다. bounds는 양수이고 factory
+매개변수 단위를 따릅니다. 기하만으로 임의 모드나 모드 추적을 추정하지 않으며
+결합 성분을 투영해 없애지 않습니다. 기존 저장 `line-quantity-design/1`과
+`line-quantity-study/1`은 단일 신호 전용을 유지합니다. 차동 물리량은 이 Python
+factory API를 사용하세요.
 
 양 endpoint가 모두 유효해야 합니다. 이미 허용오차 이내인 endpoint를 선택할 수
 있고 그 외에는 잔차 부호가 목표를 끼워야 합니다. 이분법은 연속성·단조성·해의

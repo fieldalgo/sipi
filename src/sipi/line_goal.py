@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Bounded scalar goals using extracted lossy line quantities, with refinement."""
+"""Bounded goals using explicit extracted lossy line quantities, with refinement."""
 from dataclasses import dataclass
 import json
 import math
@@ -12,7 +12,8 @@ from .sampling import _integer
 __all__ = ['LineQuantityEvaluation', 'LineQuantityDesign', 'LineQuantityGoalError',
            'seek_line_quantity']
 
-_UNITS = {'impedance_real': 'ohm', 'attenuation': 'Np/m'}
+_UNITS = {'impedance_real': 'ohm', 'attenuation': 'Np/m',
+          'differential_forward_impedance_real': 'ohm'}
 
 
 @dataclass(frozen=True)
@@ -85,22 +86,28 @@ class LineQuantityDesign:
             refined_residual=self.refined_residual, mesh_change=self.mesh_change,
             evaluations=len(self.history), history=[row.to_dict() for row in self.history],
             input=self.document.to_dict(), refined_input=self.refined_document.to_dict(),
-            scope='bounded-single-parameter-scalar-line-goal')
+            scope=('bounded-single-parameter-differential-forward-line-goal'
+                   if self.quantity == 'differential_forward_impedance_real'
+                   else 'bounded-single-parameter-scalar-line-goal'))
 
 
 def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_evaluations=40):
     """Bisect a scalar line metric, retaining full R/L/G/C and input snapshots.
 
-    factory(parameter) returns a TransmissionLineDocument with exactly one
-    signal, one positive frequency and zero length. Frequency and signal name
-    stay fixed across candidates. Geometry or materials may vary. Parameter
+    factory(parameter) returns a TransmissionLineDocument with one positive
+    frequency and zero length. Frequency and ordered signal names stay fixed
+    across candidates. Geometry or materials may vary. Parameter
     bounds are positive in the caller's units. This API does not serialize the
     callable or infer manufacturing distributions.
 
-    impedance_real targets Re(Zc) in ohms; attenuation targets Re(gamma) in
-    Np/m. Both use the existing full lossy RLGC propagation, not abs(Zc), the
-    real quasi-static impedance, or finite-length insertion loss. Pairs and
-    mode tracking across geometry changes require a separate contract.
+    For exactly one signal, impedance_real targets Re(Zc) in ohms and
+    attenuation targets Re(gamma) in Np/m, using full lossy RLGC propagation.
+    For exactly two ordered signals, differential_forward_impedance_real
+    targets Re(Zdd) in ohms with Vd=V1-V2, Id=(I1-I2)/2 and launch Ic=I1+I2=0.
+    Zdd=[1,-1] Zc [1,-1]^T uses the full forward characteristic matrix.
+    Asymmetric coupling remains: common voltage need not vanish and Ic need
+    not remain zero downstream. This is not an eigenmode, abs(Zdd), finite
+    terminal impedance or insertion loss. No mode tracking is performed.
 
     Both endpoints must evaluate successfully. An endpoint within tolerance
     is eligible; otherwise residual signs must bracket zero. Bisection is not
@@ -119,7 +126,8 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
     if not callable(factory):
         raise TypeError('factory must be callable')
     if not isinstance(quantity, str) or quantity not in _UNITS:
-        raise ValueError('quantity must be impedance_real or attenuation')
+        raise ValueError('quantity must be impedance_real, attenuation or differential_forward_impedance_real')
+    paired = quantity == 'differential_forward_impedance_real'
     try:
         lower, upper = bounds
     except (TypeError, ValueError) as exc:
@@ -161,8 +169,10 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
             text = doc.dumps(); data = doc.to_dict()
             frequency = data['frequency_hz']
             names = tuple(t.name for t in doc.cross_section.section.traces if not t.ground)
-            if len(frequency) != 1 or frequency[0] <= 0 or len(names) != 1 or data['length_m'] != 0:
-                raise ValueError('goal requires one signal, one positive frequency and zero length')
+            if (len(frequency) != 1 or frequency[0] <= 0 or
+                    len(names) != (2 if paired else 1) or data['length_m'] != 0):
+                count = 'two signals' if paired else 'one signal'
+                raise ValueError(f'goal requires {count}, one positive frequency and zero length')
             current = (frequency[0], names)
             if identity is not None and current != identity:
                 raise ValueError('frequency and signal name must stay fixed across goal inputs')
@@ -172,12 +182,19 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
             if tuple(line.frequency) != tuple(frequency) or tuple(line.names) != names:
                 raise ValueError('extraction changed frequency or signal name')
             phase = 'diagnostic'
-            propagation = line.propagation()
-            if propagation.modes != ('single',) or tuple(propagation.frequency) != tuple(frequency):
-                raise ValueError('propagation changed scalar mode or frequency')
-            value = float(propagation.z_characteristic[0, 0].real if quantity == 'impedance_real'
-                          else propagation.gamma[0, 0].real)
-            if not math.isfinite(value) or value < 0 or (quantity == 'impedance_real' and value == 0):
+            if paired:
+                characteristic = line.characteristic()
+                if (characteristic.basis != 'single-ended' or tuple(characteristic.names) != names
+                        or tuple(characteristic.frequency) != tuple(frequency)):
+                    raise ValueError('characteristic changed signal coordinates or frequency')
+                value = float(characteristic.mixed_mode().z_characteristic[0, 0, 0].real)
+            else:
+                propagation = line.propagation()
+                if propagation.modes != ('single',) or tuple(propagation.frequency) != tuple(frequency):
+                    raise ValueError('propagation changed scalar mode or frequency')
+                value = float(propagation.z_characteristic[0, 0].real if quantity == 'impedance_real'
+                              else propagation.gamma[0, 0].real)
+            if not math.isfinite(value) or value < 0 or (quantity != 'attenuation' and value == 0):
                 raise ValueError('solver returned an invalid goal quantity')
         except Exception as exc:
             raise failure(f'{stage} {phase} failed: {exc}', stage+'/'+phase, parameter,
