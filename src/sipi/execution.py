@@ -29,6 +29,7 @@ from .circuit_document import CircuitDocument
 from .modes import ModeTrackingError
 from .capacitance3d_document import Capacitance3DDocument
 from .band import NetworkBandDocument, BandAssessment
+from .length_design import LineLengthDesignDocument, LengthGoalError
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -48,6 +49,7 @@ _REGISTRY = {
     'sipi.circuit/1': CircuitDocument,
     'sipi.capacitance-3d/1': Capacitance3DDocument,
     'sipi.network-band/1': NetworkBandDocument,
+    'sipi.line-length-design/1': LineLengthDesignDocument,
 }
 
 
@@ -194,7 +196,17 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, (ImpedanceDesignDocument, ApertureDesignDocument)):
+    if isinstance(doc, LineLengthDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except LengthGoalError as exc:
+            out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
+                failed_length_m=exc.failed_length_m, cause_type=exc.cause_type,
+                history=[dict(length_m=row.length_m, passed=row.passed, minimum_margin=row.minimum_margin)
+                         for row in exc.history]))
+    elif isinstance(doc, (ImpedanceDesignDocument, ApertureDesignDocument)):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')
         value, unit = ('impedance', 'ohm') if isinstance(doc, ImpedanceDesignDocument) else ('capacitance', 'F/m')

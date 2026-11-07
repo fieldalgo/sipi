@@ -74,3 +74,5 @@ magnitude-minimum 또는 maximum-magnitude이고, 양쪽 제한이면 그중 작
 ```sh
 python -m pytest -q tests/sipi/test_band.py tests/sipi/test_network_document.py tests/sipi/test_network_assembly.py tests/sipi/test_lumped_network.py tests/sipi/test_execution.py
 ```
+
+[선로 길이 경계 역산](length_design.md)은 여러 표본별 제한을 균일 RLGC 길이 탐색에 적용합니다.

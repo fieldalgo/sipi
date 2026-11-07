@@ -115,6 +115,10 @@ def documents():
     from sipi.band import NetworkBandDocument
     base.append(NetworkBandDocument(source(),limits=[dict(name='through',input_port='near',output_port='far',
         frequency_hz=[0,1e9],minimum=0,maximum=None)]))
+    from sipi.length_design import LineLengthDesignDocument
+    base.append(LineLengthDesignDocument(dict(kind='rlgc',frequency_hz=[0,1e9],R=[[10]],L=[[2.5e-7]],
+        G=[[.004]],C=[[1e-10]],length_m=0,reference_ohms=50,names=['s']),bounds=[0,10],
+        limits=[dict(name='loss',input_port='near:s',output_port='far:s',frequency_hz=[0,1e9],minimum=.5,maximum=None)]))
     base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
                                     ground=mesh.boundary['z0']))
     return base

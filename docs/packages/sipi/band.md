@@ -78,3 +78,5 @@ existing mesh/domain, material and measurement validity limits still apply.
 ```sh
 python -m pytest -q tests/sipi/test_band.py tests/sipi/test_network_document.py tests/sipi/test_network_assembly.py tests/sipi/test_lumped_network.py tests/sipi/test_execution.py
 ```
+
+[Line-length boundary design](length_design.md) applies several sampled limits to a uniform RLGC length bracket.

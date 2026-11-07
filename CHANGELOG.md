@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved sampled-band line-length boundary design with explicit feasible/infeasible brackets, counted evaluations and retained failure histories; no global maximum or continuous-band guarantee is implied.
+
 - Add saved sampled network-band magnitude limits with explicit port direction, mixed-mode conversion, retained failures and finite shared-execution results.
 
 - Add saved single material-parameter impedance goals and a Python material factory, retaining the chosen model snapshot through refined-mesh acceptance and replay.
