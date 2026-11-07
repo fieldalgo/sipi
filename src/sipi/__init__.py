@@ -39,6 +39,7 @@ from .document import CrossSectionDocument
 from .templates import microstrip, stripline, coupled_microstrip, grounded_coplanar
 from .templates import asymmetric_coupled_microstrip
 from .templates import asymmetric_coupled_stripline
+from .templates import asymmetric_coupled_layered_stripline
 from .templates import coupled_grounded_coplanar
 from .templates import coupled_coated_microstrip
 from .templates import coated_grounded_coplanar, coupled_coated_grounded_coplanar
@@ -90,6 +91,7 @@ __all__ = ["CircularAperture", "ApertureDocument",
            "microstrip", "stripline", "coupled_microstrip", "grounded_coplanar",
            "asymmetric_coupled_microstrip",
            "asymmetric_coupled_stripline",
+           "asymmetric_coupled_layered_stripline",
            "coupled_grounded_coplanar",
            "coupled_coated_microstrip",
            "coated_grounded_coplanar", "coupled_coated_grounded_coplanar",

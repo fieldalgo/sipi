@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add unequal two-dielectric stripline pairs with explicit common bottom faces, independent materials and composed fixed-pitch/plane-spacing studies; validate independent fields and mesh/box convergence.
 - Add unequal-width/thickness centred buried stripline pairs with independent tapers, explicit forward-current quantity and shared two-width pitch, material, tolerance and goal contracts.
 
 - Add saved periodic-circuit/1 with explicit Thevenin/load tables, shared extraction guards, retained harmonic diagnostics and finite time/frequency power reporting.

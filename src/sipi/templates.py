@@ -12,6 +12,7 @@ from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
+           'asymmetric_coupled_layered_stripline',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
@@ -685,6 +686,35 @@ def coupled_layered_stripline(*, width, gap, lower_height, upper_height, lower_e
         [Trace('positive', -offset, trace.width, trace.y, trace.thickness, top_width=top_width),
          Trace('negative', offset, trace.width, trace.y, trace.thickness, top_width=top_width)],
         box, top='ground')
+
+
+def asymmetric_coupled_layered_stripline(*, left_width, right_width, gap,
+                                        lower_height, upper_height, lower_eps_r, upper_eps_r,
+                                        left_thickness=0.0, right_thickness=0.0,
+                                        lower_tan_delta=0.0, upper_tan_delta=0.0,
+                                        box_width=None, left_top_width=None, right_top_width=None):
+    """Unequal pair with both bottom faces at a two-dielectric interface.
+
+    Copper extends into the upper layer; upper_height includes copper and each
+    thickness must be smaller than it. Positive is left, negative right. The
+    full bottom-width span is centred horizontally and gap is between those
+    horizontal extents. Materials are not averaged; exchange symmetry and
+    independent even/odd modes are not assumed. Both outer planes are grounded.
+    """
+    left = _positive('left_width', left_width)
+    right = _positive('right_width', right_width)
+    gap = _positive('gap', gap)
+    lt = _positive('left_thickness', left_thickness, zero=True)
+    rt = _positive('right_thickness', right_thickness, zero=True)
+    base = layered_stripline(width=max(left, right), lower_height=lower_height,
+        upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        thickness=max(lt, rt), lower_tan_delta=lower_tan_delta,
+        upper_tan_delta=upper_tan_delta, box_width=box_width)
+    y = base.traces[0].y
+    box = max(base.width, 4*(left+gap+right)) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [Trace('positive', -(gap+right)/2, left, y, lt, top_width=left_top_width),
+         Trace('negative', (gap+left)/2, right, y, rt, top_width=right_top_width)], box, top='ground')
 
 
 def layered_coplanar_stripline(*, width, gap, ground_width, lower_height, upper_height,
