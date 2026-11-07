@@ -4,6 +4,8 @@
 
 [Bounded 3D TEM-port fields](ports3d.md) provide homogeneous Maxwell propagation with explicit annular ports and PEC walls; higher-mode radiation boundaries are not supplied.
 
+[Per-boundary conductor loss](boundary_conductor.md) assigns separate surface laws to each signal and one common reference metal, with individual skin-depth checks.
+
 [Shared saved-input execution](execution.md) provides finite JSON results for browser and local application transports.
 
 [Elliptical-aperture matrices](elliptical_aperture.md) retain coupling for single or paired round conductors.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add separate signal/reference surface-metal laws with individual skin-depth gates, retained boundary power contributions and existing roughness contracts.
+
 - Add strict saved 3D TEM-port replay and shared execution with explicit boundary labels, pre-solve frequency budgets, calculated references and retained power diagnostics.
 
 - Add bounded homogeneous 3D Maxwell fields with explicit annular TEM ports, PEC walls, calculated reference impedances and separate full-boundary/TEM-projection power diagnostics; validate coax propagation and independent edge FEM without implying general via or multimode radiation accuracy.
