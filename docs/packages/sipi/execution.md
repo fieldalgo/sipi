@@ -27,7 +27,7 @@ network validators perform small algebraic calculations. `saved_schemas()`
 lists the closed registry: cross-section/1–3, impedance-study/1–4,
 impedance-design/1–3, circular-aperture/1, aperture-section/1,
 aperture-study/1, aperture-design/1, transmission-line/1–3, volume-line/1,
-lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1, tem-ports-3d/1 and impedance-yield/1.
+lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1, tem-ports-3d/1, impedance-yield/1 and yield-design/1.
 Each name has the `sipi.` prefix. Unknown versions, duplicate keys, nonfinite
 numbers (including exponent overflow) and non-text inputs are rejected.
 
@@ -109,3 +109,5 @@ failures are checked independently. These are adapter checks; they do not
 replace the numerical reference and convergence tests of each engine.
 
 [한국어](../../locales/ko/pages/packages/sipi/execution.md)
+
+[Fixed-candidate yield design](yield_design.md) retains every candidate and cost, simultaneous confidence and selection status. The sum of all planned samples must fit the budget before any solve. Any unresolved row makes execution `incomplete`; calculation completion is separate from candidate selection.

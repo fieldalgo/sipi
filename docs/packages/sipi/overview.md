@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Fixed-candidate yield design](yield_design.md) compares declared costs with simultaneous statistical bounds.
+
 [Bounded 3D static capacitance](capacitance3d.md) reuses the shared tetrahedral kernel and returns total C in farads; it is not a full transition model.
 
 [Bounded 3D TEM-port fields](ports3d.md) provide homogeneous Maxwell propagation with explicit annular ports and PEC walls; higher-mode radiation boundaries are not supplied.

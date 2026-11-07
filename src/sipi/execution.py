@@ -33,6 +33,7 @@ from .length_design import LineLengthDesignDocument, LengthGoalError
 from .ports3d_document import TEMPorts3DDocument
 from .boundary_conductor import BoundaryConductorLoss
 from .yield_assessment import ImpedanceYieldDocument
+from .yield_design import YieldDesignDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -55,6 +56,7 @@ _REGISTRY = {
     'sipi.line-length-design/1': LineLengthDesignDocument,
     'sipi.tem-ports-3d/1': TEMPorts3DDocument,
     'sipi.impedance-yield/1': ImpedanceYieldDocument,
+    'sipi.yield-design/1': YieldDesignDocument,
 }
 
 
@@ -204,7 +206,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, ImpedanceYieldDocument):
+    if isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

@@ -128,6 +128,10 @@ def documents():
     from sipi.yield_assessment import ImpedanceYieldDocument
     from test_study import document as study_document, bounded
     base.append(ImpedanceYieldDocument(study_document(bounded('uniform', 2)), minimum=45, maximum=55))
+    from sipi.yield_design import YieldDesignDocument
+    base.append(YieldDesignDocument([dict(name='nominal', cost=1.,
+        study=study_document(bounded('uniform', 2)).to_dict())],
+        cost_unit='relative cost', minimum=45, maximum=55, minimum_yield=.9))
     return base
 
 

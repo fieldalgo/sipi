@@ -95,3 +95,5 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 대체하지 않습니다.
 
 [English](../../../../../packages/sipi/execution.md)
+
+[고정 후보 수율 설계](yield_design.md)의 `sipi.yield-design/1`도 지원합니다. 모든 후보의 계획 표본수 합을 풀이 전에 예산 검사하며, 한 행이라도 미완이면 실행은 `incomplete`입니다. 목표에 따른 후보 선택 상태와 계산 완료 상태는 별개입니다.
