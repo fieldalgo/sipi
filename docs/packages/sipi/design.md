@@ -203,3 +203,5 @@ expand the underlying models' physical validity.
 [Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.
 
 [Single material parameter goals (design v3)](material_goals.md) preserve the selected model and refined-mesh acceptance.
+
+[Two-parameter differential/common impedance targets](pair_design.md) use bounded local search and a frozen-input mesh check.
