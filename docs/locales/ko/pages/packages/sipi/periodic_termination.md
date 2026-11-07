@@ -1,5 +1,7 @@
 # 주기 Thevenin 소스와 유한 종단
 
+[저장 회로와 공통 실행](periodic_circuit.md)에서 소스·부하·진단을 함께 보존합니다.
+
 `periodic_terminated_response`는 실수 주기 소스 전압과 유한 소스/부하 임피던스를
 함께 풉니다. 기존 `terminate_network`의 조화파 피드백 풀이와 [주기 격자 계약](periodic.md)을
 사용합니다. Thevenin 전압은 반사파·소스 임피던스와 독립적으로 입사파를 지정하는 값이

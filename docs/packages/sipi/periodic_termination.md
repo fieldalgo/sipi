@@ -1,5 +1,7 @@
 # Periodic Thevenin sources and finite terminations
 
+[Saved circuits and common execution](periodic_circuit.md) preserve sources, loads and diagnostics together.
+
 `periodic_terminated_response` solves named real periodic source voltages with
 finite source/load impedances. It uses the existing harmonic
 `terminate_network` feedback solve and the [periodic grid contract](periodic.md).

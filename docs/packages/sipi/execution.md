@@ -27,7 +27,7 @@ network validators perform small algebraic calculations. `saved_schemas()`
 lists the closed registry: cross-section/1–3, impedance-study/1–4,
 impedance-design/1–3, circular-aperture/1, aperture-section/1,
 aperture-study/1, aperture-design/1, transmission-line/1–6, volume-line/1,
-lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1.
+lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1.
 Each name has the `sipi.` prefix. Unknown versions, duplicate keys, nonfinite
 numbers (including exponent overflow) and non-text inputs are rejected.
 
@@ -121,3 +121,5 @@ replace the numerical reference and convergence tests of each engine.
 [Lossy studies](line_study.md) retain all rows and return incomplete with null summary when any sample fails.
 
 [Saved periodic response](periodic_document.md) requires explicit incident samples at every final-basis port and checks the N time-sample budget before field/FFT work. Results are periodic steady-state V/I, power waves and optional discrete impulse weights, not a transient or causality certificate.
+
+[Saved periodic circuits](periodic_circuit.md) explicitly name every Thevenin source/load and retain time responses, DC/peak harmonic diagnostics, per-frequency powers and their mean-power sums.

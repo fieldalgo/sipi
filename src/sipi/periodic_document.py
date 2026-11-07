@@ -29,6 +29,18 @@ def _ports(basis, ports, refs):
     return ('d_near', 'd_far', 'c_near', 'c_far')
 
 
+def _extract(data):
+    """Extract once and enforce saved metadata before changing the wave basis."""
+    source, _, frequency, ports, refs = _metadata(data['network'])
+    extraction = None if isinstance(source, LineNetwork) else source.analyze()
+    original = source if extraction is None else extraction.network
+    if (original.port_names != ports or not np.array_equal(original.frequency, frequency)
+            or not np.array_equal(original.z_ref, refs) or original.basis != 'single-ended'):
+        raise ValueError('network extraction changed the saved frequency/ports/references/basis')
+    network = original.mixed_mode() if data['basis'] == 'mixed-mode' else original
+    return original, network, extraction
+
+
 @dataclass(frozen=True)
 class PeriodicNetworkResult:
     """Canonical input, retained source/extraction and explicit periodic outputs."""
@@ -104,13 +116,7 @@ class PeriodicNetworkDocument:
         if self.sample_count > budget:
             raise ValueError('periodic time sample count exceeds max_evaluations before field/FFT work')
         data = self._data
-        source, _, frequency, ports, refs = _metadata(data['network'])
-        extraction = None if isinstance(source, LineNetwork) else source.analyze()
-        original = source if extraction is None else extraction.network
-        if (original.port_names != ports or not np.array_equal(original.frequency, frequency)
-                or not np.array_equal(original.z_ref, refs) or original.basis != 'single-ended'):
-            raise ValueError('network extraction changed the saved frequency/ports/references/basis')
-        network = original.mixed_mode() if data['basis'] == 'mixed-mode' else original
+        original, network, extraction = _extract(data)
         incident = np.column_stack([data['incident'][name] for name in network.port_names])
         response = periodic_response(network, incident)
         impulse = periodic_impulse(network) if data['include_impulse'] else None

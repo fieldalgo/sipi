@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved periodic-circuit/1 with explicit Thevenin/load tables, shared extraction guards, retained harmonic diagnostics and finite time/frequency power reporting.
+
 - Add periodic Thevenin sources with finite passive source/load feedback, explicit DC/peak harmonic normalization, retained circuit diagnostics and time/frequency power checks.
 
 - Add saved periodic-network/1 with explicit named wave samples, retained source networks, mixed-mode conversion, pre-field time-sample budgets and common JSON execution.

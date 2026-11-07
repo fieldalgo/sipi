@@ -41,6 +41,7 @@ from .line_goal import LineQuantityGoalError
 from .line_study import LineQuantityStudyDocument
 from .line_yield import LineQuantityYieldDocument
 from .periodic_document import PeriodicNetworkDocument
+from .periodic_circuit import PeriodicCircuitDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -73,6 +74,7 @@ _REGISTRY = {
     'sipi.line-quantity-study/2': LineQuantityStudyDocument,
     'sipi.line-quantity-yield/1': LineQuantityYieldDocument,
     'sipi.periodic-network/1': PeriodicNetworkDocument,
+    'sipi.periodic-circuit/1': PeriodicCircuitDocument,
 }
 
 
@@ -198,15 +200,38 @@ def _circuit(result):
     return out
 
 
+def _periodic_time(r):
+    return dict(time_s=_array(r.time), period_s=r.period, dt_s=r.dt,
+        incident_sqrt_w=_array(r.incident), reflected_sqrt_w=_array(r.reflected),
+        voltage_v=_array(r.voltage), current_a=_array(r.current))
+
+
 def _periodic(result):
-    r = result.response
     h = result.impulse
     return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
         source_network=_network(result.source_network),
-        response=dict(time_s=_array(r.time), period_s=r.period, dt_s=r.dt,
-            incident_sqrt_w=_array(r.incident), reflected_sqrt_w=_array(r.reflected),
-            voltage_v=_array(r.voltage), current_a=_array(r.current)),
+        response=_periodic_time(result.response),
         impulse=None if h is None else dict(lag_s=_array(h.lag), weights=_array(h.weights)))
+
+
+def _periodic_circuit(result):
+    solution = result.solution
+    frequency = solution.frequency_solution
+    powers = {key:_array(getattr(frequency, attr)) for key,attr in
+              [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]}
+    with np.errstate(over='ignore', invalid='ignore'):
+        mean = {key:_array(np.sum(value)) for key,value in powers.items()}
+    return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
+        source_network=_network(result.source_network), response=_periodic_time(solution.response),
+        source_voltage_v=_array(solution.source_voltages),
+        termination_voltage_v=_array(solution.termination_voltages),
+        harmonics=dict(convention='dc-mean-positive-peak',
+            source_voltage_v=_array(frequency.source_voltages), termination_ohms=_array(frequency.terminations),
+            incident_sqrt_w=_array(frequency.a), reflected_sqrt_w=_array(frequency.b),
+            voltage_v=_array(frequency.voltage), current_a=_array(frequency.current),
+            condition_number=_array(frequency.condition_number),
+            kvl_residual=_array(frequency.kvl_residual), wave_residual=_array(frequency.wave_residual),
+            frequency_power_w=powers), mean_power_w=mean)
 
 
 def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnostics=()):
@@ -241,6 +266,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = doc.analyze().to_dict()
     elif isinstance(doc, PeriodicNetworkDocument):
         out['result'] = _periodic(doc.analyze(max_evaluations=budget))
+    elif isinstance(doc, PeriodicCircuitDocument):
+        out['result'] = _periodic_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()

@@ -27,7 +27,7 @@ print(saved_schemas())
 impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–6,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
+circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
 
 ## 결과 계약
@@ -107,3 +107,5 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 [유손실 study](line_study.md)는 실패 표본이 있으면 모든 행을 유지하고 incomplete·summary=null로 반환합니다.
 
 [저장 주기 응답](periodic_document.md)은 최종 기저의 모든 포트 입사파를 명시하고 시간 표본 수 N을 필드/FFT 전에 예산 검사합니다. 결과는 주기 정상상태 V/I·전력파와 선택적인 이산 임펄스이며 과도응답/인과성 인증이 아닙니다.
+
+[저장 주기 회로](periodic_circuit.md)는 모든 포트의 Thevenin 전압·유한 부하를 명시하며 시간 응답·DC/peak 조화파 진단·각 주파수 전력과 합산 평균 전력을 보존합니다.
