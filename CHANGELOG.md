@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit odd-length periodic S-parameter response and discrete impulse weights, preserving port references and phase with strict DC/grid checks and real voltage/current output.
+
 - Add explicit yield-design/2 for fixed lossy line candidates at one shared quantity/frequency, reusing conservative simultaneous bounds, full budgets and retained unresolved rows.
 
 - Add fixed-study iid yield for lossy scalar and differential quantities, with explicit units, retained unresolved rows and conservative exact binomial confidence bounds.

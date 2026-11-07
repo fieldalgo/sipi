@@ -1,5 +1,7 @@
 # Uniform transmission-line networks
 
+[Periodic response](periodic.md) uses explicit DC and uniform harmonics for real time samples.
+
 [Traveling-wave propagation and loss contributions](propagation.md)
 
 [Network connection and known-fixture removal](connection.md)

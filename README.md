@@ -46,7 +46,9 @@ add explicit sphere populations while preserving the version-1 input contract.
 [High-frequency surface loss](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/conductor.md) separately
 extracts signal/return R and internal L with explicit validity checks.
 
-Not implemented: time-domain response, distributed AC power-plane impedance,
+[Periodic network response](docs/packages/sipi/periodic.md) applies explicit
+DC and uniform harmonics to real power waves, with voltage/current output.
+Not implemented: general startup transients, distributed AC power-plane impedance,
 physical three-dimensional via transitions, crosshatched returns and layout import.
 
 Licensed under Apache-2.0; see [LICENSE](https://github.com/fieldalgo/sipi/blob/main/LICENSE) and [NOTICE](https://github.com/fieldalgo/sipi/blob/main/NOTICE).

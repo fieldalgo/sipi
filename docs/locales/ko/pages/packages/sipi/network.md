@@ -1,5 +1,7 @@
 # 균일 전송선 네트워크
 
+[주기 응답](periodic.md)은 명시 DC·균일 조화파에서 실수 시간 표본을 계산합니다.
+
 [진행파 전파상수와 손실 기여](propagation.md)
 
 [네트워크 연결과 알려진 fixture 제거](connection.md)
