@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Retain bounded, token-redacted executable stdout/stderr when startup fails before the UI URL, so Windows smoke failures preserve their diagnostic cause.
+
 - Preserve hash-pinned upstream notice bytes during Windows Git checkout and verify them with a real autocrlf-enabled checkout regression.
 
 - Pin the Windows candidate to available CPython 3.13.17 after the 3.12.14 setup failure, verify the matching cp313 wheel notices/hashes and collect only explicitly listed reports from the hidden validation directory.

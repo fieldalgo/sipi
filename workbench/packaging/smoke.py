@@ -9,10 +9,27 @@ import queue
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
 from urllib.request import Request, urlopen
+
+STARTUP_URL = re.compile(r'(http://127\.0\.0\.1:\d+)/#token=([\w-]+)')
+
+
+def capture_output(stream, ready, report):
+    """Retain a bounded diagnostic transcript even when startup exits early."""
+    report['process_output'] = ''
+    report['process_output_truncated'] = False
+    for line in stream:
+        if STARTUP_URL.search(line):
+            ready.put(line)
+        safe = re.sub(r'#token=[\w-]+', '#token=[redacted]', line)
+        remaining = 65536-len(report['process_output'])
+        report['process_output'] += safe[:remaining]
+        if len(safe) > remaining:
+            report['process_output_truncated'] = True
 
 
 def exercise(source, report):
@@ -31,10 +48,8 @@ def exercise(source, report):
         process = subprocess.Popen([str(exe), '--no-browser'], cwd=directory,
             env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
         lines = queue.Queue()
-        def collect():
-            for line in process.stdout:
-                lines.put(line)
-        threading.Thread(target=collect, daemon=True).start()
+        collector = threading.Thread(target=capture_output, args=(process.stdout, lines, report), daemon=True)
+        collector.start()
         try:
             deadline = started + 120
             url = None
@@ -45,7 +60,7 @@ def exercise(source, report):
                     line = lines.get(timeout=1)
                 except queue.Empty:
                     continue
-                match = re.search(r'(http://127\.0\.0\.1:\d+)/#token=([\w-]+)', line)
+                match = STARTUP_URL.search(line)
                 if match:
                     url, token = match.groups()
                     break
@@ -110,7 +125,10 @@ def exercise(source, report):
             if process.poll() is None:
                 process.kill(); process.wait(timeout=10)
             report['process_returncode'] = process.returncode
-            process.stdout.close()
+            collector.join(timeout=5)
+            report['process_output_complete'] = not collector.is_alive()
+            if not collector.is_alive():
+                process.stdout.close()
 
     report['phase'] = 'complete'
     report['status'] = 'passed'
@@ -133,6 +151,8 @@ def main():
         raise
     finally:
         source.with_name('smoke.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+        if report['status'] == 'failed' and report.get('process_output'):
+            print(report['process_output'], file=sys.stderr)
     print(json.dumps({key: report[key] for key in ('status', 'bytes', 'startup_seconds')}))
 
 

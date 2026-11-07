@@ -91,8 +91,10 @@ python workbench/packaging/smoke.py .validation/sipi-windows/FieldAlgo-SIPI.exe
 hashes, bundled native files and actual EXE size/hash. `build-info.json` is
 embedded and included in calculation exports. `smoke.json` records measured
 startup, calculation, exit and temporary-file cleanup from a Unicode/space path;
-failed launches retain a failed report. The smoke uses `--no-browser`: Windows
-10/11 interactive default-browser acceptance, isolated-network verification,
+failed launches retain a failed report.
+Startup failures also retain bounded stdout/stderr with session tokens redacted,
+including processes which exit before announcing the local URL.
+The smoke uses `--no-browser`: Windows 10/11 interactive default-browser acceptance, isolated-network verification,
 signing and complete native/static redistribution review remain separate gates.
 No ZIP or online launcher replaces the one-EXE target.
 

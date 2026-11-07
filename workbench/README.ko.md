@@ -82,7 +82,10 @@ python workbench/packaging/smoke.py .validation/sipi-windows/FieldAlgo-SIPI.exe
 `inventory.json`에는 정확 버전·컴파일러·wheel 해시·native 파일·실제 EXE 용량/해시가
 기록됩니다. `build-info.json`은 내장되어 계산 결과에도 들어갑니다. `smoke.json`은
 한글·공백 경로의 첫 실행·계산·종료·임시파일 정리를 측정하고 실패 시 실패 보고서를
-남깁니다. `--no-browser` 시험이므로 Windows 10/11의 대화형 기본 브라우저 실행,
+남깁니다.
+로컬 URL을 출력하기 전에 종료되어도 stdout/stderr를 크기 제한·세션 토큰 가림과
+함께 보존합니다.
+`--no-browser` 시험이므로 Windows 10/11의 대화형 기본 브라우저 실행,
 망 차단 검증, 서명과 전체 native/static 재배포 검토는 별도 관문입니다.
 단일 EXE 목표를 ZIP·온라인 런처로 대체하지 않습니다.
 
