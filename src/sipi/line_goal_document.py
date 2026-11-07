@@ -3,25 +3,14 @@
 """Strict saved scalar lossy goals reusing a one-variable study specification."""
 import json
 
-from .document import CrossSectionDocument, _keys, _unique_object
-from .study import ImpedanceStudyDocument, _TEMPLATES, _parameters
+from .document import _keys, _unique_object
+from .study import ImpedanceStudyDocument
 from .sampling import _copy, _integer
-from .impedance_material import _models, _sample_material
-from .line_model import TransmissionLineDocument
 from .line_goal import seek_line_quantity, _UNITS
+from .line_input import _source_study, _line_from_values
 from .network import _scalar
 
 __all__ = ['LineQuantityDesignDocument']
-
-
-def _line(study, conductor, value=None):
-    parameters = study['parameters'] if value is None else _parameters(study, [value])
-    evaluation = (study['material_evaluation'] if value is None else
-                  _sample_material(study, [value]))
-    section = _TEMPLATES[study['template']](**parameters)
-    return TransmissionLineDocument(CrossSectionDocument(section, mesh=study['mesh']),
-        [evaluation['frequency_hz']], materials=_models(evaluation), conductor=conductor,
-        length=0., z_ref=50., schema='sipi.transmission-line/6')
 
 
 class LineQuantityDesignDocument:
@@ -59,12 +48,7 @@ class LineQuantityDesignDocument:
         target = _scalar('target', data['target'], zero=quantity == 'attenuation')
         tolerance = _scalar('tolerance', data['tolerance'])
         budget = _integer(data['max_evaluations'], 3, 10000)
-        study = ImpedanceStudyDocument.from_dict(data['study']).to_dict()
-        if study['schema'] not in ('sipi.impedance-study/3', 'sipi.impedance-study/4'):
-            raise ValueError('goal study requires /3 or /4 with fixed material evaluation frequency')
-        if study['quantity'] != 'z0':
-            raise ValueError('goal study must specify a scalar z0 template')
-        _scalar('frequency_hz', study['material_evaluation']['frequency_hz'])
+        study = _source_study(data['study'])
         sampling = study['sampling']
         if sampling['kind'] != 'sweep' or sampling['count'] != 2 or len(sampling['variables']) != 1:
             raise ValueError('goal study requires a sweep with count=2 and exactly one variable')
@@ -72,9 +56,7 @@ class LineQuantityDesignDocument:
         lower, upper = (_scalar('parameter bound', variable[key]) for key in ('lower', 'upper'))
         if lower >= upper:
             raise ValueError('lower parameter bound must be below upper')
-        nominal = _line(study, data['conductor'])
-        if sum(not trace.ground for trace in nominal.cross_section.section.traces) != 1:
-            raise ValueError('goal requires exactly one signal')
+        nominal = _line_from_values(study, data['conductor'])
         self._data = dict(schema=data['schema'], study=study,
             conductor=nominal.to_dict()['conductor'], quantity=quantity, target=target,
             tolerance=tolerance, max_evaluations=budget)
@@ -97,6 +79,6 @@ class LineQuantityDesignDocument:
 
     def solve(self):
         data = self.to_dict(); study = data['study']; variable = study['sampling']['variables'][0]
-        return seek_line_quantity(lambda value: _line(study, data['conductor'], value),
+        return seek_line_quantity(lambda value: _line_from_values(study, data['conductor'], [value]),
             [variable['lower'], variable['upper']], data['target'], quantity=data['quantity'],
             tolerance=data['tolerance'], max_evaluations=data['max_evaluations'])

@@ -1,5 +1,7 @@
 # Impedance tolerance studies
 
+[Lossy scalar studies](line_study.md) reuse these sample inputs for Re(Zc) or attenuation and retain failed rows.
+
 [Two-dielectric buried coplanar lines](layered_coplanar_stripline.md) retain layer materials and compose fixed pitch with stack-height tolerances.
 
 [Buried coplanar single and differential lines](coplanar_stripline.md) include finite side grounds, saved studies and fixed-pitch impedance goals.

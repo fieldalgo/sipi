@@ -1,5 +1,7 @@
 # 임피던스 공차 분석
 
+[유손실 공차](line_study.md)는 같은 표본 입력으로 Re(Zc) 또는 감쇠량을 평가하고 실패 행을 보존합니다.
+
 [두 유전체 매립 coplanar 선로](layered_coplanar_stripline.md)는 층별 재료와 고정 pitch·전체 높이 공차를 함께 지원합니다.
 
 [매립 coplanar 단일·차동 선로](coplanar_stripline.md)는 두 접지면 사이의 유한 측면 접지와 공차·고정 pitch 역산을 지원합니다.

@@ -38,6 +38,7 @@ from .yield_design import YieldDesignDocument
 from .dielectric_fit import DebyeFitDocument
 from .line_goal_document import LineQuantityDesignDocument
 from .line_goal import LineQuantityGoalError
+from .line_study import LineQuantityStudyDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -64,6 +65,7 @@ _REGISTRY = {
     'sipi.yield-design/1': YieldDesignDocument,
     'sipi.dielectric-fit/1': DebyeFitDocument,
     'sipi.line-quantity-design/1': LineQuantityDesignDocument,
+    'sipi.line-quantity-study/1': LineQuantityStudyDocument,
 }
 
 
@@ -223,6 +225,11 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:
+            out['status'] = 'incomplete'
+    elif isinstance(doc, LineQuantityStudyDocument):
+        result = doc.analyze(max_evaluations=budget)
+        out['result'] = result.to_dict()
+        if result.failed:
             out['status'] = 'incomplete'
     elif isinstance(doc, LineQuantityDesignDocument):
         if data['max_evaluations'] > budget:

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add scalar full-loss geometry/material studies with preserved correlated samples and failures, finite descriptive statistics and shared saved execution.
+
 - Add saved line-quantity-design/1 using existing scalar geometry/material study inputs, strict line/6 conductors and shared execution with retained goal failures.
 
 - Add bounded scalar-line goals for real lossy characteristic impedance or attenuation, with frozen input refinement, counted failures and complete replay snapshots.

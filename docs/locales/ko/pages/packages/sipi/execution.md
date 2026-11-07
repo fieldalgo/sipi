@@ -27,7 +27,7 @@ print(saved_schemas())
 impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–6,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1, dielectric-fit/1, line-quantity-design/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
+circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1, dielectric-fit/1, line-quantity-design/1 and line-quantity-study/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
 
 ## 결과 계약
@@ -103,3 +103,5 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 [접지 면 저장](ground_face_line.md)은 line/6에서 확장된 접지 면 진단을 보존합니다.
 
 [저장 유손실 목표](line_goal_document.md)는 호출자 예산을 field 전에 검사하며 실패 시 시도 횟수·단계·입력·완료 이력을 보존합니다.
+
+[유손실 study](line_study.md)는 실패 표본이 있으면 모든 행을 유지하고 incomplete·summary=null로 반환합니다.
