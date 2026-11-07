@@ -12,8 +12,11 @@ surface impedance by a real factor. It does not change the definitions below.
 
 `sipi.roughness.CausalHuray` describes spherical surface populations using
 explicit radii in metres and full-sphere surface-area ratios. It modifies both
-resistance and reactance of the good-conductor half-space. All conductor
-surfaces share this model; no individual top/bottom face selection is implied.
+resistance and reactance of the good-conductor half-space. The common-metal
+`surface_conductor_loss` call below applies one model to all surfaces.
+Separate [signal-face](face_conductor.md), [reference-surface](reference_surfaces.md)
+and [ground-face](ground_faces.md) APIs assign these existing laws individually;
+those assignments do not change the constitutive formula.
 
 ```python
 from sipi.roughness import CausalHuray
@@ -132,7 +135,8 @@ relative to conductor dimensions, curvature or gaps; the homogenized surface
 model and perturbation still need physical justification. Low-frequency
 limits above are mathematical checks, **not permission to use the surface
 adapter at DC**. Finite-metal diffusion is a separate smooth-metal model and
-receives no roughness multiplier. Unequal face roughness, arbitrary base area,
+receives no roughness multiplier. Unequal face assignments use the separate
+APIs linked above, not the common-metal call shown here. Arbitrary base area,
 parameter fitting, resolved 3D texture, time-domain propagation and measured
 accuracy are outside this contract. A causal conductor law alone does not
 certify causality of an arbitrary dielectric model or full line input.

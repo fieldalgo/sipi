@@ -51,7 +51,10 @@ All values are SI. A runnable example is
   measured surface fit, or a correction to the geometry. Alternatively,
   [causal Huray roughness](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/roughness.md) changes both R and internal L using
   explicit sphere radii/area ratios; choose `roughness=CausalHuray(...)`.
-  Gradient and Groisse models are not implemented.
+  [Groiss RMS](groiss.md) instead multiplies the full impedance by a real,
+  noncausal frequency-domain factor. [Cannonball Huray](cannonball.md) maps
+  explicit ten-point Rz to the causal sphere law. Gradient roughness is not
+  supported by this surface adapter.
 - Invalid material/skin inputs are rejected before meshing. A discrepancy of
   more than 0.05 in the integrated unit-current matrix raises `ValueError`
   requesting refinement. This flux check is **not a 5% resistance guarantee**.
@@ -124,9 +127,14 @@ third-party binary is added. The plate/coax references independently check the
 geometry integrals. The finite-thickness PCB check demonstrates convergence
 for that case, not measured loss accuracy or a universal error bound.
 
-Missing: DC/low-frequency transition, interior skin/proximity diffusion,
-different metals per surface, finite reference-plane redistribution,
-measured-coupon calibration and full-wave radiation.
+This common-metal adapter does not model DC/low-frequency transition or
+interior skin/proximity diffusion. Those belong to the separate
+[finite-metal diffusion model](conductor_diffusion.md). Distinct metals and
+roughness use the separate [signal-boundary](boundary_conductor.md),
+[signal-face](face_conductor.md), [reference-surface](reference_surfaces.md)
+and [ground-face](ground_faces.md) assignments; they retain the surface
+perturbation assumptions. Finite-conductivity reference-current redistribution,
+measured-coupon calibration and full-wave radiation remain outside this model.
 Do not extrapolate this model to DC or substitute it for an AC PDN solver.
 
 References: E. Hammerstad and Ø. Jensen, “Accurate models for microstrip

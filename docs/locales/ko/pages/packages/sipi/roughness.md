@@ -11,8 +11,10 @@
 [표면 추출](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/conductor.md) · [주파수 선로 JSON](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/line_model.md)
 
 `sipi.roughness.CausalHuray`는 구형 돌기의 반지름(m)과 구 전체 표면적 비율을
-명시합니다. 양도체 반공간의 저항과 리액턴스를 함께 보정합니다. 모든 신호·기준
-도체 표면에 같은 모델을 적용하며, 윗면·아랫면별 선택 기능은 아닙니다.
+명시합니다. 양도체 반공간의 저항과 리액턴스를 함께 보정합니다. 아래의 공통 금속
+`surface_conductor_loss` 호출은 모든 표면에 같은 모델을 적용합니다.
+별도 [신호 면](face_conductor.md), [기준 표면](reference_surfaces.md),
+[접지 면](ground_faces.md) API는 기존 법칙을 각 면에 할당하며 구성 법칙 자체는 바꾸지 않습니다.
 
 ```python
 from sipi.roughness import CausalHuray
@@ -115,7 +117,8 @@ a=.5 mm, b=2 mm, 방사 셀 64/128/256, 각방향 256에서 거친 R·내부 L �
 도체 치수·곡률·간격보다 충분히 작다는 보장은 없으며, 균질 표면 모델과 섭동 가정의
 적합성을 확인해야 합니다. 위 저주파 극한은 수학적 검사이며 **표면 API의 DC 사용 허용이 아닙니다**.
 유한 금속 확산은 별도의 매끈한 금속 모델로서 거칠기 승수를 적용하지 않습니다.
-면별 상이한 거칠기·임의 기본 면적비·재료 추정·3D 실제 요철·시간영역 전파·실측 정확도는
+상이한 면별 할당은 위에 연결한 별도 API를 사용하며 여기의 공통 금속 호출에 속하지 않습니다.
+임의 기본 면적비·재료 추정·3D 실제 요철·시간영역 전파·실측 정확도는
 이 계약의 범위 밖입니다. 도체 법칙의 인과성만으로 임의 유전체나 전체 선로의 인과성이 보장되지 않습니다.
 
 ```sh

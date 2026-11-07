@@ -42,7 +42,10 @@ loss.R, loss.L_internal, loss.skin_depth, loss.factors.current_error
   `1 + (2/pi)*atan(1.4*(Rq/delta)**2)`를 **R에만** 곱하며 매끈한 금속의 리액턴스는 유지합니다.
   인과적 광대역 거칠기 모델, 실측 표면 보정 또는 형상 변경이 아닙니다.
   [인과적 Huray](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/roughness.md)는 명시 구 반지름·면적비를 받아 R과 내부 L을 함께
-  보정합니다. `roughness=CausalHuray(...)`로 선택합니다. Gradient·Groisse는 미구현입니다.
+  보정합니다. `roughness=CausalHuray(...)`로 선택합니다. 별도 [Groiss RMS](groiss.md)는
+  전체 임피던스에 실수인 비인과적 주파수영역 계수를 곱합니다.
+  [Cannonball Huray](cannonball.md)는 명시적 10점 Rz를 인과적 구형 법칙에 연결합니다.
+  이 표면 어댑터는 Gradient 거칠기를 지원하지 않습니다.
 - 잘못된 재료·표피 깊이 입력은 메시 전에 거부합니다. 적분한 단위 전류 행렬의 최대 차이가
   0.05를 넘으면 세분을 요구하는 `ValueError`를 냅니다. **저항 오차 5% 보장이 아닙니다.**
   R 자체의 세분 변화와 상자 크기 영향은 별도로 확인해야 합니다.
@@ -102,8 +105,13 @@ scikit-rf 검사는 **반공간 법칙** 비교로 PCB 장해석이나 거칠기
 평행판·동축은 형상 적분을 독립적으로 확인합니다. PCB 사례는 해당 형상의 수렴이며
 실측 손실 정확도나 보편적 오차 한계가 아닙니다.
 
-남은 것: DC/저주파 전이, 도체 내부 표피·근접 확산, 표면별 다른 금속, 유한 접지 전류 재분포,
-실측 쿠폰 보정, 전파·복사. DC로 외삽하거나 교류 PDN 솔버로 대체하지 마세요.
+이 공통 금속 어댑터는 DC/저주파 전이와 내부 표피·근접 확산을 모델링하지 않습니다.
+그 기능은 별도의 [유한 금속 확산 모델](conductor_diffusion.md)에서 다룹니다.
+서로 다른 금속·거칠기는 별도 [신호 경계](boundary_conductor.md),
+[신호 면](face_conductor.md), [기준 표면](reference_surfaces.md),
+[접지 면](ground_faces.md) 할당을 사용하며 표면 섭동 가정은 유지합니다.
+유한 전도도의 기준 전류 재분포·실측 쿠폰 보정·전파와 복사는 이 모델의 범위 밖입니다.
+DC로 외삽하거나 교류 PDN 솔버로 대체하지 마세요.
 
 참고: E. Hammerstad and Ø. Jensen, “Accurate models for microstrip computer-aided design,”
 IEEE MTT-S Digest, 1980(거칠기 경험식); 표준 양도체 표면 임피던스와 준TEM 전기·자기 쌍대성은
