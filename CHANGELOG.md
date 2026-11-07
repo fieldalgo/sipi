@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add fixed-study iid yield for lossy scalar and differential quantities, with explicit units, retained unresolved rows and conservative exact binomial confidence bounds.
+
 - Add explicit line-quantity-study/2 for paired full-loss sampling, preserving correlated vectors, geometry/material constraints, failed rows and complete-only statistics.
 
 - Add explicit line-quantity-design/2 for saved differential forward goals, reusing fixed pitch, stack height and material bindings while preserving scalar v1 behavior.

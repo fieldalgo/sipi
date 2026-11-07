@@ -151,8 +151,12 @@ def documents():
     from test_ports3d_document import document as tem_document
     base.append(tem_document())
     from sipi.yield_assessment import ImpedanceYieldDocument
+    from sipi.line_yield import LineQuantityYieldDocument
     from test_study import document as study_document, bounded
     base.append(ImpedanceYieldDocument(study_document(bounded('uniform', 2)), minimum=45, maximum=55))
+    random_line = LineQuantityStudyDocument(study_document(bounded('uniform', 2), frequency=1e9, materials={}),
+        conductor=dict(kind='perfect'), quantity='impedance_real')
+    base.append(LineQuantityYieldDocument(random_line, minimum=45, maximum=55))
     from sipi.yield_design import YieldDesignDocument
     base.append(YieldDesignDocument([dict(name='nominal', cost=1.,
         study=study_document(bounded('uniform', 2)).to_dict())],

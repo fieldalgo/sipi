@@ -1,5 +1,7 @@
 # 유손실 단일 선로 물리량의 공차 계산
 
+[유손실 iid 수율](line_yield.md)은 무작위 표본의 미확정 행을 보존한 신뢰구간을 제공합니다.
+
 [명시적 /2 차동 공차](differential_line_study.md)는 비대칭 쌍의 순방향 입력 물리량을 추가합니다. 기본 /1과 아래 단일 선로 계약은 유지합니다.
 
 [English](../../../../../packages/sipi/line_study.md) · [Source sampling](study.md) · [유손실 목표](line_goal_document.md)

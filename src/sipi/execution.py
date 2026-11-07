@@ -39,6 +39,7 @@ from .dielectric_fit import DebyeFitDocument
 from .line_goal_document import LineQuantityDesignDocument
 from .line_goal import LineQuantityGoalError
 from .line_study import LineQuantityStudyDocument
+from .line_yield import LineQuantityYieldDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -68,6 +69,7 @@ _REGISTRY = {
     'sipi.line-quantity-design/2': LineQuantityDesignDocument,
     'sipi.line-quantity-study/1': LineQuantityStudyDocument,
     'sipi.line-quantity-study/2': LineQuantityStudyDocument,
+    'sipi.line-quantity-yield/1': LineQuantityYieldDocument,
 }
 
 
@@ -223,7 +225,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         if len(data['frequency_hz']) > budget:
             raise ValueError('saved fit frequency count exceeds max_evaluations before fitting')
         out['result'] = doc.analyze().to_dict()
-    elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument)):
+    elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

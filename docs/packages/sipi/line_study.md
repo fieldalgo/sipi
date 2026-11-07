@@ -1,5 +1,7 @@
 # Sampling lossy scalar-line quantities
 
+[Lossy-line iid yield](line_yield.md) adds confidence bounds while retaining unresolved random samples.
+
 [Explicit /2 paired studies](differential_line_study.md) add asymmetric forward-launch quantities. The default /1 and the scalar contract below remain unchanged.
 
 [한국어](../../locales/ko/pages/packages/sipi/line_study.md) · [Source sampling](study.md) · [Lossy goals](line_goal_document.md)

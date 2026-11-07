@@ -23,11 +23,11 @@ def _scalar(name, value, *, zero=False):
         raise ValueError(f'{name} must be a representable finite real scalar') from exc
 
 
-def _criteria(minimum, maximum, confidence, minimum_yield):
-    low = None if minimum is None else _scalar('minimum impedance', minimum, zero=True)
-    high = None if maximum is None else _scalar('maximum impedance', maximum, zero=True)
+def _criteria(minimum, maximum, confidence, minimum_yield, *, quantity_name='impedance'):
+    low = None if minimum is None else _scalar('minimum '+quantity_name, minimum, zero=True)
+    high = None if maximum is None else _scalar('maximum '+quantity_name, maximum, zero=True)
     if low is None and high is None or low is not None and high is not None and low > high:
-        raise ValueError('at least one impedance limit is required, with minimum <= maximum')
+        raise ValueError(f'at least one {quantity_name} limit is required, with minimum <= maximum')
     level = _scalar('confidence', confidence)
     if not 0 < level < 1 or not 0 < (1-level)/2 < .5:
         raise ValueError('confidence must be strictly between zero and one at float precision')

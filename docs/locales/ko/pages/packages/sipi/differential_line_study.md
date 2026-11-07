@@ -1,5 +1,7 @@
 # 유손실 차동 순방향 임피던스 표본 분석
 
+[유손실 iid 수율](line_yield.md)은 무작위 표본의 미확정 행을 보존한 신뢰구간을 제공합니다.
+
 [English](../../../../../packages/sipi/differential_line_study.md) · [단일 선로 공차](line_study.md) · [순방향 입력](differential_line_goal.md) · [원표본](study.md)
 
 명시적 `sipi.line-quantity-study/2`는 기존 단일 선로 공차 계약에

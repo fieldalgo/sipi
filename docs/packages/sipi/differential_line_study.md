@@ -1,5 +1,7 @@
 # Sampling lossy differential forward impedance
 
+[Lossy-line iid yield](line_yield.md) adds confidence bounds while retaining unresolved random samples.
+
 [한국어](../../locales/ko/pages/packages/sipi/differential_line_study.md) · [Scalar study](line_study.md) · [Forward launch](differential_line_goal.md) · [Source samples](study.md)
 
 Explicit `sipi.line-quantity-study/2` adds the quantity
