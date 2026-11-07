@@ -24,6 +24,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
               ('microstrip', 'stripline', 'coupled_microstrip', 'asymmetric_coupled_microstrip', 'grounded_coplanar',
                'asymmetric_coupled_stripline',
                'asymmetric_coupled_layered_stripline',
+               'asymmetric_coupled_grounded_coplanar',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
                'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
                'layered_broadside_stripline',
@@ -37,7 +38,8 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_unbacked_coplanar',
                'coupled_conformal_coated_unbacked_coplanar')}
 _ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
-                                        'asymmetric_coupled_layered_stripline'))
+                                        'asymmetric_coupled_layered_stripline',
+                                        'asymmetric_coupled_grounded_coplanar'))
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
                          'coupled_layered_coplanar_stripline',
                          'coupled_coplanar_stripline',

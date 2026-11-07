@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add unequal surface pairs with finite coplanar grounds, explicit ground thickness and saved forward-current studies/goals; validate independent fields, image-panel limits and separate domain/ground sensitivities.
 - Add unequal two-dielectric stripline pairs with explicit common bottom faces, independent materials and composed fixed-pitch/plane-spacing studies; validate independent fields and mesh/box convergence.
 - Add unequal-width/thickness centred buried stripline pairs with independent tapers, explicit forward-current quantity and shared two-width pitch, material, tolerance and goal contracts.
 

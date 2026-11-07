@@ -13,6 +13,7 @@ from .crosssection import CrossSection, Layer, Trace
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
+           'asymmetric_coupled_grounded_coplanar',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
@@ -153,6 +154,42 @@ def coupled_grounded_coplanar(*, width, gap, ground_gap, ground_width,
          Trace('negative', offset, w, h, t, top_width=top_width),
          Trace('ground_left', -ground_offset, gw, h, t, ground=True),
          Trace('ground_right', ground_offset, gw, h, t, ground=True)], box)
+
+
+def asymmetric_coupled_grounded_coplanar(*, left_width, right_width, gap,
+                                        ground_gap, ground_width, substrate_height, eps_r,
+                                        left_thickness=0.0, right_thickness=0.0,
+                                        ground_thickness=0.0, tan_delta=0.0,
+                                        air_height=None, box_width=None,
+                                        left_top_width=None, right_top_width=None):
+    """Unequal surface pair between finite grounds and above a backing plane.
+
+    All bottoms lie at the substrate surface. Signal widths, thicknesses and
+    tapers are independent; both rectangular grounds share explicit dimensions.
+    ground_thickness is never inferred from a signal. gap and ground_gap refer
+    to horizontal bottom extents; there is no central ground. The complete
+    signal bottom span is centred, positive left and negative right. Ground
+    width, open-domain width and air height require separate sensitivity checks.
+    """
+    left = _positive('left_width', left_width)
+    right = _positive('right_width', right_width)
+    gap = _positive('gap', gap)
+    gg = _positive('ground_gap', ground_gap)
+    gw = _positive('ground_width', ground_width)
+    lt = _positive('left_thickness', left_thickness, zero=True)
+    rt = _positive('right_thickness', right_thickness, zero=True)
+    gt = _positive('ground_thickness', ground_thickness, zero=True)
+    _, h, _, box, layers = _surface(max(left, right), substrate_height, eps_r,
+                                    max(lt, rt, gt), tan_delta, air_height, box_width)
+    span = left+right+gap
+    if box_width is None:
+        box = max(box, span+2*gg+2*gw+4*h)
+    offset = (left+right)/2+gap/2+gg+gw/2
+    return CrossSection(layers,
+        [Trace('positive', -(gap+right)/2, left, h, lt, top_width=left_top_width),
+         Trace('negative', (gap+left)/2, right, h, rt, top_width=right_top_width),
+         Trace('ground_left', -offset, gw, h, gt, ground=True),
+         Trace('ground_right', offset, gw, h, gt, ground=True)], box)
 
 
 def _unbacked_coplanar(base, lower_air_height):
