@@ -79,6 +79,12 @@ object. Its [roughness contract](https://github.com/fieldalgo/sipi/blob/main/doc
 fields. Version 1 and the constructor default remain unchanged; saved versions
 are preserved.
 
+Version 3 (`sipi.transmission-line/3`) also permits the strict
+[`surface-boundaries` conductor record](boundary_conductor.md#saved-shared-mesh-line)
+with one metal/roughness law per signal and one common reference metal. It
+retains one shared mesh and C0 solve, while checking each metal's skin depth
+against its own geometry. Versions 1/2 and the default remain unchanged.
+
 ## Results
 
 `TransmissionLineResult` retains `.input_json`, read-only `.mesh_settings`,

@@ -116,6 +116,13 @@ def _boundary_from_factors(factors, f, metals, depth, correction, zs):
     return BoundaryConductorLoss(f, resistance, internal, depth, correction, zs, metals, factors)
 
 
+def _boundary_from_mesh(meshed, names, f, metals, depth, correction, zs):
+    factors = surface_current_factors(meshed.mesh, meshed.signals, meshed.ground)
+    if factors.names != names:
+        raise ValueError('meshing changed the signal boundary order')
+    return _boundary_from_factors(factors, f, metals, depth, correction, zs)
+
+
 def surface_conductor_loss_by_boundary(section, frequency, *, conductors, reference,
                                         ground_thickness, **mesh_options):
     """One SurfaceMetal per named signal, plus one common reference metal.
@@ -128,10 +135,5 @@ def surface_conductor_loss_by_boundary(section, frequency, *, conductors, refere
     This is first-order surface perturbation, not finite-metal diffusion,
     independent foil-face assignment or proof of a roughness model's validity.
     """
-    names, f, metals, depth, correction, zs = _boundary_samples(
-        section, frequency, conductors, reference, ground_thickness)
-    meshed = section.mesh(**mesh_options)
-    factors = surface_current_factors(meshed.mesh, meshed.signals, meshed.ground)
-    if factors.names != names:
-        raise ValueError('meshing changed the signal boundary order')
-    return _boundary_from_factors(factors, f, metals, depth, correction, zs)
+    samples = _boundary_samples(section, frequency, conductors, reference, ground_thickness)
+    return _boundary_from_mesh(section.mesh(**mesh_options), *samples)

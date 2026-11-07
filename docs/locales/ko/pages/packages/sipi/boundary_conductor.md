@@ -76,4 +76,49 @@ Cannonball은 명시적인 10점 Rz를 요구합니다. 자동 환산이나 동�
 대각 손실·상호/귀환 항·PSD·상호성/수동성, 메시 세분과 횡방향 박스 폭 2배 변경을
 5% 기준으로 검사합니다. 이는 제한된 수렴 시험이며 보편적인 손실 오차 한계나
 모든 외곽 방향의 수렴을 뜻하지 않습니다. 경험적 동박 정확도·실제 거친 기하·
-도체 면별 지정·Gradient 모델은 범위 밖입니다. 저장 선로/JSON·앱 연결은 별도 작업입니다.
+도체 면별 지정·Gradient 모델은 범위 밖입니다. 앱 연결은 엔진 API와 별도입니다.
+
+## 같은 메시를 쓰는 저장 선로
+
+`TransmissionLineDocument`의 `sipi.transmission-line/3`은
+`conductor.kind="surface-boundaries"`를 추가합니다. conductor 필드는 정확히
+`kind`, `conductors`, `reference`, `ground_thickness`입니다. 이름으로 지정한
+각 신호와 기준 금속은 정확히 `conductivity`, `relative_permeability`, 명시적인
+`roughness` 객체를 요구합니다. 거칠기는 smooth, Hammerstad, Groiss,
+causal-Huray, Cannonball-Huray 중 하나입니다. 기본 금속이나 누락된 신호를 추정하지 않습니다.
+
+```python
+from sipi import CrossSectionDocument
+from sipi.line_model import TransmissionLineDocument
+from sipi.execution import execute_saved
+
+geometry = CrossSectionDocument(section,
+    mesh=dict(edge_size=2.5e-6, far_size=.1e-3, grade=.05))
+model = TransmissionLineDocument(geometry, [1e9, 4e9], materials={}, length=.03,
+    schema="sipi.transmission-line/3",
+    conductor=dict(kind="surface-boundaries", ground_thickness=35e-6,
+        conductors={name: dict(conductivity=58e6, relative_permeability=1.,
+            roughness=dict(kind="causal-huray", radii_m=[.2e-6], surface_ratios=[2.]))},
+        reference=dict(conductivity=45e6, relative_permeability=1.,
+            roughness=dict(kind="hammerstad", rms_m=.5e-6))))
+saved = model.dumps()
+report = execute_saved(saved)
+parts = report["result"]["conductor_boundaries"]
+assert parts["labels"] == ["signal:"+name, "reference"]
+np.testing.assert_allclose(np.array(parts["resistance_ohm_per_m"]).sum(axis=1),
+                           report["result"]["R_ohm_per_m"], rtol=1e-12)
+```
+
+정규화에서 요청한 모든 금속과 주파수의 조건을 메시 생성 전에 검사합니다.
+해석은 메시 하나와 같은 진공 C0/전류 계수를 유전체·도체 계산에 공유합니다.
+R/L/G/C와 S의 단위 및 포트 순서는 그대로입니다. 기존 network/circuit의
+`kind="transmission-line"` 입력 안에 이 문서를 넣을 수 있습니다. 버전 1·2의
+계약과 생성자 기본 버전 1은 유지합니다. 버전 3도 perfect 금속과 버전 2의
+공통 surface 기록을 허용합니다.
+
+공통 실행은 도체별 모델에만 `conductor_boundaries`를 추가합니다. 경계 이름,
+`skin_depth_m`, `roughness_factor`, 복소 `surface_impedance_ohms`,
+`resistance_ohm_per_m` 기여를 보존합니다. 각 금속 기록은 정규 입력에도 남습니다.
+저장 재생을 별도 도체/유전체 API와 RLGC 상대 `1e-10`, S 절대 `1e-10`에 대조하고,
+메시 한 번 사용 및 종단 회로 재생을 검사합니다. 이 조합으로 물리적 유효범위를
+확대하거나 앱의 고정 엔진을 변경하지 않습니다.

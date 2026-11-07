@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add transmission-line/3 saved signal/reference metal assignments on one shared mesh, retaining boundary diagnostics through common execution and existing network/circuit inputs.
+
 - Add separate signal/reference surface-metal laws with individual skin-depth gates, retained boundary power contributions and existing roughness contracts.
 
 - Add strict saved 3D TEM-port replay and shared execution with explicit boundary labels, pre-solve frequency budgets, calculated references and retained power diagnostics.

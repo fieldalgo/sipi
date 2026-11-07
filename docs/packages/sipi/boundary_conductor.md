@@ -84,4 +84,50 @@ PSD, reciprocity/passivity, refined mesh and doubled lateral box width at 5%.
 The latter is a finite set of convergence checks, not a universal loss error bar
 or convergence in every exterior direction. Empirical foil accuracy, resolved
 rough geometry, independent conductor faces and Gradient roughness are outside
-this contract. Saved line/JSON and application integration are separate work.
+this contract. Application integration remains separate from the engine API.
+
+## Saved shared-mesh line
+
+`TransmissionLineDocument` schema `sipi.transmission-line/3` adds
+`conductor.kind="surface-boundaries"`. Its exact conductor fields are `kind`,
+`conductors`, `reference` and `ground_thickness`. Each named signal and the
+reference record requires exactly `conductivity`, `relative_permeability` and
+an explicit `roughness` object (smooth, Hammerstad, Groiss, causal-Huray or
+Cannonball-Huray). No default metal or missing signal is inferred.
+
+```python
+from sipi import CrossSectionDocument
+from sipi.line_model import TransmissionLineDocument
+from sipi.execution import execute_saved
+
+geometry = CrossSectionDocument(section,
+    mesh=dict(edge_size=2.5e-6, far_size=.1e-3, grade=.05))
+model = TransmissionLineDocument(geometry, [1e9, 4e9], materials={}, length=.03,
+    schema="sipi.transmission-line/3",
+    conductor=dict(kind="surface-boundaries", ground_thickness=35e-6,
+        conductors={name: dict(conductivity=58e6, relative_permeability=1.,
+            roughness=dict(kind="causal-huray", radii_m=[.2e-6], surface_ratios=[2.]))},
+        reference=dict(conductivity=45e6, relative_permeability=1.,
+            roughness=dict(kind="hammerstad", rms_m=.5e-6))))
+saved = model.dumps()
+report = execute_saved(saved)
+parts = report["result"]["conductor_boundaries"]
+assert parts["labels"] == ["signal:"+name, "reference"]
+np.testing.assert_allclose(np.array(parts["resistance_ohm_per_m"]).sum(axis=1),
+                           report["result"]["R_ohm_per_m"], rtol=1e-12)
+```
+
+Normalization validates every requested metal/frequency before meshing. Analysis
+uses one mesh and the same vacuum C0/current factors for dielectric and conductor
+extraction. R/L/G/C and S retain their existing units and port ordering. Existing
+network/circuit inputs with `kind="transmission-line"` can contain this document.
+Versions 1 and 2 retain their contracts and the constructor default remains 1.
+Version 3 also accepts perfect metal and the version-2 common surface record.
+
+Shared execution adds `conductor_boundaries` only for this distinct-metal model:
+labels, `skin_depth_m`, `roughness_factor`, complex `surface_impedance_ohms` and
+`resistance_ohm_per_m` contributions. Per-boundary records remain in the canonical
+input. Saved replay is checked against the standalone boundary/dielectric APIs
+at relative `1e-10` for RLGC and absolute `1e-10` for S, with a one-mesh assertion
+and terminal-circuit replay. This composition does not strengthen the physical
+validity limits or advance an application's pinned engine.

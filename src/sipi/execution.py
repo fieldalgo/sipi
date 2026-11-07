@@ -31,6 +31,7 @@ from .capacitance3d_document import Capacitance3DDocument
 from .band import NetworkBandDocument, BandAssessment
 from .length_design import LineLengthDesignDocument, LengthGoalError
 from .ports3d_document import TEMPorts3DDocument
+from .boundary_conductor import BoundaryConductorLoss
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -42,7 +43,7 @@ _REGISTRY = {
     'sipi.aperture-section/1': ApertureSectionDocument,
     'sipi.aperture-study/1': ApertureStudyDocument,
     'sipi.aperture-design/1': ApertureDesignDocument,
-    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2)},
+    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3)},
     'sipi.volume-line/1': VolumeLineDocument,
     'sipi.lumped-network/1': LumpedNetworkDocument,
     'sipi.network-assembly/1': NetworkAssemblyDocument,
@@ -259,6 +260,12 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),
                 G_s_per_m=_array(result.G), C_f_per_m=_array(result.C),
                 network=_network(result.network), diagnostics=_diagnostics(result, diagnostics))
+            if isinstance(doc, TransmissionLineDocument) and isinstance(result.conductor, BoundaryConductorLoss):
+                loss = result.conductor
+                out['result']['conductor_boundaries'] = dict(labels=list(loss.boundary_labels),
+                    skin_depth_m=_array(loss.skin_depth), roughness_factor=_array(loss.roughness_factor),
+                    surface_impedance_ohms=_array(loss.surface_impedance),
+                    resistance_ohm_per_m=_array(loss.resistance_parts))
         elif isinstance(doc, CircuitDocument):
             out['result'] = _circuit(result)
         elif isinstance(doc, LumpedNetworkDocument):
