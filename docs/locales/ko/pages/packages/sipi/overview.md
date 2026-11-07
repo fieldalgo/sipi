@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[유한 영역의 3D 정전용량](capacitance3d.md)은 공유 사면체 커널로 전체 C를 패럿 단위로 계산합니다. 완전한 전이 모델은 아닙니다.
+
 [저장 입력 공통 실행](execution.md)은 브라우저와 로컬 프로그램에 유한 JSON 결과를 제공합니다.
 
 [타원형 개구 행렬](elliptical_aperture.md)은 원형 도체 1개 또는 쌍의 결합 성분을 보존합니다.
@@ -196,7 +198,7 @@ CPU 강하는 13.2 mV, 판 손실은 0.17 W입니다.
 
 - 실측 재료 추정과 형상/전파 분산.
 - 시간 영역 응답. [균일 전송선 S·Touchstone 출력](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)은 명시한 RLGC를 받습니다.
-- DC 전원면을 넘는 3D 구조와 전원 분배망: 비아, 여러 층, 평면 공진, 교류 PDN 임피던스, 디커플링.
+- 완전한 3D 전이 모델과 DC 전원면을 넘는 전원 분배망: 비아, 여러 층, 평면 공진, 교류 PDN 임피던스, 디커플링.
 - 레이아웃 가져오기(Gerber, ODB++, IPC-2581), 곡선/구멍을 가진 도체와 Studio 화면. [단순 다각형·국소 마스크·JSONv3](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/polygon_sections.md)와 [사다리꼴·평탄 코팅](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/manufacturing_sections.md)은 지원합니다.
 - 자성 기판: `L`은 모든 곳에서 `mu = mu0`를 가정합니다.
 

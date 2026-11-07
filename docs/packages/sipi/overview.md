@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Bounded 3D static capacitance](capacitance3d.md) reuses the shared tetrahedral kernel and returns total C in farads; it is not a full transition model.
+
 [Shared saved-input execution](execution.md) provides finite JSON results for browser and local application transports.
 
 [Elliptical-aperture matrices](elliptical_aperture.md) retain coupling for single or paired round conductors.
@@ -39,7 +41,7 @@ line.z0, line.eps_eff, line.delay     # ohm, -, s/m
 line.C, line.L, line.G(1e9)           # F/m, H/m, S/m matrices
 ```
 
-All lengths are in metres and all results are per metre of line.
+Here all lengths are in metres and cross-section results are per metre of line.
 [`examples/sipi/pcb_lines.py`](https://github.com/fieldalgo/sipi/blob/main/examples/sipi/pcb_lines.py) prints the
 impedance of a 50-ohm-class microstrip and of an edge-coupled differential pair.
 
@@ -229,7 +231,7 @@ adds no dependency. See [the adapters](https://github.com/fieldalgo/openphysics/
 
 - Measured material fitting and geometric/full-wave dispersion.
 - Time-domain responses. [Uniform-line S and Touchstone export](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network.md) accept explicit RLGC.
-- 3D structures and power-delivery networks beyond DC planes: vias, several layers,
+- Full 3D interconnect transitions and power-delivery networks beyond DC planes: vias, several layers,
   plane resonances, AC PDN impedance, decoupling.
 - Layout import (Gerber, ODB++, IPC-2581), curved or holed conductors and a Studio view.
   [Simple polygons, local masks and JSON v3](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/polygon_sections.md) and

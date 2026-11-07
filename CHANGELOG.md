@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add bounded static 3D capacitance through the shared tetrahedral assembler, with explicit PEC/ground node sets, charge/energy diagnostics, analytical and independent FEM checks; no full-wave transition or saved-input support is implied.
+
 - Retain bounded, token-redacted executable stdout/stderr when startup fails before the UI URL, so Windows smoke failures preserve their diagnostic cause.
 
 - Preserve hash-pinned upstream notice bytes during Windows Git checkout and verify them with a real autocrlf-enabled checkout regression.

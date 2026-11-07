@@ -23,7 +23,8 @@ copper plane fed by voltage sources and loaded by current sinks.
 High-frequency conductor loss is available in ``sipi.conductor`` with explicit
 skin-depth and mesh validity checks.
 Finite-metal current diffusion is available in ``sipi.conductor_diffusion``.
-Distributed AC power-plane impedance and 3D structures are not implemented.
+Bounded static 3D capacitance is available in ``sipi.capacitance3d``.
+Distributed AC power-plane impedance and full 3D interconnect transitions are not implemented.
 """
 
 from .crosssection import CrossSection, Layer, MeshedCrossSection, Trace
