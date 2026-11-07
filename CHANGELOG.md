@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved local-capacitance tolerance studies and bounded goals with shared deterministic sampling, preserved invalid rows and mandatory target checks on requested and refined meshes.
+
 - Add local elliptical-aperture Maxwell and power-dual differential/common capacitance matrices for one or two round conductors, with independent panel/FEM references, strict saved inputs and explicit geometry/transition limits.
 
 - Add local homogeneous circular-aperture capacitance with eccentric conductors, explicit radial/angular refinement, strict saved input and independent eccentric-circle/FEM validation; no finite-pad or 3D transition interpretation.
