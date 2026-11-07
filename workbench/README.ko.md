@@ -42,6 +42,9 @@ setuptools/wheel을 설치합니다. 준비 단계는 공식 자산 다운로드
 archive/lock 해시, 자체 wheel, 고지·출처·런타임 목록을 보존하며 새 출력 폴더를
 사용합니다.
 
+Git attributes로 Windows에서도 원본 고지의 바이트를 보존합니다. 고지 원문이나
+해시 검사 기준을 바꿔 불일치를 감추지 않습니다.
+
 ```sh
 python workbench/packaging/browser.py --engine ENGINE_CHECKOUT --shared SHARED_CHECKOUT --output .validation/web
 python -m pytest -q workbench/tests

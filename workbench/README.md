@@ -46,6 +46,8 @@ Staging requires clean checkouts at the exact engine and shared-package pins,
 installed setuptools/wheel and access to the official asset sources. The
 stager verifies archive/lock hashes, builds pure first-party wheels and retains
 licenses, source links and a runtime inventory. Use a new output directory.
+Git attributes keep original notice bytes unchanged on Windows; their hashes
+must not be repaired by editing upstream texts or relaxing the check.
 
 ```sh
 python workbench/packaging/browser.py --engine ENGINE_CHECKOUT --shared SHARED_CHECKOUT --output .validation/web

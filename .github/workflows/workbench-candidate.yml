@@ -3,7 +3,7 @@ name: Workbench candidate
 on:
   push:
     branches: [codex/independent-repository]
-    paths: ['workbench/**', '.github/workflows/workbench-candidate.yml']
+    paths: ['workbench/**', '.gitattributes', '.github/workflows/workbench-candidate.yml']
 
 permissions:
   contents: read

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve hash-pinned upstream notice bytes during Windows Git checkout and verify them with a real autocrlf-enabled checkout regression.
+
 - Pin the Windows candidate to available CPython 3.13.17 after the 3.12.14 setup failure, verify the matching cp313 wheel notices/hashes and collect only explicitly listed reports from the hidden validation directory.
 
 - Add an independent workbench source candidate with strict saved-analysis JSON execution, retained failures, cancellation/export guards and reproducible browser/Windows packaging inputs; Windows executable and redistribution acceptance remain explicit verification gates.
