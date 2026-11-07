@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add versioned mixed circuit documents with explicit per-port source kinds, frequency budgets and finite shared execution results.
 - Add explicit mixed Thevenin/Norton terminal boundaries with ideal voltage, short, open and current-source support, per-port residuals and power diagnostics.
 - Add strict periodic Norton circuit JSON with explicit current/shunt tables, pre-field sample budgets and shared time/harmonic power execution.
 - Add real periodic Norton current-source responses with open terminals, frequency-dependent shunt currents, retained harmonic diagnostics and time/frequency power checks.

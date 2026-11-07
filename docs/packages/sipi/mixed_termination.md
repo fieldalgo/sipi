@@ -84,7 +84,7 @@ overflow. SciPy 1.18.1 (BSD-3-Clause) analytical RLC nodal equations and scikit-
 with an open/current/shunt free node. Maximum V/I differences are
 2.289e-16 V / 2.454e-17 A, below the absolute 1e-12 gate.
 
-This frequency-domain API adds no time transform or saved schema (44 remain).
+Saved inputs use [mixed-circuit/1](mixed_circuit.md). This API adds no time transform.
 It establishes no new field accuracy, measured-board accuracy, supplied-network
 passivity, causality, startup behavior or application/Windows acceptance.
 
