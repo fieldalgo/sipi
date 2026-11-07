@@ -1,5 +1,7 @@
 # 표본 네트워크의 주기 응답
 
+[저장 JSON과 공통 실행](periodic_document.md)에서 명시 포트 입력과 예산을 재사용합니다.
+
 `periodic_response(network, incident)`는 `LineNetwork`에 한 주기의 실수 입사
 전력파를 적용합니다. `periodic_impulse(network)`는 같은 이산 원형 컨볼루션
 가중치를 반환합니다. 기존 RLGC·회로·측정 네트워크도 아래 조건을 만족해야 합니다.

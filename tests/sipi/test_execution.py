@@ -136,6 +136,8 @@ def documents():
         variable='dk', bounds=[2,6], target=50., frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
         material_variables={'dk':dict(region='dielectric',path=['eps_r'])}))
     from sipi.band import NetworkBandDocument
+    from sipi.periodic_document import PeriodicNetworkDocument
+    base.append(PeriodicNetworkDocument(source(), incident={'near': [1, 0, -1], 'far': [0, 0, 0]}))
     base.append(NetworkBandDocument(source(),limits=[dict(name='through',input_port='near',output_port='far',
         frequency_hz=[0,1e9],minimum=0,maximum=None)]))
     from sipi.length_design import LineLengthDesignDocument

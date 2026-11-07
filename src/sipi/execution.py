@@ -40,6 +40,7 @@ from .line_goal_document import LineQuantityDesignDocument
 from .line_goal import LineQuantityGoalError
 from .line_study import LineQuantityStudyDocument
 from .line_yield import LineQuantityYieldDocument
+from .periodic_document import PeriodicNetworkDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -71,6 +72,7 @@ _REGISTRY = {
     'sipi.line-quantity-study/1': LineQuantityStudyDocument,
     'sipi.line-quantity-study/2': LineQuantityStudyDocument,
     'sipi.line-quantity-yield/1': LineQuantityYieldDocument,
+    'sipi.periodic-network/1': PeriodicNetworkDocument,
 }
 
 
@@ -196,6 +198,17 @@ def _circuit(result):
     return out
 
 
+def _periodic(result):
+    r = result.response
+    h = result.impulse
+    return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
+        source_network=_network(result.source_network),
+        response=dict(time_s=_array(r.time), period_s=r.period, dt_s=r.dt,
+            incident_sqrt_w=_array(r.incident), reflected_sqrt_w=_array(r.reflected),
+            voltage_v=_array(r.voltage), current_a=_array(r.current)),
+        impulse=None if h is None else dict(lag_s=_array(h.lag), weights=_array(h.weights)))
+
+
 def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnostics=()):
     """Run a strict saved document and return a finite sipi.execution/1 dict.
 
@@ -226,6 +239,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         if len(data['frequency_hz']) > budget:
             raise ValueError('saved fit frequency count exceeds max_evaluations before fitting')
         out['result'] = doc.analyze().to_dict()
+    elif isinstance(doc, PeriodicNetworkDocument):
+        out['result'] = _periodic(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()

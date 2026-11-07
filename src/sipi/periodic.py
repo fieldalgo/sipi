@@ -22,10 +22,8 @@ def _readonly(value):
     return array
 
 
-def _grid(network):
-    if not isinstance(network, LineNetwork):
-        raise ValueError('network must be a LineNetwork')
-    f = network.frequency
+def _time_grid(f):
+    """Validate already-normalized source frequencies without solving its fields."""
     if len(f) < 2 or f[0] != 0:
         raise ValueError('periodic response requires DC and at least one positive harmonic')
     df = f[1]
@@ -38,12 +36,19 @@ def _grid(network):
         time = np.arange(count, dtype=float)*dt
     if not np.isfinite(error) or error > 1e-12:
         raise ValueError('frequencies must be uniformly spaced harmonics from DC')
-    if np.any(network.s[0].imag != 0):
-        raise ValueError('DC S must be exactly real for a real periodic response')
     if (not np.isfinite(period) or not np.isfinite(dt) or dt <= 0
             or not np.all(np.isfinite(time)) or np.any(np.diff(time) <= 0)):
         raise ValueError('period and time samples are not representable at this numeric scale')
     return count, float(period), float(dt), time
+
+
+def _grid(network):
+    if not isinstance(network, LineNetwork):
+        raise ValueError('network must be a LineNetwork')
+    grid = _time_grid(network.frequency)
+    if np.any(network.s[0].imag != 0):
+        raise ValueError('DC S must be exactly real for a real periodic response')
+    return grid
 
 
 def _finite(*arrays):

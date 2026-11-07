@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved periodic-network/1 with explicit named wave samples, retained source networks, mixed-mode conversion, pre-field time-sample budgets and common JSON execution.
+
 - Add explicit odd-length periodic S-parameter response and discrete impulse weights, preserving port references and phase with strict DC/grid checks and real voltage/current output.
 
 - Add explicit yield-design/2 for fixed lossy line candidates at one shared quantity/frequency, reusing conservative simultaneous bounds, full budgets and retained unresolved rows.

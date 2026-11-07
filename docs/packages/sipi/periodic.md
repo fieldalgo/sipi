@@ -1,5 +1,7 @@
 # Sampled periodic network response
 
+[Saved JSON and common execution](periodic_document.md) preserve explicit port inputs and budgets.
+
 `periodic_response(network, incident)` applies a `LineNetwork` to one period
 of real incident power waves. `periodic_impulse(network)` gives the matching
 discrete circular-convolution weights. Existing RLGC, circuit and measured
