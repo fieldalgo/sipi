@@ -1,5 +1,7 @@
 # 표본 네트워크의 주기 응답
 
+[주기 소스·유한 종단](periodic_termination.md)은 실제 소스/부하 임피던스의 반사 피드백을 풉니다.
+
 [저장 JSON과 공통 실행](periodic_document.md)에서 명시 포트 입력과 예산을 재사용합니다.
 
 `periodic_response(network, incident)`는 `LineNetwork`에 한 주기의 실수 입사

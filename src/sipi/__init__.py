@@ -58,6 +58,7 @@ from .quasistatic import LineParameters, capacitance_matrix, line_parameters
 
 from .network import LineNetwork, rlgc_network, quasistatic_network
 from .periodic import PeriodicResponse, PeriodicImpulse, periodic_response, periodic_impulse
+from .periodic_termination import PeriodicTerminatedResponse, periodic_terminated_response
 from .lumped import lumped_network, LumpedNetworkDocument
 from .connection import cascade_networks, deembed_network, connect_networks, ideal_junction
 from .propagation import LinePropagation, rlgc_propagation
@@ -75,6 +76,7 @@ __all__ = ["CircularAperture", "ApertureDocument",
            "CrossSection", "Layer", "Trace", "PolygonTrace", "DielectricRegion", "MeshedCrossSection", "LineParameters",
            "LineNetwork", "rlgc_network", "quasistatic_network",
            "PeriodicResponse", "PeriodicImpulse", "periodic_response", "periodic_impulse",
+           "PeriodicTerminatedResponse", "periodic_terminated_response",
            "lumped_network", "LumpedNetworkDocument",
            "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",
            "LinePropagation", "rlgc_propagation",

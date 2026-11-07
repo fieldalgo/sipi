@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add periodic Thevenin sources with finite passive source/load feedback, explicit DC/peak harmonic normalization, retained circuit diagnostics and time/frequency power checks.
+
 - Add saved periodic-network/1 with explicit named wave samples, retained source networks, mixed-mode conversion, pre-field time-sample budgets and common JSON execution.
 
 - Add explicit odd-length periodic S-parameter response and discrete impulse weights, preserving port references and phase with strict DC/grid checks and real voltage/current output.
