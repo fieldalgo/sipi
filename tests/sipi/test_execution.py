@@ -121,6 +121,8 @@ def documents():
         limits=[dict(name='loss',input_port='near:s',output_port='far:s',frequency_hz=[0,1e9],minimum=.5,maximum=None)]))
     base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
                                     ground=mesh.boundary['z0']))
+    from test_ports3d_document import document as tem_document
+    base.append(tem_document())
     return base
 
 

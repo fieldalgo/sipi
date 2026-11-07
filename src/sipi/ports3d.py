@@ -147,15 +147,8 @@ def _port_mode(space, data):
     return electric, boundary
 
 
-def solve_tem_ports_3d(mesh, *, ports, frequency, eps_r=1.):
-    """Solve the explicit bounded two-port local-admittance Maxwell problem.
-
-    Uniform positive real eps_r, mu_r=1, positive increasing Hz. Exactly two
-    disjoint planar annular TEMPort3D objects; all other exterior faces PEC.
-    The caller supplies conforming geometry. No overlap/hanging-node search,
-    meshing, material loss, full multimode ports or radiation model is provided.
-    Numerical consistency gates do not establish physical mesh/port accuracy.
-    """
+def _prepare_tem_inputs(mesh, ports, frequency, eps_r):
+    """Detach and validate geometry/boundaries without a field solve."""
     mesh = _snapshot(mesh)
     relative = _scalar('eps_r', eps_r)
     frequencies = _frequencies(frequency)
@@ -182,6 +175,20 @@ def solve_tem_ports_3d(mesh, *, ports, frequency, eps_r=1.):
     for data in prepared:
         if ({tuple(edge) for edge in data[4]} & wall_keys) != {tuple(edge) for edge in data[5]}:
             raise ValueError('PEC walls must meet each port exactly on its perimeter')
+    return mesh, relative, frequencies, ports, prepared, wall_edges
+
+
+def solve_tem_ports_3d(mesh, *, ports, frequency, eps_r=1.):
+    """Solve the explicit bounded two-port local-admittance Maxwell problem.
+
+    Uniform positive real eps_r, mu_r=1, positive increasing Hz. Exactly two
+    disjoint planar annular TEMPort3D objects; all other exterior faces PEC.
+    The caller supplies conforming geometry. No overlap/hanging-node search,
+    meshing, material loss, full multimode ports or radiation model is provided.
+    Numerical consistency gates do not establish physical mesh/port accuracy.
+    """
+    mesh, relative, frequencies, ports, prepared, wall_edges = _prepare_tem_inputs(
+        mesh, ports, frequency, eps_r)
     space = EdgeSpace3D(mesh)
     pec = edge_ids(space, wall_edges)
     free = np.setdiff1d(np.arange(space.num_edges), pec)

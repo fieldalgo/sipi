@@ -99,6 +99,47 @@ is the actual fixed PEC wall, not an artificial open-space truncation.
 No arbitrary transition, pad/antipad, via/stub, radiation, higher-mode cutoff,
 or conductor-loss accuracy is established by these tests. For a new geometry,
 independent references and mesh/port-distance studies are still needed; a small
-algebraic residual alone is insufficient. JSON replay and application support
-are separate from this Python API. Runtime dependencies remain the pinned
+algebraic residual alone is insufficient. Application support is separate
+from this Python API. Runtime dependencies remain the pinned
 external galerkin/meshine and NumPy/SciPy; scikit-fem is test-only.
+
+## Saved input and shared execution
+
+`sipi.ports3d_document.TEMPorts3DDocument` stores `sipi.tem-ports-3d/1`.
+Using the mesh and ports from the example above:
+
+```python
+import json
+from sipi.ports3d_document import TEMPorts3DDocument
+from sipi.execution import normalize_saved, execute_saved
+
+document = TEMPorts3DDocument(mesh, ports=ports, frequency=[5e8, 1e9], eps_r=4.)
+text = normalize_saved(document.dumps())
+replayed = TEMPorts3DDocument.loads(text).analyze()
+np.testing.assert_allclose(replayed.network.s, result.network.s, rtol=0, atol=1e-10)
+output = execute_saved(text, max_evaluations=2)
+assert output["result"]["model"] == "bounded-homogeneous-3d-local-tem-admittance"
+assert output["result"]["network"]["port_names"] == ["near", "far"]
+json.dumps(output, allow_nan=False)
+```
+
+The exact top-level fields are `schema`, `length_unit="m"`,
+`unprescribed_boundary="pec"`, `port_boundary="local-tem-admittance"`, `mesh`,
+`eps_r`, `frequency_hz` and `ports`. `mesh` contains only `nodes` and
+`tetrahedra`; `ports` is an ordered list of exactly two objects containing
+only `name`, `faces`, `signal` and `ground`. Integer indices are checked before
+Mesh3D can coerce them. Unknown/missing fields, duplicate JSON keys, booleans
+in numeric fields, nonfinite/overflowing numbers and unsupported boundary
+labels are rejected. Data is detached from the caller and `to_dict()` returns
+a copy. Normalization validates geometry/topology without a port or volume
+field solve; it does not certify conformity or physical accuracy.
+
+Shared execution counts **one evaluation per frequency** against
+`max_evaluations`, before any field work. Its usual input-byte limit also
+applies. Neither limit bounds sparse-solve memory or elapsed time; callers
+must provide process/Worker isolation and cancellation. Solver errors propagate
+without returning a successful partial network. Selected output preserves
+the boundary-model label, network, port norms, node/tet/edge counts and all
+six consistency/power diagnostics. Volume fields are not serialized. This
+engine contract does not advance an application's pinned engine or establish
+Windows/Worker support for that application.

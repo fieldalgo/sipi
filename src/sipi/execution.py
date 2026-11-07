@@ -30,6 +30,7 @@ from .modes import ModeTrackingError
 from .capacitance3d_document import Capacitance3DDocument
 from .band import NetworkBandDocument, BandAssessment
 from .length_design import LineLengthDesignDocument, LengthGoalError
+from .ports3d_document import TEMPorts3DDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -50,6 +51,7 @@ _REGISTRY = {
     'sipi.capacitance-3d/1': Capacitance3DDocument,
     'sipi.network-band/1': NetworkBandDocument,
     'sipi.line-length-design/1': LineLengthDesignDocument,
+    'sipi.tem-ports-3d/1': TEMPorts3DDocument,
 }
 
 
@@ -180,6 +182,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
 
     Study sample counts and saved goal budgets must not exceed max_evaluations
     (2..10000); goals keep their original budget, never silently clamp it.
+    Bounded TEM-port 3D counts one evaluation per frequency before field work.
     diagnostics may contain 'characteristic' and/or 'modes', only for top-level
     transmission/volume lines. A failed diagnostic preserves the base output.
     Failed goals return status='failed' with completed history; malformed input
@@ -193,6 +196,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         raise ValueError('diagnostics must contain unique characteristic/modes selections')
     doc = _load(text, max_input_bytes)
     data = doc.to_dict()
+    if isinstance(doc, TEMPorts3DDocument) and len(data['frequency_hz']) > budget:
+        raise ValueError('saved 3D frequency count exceeds max_evaluations before any field solve')
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
@@ -242,6 +247,13 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 consistency={key: getattr(result, key) for key in
                     ('free_residual_relative', 'charge_balance_relative',
                      'energy_charge_relative', 'symmetry_relative')})
+        elif isinstance(doc, TEMPorts3DDocument):
+            out['result'] = dict(model='bounded-homogeneous-3d-local-tem-admittance',
+                network=_network(result.network), port_norm=_array(result.port_norm),
+                mesh=dict(nodes=len(data['mesh']['nodes']), tetrahedra=result.num_tets, edges=result.num_edges),
+                consistency={key: _array(getattr(result, key)) for key in
+                    ('linear_residual', 'power_balance', 'reciprocity',
+                     'projected_unitarity', 'unprojected_port_power')})
         elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
             out['result'] = dict(names=list(result.names), frequency_hz=_array(result.frequency),
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),

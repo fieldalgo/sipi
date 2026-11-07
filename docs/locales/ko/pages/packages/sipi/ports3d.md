@@ -91,6 +91,44 @@ TEM 투영 S만으로는 유니터리하지 않을 수 있습니다. TEM에 직�
 
 임의 전이·pad/antipad·via/stub·방사·고차 모드 차단 주파수·도체 손실 정확도를
 이 시험으로 보증하지 않습니다. 새 기하는 독립 기준과 메시·포트 거리 수렴이
-필요하며 작은 선형 잔차만으로 충분하지 않습니다. JSON 재생·앱 지원은 Python
-API와 별도입니다. 실행 의존성은 고정된 외부 galerkin/meshine과 NumPy/SciPy를
+필요하며 작은 선형 잔차만으로 충분하지 않습니다. 앱 지원은 Python API와
+별도입니다. 실행 의존성은 고정된 외부 galerkin/meshine과 NumPy/SciPy를
 유지하며 scikit-fem은 시험에서만 사용합니다.
+
+## 저장 입력과 공통 실행
+
+`sipi.ports3d_document.TEMPorts3DDocument`가 `sipi.tem-ports-3d/1`을 저장합니다.
+위 예제의 메시와 포트를 그대로 사용합니다.
+
+```python
+import json
+from sipi.ports3d_document import TEMPorts3DDocument
+from sipi.execution import normalize_saved, execute_saved
+
+document = TEMPorts3DDocument(mesh, ports=ports, frequency=[5e8, 1e9], eps_r=4.)
+text = normalize_saved(document.dumps())
+replayed = TEMPorts3DDocument.loads(text).analyze()
+np.testing.assert_allclose(replayed.network.s, result.network.s, rtol=0, atol=1e-10)
+output = execute_saved(text, max_evaluations=2)
+assert output["result"]["model"] == "bounded-homogeneous-3d-local-tem-admittance"
+assert output["result"]["network"]["port_names"] == ["near", "far"]
+json.dumps(output, allow_nan=False)
+```
+
+최상위 필드는 정확히 `schema`, `length_unit="m"`,
+`unprescribed_boundary="pec"`, `port_boundary="local-tem-admittance"`, `mesh`,
+`eps_r`, `frequency_hz`, `ports`입니다. `mesh`에는 `nodes`, `tetrahedra`만,
+순서 있는 두 `ports` 항목에는 `name`, `faces`, `signal`, `ground`만 둡니다.
+Mesh3D의 정수 변환 전에 원래 인덱스 타입을 검사합니다. 알 수 없거나 누락된
+필드·중복 JSON 키·숫자 위치의 불리언·비유한 값·수치 범위 초과·다른 경계 이름은
+거부합니다. 입력을 복사하며 `to_dict()`도 사본을 반환합니다. 정규화는 포트나
+체적 필드를 풀지 않고 기하·위상을 검사합니다. 정합성이나 물리 정확도 인증은
+아닙니다.
+
+공통 실행은 **주파수 하나당 평가 한 번**으로 계산해 필드 계산 전에
+`max_evaluations`를 검사합니다. 기존 입력 바이트 제한도 적용합니다. 이 제한은
+희소 풀이의 메모리나 실행 시간을 제한하지 않으므로 호출자가 프로세스/Worker
+격리와 취소를 제공해야 합니다. 솔버 오류를 성공한 부분 네트워크로 바꾸지 않고
+전파합니다. 결과는 경계 모델 이름·네트워크·포트 노름·노드/사면체/edge 수와
+여섯 일관성/전력 진단을 보존하고 체적 필드는 직렬화하지 않습니다. 이 엔진
+계약만으로 앱의 고정 엔진을 변경하거나 Windows/Worker 지원을 확정하지 않습니다.

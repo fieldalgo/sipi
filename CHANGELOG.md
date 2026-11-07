@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict saved 3D TEM-port replay and shared execution with explicit boundary labels, pre-solve frequency budgets, calculated references and retained power diagnostics.
+
 - Add bounded homogeneous 3D Maxwell fields with explicit annular TEM ports, PEC walls, calculated reference impedances and separate full-boundary/TEM-projection power diagnostics; validate coax propagation and independent edge FEM without implying general via or multimode radiation accuracy.
 
 - Add saved sampled-band line-length boundary design with explicit feasible/infeasible brackets, counted evaluations and retained failure histories; no global maximum or continuous-band guarantee is implied.
