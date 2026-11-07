@@ -1,5 +1,7 @@
 # Mixed voltage and current boundaries
 
+[Periodic mixed sources](periodic_mixed.md) apply real voltage/current waveforms and retain time/harmonic power.
+
 `terminate_mixed_network(network, boundaries)` chooses a Thevenin or Norton
 boundary independently at each port. An ideal voltage source or short can
 therefore coexist with an open terminal or ideal current source. The existing

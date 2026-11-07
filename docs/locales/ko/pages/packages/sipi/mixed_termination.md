@@ -1,5 +1,7 @@
 # 전압원·전류원 혼합 종단
 
+[주기 혼합 전원](periodic_mixed.md)은 실수 전압·전류 파형과 시간·고조파 전력을 연결합니다.
+
 `terminate_mixed_network(network, boundaries)`는 각 포트에서 Thevenin 또는
 Norton 경계를 독립적으로 선택합니다. 따라서 이상 전압원·단락과 개방·이상
 전류원을 같은 네트워크에서 사용할 수 있습니다. 기존 [Thevenin](termination.md)·
