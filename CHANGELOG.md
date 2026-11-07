@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict saved dielectric-fit/1 requests and shared execution with pre-optimizer sample budgets and separate computation/fit acceptance states.
+
 - Add fixed-pole passive Debye fitting with bounded coefficients, conditioning/optimality rejection and retained sampled residuals and acceptance limits.
 
 - Add transmission-line/5 reference-surface JSON with shared extraction diagnostics and existing circuit and sampled-length replay.

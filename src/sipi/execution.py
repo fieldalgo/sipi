@@ -35,6 +35,7 @@ from .boundary_conductor import BoundaryConductorLoss
 from .face_conductor import FaceConductorLoss
 from .yield_assessment import ImpedanceYieldDocument
 from .yield_design import YieldDesignDocument
+from .dielectric_fit import DebyeFitDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -59,6 +60,7 @@ _REGISTRY = {
     'sipi.tem-ports-3d/1': TEMPorts3DDocument,
     'sipi.impedance-yield/1': ImpedanceYieldDocument,
     'sipi.yield-design/1': YieldDesignDocument,
+    'sipi.dielectric-fit/1': DebyeFitDocument,
 }
 
 
@@ -190,6 +192,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     Study sample counts and saved goal budgets must not exceed max_evaluations
     (2..10000); goals keep their original budget, never silently clamp it.
     Bounded TEM-port 3D counts one evaluation per frequency before field work.
+    Dielectric fitting counts input frequencies before matrix/optimizer work;
+    completed execution keeps the fit's accepted flag as a separate decision.
     diagnostics may contain 'characteristic' and/or 'modes', only for top-level
     transmission/volume lines. A failed diagnostic preserves the base output.
     Failed goals return status='failed' with completed history; malformed input
@@ -208,7 +212,11 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument)):
+    if isinstance(doc, DebyeFitDocument):
+        if len(data['frequency_hz']) > budget:
+            raise ValueError('saved fit frequency count exceeds max_evaluations before fitting')
+        out['result'] = doc.analyze().to_dict()
+    elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

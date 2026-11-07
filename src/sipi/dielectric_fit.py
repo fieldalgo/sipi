@@ -2,14 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 """Constrained Debye fitting at explicit fixed poles, with retained residuals."""
 from dataclasses import dataclass
+import json
 
 import numpy as np
 from scipy.optimize import nnls
 
 from .dielectric import DebyeDielectric, dielectric_to_dict
+from .circuit_document import _json_copy
+from .document import _keys, _unique_object
 from .network import _frequencies, _real, _scalar
 
-__all__ = ['DebyeFit', 'fit_debye']
+__all__ = ['DebyeFit', 'fit_debye', 'DebyeFitDocument']
 
 
 @dataclass(frozen=True)
@@ -64,6 +67,28 @@ class DebyeFit:
             weighted_rms_error=self.weighted_rms_error, error_limit=self.error_limit, accepted=self.accepted)
 
 
+def _fit_inputs(frequency, eps_real, eps_loss, relaxation_hz, max_error, weights):
+    """Validate and copy inputs without SVD, optimization or field work."""
+    f = _frequencies(frequency)
+    if not 2 <= len(f) <= 10000 or not np.all(np.isfinite(f)):
+        raise ValueError('fit requires 2..10000 finite frequency samples')
+    poles = _real('relaxation_hz', relaxation_hz)
+    if (poles.ndim != 1 or not 1 <= len(poles) <= 32 or not np.all(np.isfinite(poles))
+            or np.any(poles <= 0) or np.any(np.diff(poles) <= 0)):
+        raise ValueError('fit requires 1..32 distinct increasing positive poles')
+    real, loss = _real('eps_real', eps_real), _real('eps_loss', eps_loss)
+    if (real.shape != f.shape or loss.shape != f.shape or not np.all(np.isfinite(real))
+            or not np.all(np.isfinite(loss)) or np.any(real < 1) or np.any(loss < 0)):
+        raise ValueError('finite eps_real>=1 and eps_loss>=0 must match the frequency grid')
+    w = np.ones_like(f) if weights is None else _real('weights', weights)
+    if w.shape != f.shape or not np.all(np.isfinite(w)) or np.any(w <= 0):
+        raise ValueError('positive finite weights must match every frequency')
+    limit = _scalar('max_error', max_error)
+    if not np.isfinite(limit):
+        raise ValueError('max_error is not representable')
+    return f, real, loss, poles, w, limit
+
+
 def fit_debye(frequency, *, eps_real, eps_loss, relaxation_hz, max_error, weights=None):
     """Fit eps_inf>=1 and nonnegative strengths at 1..32 fixed positive poles.
 
@@ -85,23 +110,7 @@ def fit_debye(frequency, *, eps_real, eps_loss, relaxation_hz, max_error, weight
     samples. The returned Debye law is mathematically passive and causal.
     No field solve or mesh convergence is performed by this operation.
     """
-    f = _frequencies(frequency)
-    if not 2 <= len(f) <= 10000 or not np.all(np.isfinite(f)):
-        raise ValueError('fit requires 2..10000 finite frequency samples')
-    poles = _real('relaxation_hz', relaxation_hz)
-    if (poles.ndim != 1 or not 1 <= len(poles) <= 32 or not np.all(np.isfinite(poles))
-            or np.any(poles <= 0) or np.any(np.diff(poles) <= 0)):
-        raise ValueError('fit requires 1..32 distinct increasing positive poles')
-    real, loss = _real('eps_real', eps_real), _real('eps_loss', eps_loss)
-    if (real.shape != f.shape or loss.shape != f.shape or not np.all(np.isfinite(real))
-            or not np.all(np.isfinite(loss)) or np.any(real < 1) or np.any(loss < 0)):
-        raise ValueError('finite eps_real>=1 and eps_loss>=0 must match the frequency grid')
-    w = np.ones_like(f) if weights is None else _real('weights', weights)
-    if w.shape != f.shape or not np.all(np.isfinite(w)) or np.any(w <= 0):
-        raise ValueError('positive finite weights must match every frequency')
-    limit = _scalar('max_error', max_error)
-    if not np.isfinite(limit):
-        raise ValueError('max_error is not representable')
+    f, real, loss, poles, w, limit = _fit_inputs(frequency, eps_real, eps_loss, relaxation_hz, max_error, weights)
 
     # Stable relaxation basis even when f/pole or hypot(f,pole) would overflow.
     scale = np.maximum(f[:, None], poles)
@@ -144,3 +153,46 @@ def fit_debye(frequency, *, eps_real, eps_loss, relaxation_hz, max_error, weight
     weighted_rms = residual_scale*float(np.linalg.norm((residual/residual_scale)*root_weights)/np.linalg.norm(root_weights))
     return DebyeFit(model, f, real, loss, w, predicted, residual, condition, kkt,
                     maximum, weighted_rms, limit)
+
+
+class DebyeFitDocument:
+    """Strict saved fixed-pole fitting request; parsing performs no fitting.
+
+    Numerical identifiability, condition and optimality are checked at analyze.
+    Completed candidates retain their sampled acceptance flag independently of
+    execution completion. Invalid inputs and numerical failures raise, never
+    fabricating a model. The original fitted-model material schema is reused.
+    """
+    def __init__(self, frequency, *, eps_real, eps_loss, relaxation_hz, max_error, weights=None):
+        f, real, loss, poles, w, limit = _fit_inputs(frequency, eps_real, eps_loss, relaxation_hz, max_error, weights)
+        self._data = dict(schema='sipi.dielectric-fit/1', frequency_hz=f.tolist(), eps_real=real.tolist(),
+            eps_loss=loss.tolist(), relaxation_hz=poles.tolist(), weights=w.tolist(), max_error=limit)
+
+    @classmethod
+    def from_dict(cls, data):
+        data = _json_copy(data)
+        _keys(data, ('schema', 'frequency_hz', 'eps_real', 'eps_loss', 'relaxation_hz', 'weights', 'max_error'),
+              where='dielectric fit')
+        if data['schema'] != 'sipi.dielectric-fit/1':
+            raise ValueError('unsupported dielectric-fit schema')
+        # JSON requests must resolve every weight explicitly, including defaults.
+        if data['weights'] is None:
+            raise ValueError('saved weights must explicitly match every frequency')
+        return cls(data['frequency_hz'], eps_real=data['eps_real'], eps_loss=data['eps_loss'],
+                   relaxation_hz=data['relaxation_hz'], weights=data['weights'], max_error=data['max_error'])
+
+    @classmethod
+    def loads(cls, text):
+        def reject(value): raise ValueError(f'nonfinite JSON number: {value}')
+        return cls.from_dict(json.loads(text, object_pairs_hook=_unique_object, parse_constant=reject))
+
+    def dumps(self):
+        return json.dumps(self._data, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False)
+
+    def to_dict(self):
+        return json.loads(self.dumps())
+
+    def analyze(self):
+        data = self.to_dict()
+        return fit_debye(data['frequency_hz'], eps_real=data['eps_real'], eps_loss=data['eps_loss'],
+            relaxation_hz=data['relaxation_hz'], max_error=data['max_error'], weights=data['weights'])

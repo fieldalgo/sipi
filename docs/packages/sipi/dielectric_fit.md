@@ -29,7 +29,8 @@ np.testing.assert_array_equal(restored.permittivity(frequency), fit.predicted)
 
 This example uses synthetic samples, not measured material data. The output model
 can be supplied to the existing line/study/design material APIs and their saved
-material records. This Python API does not add a saved fitting-request schema.
+material records. [Saved fitting requests](dielectric_fit_document.md) reuse the
+same algorithm through dielectric-fit/1 and shared execution.
 
 ## Inputs and objective
 

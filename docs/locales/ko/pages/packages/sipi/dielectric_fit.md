@@ -28,8 +28,8 @@ np.testing.assert_array_equal(restored.permittivity(frequency), fit.predicted)
 ```
 
 예제는 실측이 아닌 합성 표본입니다. 결과 모델은 기존 선로·공차·역산의 재료 API와
-저장 재료 record에 넣을 수 있습니다. 이 Python API는 fitting 요청 저장 schema를
-추가하지 않습니다.
+저장 재료 record에 넣을 수 있습니다. [저장 fitting 요청](dielectric_fit_document.md)은
+dielectric-fit/1과 공통 실행으로 같은 알고리즘을 재사용합니다.
 
 ## 입력과 목적 함수
 

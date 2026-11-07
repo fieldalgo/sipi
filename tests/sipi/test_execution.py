@@ -17,6 +17,7 @@ from sipi.line_model import TransmissionLineDocument
 from sipi.volume_line import VolumeLineDocument
 from sipi.circuit_document import CircuitDocument
 from sipi.dielectric import ConstantDielectric
+from sipi.dielectric_fit import DebyeFitDocument
 
 
 def cross():
@@ -111,6 +112,8 @@ def documents():
     base.append(TransmissionLineDocument.from_dict(data))
     base.append(NetworkTransformDocument(source(), operations=[dict(kind='renormalize', reference_ohms=75)],
         schema='sipi.network-transforms/2'))
+    base.append(DebyeFitDocument([1e5, 1e7], eps_real=[3., 2.], eps_loss=[.2, .3],
+                                relaxation_hz=[1e6], max_error=.01))
     base.append(ImpedanceStudyDocument('stripline', dict(width=.5e-3, plane_spacing=1e-3, eps_r=1),
         quantity='z0', frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
         material_variables={'dk':dict(region='dielectric',path=['eps_r'])},

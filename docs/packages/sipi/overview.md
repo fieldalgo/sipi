@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Saved dielectric fitting](dielectric_fit_document.md) preserves the complete request and a separate fit-error decision.
+
 [Fixed-pole dielectric fitting](dielectric_fit.md) retains all samples and residuals while fitting passive Debye coefficients.
 
 [Saved reference-surface lines](reference_line.md) use line/5 and reuse circuit and once-extracted length analysis.
