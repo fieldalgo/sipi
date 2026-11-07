@@ -52,7 +52,8 @@ Ordered signal names, one positive frequency and `length_m=0` stay fixed.
 Bounds are positive in the factory parameter's units. No arbitrary modal target
 or tracking is inferred from geometry. The API does not project away coupling.
 The existing saved `line-quantity-design/1` and `line-quantity-study/1` schemas
-remain scalar-only; use this Python factory API for the paired quantity.
+remain scalar-only; use this Python factory API or explicit
+[saved /2](differential_goal_document.md) for the paired quantity.
 
 Both endpoints must be valid. An endpoint within tolerance can be selected;
 otherwise residual signs must bracket zero. Bisection does not prove continuity,

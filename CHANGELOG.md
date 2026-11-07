@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit line-quantity-design/2 for saved differential forward goals, reusing fixed pitch, stack height and material bindings while preserving scalar v1 behavior.
+
 - Add an explicit lossy differential forward-current launch impedance goal, preserving asymmetric coupling, frozen refinement and scalar-only saved v1 contracts.
 
 - Add scalar full-loss geometry/material studies with preserved correlated samples and failures, finite descriptive statistics and shared saved execution.

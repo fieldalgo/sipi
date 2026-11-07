@@ -1,5 +1,7 @@
 # Lossy differential forward-impedance goal
 
+[Saved /2](differential_goal_document.md) connects this API to JSON requests.
+
 [한국어](../../locales/ko/pages/packages/sipi/differential_line_goal.md) · [Goal API](line_goal.md) · [Forward matrices](characteristic.md)
 
 `differential_forward_impedance_real` targets Re(Zdd) in ohms for exactly two

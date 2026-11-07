@@ -51,7 +51,7 @@ factory는 기하 또는 재료 매개변수를 바꿀 수 있습니다. 단일 
 매개변수 단위를 따릅니다. 기하만으로 임의 모드나 모드 추적을 추정하지 않으며
 결합 성분을 투영해 없애지 않습니다. 기존 저장 `line-quantity-design/1`과
 `line-quantity-study/1`은 단일 신호 전용을 유지합니다. 차동 물리량은 이 Python
-factory API를 사용하세요.
+factory API 또는 명시적 [저장 /2](differential_goal_document.md)를 사용하세요.
 
 양 endpoint가 모두 유효해야 합니다. 이미 허용오차 이내인 endpoint를 선택할 수
 있고 그 외에는 잔차 부호가 목표를 끼워야 합니다. 이분법은 연속성·단조성·해의

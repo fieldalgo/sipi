@@ -1,5 +1,7 @@
 # 유손실 단일 선로 목표의 저장과 실행
 
+[명시적 /2 차동 목표](differential_goal_document.md)는 비대칭 순방향 입력을 추가합니다. 기본 /1과 아래 단일 신호 계약은 유지합니다.
+
 [English](../../../../../packages/sipi/line_goal_document.md) · [목표 API](line_goal.md) · [Study 입력](study.md)
 
 `sipi.line-quantity-design/1`은 Python callable 없이 제한된 단일 선로 목표를

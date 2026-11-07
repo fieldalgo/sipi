@@ -206,7 +206,7 @@ def test_independent_skrf_saved_goal_propagation(solved):
     'unknown_conductor', 'missing_roughness', 'extra_conductor', 'nominal_skin'])
 def test_strict_input_rejection_before_mesh(monkeypatch, case):
     raw = document().to_dict(); source = raw['study']
-    if case == 'schema': raw['schema'] = 'sipi.line-quantity-design/2'
+    if case == 'schema': raw['schema'] = 'sipi.line-quantity-design/3'
     if case == 'missing': del raw['target']
     if case == 'extra': raw['unknown'] = 0
     if case == 'quantity': raw['quantity'] = 'z0'

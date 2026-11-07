@@ -1,5 +1,7 @@
 # Saved lossy scalar-line goals
 
+[Explicit /2 paired goals](differential_goal_document.md) add an asymmetric forward launch. The default /1 and the scalar contract below remain unchanged.
+
 [한국어](../../locales/ko/pages/packages/sipi/line_goal_document.md) · [Goal API](line_goal.md) · [Study inputs](study.md)
 
 `sipi.line-quantity-design/1` saves a bounded scalar goal without a Python

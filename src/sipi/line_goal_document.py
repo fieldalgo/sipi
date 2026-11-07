@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Strict saved scalar lossy goals reusing a one-variable study specification."""
+"""Strict saved lossy goals reusing a one-variable study specification."""
 import json
 
 from .document import _keys, _unique_object
@@ -14,12 +14,18 @@ __all__ = ['LineQuantityDesignDocument']
 
 
 class LineQuantityDesignDocument:
-    """sipi.line-quantity-design/1: saved geometry/material factory and lossy target.
+    """Saved geometry/material factory and lossy target, versions 1 and 2.
 
-    study is a /3 or /4 ImpedanceStudyDocument (or its dictionary), with z0,
+    study is a /3 or /4 ImpedanceStudyDocument (or its dictionary), with z0
+    for scalar goals or z_diff_forward for the explicit paired goal,
     one positive fixed frequency, sweep count=2 and one positive-bounded variable.
     It specifies inputs only: no preliminary study or quasi-static goal runs.
-    The goal uses full lossy scalar RLGC through seek_line_quantity.
+    Version 1 (the constructor default) keeps the scalar contract. Explicit
+    version 2 also accepts differential_forward_impedance_real with a paired
+    z_diff_forward source. That is the full lossy Re(Zdd) at a forward launch
+    with Ic=0, not a decoupled eigenmode or finite-terminal impedance.
+    The goal uses full lossy RLGC through seek_line_quantity. Existing fixed
+    pitch and total stack-height constraints are preserved.
 
     conductor is the exact transmission-line/6 record, fixed across the search.
     Normalization retains the study's endpoint geometry/material preflight and
@@ -29,10 +35,11 @@ class LineQuantityDesignDocument:
     Selected and refined inputs retain zero-length line/6 documents at 50 ohms;
     that network reference does not define the characteristic target quantity.
     """
-    def __init__(self, study, *, conductor, quantity, target, tolerance, max_evaluations=40):
+    def __init__(self, study, *, conductor, quantity, target, tolerance, max_evaluations=40,
+                 schema='sipi.line-quantity-design/1'):
         if isinstance(study, ImpedanceStudyDocument):
             study = study.to_dict()
-        self._assign(dict(schema='sipi.line-quantity-design/1', study=study,
+        self._assign(dict(schema=schema, study=study,
             conductor=conductor, quantity=quantity, target=target, tolerance=tolerance,
             max_evaluations=max_evaluations))
 
@@ -40,15 +47,18 @@ class LineQuantityDesignDocument:
         data = _copy(data)
         _keys(data, ('schema', 'study', 'conductor', 'quantity', 'target', 'tolerance',
                      'max_evaluations'), where='line quantity design')
-        if data['schema'] != 'sipi.line-quantity-design/1':
+        if data['schema'] not in ('sipi.line-quantity-design/1', 'sipi.line-quantity-design/2'):
             raise ValueError('unsupported line-quantity-design schema')
         quantity = data['quantity']
-        if not isinstance(quantity, str) or quantity not in ('impedance_real', 'attenuation'):
-            raise ValueError('quantity must be impedance_real or attenuation')
+        allowed = ('impedance_real', 'attenuation')
+        if data['schema'] == 'sipi.line-quantity-design/2':
+            allowed += ('differential_forward_impedance_real',)
+        if not isinstance(quantity, str) or quantity not in allowed:
+            raise ValueError('quantity must be '+' or '.join(allowed))
         target = _scalar('target', data['target'], zero=quantity == 'attenuation')
         tolerance = _scalar('tolerance', data['tolerance'])
         budget = _integer(data['max_evaluations'], 3, 10000)
-        study = _source_study(data['study'])
+        study = _source_study(data['study'], paired=quantity == 'differential_forward_impedance_real')
         sampling = study['sampling']
         if sampling['kind'] != 'sweep' or sampling['count'] != 2 or len(sampling['variables']) != 1:
             raise ValueError('goal study requires a sweep with count=2 and exactly one variable')

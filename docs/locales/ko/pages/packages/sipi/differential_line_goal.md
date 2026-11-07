@@ -1,5 +1,7 @@
 # 유손실 차동 순방향 임피던스 목표
 
+[저장 /2](differential_goal_document.md)는 이 API를 JSON 요청으로 연결합니다.
+
 [English](../../../../../packages/sipi/differential_line_goal.md) · [목표 API](line_goal.md) · [순방향 행렬](characteristic.md)
 
 `differential_forward_impedance_real`은 순서가 있는 두 신호와 고정된 양수 주파수
