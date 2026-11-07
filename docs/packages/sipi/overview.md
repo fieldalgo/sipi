@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.
+
 [Fixed-candidate yield design](yield_design.md) compares declared costs with simultaneous statistical bounds.
 
 [Bounded 3D static capacitance](capacitance3d.md) reuses the shared tetrahedral kernel and returns total C in farads; it is not a full transition model.

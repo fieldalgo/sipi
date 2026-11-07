@@ -14,6 +14,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_microstrip',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
+           'layered_broadside_stripline',
            'coupled_coated_microstrip',
            'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar',
            'unbacked_coplanar', 'coupled_unbacked_coplanar',
@@ -531,6 +532,40 @@ def broadside_stripline(*, width, gap, plane_spacing, eps_r, thickness,
     return CrossSection(base.layers,
         [Trace('positive', -offset/2, width, plane_spacing/2-gap/2-t, t),
          Trace('negative', offset/2, width, plane_spacing/2+gap/2, t)], box_width, top='ground')
+
+
+def layered_broadside_stripline(*, width, gap, lower_height, upper_height,
+                               lower_eps_r, gap_eps_r, upper_eps_r, thickness,
+                               offset=0.0, lower_tan_delta=0.0, gap_tan_delta=0.0,
+                               upper_tan_delta=0.0, box_width=None):
+    """Broadside rectangular pair with three explicit dielectric layers.
+
+    lower_height/upper_height are metal-to-outer-plane clearances, excluding
+    copper. gap is the inner metal-face separation. Both traces have the same
+    positive width/thickness. The layer interfaces meet the inner metal faces;
+    the lower/upper layers include the corresponding copper thickness. The
+    lower positive trace is centred at -offset/2, the upper negative at +offset/2.
+    No symmetry or independent differential/common mode is assumed.
+    """
+    w = _positive('width', width)
+    g = _positive('gap', gap)
+    lower = _positive('lower_height', lower_height)
+    upper = _positive('upper_height', upper_height)
+    t = _positive('thickness', thickness)
+    if isinstance(offset, bool) or not isinstance(offset, Real) or not math.isfinite(offset):
+        raise ValueError('offset must be a finite real number')
+    offset = float(offset)
+    total = lower+upper+g+2*t
+    box = max(12*total, 4*(w+abs(offset))) if box_width is None else _positive('box_width', box_width)
+    layers = [Layer('lower', lower+t, _positive('lower_eps_r', lower_eps_r),
+                    _positive('lower_tan_delta', lower_tan_delta, zero=True)),
+              Layer('gap', g, _positive('gap_eps_r', gap_eps_r),
+                    _positive('gap_tan_delta', gap_tan_delta, zero=True)),
+              Layer('upper', upper+t, _positive('upper_eps_r', upper_eps_r),
+                    _positive('upper_tan_delta', upper_tan_delta, zero=True))]
+    return CrossSection(layers,
+        [Trace('positive', -offset/2, w, lower, t),
+         Trace('negative', offset/2, w, lower+t+g, t)], box, top='ground')
 
 
 def layered_stripline(*, width, lower_height, upper_height, lower_eps_r, upper_eps_r,

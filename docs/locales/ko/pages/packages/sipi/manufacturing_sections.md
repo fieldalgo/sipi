@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[세 유전체 broadside 쌍](layered_broadside.md)은 아래·도체 사이·위 유전체를 보존하고 저장 공차·역산에서 `z_diff_forward`를 사용합니다.
+
 [Coplanar 법선 코팅 4종](conformal_coplanar.md): 유한 옆 접지·후면 접지면 유무.
 
 [법선 두께 코팅 단면](conformal_coating.md): 단일선·쌍과 저장형 공차·역산.

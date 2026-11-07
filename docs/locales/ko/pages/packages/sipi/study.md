@@ -1,5 +1,7 @@
 # 임피던스 공차 분석
 
+[세 유전체 broadside 쌍](layered_broadside.md)은 아래·도체 사이·위 유전체를 보존하고 저장 공차·역산에서 `z_diff_forward`를 사용합니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/study.md) | **한국어**
 
 [개요](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/overview.md) · [임피던스 역산](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/design.md)
@@ -35,14 +37,14 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 거부합니다. 읽은 v2는 제약이 null이어도 v2를 유지합니다. 미등록 버전은 거부합니다.
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `grounded_coplanar`,
 `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
-및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`
+및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`, `layered_broadside_stripline`
 및 `coupled_coated_microstrip`, `coated_grounded_coplanar`,
 `coupled_coated_grounded_coplanar`, `unbacked_coplanar`,
 `coupled_unbacked_coplanar`, `coated_unbacked_coplanar`,
 `coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
 `coupled_conformal_coated_microstrip`,
 `conformal_coated_grounded_coplanar`, `coupled_conformal_coated_grounded_coplanar`,
-`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 25종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 26종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
@@ -51,7 +53,7 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `coupled_grounded_coplanar`, `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar`,
 `coupled_conformal_coated_unbacked_coplanar`에서 `z_diff` 또는 명시적인 `z_diff_forward`입니다.
-`asymmetric_coupled_microstrip`은 `z_diff_forward`만, 단일 신호 템플릿은 `z0`만 받습니다. 기존 스키마 필드·입력 의미를 유지하며 지원
+`asymmetric_coupled_microstrip`과 `layered_broadside_stripline`은 `z_diff_forward`만, 단일 신호 템플릿은 `z0`만 받습니다. 기존 스키마 필드·입력 의미를 유지하며 지원
 템플릿 이름을 확장합니다. 이전 판독기는 새 이름을 거부하므로 입력과 함께 SIPI 버전을 기록하세요.
 독립 변수는 템플릿 매개변수 이름 1–8개를 중복 없이 지정하고 나열 순서를 유지합니다.
 

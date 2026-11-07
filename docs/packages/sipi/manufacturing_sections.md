@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.
+
 [Coplanar normal-thickness films](conformal_coplanar.md) cover finite grounds with or without a backing plane.
 
 [Normal-thickness coating](conformal_coating.md) supports single/pair sections, saved studies and goals.

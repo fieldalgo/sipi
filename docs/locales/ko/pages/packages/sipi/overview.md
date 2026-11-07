@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[세 유전체 broadside 쌍](layered_broadside.md)은 아래·도체 사이·위 유전체를 보존하고 저장 공차·역산에서 `z_diff_forward`를 사용합니다.
+
 [고정 후보 수율 설계](yield_design.md)는 명시한 비용과 동시 신뢰구간으로 후보를 비교합니다.
 
 [유한 영역의 3D 정전용량](capacitance3d.md)은 공유 사면체 커널로 전체 C를 패럿 단위로 계산합니다. 완전한 전이 모델은 아닙니다.

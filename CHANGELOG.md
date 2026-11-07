@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a three-dielectric broadside pair with explicit outer clearances, signed offset and asymmetric forward-impedance study/material/goal reuse; validate independent fields, limits and mesh/box convergence.
+
 - Add fixed-candidate yield-constrained selection with simultaneous confidence, explicit costs, complete failure reports and whole-set evaluation budgets.
 
 - Add saved iid impedance-yield assessment with retained unresolved rows, exact binomial confidence envelopes and explicit target uncertainty; no measured production-yield claim is implied.

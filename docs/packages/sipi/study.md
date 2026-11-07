@@ -1,5 +1,7 @@
 # Impedance tolerance studies
 
+[Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/study.md)
 
 [Overview](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) · [Impedance design](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/design.md)
@@ -35,10 +37,10 @@ Version `sipi.impedance-study/2` has the same fields plus required
 `fixed_plane_spacing_m` (null or a positive length). Existing constructors without
 that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
 retains v2 even when its constraint is null. Unknown versions are rejected.
-The twenty-five templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`,
+The twenty-six templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`,
 `grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline`,
-`coupled_layered_stripline`, `coupled_coated_microstrip`,
+`coupled_layered_stripline`, `layered_broadside_stripline`, `coupled_coated_microstrip`,
 `coated_grounded_coplanar`, `coupled_coated_grounded_coplanar`,
 `unbacked_coplanar`, `coupled_unbacked_coplanar`, `coated_unbacked_coplanar`,
 `coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
@@ -56,7 +58,7 @@ explicit air/box dimensions when those must remain fixed.
 `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`,
 `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar` and
 `coupled_conformal_coated_unbacked_coplanar`. These pair templates also accept
-explicit `z_diff_forward`; `asymmetric_coupled_microstrip` requires that quantity.
+explicit `z_diff_forward`; `asymmetric_coupled_microstrip` and `layered_broadside_stripline` require that quantity.
 Single-signal templates require `z0`.
 This extends the supported template names
 without changing schema fields or existing plan semantics. Older readers reject
