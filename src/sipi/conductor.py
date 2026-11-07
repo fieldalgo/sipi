@@ -133,6 +133,11 @@ def surface_current_factors(mesh, signals, ground):
     boundaries are insulated in the electric dual problem. Uniform isotropic
     nonmagnetic exterior is assumed. Geometry and box errors require refinement.
     """
+    return _surface_current_data(mesh, signals, ground)[0]
+
+
+def _surface_current_data(mesh, signals, ground):
+    """Shared current solve and unchanged boundary integrals, with metal edges."""
     if not signals:
         raise ValueError('at least one signal is required')
     n, count = mesh.num_nodes, len(signals)
@@ -191,7 +196,8 @@ def surface_current_factors(mesh, signals, ground):
         weights, values = lengths[selected], currents[selected]
         parts.append(values.T@(weights[:,None]*values))
         integrated.append(np.sum(weights[:,None]*values,axis=0))
-    return SurfaceCurrentFactors(tuple(signals),parts,integrated,c0)
+    factors = SurfaceCurrentFactors(tuple(signals),parts,integrated,c0)
+    return factors, edges, group, lengths, currents
 
 
 @dataclass(frozen=True)

@@ -1,5 +1,7 @@
 # 신호선과 기준 도체별 금속·거칠기
 
+[신호 면별 표면 손실](face_conductor.md)은 bottom/top/left/right 법칙을 분리하며 reference는 공통 금속으로 유지합니다.
+
 [English](../../../../../packages/sipi/boundary_conductor.md)
 
 `sipi.boundary_conductor.surface_conductor_loss_by_boundary`는 PEC 진공 전류장을

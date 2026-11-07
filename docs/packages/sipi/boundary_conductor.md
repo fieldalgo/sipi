@@ -1,5 +1,7 @@
 # Different metals on signal and reference boundaries
 
+[Signal-face surface loss](face_conductor.md) resolves bottom/top/left/right laws while retaining one common reference metal.
+
 [한국어](../../locales/ko/pages/packages/sipi/boundary_conductor.md)
 
 `sipi.boundary_conductor.surface_conductor_loss_by_boundary` reuses one PEC

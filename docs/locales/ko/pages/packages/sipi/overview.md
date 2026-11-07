@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[신호 면별 표면 손실](face_conductor.md)은 bottom/top/left/right 법칙을 분리하며 reference는 공통 금속으로 유지합니다.
+
 [세 유전체 broadside 쌍](layered_broadside.md)은 아래·도체 사이·위 유전체를 보존하고 저장 공차·역산에서 `z_diff_forward`를 사용합니다.
 
 [고정 후보 수율 설계](yield_design.md)는 명시한 비용과 동시 신뢰구간으로 후보를 비교합니다.
