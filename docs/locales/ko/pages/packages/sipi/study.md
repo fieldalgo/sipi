@@ -1,5 +1,7 @@
 # 임피던스 공차 분석
 
+[두 유전체 비대칭 매립 코플래너 쌍](asymmetric_layered_coplanar_stripline.md)은 두 폭 피치와 전체 적층 두께를 별도 재료 영역에 연결합니다.
+
 [비대칭 매립 코플래너 쌍](asymmetric_coplanar_stripline.md)은 독립 신호 금속·명시 유한 접지와 두 폭 피치 계약을 사용합니다.
 
 [비대칭 coplanar 쌍](asymmetric_coplanar.md)은 유한 접지 치수와 독립 신호 두께를 보존합니다.
@@ -49,7 +51,7 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `sipi.impedance-study/2`는 같은 필드에 필수 `fixed_plane_spacing_m`(null 또는 양의 길이)을
 추가합니다. 이 제약을 사용하지 않는 기존 생성기는 계속 v1을 출력하고 v1은 새 필드를
 거부합니다. 읽은 v2는 제약이 null이어도 v2를 유지합니다. 미등록 버전은 거부합니다.
-템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `asymmetric_coupled_stripline`, `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_grounded_coplanar`·`asymmetric_coupled_coplanar_stripline`, `grounded_coplanar`,
+템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `asymmetric_coupled_stripline`, `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_layered_coplanar_stripline`, `asymmetric_coupled_grounded_coplanar`·`asymmetric_coupled_coplanar_stripline`, `grounded_coplanar`,
 `coplanar_stripline`, `coupled_coplanar_stripline`, `layered_coplanar_stripline`, `coupled_layered_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
 및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`, `layered_broadside_stripline`
 및 `coupled_coated_microstrip`, `coated_grounded_coplanar`,
@@ -58,7 +60,7 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
 `coupled_conformal_coated_microstrip`,
 `conformal_coated_grounded_coplanar`, `coupled_conformal_coated_grounded_coplanar`,
-`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 34종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 35종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
@@ -67,7 +69,7 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `coupled_grounded_coplanar`, `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar`,
 `coupled_conformal_coated_unbacked_coplanar`에서 `z_diff` 또는 명시적인 `z_diff_forward`입니다.
-`asymmetric_coupled_microstrip`·`asymmetric_coupled_stripline`·`asymmetric_coupled_layered_stripline`·`asymmetric_coupled_grounded_coplanar`·`asymmetric_coupled_coplanar_stripline`·`layered_broadside_stripline`은 `z_diff_forward`만, 단일 신호 템플릿은 `z0`만 받습니다. 기존 스키마 필드·입력 의미를 유지하며 지원
+`asymmetric_coupled_microstrip`·`asymmetric_coupled_stripline`·`asymmetric_coupled_layered_stripline`, `asymmetric_coupled_layered_coplanar_stripline`·`asymmetric_coupled_grounded_coplanar`·`asymmetric_coupled_coplanar_stripline`·`layered_broadside_stripline`은 `z_diff_forward`만, 단일 신호 템플릿은 `z0`만 받습니다. 기존 스키마 필드·입력 의미를 유지하며 지원
 템플릿 이름을 확장합니다. 이전 판독기는 새 이름을 거부하므로 입력과 함께 SIPI 버전을 기록하세요.
 독립 변수는 템플릿 매개변수 이름 1–8개를 중복 없이 지정하고 나열 순서를 유지합니다.
 
@@ -125,7 +127,7 @@ nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 
 ## 전체 접지면 간격 고정(v2)
 
-`fixed_plane_spacing_m`은 `asymmetric_coupled_layered_stripline`, `layered_stripline`, `coupled_layered_stripline`,
+`fixed_plane_spacing_m`은 `asymmetric_coupled_layered_stripline`, `asymmetric_coupled_layered_coplanar_stripline`, `layered_stripline`, `coupled_layered_stripline`,
 `layered_coplanar_stripline`, `coupled_layered_coplanar_stripline`에서
 지원합니다. `lower_height`, `upper_height` 중 정확히 하나를 독립 변수로 지정하면
 다른 높이는 전체 간격에서 표본 높이를 뺀 값입니다. nominal 높이의 합은 지정

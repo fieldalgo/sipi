@@ -24,6 +24,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
               ('microstrip', 'stripline', 'coupled_microstrip', 'asymmetric_coupled_microstrip', 'grounded_coplanar',
                'asymmetric_coupled_stripline',
                'asymmetric_coupled_layered_stripline',
+               'asymmetric_coupled_layered_coplanar_stripline',
                'asymmetric_coupled_grounded_coplanar',
                'asymmetric_coupled_coplanar_stripline',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
@@ -40,6 +41,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'coupled_conformal_coated_unbacked_coplanar')}
 _ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
                                         'asymmetric_coupled_layered_stripline',
+               'asymmetric_coupled_layered_coplanar_stripline',
                                         'asymmetric_coupled_grounded_coplanar',
                                         'asymmetric_coupled_coplanar_stripline'))
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
@@ -218,6 +220,7 @@ class ImpedanceStudyDocument:
                 spacing = _scalar(spacing, positive=True)
                 if (template not in ('layered_stripline', 'coupled_layered_stripline',
                                      'asymmetric_coupled_layered_stripline',
+               'asymmetric_coupled_layered_coplanar_stripline',
                                      'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline')
                         or len({'lower_height', 'upper_height'} & set(names)) != 1):
                     raise ValueError('fixed plane spacing requires a layered stripline '

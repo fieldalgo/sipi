@@ -15,7 +15,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_layered_stripline',
            'asymmetric_coupled_grounded_coplanar',
            'coplanar_stripline', 'coupled_coplanar_stripline',
-           'asymmetric_coupled_coplanar_stripline',
+           'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_layered_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'layered_broadside_stripline',
@@ -840,6 +840,48 @@ def coupled_layered_coplanar_stripline(*, width, gap, ground_gap, ground_width,
     return CrossSection(base.layers,
         [left, right, Trace('ground_left', -offset, gw, left.y, left.thickness, ground=True),
          Trace('ground_right', offset, gw, left.y, left.thickness, ground=True)], box, top='ground')
+
+
+def asymmetric_coupled_layered_coplanar_stripline(*, left_width, right_width, gap,
+                                         ground_gap, ground_width, lower_height, upper_height,
+                                         lower_eps_r, upper_eps_r, left_thickness=0.0,
+                                         right_thickness=0.0, ground_thickness=0.0,
+                                         lower_tan_delta=0.0, upper_tan_delta=0.0, box_width=None,
+                                         left_top_width=None, right_top_width=None):
+    """Unequal buried coplanar pair at a two-dielectric interface.
+
+    All four bottom faces lie at lower_height; copper extends into the upper
+    dielectric and upper_height includes copper. Each thickness must be smaller
+    than upper_height. Signal widths/thicknesses/tapers are independent; finite
+    rectangular grounds have explicit thickness (default zero). gap and
+    ground_gap are bottom-edge clearances, with no central ground. The complete
+    signal bottom span is centred, positive left and negative right. Both outer
+    planes are grounded and lateral sides are insulated. Materials are kept
+    separate; no exchange symmetry or general effective-permittivity average
+    is assumed. Ground width is physical; box width controls the outer domain.
+    """
+    left = _positive('left_width', left_width)
+    right = _positive('right_width', right_width)
+    gap = _positive('gap', gap)
+    gg = _positive('ground_gap', ground_gap)
+    gw = _positive('ground_width', ground_width)
+    lt = _positive('left_thickness', left_thickness, zero=True)
+    rt = _positive('right_thickness', right_thickness, zero=True)
+    gt = _positive('ground_thickness', ground_thickness, zero=True)
+    base = layered_stripline(width=max(left, right), lower_height=lower_height,
+        upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        thickness=max(lt, rt, gt), lower_tan_delta=lower_tan_delta,
+        upper_tan_delta=upper_tan_delta, box_width=box_width)
+    y = base.traces[0].y
+    x_left, x_right = -(gap+right)/2, (gap+left)/2
+    offset = x_right+right/2+gg+gw/2
+    box = (max(base.width, 4*(left+right+gap), 2*(offset+gw/2)+4*base.height)
+           if box_width is None else base.width)
+    return CrossSection(base.layers,
+        [Trace('positive', x_left, left, y, lt, top_width=left_top_width),
+         Trace('negative', x_right, right, y, rt, top_width=right_top_width),
+         Trace('ground_left', -offset, gw, y, gt, ground=True),
+         Trace('ground_right', offset, gw, y, gt, ground=True)], box, top='ground')
 
 
 def with_surface_mask(section, *, thickness, eps_r, tan_delta=0.0, gap_fill_height=0.0):
