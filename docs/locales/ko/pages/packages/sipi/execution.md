@@ -1,5 +1,7 @@
 # 저장 입력의 공통 실행
 
+[전도율 프로파일 저장](conductivity_profile_document.md)은 외측 포트면을 보존하고 적분 전에 주파수 예산을 확인합니다.
+
 [주기 혼합 전원 저장](periodic_mixed_circuit.md)은 두 전원 종류·시간 배열·고조파/평균 전력을 보존합니다.
 
 [혼합 회로 저장](mixed_circuit.md)은 포트별 전압원·전류원 종류와 이상 경계·구조별 전력을 보존합니다.
@@ -35,7 +37,7 @@ print(saved_schemas())
 impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–6,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1, mixed-circuit/1, periodic-mixed-circuit/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
+circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1, mixed-circuit/1, periodic-mixed-circuit/1, conductivity-profile/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
 
 ## 결과 계약

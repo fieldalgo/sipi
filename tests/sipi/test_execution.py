@@ -78,6 +78,7 @@ def network_equal(output, expected):
 
 def documents():
     from galerkin.mesh3d import box_mesh
+    from sipi import GaussianConductivityProfile, ConductivityProfileDocument
     from sipi.capacitance3d_document import Capacitance3DDocument
     mesh = box_mesh(.004, .003, .002, 2, 2, 2)
     base = [cross(), ApertureDocument(CircularAperture(.28e-3, .8e-3, eps_r=3.96)), aperture(),
@@ -88,6 +89,8 @@ def documents():
         NetworkTransformDocument(source(), operations=[dict(kind='renormalize', reference_ohms=75)]),
         CircuitDocument(source(), excitation=dict(kind='sources', voltages={'near': 1}), terminations={})]
     # Exercise every registry version through its real validator.
+    base.append(ConductivityProfileDocument(
+        GaussianConductivityProfile(conductivity=58e6,rms_m=1e-6),[1e9,4e9]))
     second = cross().to_dict(); second['schema'] = 'sipi.cross-section/2'
     for trace in second['traces']:
         trace['top_width'] = trace['width']

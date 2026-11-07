@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add strict conductivity-profile/1 JSON and shared execution with pre-integration budgets, exterior-plane metadata and exact kernel replay.
 - Add a bounded Gaussian conductivity-profile half-space kernel with explicit exterior-port position, displacement current and independent field/energy/reference-plane checks.
 - Clarify common-metal surface scope and link existing Groiss, Cannonball, diffusion and individual face assignments in English and Korean.
 - Add unequal planar-coated coplanar pairs with explicit ground copper, coating material studies, fixed-pitch width targets and independent field/limit checks.

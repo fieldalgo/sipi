@@ -1,5 +1,7 @@
 # 명시적 외측 기준면의 Gaussian 전도율 프로파일
 
+[프로파일 입력 저장](conductivity_profile_document.md)은 외측 cutoff와 적분 전 주파수 예산을 보존합니다.
+
 `GaussianConductivityProfile`은 Gaussian 전도율 전이를 지정한 비자성 도체의
 1D 전체 Maxwell 표면 임피던스를 계산합니다. 임피던스와 함께 포트 위치를 반환합니다.
 별도 반공간 구성 법칙 커널이며 `roughness=` 승수로 받거나 선로의 평균면 외부

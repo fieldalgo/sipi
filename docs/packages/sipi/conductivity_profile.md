@@ -1,5 +1,7 @@
 # Gaussian conductivity profile at an explicit exterior plane
 
+[Saved profile inputs](conductivity_profile_document.md) preserve the exterior cutoff and apply pre-integration frequency budgets.
+
 `GaussianConductivityProfile` computes the 1D full-Maxwell surface impedance
 of a nonmagnetic conductor with a prescribed Gaussian conductivity transition.
 It returns the port's position as well as its impedance. It is a separate
