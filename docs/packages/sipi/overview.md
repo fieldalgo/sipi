@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Extracted line-length boundaries](extracted_length.md) reuse one field extraction for sampled-band design with a retained attempt ledger.
+
 [Saved signal-face lines](face_line.md) use transmission-line/4 with strict face assignments and one shared mesh/C0.
 
 [Signal-face surface loss](face_conductor.md) resolves bottom/top/left/right laws while retaining one common reference metal.

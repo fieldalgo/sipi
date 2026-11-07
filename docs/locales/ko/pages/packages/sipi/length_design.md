@@ -2,6 +2,8 @@
 
 [English](../../../../../packages/sipi/length_design.md) · [대역 제한](band.md)
 
+[버전 2](extracted_length.md)는 저장된 필드 입력을 한 번 추출한 뒤 길이를 탐색합니다.
+
 `LineLengthDesignDocument`는 주어진 균일 선로 RLGC에서 길이만 바꿉니다.
 삽입·반사·누화 등 여러 제한을 동시에 만족하는 쪽과 위반하는 쪽의 길이 경계를
 찾습니다. **전역 최대 길이**를 보장하지 않습니다. 부정합 선로에서는 허용 구간이

@@ -55,6 +55,7 @@ _REGISTRY = {
     'sipi.capacitance-3d/1': Capacitance3DDocument,
     'sipi.network-band/1': NetworkBandDocument,
     'sipi.line-length-design/1': LineLengthDesignDocument,
+    'sipi.line-length-design/2': LineLengthDesignDocument,
     'sipi.tem-ports-3d/1': TEMPorts3DDocument,
     'sipi.impedance-yield/1': ImpedanceYieldDocument,
     'sipi.yield-design/1': YieldDesignDocument,
@@ -222,6 +223,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 failed_length_m=exc.failed_length_m, cause_type=exc.cause_type,
                 history=[dict(length_m=row.length_m, passed=row.passed, minimum_margin=row.minimum_margin)
                          for row in exc.history]))
+            if exc.source_evaluation is not None:
+                out['error']['source_evaluation'] = exc.source_evaluation
     elif isinstance(doc, (ImpedanceDesignDocument, ApertureDesignDocument)):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')

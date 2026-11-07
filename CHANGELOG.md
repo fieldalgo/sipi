@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add line-length-design/2 with one field-source extraction, frozen RLGC replay and complete extraction/length attempt accounting through success and failure.
+
 - Add transmission-line/4 face-metal JSON, shared mesh/C0 composition, retained face-current diagnostics and existing circuit replay.
 
 - Add separate bottom/top/side signal surface laws with one shared PEC current solve, conserved face contributions and retained skin-depth/flux gates.

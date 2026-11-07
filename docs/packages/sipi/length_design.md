@@ -2,6 +2,8 @@
 
 [한국어](../../locales/ko/pages/packages/sipi/length_design.md) · [Band limits](band.md)
 
+[Version 2](extracted_length.md) also accepts saved field sources, extracting once before length search.
+
 `LineLengthDesignDocument` varies only length in a supplied uniform RLGC model.
 It finds a feasible/infeasible boundary for several sampled insertion, reflection
 or crosstalk constraints together. It does **not** claim a global maximum length:

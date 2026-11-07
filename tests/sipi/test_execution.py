@@ -123,6 +123,10 @@ def documents():
     base.append(LineLengthDesignDocument(dict(kind='rlgc',frequency_hz=[0,1e9],R=[[10]],L=[[2.5e-7]],
         G=[[.004]],C=[[1e-10]],length_m=0,reference_ohms=50,names=['s']),bounds=[0,10],
         limits=[dict(name='loss',input_port='near:s',output_port='far:s',frequency_hz=[0,1e9],minimum=.5,maximum=None)]))
+    field = line().to_dict(); field['length_m'] = 0.
+    base.append(LineLengthDesignDocument(dict(kind='transmission-line', document=field), bounds=[0, 10],
+        limits=[dict(name='loss', input_port='near:signal', output_port='far:signal',
+                     frequency_hz=[1e3, 2e3], minimum=.5, maximum=None)], schema='sipi.line-length-design/2'))
     base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
                                     ground=mesh.boundary['z0']))
     from test_ports3d_document import document as tem_document

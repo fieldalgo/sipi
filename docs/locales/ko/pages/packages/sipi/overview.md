@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[추출 선로 길이 경계](extracted_length.md)는 필드 1회 추출을 재사용해 표본 대역을 역산하며 모든 시도를 보존합니다.
+
 [저장 신호 면별 선로](face_line.md)는 transmission-line/4의 엄격한 면 배정과 한 메시/C0를 사용합니다.
 
 [신호 면별 표면 손실](face_conductor.md)은 bottom/top/left/right 법칙을 분리하며 reference는 공통 금속으로 유지합니다.
