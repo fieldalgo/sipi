@@ -1,5 +1,7 @@
 # Current sources and open terminal boundaries
 
+[Saved Norton circuits](norton_circuit.md) add a separate versioned input and shared execution contract.
+
 `terminate_norton_network` solves explicit Norton sources on a `LineNetwork`,
 retaining voltage and current at **every** port, including opens. It accepts
 the network's actual port names, ordering, basis and positive real references.
@@ -85,7 +87,7 @@ retain invalid inputs, singular/floating and ill-conditioned boundaries,
 numeric/power overflow and read-only input snapshots.
 
 This is a circuit-algebra API, with no new field mesh or extraction model.
-It adds no saved schema (42 versions remain), time-domain integration, measured
+The API itself adds no saved schema, time-domain integration, measured
 accuracy or application/platform acceptance. Existing finite Thevenin inputs
 and the separate port-reduction API remain supported.
 

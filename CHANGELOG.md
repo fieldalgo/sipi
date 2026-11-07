@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add versioned Norton circuit inputs and shared execution with explicit final-basis source/admittance tables, pre-field frequency budgets, extraction identity checks and per-frequency powers.
 - Add explicit Norton current-source and open-terminal network solutions with passive finite shunt admittances, retained port voltages/currents, circuit diagnostics and topology-specific power accounting.
 - Add unequal surface pairs with finite coplanar grounds, explicit ground thickness and saved forward-current studies/goals; validate independent fields, image-panel limits and separate domain/ground sensitivities.
 - Add unequal two-dielectric stripline pairs with explicit common bottom faces, independent materials and composed fixed-pitch/plane-spacing studies; validate independent fields and mesh/box convergence.
