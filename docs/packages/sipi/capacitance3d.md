@@ -129,3 +129,42 @@ sparse-solver memory or runtime. Callers still need process isolation and their
 own budgets. This explicit mesh is not a parametric geometry or a study/goal
 input. Existing application candidates must update and validate their exact
 engine pin before claiming this schema is supported.
+
+## Shared layered meshing: a closed coaxial limit
+
+The existing meshine extrusion can provide an explicit conforming volume.
+For inner radius `a`, outer radius `b` and insulating ends, the bounded coaxial
+solution is `C = 2*pi*epsilon_0*sum(eps_i*length_i)/log(b/a)`. The layers here
+are along the axis, not radial series layers. The outer cylinder is grounded;
+there is no open-end fringing or wave port.
+
+```python
+import numpy as np
+from galerkin.mesh import annulus_mesh
+from galerkin.mesh3d import Mesh3D
+from meshine.mesh import TriMesh
+from meshine.extrude import extrude
+
+base = annulus_mesh(.14e-3, .4e-3, 16, 128)
+footprint = TriMesh(base.nodes, base.triangles,
+                   np.zeros(len(base.triangles), dtype=int),
+                   ["dielectric"], base.boundary_edges)
+raw = extrude(footprint, [0, 1e-3], divisions=2)
+coax = extract_capacitance_3d(
+    Mesh3D(raw.nodes, raw.tetrahedra), eps_r=3.8,
+    conductors={"inner": raw.boundary_nodes["inner"]},
+    ground=raw.boundary_nodes["outer"],
+)
+exact = 2*np.pi*epsilon_0*3.8*1e-3/np.log(.4/.14)
+assert abs(coax.C[0, 0]/exact-1) < .005
+```
+
+Regression refines radial/angular divisions `(4,32)`, `(8,64)`, `(16,128)`
+for uniform and aligned axial-layered dielectrics, requiring decreasing
+analytical error and a final error below 0.5%. Separately, one/two/four axial
+subdivisions at `(8,64)` must differ by less than `1e-4` relative to their
+largest C. P1 tetrahedral subdivision can affect axial invariance at finite
+resolution; exact equality is not assumed. These are fixture-specific gates.
+Curvature polygonization changes the domain, so this is not a proof of
+monotonicity on nested spaces of one fixed geometry. The example is not a
+finite via, connector transition, or complete 3D geometry generator.

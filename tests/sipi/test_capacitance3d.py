@@ -30,6 +30,36 @@ def test_plate_and_layered_series_have_exact_affine_fields(layered,n):
     assert result.num_tets==len(mesh.tets)
 
 
+@pytest.mark.parametrize('layered', [False, True])
+def test_extruded_curved_coax_converges_to_bounded_analytical_solution(layered):
+    from galerkin.mesh import annulus_mesh
+    from meshine.mesh import TriMesh
+    from meshine.extrude import extrude
+    a, b, length = .14e-3, .4e-3, 1e-3
+    exact = 2*np.pi*epsilon_0*(4. if layered else 3.8)*length/np.log(b/a)
+    values = []
+    for nr, nt, nz in [(4, 32, 2), (8, 64, 2), (16, 128, 2), (8, 64, 1), (8, 64, 4)]:
+        base = annulus_mesh(a, b, nr, nt)
+        footprint = TriMesh(base.nodes, base.triangles, np.zeros(len(base.triangles), dtype=int),
+                            ['dielectric'], base.boundary_edges)
+        levels = [0, length/2, length] if layered else [0, length]
+        raw = extrude(footprint, levels, divisions=nz)
+        mesh = Mesh3D(raw.nodes, raw.tetrahedra)
+        eps = np.where(mesh.nodes[mesh.tets].mean(axis=1)[:, 2] < length/2, 2., 6.) if layered else 3.8
+        result = extract_capacitance_3d(mesh, eps_r=eps,
+            conductors={'inner': raw.boundary_nodes['inner']}, ground=raw.boundary_nodes['outer'])
+        values.append(result.C[0, 0])
+        assert result.energy_charge_relative < 1e-10
+        assert result.charge_balance_relative < 1e-10
+    errors = np.abs(np.array(values[:3])/exact-1)
+    assert errors[0] > errors[1] > errors[2]
+    assert errors[2] < .005
+    axial = np.array([values[3], values[1], values[4]])
+    assert np.ptp(axial)/np.max(axial) < 1e-4
+    # The physical outer cylinder is ground and both end caps are insulating.
+    # Changing polygonization is not a nested-space variational monotonicity test.
+
+
 def electrodes(n=8):
     mesh=box_mesh(.004,.004,.002,n,n,n)
     x,y,z=mesh.nodes.T

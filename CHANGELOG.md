@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Validate shared layered tetrahedral meshing against the closed coaxial capacitance limit, with curved-boundary/radial refinement and explicit axial-resolution checks.
+
 - Add strict explicit-mesh 3D capacitance JSON replay and compact shared execution, preserving conductor order and boundary meaning without field solving during normalization.
 
 - Add bounded static 3D capacitance through the shared tetrahedral assembler, with explicit PEC/ground node sets, charge/energy diagnostics, analytical and independent FEM checks; no full-wave transition or saved-input support is implied.

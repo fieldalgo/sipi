@@ -115,3 +115,41 @@ bool/소수 노드 번호, 비유한 수와 지수 overflow를 거부합니다. 
 시간을 제한하지 못하므로 호출 측의 격리·자원 제한이 필요합니다. 이 명시적 메시는
 파라미터 기하나 공차·역산 입력이 아닙니다. 기존 앱 후보는 정확한 엔진 버전을
 갱신하고 별도로 검증한 뒤에 이 스키마의 지원을 주장해야 합니다.
+
+## 공유 층상 메시: 닫힌 동축형 한계
+
+기존 meshine extrusion으로 명시적인 정합 체적 메시를 만들 수 있습니다.
+내반경 `a`, 외반경 `b`, 절연된 양단의 유한 동축형 영역 해석식은
+`C = 2*pi*epsilon_0*sum(eps_i*length_i)/log(b/a)`입니다. 여기서 층은
+축 방향이며 반경 방향 직렬 유전체가 아닙니다. 외원통은 접지이고
+열린 끝의 프린징이나 파동 포트는 없습니다.
+
+```python
+import numpy as np
+from galerkin.mesh import annulus_mesh
+from galerkin.mesh3d import Mesh3D
+from meshine.mesh import TriMesh
+from meshine.extrude import extrude
+
+base = annulus_mesh(.14e-3, .4e-3, 16, 128)
+footprint = TriMesh(base.nodes, base.triangles,
+                   np.zeros(len(base.triangles), dtype=int),
+                   ["dielectric"], base.boundary_edges)
+raw = extrude(footprint, [0, 1e-3], divisions=2)
+coax = extract_capacitance_3d(
+    Mesh3D(raw.nodes, raw.tetrahedra), eps_r=3.8,
+    conductors={"inner": raw.boundary_nodes["inner"]},
+    ground=raw.boundary_nodes["outer"],
+)
+exact = 2*np.pi*epsilon_0*3.8*1e-3/np.log(.4/.14)
+assert abs(coax.C[0, 0]/exact-1) < .005
+```
+
+회귀는 균일·축방향 층상 유전체의 반경/각도 분할을 `(4,32)`, `(8,64)`,
+`(16,128)`로 세분해 해석 오차 감소와 최종 0.5% 미만을 요구합니다.
+별도로 `(8,64)`에서 축 분할 1·2·4의 C 범위가 최대 C 대비 `1e-4` 미만인지
+확인합니다. 유한한 P1 사면체 분할에서는 축 방향 불변성에 작은 오차가
+생길 수 있으므로 정확한 동일성을 가정하지 않습니다. 이 기준은 해당 시험
+기하에 한정됩니다. 곡면 다각화로 영역 자체가 바뀌므로 고정 기하의 중첩 공간
+단조성을 증명한 것은 아닙니다. 유한 비아·커넥터 전이나 일반 3D 기하 생성기를
+구현한 예제로 해석하지 않습니다.
