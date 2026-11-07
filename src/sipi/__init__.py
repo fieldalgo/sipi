@@ -24,6 +24,8 @@ High-frequency conductor loss is available in ``sipi.conductor`` with explicit
 skin-depth and mesh validity checks.
 Finite-metal current diffusion is available in ``sipi.conductor_diffusion``.
 Bounded static 3D capacitance is available in ``sipi.capacitance3d``.
+Bounded homogeneous Maxwell fields with local TEM-admittance ports are
+available in ``sipi.ports3d``; this is not a full multimode port model.
 Distributed AC power-plane impedance and full 3D interconnect transitions are not implemented.
 """
 

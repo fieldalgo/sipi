@@ -2,6 +2,8 @@
 
 [Bounded 3D static capacitance](capacitance3d.md) reuses the shared tetrahedral kernel and returns total C in farads; it is not a full transition model.
 
+[Bounded 3D TEM-port fields](ports3d.md) provide homogeneous Maxwell propagation with explicit annular ports and PEC walls; higher-mode radiation boundaries are not supplied.
+
 [Shared saved-input execution](execution.md) provides finite JSON results for browser and local application transports.
 
 [Elliptical-aperture matrices](elliptical_aperture.md) retain coupling for single or paired round conductors.
