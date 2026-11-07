@@ -1,5 +1,7 @@
 # 중심 간격을 유지하는 비대칭 쌍
 
+같은 두 폭 피치 규칙을 [비대칭 매립 스트립라인](asymmetric_stripline.md)에도 적용합니다. 각 도체의 수직 중심은 두 접지면 중간입니다.
+
 asymmetric_coupled_microstrip의 study/design에서 fixed_pitch_m=p는 두 선로 중심의
 수평 거리입니다. 각 행의 밑면 가장자리 간격은 다음처럼 유도합니다.
 

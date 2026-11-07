@@ -11,7 +11,7 @@ from numbers import Real
 from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
-           'asymmetric_coupled_microstrip',
+           'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
@@ -515,6 +515,33 @@ def coupled_stripline(*, width, gap, plane_spacing, eps_r, thickness=0.0,
     return CrossSection(base.layers,
         [Trace('positive', -offset, width, y, thickness, top_width=top_width),
          Trace('negative', offset, width, y, thickness, top_width=top_width)], box_width, top='ground')
+
+
+def asymmetric_coupled_stripline(*, left_width, right_width, gap, plane_spacing, eps_r,
+                                left_thickness=0.0, right_thickness=0.0, tan_delta=0.0,
+                                box_width=None, left_top_width=None, right_top_width=None):
+    """Unequal buried pair, each conductor's vertical midpoint halfway between planes.
+
+    Positive is left, negative right; the total bottom-width span is centred at
+    x=0. Gap separates the horizontal bottom-width extents. Individual bottom
+    heights are (plane_spacing-thickness)/2, so unequal thicknesses do not share
+    a bottom face. Top widths are independent. No exchange/eigenmode symmetry is
+    assumed. The homogeneous dielectric touches both grounded planes; sides are
+    insulated. Geometry guards reject contact, overlap or clipping.
+    """
+    left = _positive('left_width', left_width)
+    right = _positive('right_width', right_width)
+    gap = _positive('gap', gap)
+    lt = _positive('left_thickness', left_thickness, zero=True)
+    rt = _positive('right_thickness', right_thickness, zero=True)
+    base = stripline(width=max(left, right), plane_spacing=plane_spacing, eps_r=eps_r,
+                    thickness=max(lt, rt), tan_delta=tan_delta, box_width=box_width)
+    box = max(base.width, 4*(left+gap+right)) if box_width is None else base.width
+    height = base.height
+    return CrossSection(base.layers,
+        [Trace('positive', -(gap+right)/2, left, (height-lt)/2, lt, top_width=left_top_width),
+         Trace('negative', (gap+left)/2, right, (height-rt)/2, rt, top_width=right_top_width)],
+        box, top='ground')
 
 
 def coplanar_stripline(*, width, gap, ground_width, plane_spacing, trace_height, eps_r,

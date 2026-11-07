@@ -1,5 +1,7 @@
 # Unequal pairs at fixed centre spacing
 
+The same two-width pitch rule applies to [unequal buried striplines](asymmetric_stripline.md), whose individual vertical midpoints lie halfway between planes.
+
 For `asymmetric_coupled_microstrip`, study and design `fixed_pitch_m=p` means
 the horizontal distance between trace centres. Each row derives the bottom-edge gap:
 

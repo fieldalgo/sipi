@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add unequal-width/thickness centred buried stripline pairs with independent tapers, explicit forward-current quantity and shared two-width pitch, material, tolerance and goal contracts.
+
 - Add saved periodic-circuit/1 with explicit Thevenin/load tables, shared extraction guards, retained harmonic diagnostics and finite time/frequency power reporting.
 
 - Add periodic Thevenin sources with finite passive source/load feedback, explicit DC/peak harmonic normalization, retained circuit diagnostics and time/frequency power checks.

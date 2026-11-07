@@ -22,6 +22,7 @@ __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
 _TEMPLATES = {name: getattr(templates, name) for name in
               ('microstrip', 'stripline', 'coupled_microstrip', 'asymmetric_coupled_microstrip', 'grounded_coplanar',
+               'asymmetric_coupled_stripline',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
                'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
                'layered_broadside_stripline',
@@ -34,6 +35,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'coupled_conformal_coated_microstrip', 'conformal_coated_grounded_coplanar',
                'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_unbacked_coplanar',
                'coupled_conformal_coated_unbacked_coplanar')}
+_ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline'))
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
                          'coupled_layered_coplanar_stripline',
                          'coupled_coplanar_stripline',
@@ -56,7 +58,7 @@ def _parameters(data, values):
                   if v['name'] not in data.get('material_variables', {}))
     if data['fixed_pitch_m'] is not None:
         half_widths = (params['left_width']/2+params['right_width']/2
-                       if data['template'] == 'asymmetric_coupled_microstrip' else params['width'])
+                       if data['template'] in _ASYMMETRIC_HORIZONTAL_PAIRS else params['width'])
         params['gap'] = data['fixed_pitch_m']-half_widths
     spacing = data.get('fixed_plane_spacing_m')
     if spacing is not None:
@@ -168,7 +170,7 @@ class ImpedanceStudyDocument:
             raise ValueError('mesh must be an object')
         doc = CrossSectionDocument(section, mesh=data['mesh'])
         mesh = section.mesh_settings(**doc.mesh_options)
-        allowed = (('z_diff_forward',) if template in ('asymmetric_coupled_microstrip', 'layered_broadside_stripline') else
+        allowed = (('z_diff_forward',) if template in _ASYMMETRIC_HORIZONTAL_PAIRS or template == 'layered_broadside_stripline' else
                    ('z_diff', 'z_diff_forward') if template in _DIFFERENTIAL else ('z0',))
         quantity = data['quantity']
         if not isinstance(quantity, str) or quantity not in allowed:
@@ -186,7 +188,7 @@ class ImpedanceStudyDocument:
         pitch = data['fixed_pitch_m']
         if pitch is not None:
             pitch = _scalar(pitch, positive=True)
-            if template == 'asymmetric_coupled_microstrip':
+            if template in _ASYMMETRIC_HORIZONTAL_PAIRS:
                 if not {'left_width', 'right_width'}.intersection(names) or 'gap' in names:
                     raise ValueError('fixed pitch requires left_width or right_width sampling, '
                                      'without gap sampling')
