@@ -14,7 +14,7 @@ import numpy as np
 
 from .network import _real, _scalar
 
-__all__ = ['CausalHuray', 'GroissRMS']
+__all__ = ['CausalHuray', 'GroissRMS', 'CannonballHuray']
 
 
 @dataclass(frozen=True)
@@ -111,3 +111,41 @@ class CausalHuray:
             resistance += weighted*(2*a/denominator)
             reactance += weighted*(2*(d+a)/denominator)
         return resistance, reactance
+
+
+@dataclass(frozen=True)
+class CannonballHuray:
+    """Explicit ten-point Rz mapping to the existing causal sphere model.
+
+    The published rounded mapping is radius = 0.06*Rz. Fourteen equal spheres
+    over a 36*radius**2 tile give full-sphere area ratio 14*pi/9. This assumes
+    the stated triangular-profile/FCC heuristic; it is not a general Rz/Rq/Ra
+    conversion or a measured foil fit. One uniform surface model is applied.
+    Rz must be positive; select the smooth model for zero roughness.
+    """
+    rz_10point_m: float
+
+    def __post_init__(self):
+        value = _scalar('rz_10point_m', self.rz_10point_m)
+        if .06*value == 0:
+            raise ValueError('Cannonball sphere radius cannot be represented')
+        object.__setattr__(self, 'rz_10point_m', value)
+
+    @property
+    def radius_m(self):
+        return .06*self.rz_10point_m
+
+    @property
+    def surface_ratio(self):
+        return 14*math.pi/9
+
+    def to_huray(self):
+        """Equivalent immutable sphere population, without rounding its area."""
+        return CausalHuray((self.radius_m,), (self.surface_ratio,))
+
+    def factor(self, skin_depth):
+        """Complex causal multiplier, not the real resistance ratio."""
+        return self.to_huray().factor(skin_depth)
+
+    def _impedance_factors(self, skin_depth):
+        return self.to_huray()._impedance_factors(skin_depth)

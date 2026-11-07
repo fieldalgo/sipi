@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an explicit ten-point Rz Cannonball surface input mapped to the existing causal Huray law, with strict saved selection and independent packing, relaxation and extraction checks.
+
 - Add saved local-capacitance tolerance studies and bounded goals with shared deterministic sampling, preserved invalid rows and mandatory target checks on requested and refined meshes.
 
 - Add local elliptical-aperture Maxwell and power-dual differential/common capacitance matrices for one or two round conductors, with independent panel/FEM references, strict saved inputs and explicit geometry/transition limits.

@@ -1,5 +1,8 @@
 # Causal conductor surface roughness
 
+The [explicit ten-point Rz mapping](cannonball.md) provides a separate Cannonball
+input that delegates to the same causal law with documented packing assumptions.
+
 The separate [Groiss RMS option](groiss.md) is noncausal and multiplies the full
 surface impedance by a real factor. It does not change the definitions below.
 

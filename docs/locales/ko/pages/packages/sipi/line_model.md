@@ -66,7 +66,7 @@ touchstone = result.network.touchstone()
 엔진 revision·환경도 함께 보관하세요. 이 스키마는 입력 전용이며 기존 형상 JSON을 바꾸지 않습니다.
 
 버전 2(`sipi.transmission-line/2`)는 위 최상위 필드를 유지하며 surface의
-`roughness_rms`만 명시적 smooth/Hammerstad/causal-Huray 객체로 대체합니다.
+`roughness_rms`만 명시적 smooth/Hammerstad/Groiss/causal-Huray/Cannonball 객체로 대체합니다.
 [거칠기 입력 계약](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/roughness.md#버전-있는-선로-입력)에 정확한 필드를 정의합니다.
 버전 1과 생성자 기본값은 유지하고 저장한 버전도 보존합니다.
 

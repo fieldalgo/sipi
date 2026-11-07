@@ -17,7 +17,7 @@ from scipy.constants import epsilon_0, mu_0
 from galerkin import assemble_stiffness, solve_dirichlet
 from .network import _frequencies, _scalar, rlgc_network
 from .quasistatic import _node_set
-from .roughness import CausalHuray, GroissRMS
+from .roughness import CausalHuray, GroissRMS, CannonballHuray
 
 __all__ = ['SurfaceCurrentFactors', 'ConductorLoss', 'surface_current_factors',
            'surface_impedance', 'surface_conductor_loss']
@@ -32,8 +32,8 @@ def _metal_samples(frequency, conductivity, relative_permeability, roughness_rms
     mu_r = _scalar('relative_permeability', relative_permeability)
     rms = _scalar('roughness_rms', roughness_rms, zero=True)
     if roughness is not None:
-        if not isinstance(roughness, (CausalHuray, GroissRMS)):
-            raise TypeError('roughness must be a CausalHuray or GroissRMS model or None')
+        if not isinstance(roughness, (CausalHuray, GroissRMS, CannonballHuray)):
+            raise TypeError('roughness must be a CausalHuray, GroissRMS or CannonballHuray model or None')
         if rms != 0:
             raise ValueError('choose either roughness_rms or a roughness model')
     log_f = np.log(f)
@@ -68,7 +68,8 @@ def surface_impedance(frequency, *, conductivity, relative_permeability=1.0,
     multiplies only its resistance by 1+(2/pi)*atan(1.4*(Rq/delta)^2).
     The correction is empirical, without an added causal reactance model.
     Alternatively roughness=CausalHuray(...) changes both resistance and
-    reactance. GroissRMS(...) multiplies both by the same real factor and
+    reactance. CannonballHuray(...) maps explicit ten-point Rz into that law.
+    GroissRMS(...) multiplies both by the same real factor and
     is noncausal, for frequency-domain use only. Neither model can be
     combined with nonzero roughness_rms.
     Geometry/skin-depth validity is checked by surface_conductor_loss, not here.

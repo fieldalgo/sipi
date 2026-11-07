@@ -74,7 +74,7 @@ This schema stores inputs, not calculated results. It does not replace or
 change the older geometry JSON contracts.
 
 Version 2 (`sipi.transmission-line/2`) keeps these top-level fields and replaces
-only the surface `roughness_rms` with an explicit smooth/Hammerstad/causal-Huray
+only the surface `roughness_rms` with an explicit smooth/Hammerstad/Groiss/causal-Huray/Cannonball
 object. Its [roughness contract](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/roughness.md#versioned-line-input) defines all
 fields. Version 1 and the constructor default remain unchanged; saved versions
 are preserved.
