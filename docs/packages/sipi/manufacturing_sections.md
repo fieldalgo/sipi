@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Buried coplanar single and differential lines](coplanar_stripline.md) include finite side grounds, saved studies and fixed-pitch impedance goals.
+
 [Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.
 
 [Coplanar normal-thickness films](conformal_coplanar.md) cover finite grounds with or without a backing plane.

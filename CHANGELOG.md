@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add single and differential buried coplanar stripline templates with finite side grounds, saved material/tolerance studies and fixed-pitch impedance goals.
+
 - Add strict saved dielectric-fit/1 requests and shared execution with pre-optimizer sample budgets and separate computation/fit acceptance states.
 
 - Add fixed-pole passive Debye fitting with bounded coefficients, conditioning/optimality rejection and retained sampled residuals and acceptance limits.

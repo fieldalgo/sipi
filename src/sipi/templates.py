@@ -12,6 +12,7 @@ from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'asymmetric_coupled_microstrip',
+           'coplanar_stripline', 'coupled_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'layered_broadside_stripline',
@@ -513,6 +514,49 @@ def coupled_stripline(*, width, gap, plane_spacing, eps_r, thickness=0.0,
     return CrossSection(base.layers,
         [Trace('positive', -offset, width, y, thickness, top_width=top_width),
          Trace('negative', offset, width, y, thickness, top_width=top_width)], box_width, top='ground')
+
+
+def coplanar_stripline(*, width, gap, ground_width, plane_spacing, trace_height, eps_r,
+                      thickness=0.0, tan_delta=0.0, box_width=None, top_width=None):
+    """One buried trace with finite side grounds between two reference planes.
+
+    Uniform dielectric; planes at y=0 and plane_spacing; open side boundaries.
+    trace_height is the bottom-face height, excluding copper thickness. gap is
+    signal-to-ground bottom-edge clearance. Both rectangular grounds share the
+    signal's height and thickness. top_width affects only the signal. Ground
+    width is a physical dimension; box width is a separate outer-domain choice.
+    """
+    gap = _positive('gap', gap); gw = _positive('ground_width', ground_width)
+    base = offset_stripline(width=width, plane_spacing=plane_spacing, trace_height=trace_height,
+        eps_r=eps_r, thickness=thickness, tan_delta=tan_delta, box_width=box_width, top_width=top_width)
+    trace = base.traces[0]; offset = (trace.width+gw)/2+gap
+    box = max(base.width, trace.width+2*gap+2*gw+4*base.height) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [trace, Trace('ground_left', -offset, gw, trace.y, trace.thickness, ground=True),
+         Trace('ground_right', offset, gw, trace.y, trace.thickness, ground=True)], box, top='ground')
+
+
+def coupled_coplanar_stripline(*, width, gap, ground_gap, ground_width, plane_spacing,
+                              trace_height, eps_r, thickness=0.0, tan_delta=0.0,
+                              box_width=None, top_width=None):
+    """Equal buried signal pair and finite outer grounds between two planes.
+
+    gap separates signal bottom edges; ground_gap separates each outer signal
+    bottom edge from its adjacent ground. No central ground is inserted. All
+    four traces share the explicit bottom-face trace_height and thickness.
+    Uniform dielectric, grounded top/bottom and open sides. Signal top_width
+    may taper; grounds stay rectangular and all grounds share one PEC potential.
+    """
+    gg = _positive('ground_gap', ground_gap); gw = _positive('ground_width', ground_width)
+    y = _positive('trace_height', trace_height)
+    base = coupled_stripline(width=width, gap=gap, plane_spacing=plane_spacing, eps_r=eps_r,
+        thickness=thickness, tan_delta=tan_delta, box_width=box_width, top_width=top_width, trace_height=y)
+    left, right = base.traces
+    offset = right.x+right.width/2+gg+gw/2
+    box = max(base.width, 2*(offset+gw/2)+4*base.height) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [left, right, Trace('ground_left', -offset, gw, y, left.thickness, ground=True),
+         Trace('ground_right', offset, gw, y, left.thickness, ground=True)], box, top='ground')
 
 
 def broadside_stripline(*, width, gap, plane_spacing, eps_r, thickness,

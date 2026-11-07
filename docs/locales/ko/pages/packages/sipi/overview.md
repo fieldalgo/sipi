@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[매립 coplanar 단일·차동 선로](coplanar_stripline.md)는 두 접지면 사이의 유한 측면 접지와 공차·고정 pitch 역산을 지원합니다.
+
 [저장 유전체 fitting](dielectric_fit_document.md)은 전체 요청과 별도의 오차 수락 판정을 보존합니다.
 
 [고정 pole 유전체 fitting](dielectric_fit.md)은 수동 Debye 계수를 구하고 모든 표본·잔차를 보존합니다.

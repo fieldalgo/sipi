@@ -1,5 +1,7 @@
 # 임피던스 공차 분석
 
+[매립 coplanar 단일·차동 선로](coplanar_stripline.md)는 두 접지면 사이의 유한 측면 접지와 공차·고정 pitch 역산을 지원합니다.
+
 [세 유전체 broadside 쌍](layered_broadside.md)은 아래·도체 사이·위 유전체를 보존하고 저장 공차·역산에서 `z_diff_forward`를 사용합니다.
 
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/study.md) | **한국어**
@@ -36,7 +38,7 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 추가합니다. 이 제약을 사용하지 않는 기존 생성기는 계속 v1을 출력하고 v1은 새 필드를
 거부합니다. 읽은 v2는 제약이 null이어도 v2를 유지합니다. 미등록 버전은 거부합니다.
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `grounded_coplanar`,
-`coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
+`coplanar_stripline`, `coupled_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
 및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`, `layered_broadside_stripline`
 및 `coupled_coated_microstrip`, `coated_grounded_coplanar`,
 `coupled_coated_grounded_coplanar`, `unbacked_coplanar`,
@@ -44,12 +46,12 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
 `coupled_conformal_coated_microstrip`,
 `conformal_coated_grounded_coplanar`, `coupled_conformal_coated_grounded_coplanar`,
-`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 26종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 28종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
 
-`quantity`는 `coupled_microstrip`, `coupled_stripline`, `broadside_stripline`,
+`quantity`는 `coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`, `broadside_stripline`,
 `coupled_grounded_coplanar`, `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar`,
 `coupled_conformal_coated_unbacked_coplanar`에서 `z_diff` 또는 명시적인 `z_diff_forward`입니다.

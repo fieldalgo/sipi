@@ -1,5 +1,7 @@
 # Impedance tolerance studies
 
+[Buried coplanar single and differential lines](coplanar_stripline.md) include finite side grounds, saved studies and fixed-pitch impedance goals.
+
 [Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.
 
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/study.md)
@@ -37,8 +39,8 @@ Version `sipi.impedance-study/2` has the same fields plus required
 `fixed_plane_spacing_m` (null or a positive length). Existing constructors without
 that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
 retains v2 even when its constraint is null. Unknown versions are rejected.
-The twenty-six templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`,
-`grounded_coplanar`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
+The twenty-eight templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`,
+`grounded_coplanar`, `coplanar_stripline`, `coupled_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline`,
 `coupled_layered_stripline`, `layered_broadside_stripline`, `coupled_coated_microstrip`,
 `coated_grounded_coplanar`, `coupled_coated_grounded_coplanar`,
@@ -52,7 +54,7 @@ all template defaults and the nominal resolved mesh settings are saved. A saved
 which can change the generated box size when another dimension changes. Supply
 explicit air/box dimensions when those must remain fixed.
 
-`quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`,
+`quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `coupled_layered_stripline`,
 `coupled_coated_microstrip`, `coupled_coated_grounded_coplanar`,
 `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`,
