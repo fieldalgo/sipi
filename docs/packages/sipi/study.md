@@ -1,5 +1,7 @@
 # Impedance tolerance studies
 
+[Two-dielectric buried coplanar lines](layered_coplanar_stripline.md) retain layer materials and compose fixed pitch with stack-height tolerances.
+
 [Buried coplanar single and differential lines](coplanar_stripline.md) include finite side grounds, saved studies and fixed-pitch impedance goals.
 
 [Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.
@@ -39,8 +41,8 @@ Version `sipi.impedance-study/2` has the same fields plus required
 `fixed_plane_spacing_m` (null or a positive length). Existing constructors without
 that constraint still emit v1, and v1 rejects the new field. A loaded v2 document
 retains v2 even when its constraint is null. Unknown versions are rejected.
-The twenty-eight templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`,
-`grounded_coplanar`, `coplanar_stripline`, `coupled_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
+The thirty templates are `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`,
+`grounded_coplanar`, `coplanar_stripline`, `coupled_coplanar_stripline`, `layered_coplanar_stripline`, `coupled_layered_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `layered_stripline`,
 `coupled_layered_stripline`, `layered_broadside_stripline`, `coupled_coated_microstrip`,
 `coated_grounded_coplanar`, `coupled_coated_grounded_coplanar`,
@@ -54,7 +56,7 @@ all template defaults and the nominal resolved mesh settings are saved. A saved
 which can change the generated box size when another dimension changes. Supply
 explicit air/box dimensions when those must remain fixed.
 
-`quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`,
+`quantity` is `z_diff` for `coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`, `coupled_layered_coplanar_stripline`,
 `broadside_stripline`, `coupled_grounded_coplanar`, `coupled_layered_stripline`,
 `coupled_coated_microstrip`, `coupled_coated_grounded_coplanar`,
 `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`,
@@ -100,7 +102,7 @@ Unequal pairs have a separate [two-width centre-distance rule](asymmetric_pitch.
 The equal-width rules below remain unchanged.
 
 `fixed_pitch_m` is `None`, or a positive centre-to-centre pitch for
-`coupled_microstrip`, `coupled_stripline`, `coupled_grounded_coplanar`,
+`coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`, `coupled_layered_coplanar_stripline`, `coupled_grounded_coplanar`,
 `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`,
 `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar` or
@@ -113,7 +115,7 @@ Bounded corners with nonpositive gap are rejected at construction. Normal sample
 that cross zero gap are retained as invalid rows. This is a deterministic geometric
 constraint, not an additional statistical correlation parameter.
 
-For `coupled_grounded_coplanar` and its coated/unbacked variants, this fixes the **signal** centres only. The
+For `coupled_grounded_coplanar`, its coated/unbacked variants and homogeneous/layered buried coplanar pairs, this fixes the **signal** centres only. The
 outer grounds move with the signal edges to preserve each row's `ground_gap`;
 they are not fixed in position. See [coplanar dimensions](coupled_coplanar.md).
 
@@ -129,8 +131,8 @@ positive clearance above the copper. Invalid normal samples remain failed rows.
 
 ## Fixed total plane spacing (v2)
 
-`fixed_plane_spacing_m` supports `layered_stripline` and
-`coupled_layered_stripline`. Sample exactly one of `lower_height` and
+`fixed_plane_spacing_m` supports `layered_stripline`, `coupled_layered_stripline`,
+`layered_coplanar_stripline` and `coupled_layered_coplanar_stripline`. Sample exactly one of `lower_height` and
 `upper_height`; the other is derived as total spacing minus the sampled height.
 The nominal heights must sum to the specified spacing within relative 1e-12.
 Sampling both heights, neither height, or using this constraint on another

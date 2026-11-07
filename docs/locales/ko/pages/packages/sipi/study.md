@@ -1,5 +1,7 @@
 # 임피던스 공차 분석
 
+[두 유전체 매립 coplanar 선로](layered_coplanar_stripline.md)는 층별 재료와 고정 pitch·전체 높이 공차를 함께 지원합니다.
+
 [매립 coplanar 단일·차동 선로](coplanar_stripline.md)는 두 접지면 사이의 유한 측면 접지와 공차·고정 pitch 역산을 지원합니다.
 
 [세 유전체 broadside 쌍](layered_broadside.md)은 아래·도체 사이·위 유전체를 보존하고 저장 공차·역산에서 `z_diff_forward`를 사용합니다.
@@ -38,7 +40,7 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 추가합니다. 이 제약을 사용하지 않는 기존 생성기는 계속 v1을 출력하고 v1은 새 필드를
 거부합니다. 읽은 v2는 제약이 null이어도 v2를 유지합니다. 미등록 버전은 거부합니다.
 템플릿은 `microstrip`, `stripline`, `coupled_microstrip`, `asymmetric_coupled_microstrip`, `grounded_coplanar`,
-`coplanar_stripline`, `coupled_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
+`coplanar_stripline`, `coupled_coplanar_stripline`, `layered_coplanar_stripline`, `coupled_layered_coplanar_stripline`, `coated_microstrip`, `offset_stripline`, `coupled_stripline`, `broadside_stripline`
 및 `coupled_grounded_coplanar`, `layered_stripline`, `coupled_layered_stripline`, `layered_broadside_stripline`
 및 `coupled_coated_microstrip`, `coated_grounded_coplanar`,
 `coupled_coated_grounded_coplanar`, `unbacked_coplanar`,
@@ -46,12 +48,12 @@ strict `sipi.impedance-study/1`의 필드는 정확히 `schema`, `template`,
 `coupled_coated_unbacked_coplanar`, `conformal_coated_microstrip`,
 `coupled_conformal_coated_microstrip`,
 `conformal_coated_grounded_coplanar`, `coupled_conformal_coated_grounded_coplanar`,
-`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 28종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
+`conformal_coated_unbacked_coplanar`, `coupled_conformal_coated_unbacked_coplanar` 총 30종입니다. 기존 SI 입력을 따르며 모든 템플릿 기본값과 nominal에서
 해결한 메시 설정을 저장합니다. 자동 크기의 `None`은 기존 템플릿 규칙을 유지하므로
 다른 치수가 바뀌면 상자 크기도 바뀔 수 있습니다. 고정하려면 공기·상자 치수를
 명시하세요.
 
-`quantity`는 `coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`, `broadside_stripline`,
+`quantity`는 `coupled_microstrip`, `coupled_stripline`, `coupled_coplanar_stripline`, `coupled_layered_coplanar_stripline`, `broadside_stripline`,
 `coupled_grounded_coplanar`, `coupled_layered_stripline`, `coupled_coated_microstrip`,
 `coupled_coated_grounded_coplanar`, `coupled_unbacked_coplanar`, `coupled_coated_unbacked_coplanar`, `coupled_conformal_coated_microstrip`, `coupled_conformal_coated_grounded_coplanar`,
 `coupled_conformal_coated_unbacked_coplanar`에서 `z_diff` 또는 명시적인 `z_diff_forward`입니다.
@@ -90,7 +92,7 @@ NumPy `Generator(PCG64(seed))`를 사용합니다. 정규분포는 **비유계**
 비대칭 쌍에는 [두 폭으로 계산하는 중심 거리 규칙](asymmetric_pitch.md)을 적용합니다.
 아래 같은 폭 쌍의 기존 규칙은 그대로입니다.
 
-`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_grounded_coplanar·coupled_layered_stripline·coupled_coated_microstrip·coupled_coated_grounded_coplanar·coupled_unbacked_coplanar·coupled_coated_unbacked_coplanar·coupled_conformal_coated_microstrip·coupled_conformal_coated_grounded_coplanar·coupled_conformal_coated_unbacked_coplanar의 양의 수평 중심 간 거리입니다.
+`fixed_pitch_m`은 `None` 또는 coupled_microstrip·coupled_stripline·coupled_coplanar_stripline·coupled_layered_coplanar_stripline·coupled_grounded_coplanar·coupled_layered_stripline·coupled_coated_microstrip·coupled_coated_grounded_coplanar·coupled_unbacked_coplanar·coupled_coated_unbacked_coplanar·coupled_conformal_coated_microstrip·coupled_conformal_coated_grounded_coplanar·coupled_conformal_coated_unbacked_coplanar의 양의 수평 중심 간 거리입니다.
 독립 변수에 width가 있어야 하고 gap을 독립적으로 샘플링할 수 없습니다.
 nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 각 행의 `gap=pitch-width`로 두 선의 중심 위치를 유지합니다. 사다리꼴은 기존
@@ -98,7 +100,7 @@ nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 거부하고, 정규 표본에서 발생하면 오류 행으로 보존합니다. 통계 상관 매개변수가
 아니라 결정적 형상 제약입니다.
 
-`coupled_grounded_coplanar`와 코팅·무후면접지 버전에서 고정되는 것은 **신호선** 중심뿐입니다. 외측 접지는
+`coupled_grounded_coplanar`와 코팅·무후면접지·균일/두 유전체 매립 coplanar 버전에서 고정되는 것은 **신호선** 중심뿐입니다. 외측 접지는
 각 행의 `ground_gap`을 유지하도록 신호선 가장자리와 함께 움직이며 위치가 고정되지
 않습니다. [차동 coplanar 치수](coupled_coplanar.md)를 참조하세요.
 
@@ -113,7 +115,8 @@ nominal width+gap이 pitch와 상대 1e-12 이내로 같아야 합니다.
 
 ## 전체 접지면 간격 고정(v2)
 
-`fixed_plane_spacing_m`은 `layered_stripline`과 `coupled_layered_stripline`에서
+`fixed_plane_spacing_m`은 `layered_stripline`, `coupled_layered_stripline`,
+`layered_coplanar_stripline`, `coupled_layered_coplanar_stripline`에서
 지원합니다. `lower_height`, `upper_height` 중 정확히 하나를 독립 변수로 지정하면
 다른 높이는 전체 간격에서 표본 높이를 뺀 값입니다. nominal 높이의 합은 지정
 간격과 상대 1e-12 이내로 같아야 합니다. 두 높이 동시 지정·높이 미지정·지원하지

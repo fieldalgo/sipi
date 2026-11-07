@@ -26,6 +26,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
                'layered_broadside_stripline',
                'coplanar_stripline', 'coupled_coplanar_stripline',
+               'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline',
                'coupled_coated_microstrip', 'coated_grounded_coplanar',
                'coupled_coated_grounded_coplanar', 'unbacked_coplanar',
                'coupled_unbacked_coplanar', 'coated_unbacked_coplanar',
@@ -34,12 +35,14 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_unbacked_coplanar',
                'coupled_conformal_coated_unbacked_coplanar')}
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
+                         'coupled_layered_coplanar_stripline',
                          'coupled_coplanar_stripline',
                          'coupled_grounded_coplanar', 'coupled_layered_stripline', 'coupled_coated_microstrip',
                          'coupled_coated_grounded_coplanar', 'coupled_unbacked_coplanar',
                          'coupled_coated_unbacked_coplanar', 'coupled_conformal_coated_microstrip',
                          'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_unbacked_coplanar'))
 _HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar',
+                             'coupled_layered_coplanar_stripline',
                              'coupled_coplanar_stripline',
                              'coupled_layered_stripline', 'coupled_coated_microstrip',
                              'coupled_coated_grounded_coplanar', 'coupled_unbacked_coplanar',
@@ -105,9 +108,10 @@ class ImpedanceStudyDocument:
     Sampling is separate from expensive FEM evaluation. Normal samples are
     unbounded: invalid physical inputs remain failed rows, never resampled.
     Fixed horizontal pitch applies to edge-coupled microstrip, stripline (including layered) and
-    grounded coplanar pairs. Outer coplanar grounds retain ground_gap, not position.
+    coplanar pairs. Outer coplanar grounds retain ground_gap, not position.
     The broadside gap is vertical and is never derived from horizontal pitch.
-    Version 2 adds fixed total plane spacing for the two-dielectric templates;
+    Version 2 adds fixed total plane spacing for the two-dielectric stripline
+    and buried coplanar templates;
     exactly one layer height is sampled and the other is derived.
     Version 3 adds fixed-frequency scalar/principal-axis material overrides;
     only geometry variables are sampled. Its full input_json is required to
@@ -204,7 +208,8 @@ class ImpedanceStudyDocument:
             spacing = data['fixed_plane_spacing_m']
             if spacing is not None:
                 spacing = _scalar(spacing, positive=True)
-                if (template not in ('layered_stripline', 'coupled_layered_stripline')
+                if (template not in ('layered_stripline', 'coupled_layered_stripline',
+                                     'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline')
                         or len({'lower_height', 'upper_height'} & set(names)) != 1):
                     raise ValueError('fixed plane spacing requires a layered stripline '
                                      'and exactly one sampled layer height')

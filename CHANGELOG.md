@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add two-dielectric buried coplanar templates with separate material coefficients, composed pitch/stack-height constraints and saved tolerance and impedance goals.
+
 - Add single and differential buried coplanar stripline templates with finite side grounds, saved material/tolerance studies and fixed-pitch impedance goals.
 
 - Add strict saved dielectric-fit/1 requests and shared execution with pre-optimizer sample budgets and separate computation/fit acceptance states.

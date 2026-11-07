@@ -49,6 +49,7 @@ from .templates import conformal_coated_unbacked_coplanar, coupled_conformal_coa
 from .templates import layered_stripline, coupled_layered_stripline
 from .templates import layered_broadside_stripline
 from .templates import coplanar_stripline, coupled_coplanar_stripline
+from .templates import layered_coplanar_stripline, coupled_layered_coplanar_stripline
 from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
 from .design_document import ImpedanceDesignDocument
 from .plane import (COPPER_CONDUCTIVITY, IRDropResult, PowerPlane, Sink, Source, circle, edge,
@@ -94,6 +95,7 @@ __all__ = ["CircularAperture", "ApertureDocument",
            "layered_stripline", "coupled_layered_stripline",
            "layered_broadside_stripline",
            "coplanar_stripline", "coupled_coplanar_stripline",
+           "layered_coplanar_stripline", "coupled_layered_coplanar_stripline",
            "DesignEvaluation", "ImpedanceDesign", "GoalSeekError", "seek_impedance",
            "ImpedanceDesignDocument",
            "PowerPlane", "Source", "Sink", "IRDropResult", "circle", "edge", "rectangle_outline",

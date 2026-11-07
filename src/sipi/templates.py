@@ -16,6 +16,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
            'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
            'layered_broadside_stripline',
+           'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline',
            'coupled_coated_microstrip',
            'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar',
            'unbacked_coplanar', 'coupled_unbacked_coplanar',
@@ -657,6 +658,54 @@ def coupled_layered_stripline(*, width, gap, lower_height, upper_height, lower_e
         [Trace('positive', -offset, trace.width, trace.y, trace.thickness, top_width=top_width),
          Trace('negative', offset, trace.width, trace.y, trace.thickness, top_width=top_width)],
         box, top='ground')
+
+
+def layered_coplanar_stripline(*, width, gap, ground_width, lower_height, upper_height,
+                              lower_eps_r, upper_eps_r, thickness=0.0,
+                              lower_tan_delta=0.0, upper_tan_delta=0.0,
+                              box_width=None, top_width=None):
+    """Single buried coplanar signal at a two-dielectric interface.
+
+    lower_height ends at the metal bottom face; upper_height includes copper.
+    gap is the signal-to-ground bottom-edge clearance. Finite rectangular side
+    grounds share the signal height/thickness and the plane reference potential.
+    Signal top_width may taper. Physical ground width and open-side box width
+    are independent dimensions; the two dielectric coefficients are not averaged.
+    """
+    gap = _positive('gap', gap); gw = _positive('ground_width', ground_width)
+    base = layered_stripline(width=width, lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        box_width=box_width, top_width=top_width)
+    trace = base.traces[0]; offset = (trace.width+gw)/2+gap
+    box = max(base.width, 2*(offset+gw/2)+4*base.height) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [trace, Trace('ground_left', -offset, gw, trace.y, trace.thickness, ground=True),
+         Trace('ground_right', offset, gw, trace.y, trace.thickness, ground=True)], box, top='ground')
+
+
+def coupled_layered_coplanar_stripline(*, width, gap, ground_gap, ground_width,
+                                      lower_height, upper_height, lower_eps_r, upper_eps_r,
+                                      thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0,
+                                      box_width=None, top_width=None):
+    """Equal buried coplanar pair at a two-dielectric interface.
+
+    gap separates signal bottom edges; ground_gap is each outer signal-to-ground
+    bottom-edge clearance. No central ground is inserted. Copper extends from
+    lower_height into the upper dielectric; upper_height includes that copper.
+    All traces share height/thickness; side grounds are rectangular, signal
+    top_width may taper, and both planes and side grounds share one PEC potential.
+    """
+    gg = _positive('ground_gap', ground_gap); gw = _positive('ground_width', ground_width)
+    base = coupled_layered_stripline(width=width, gap=gap, lower_height=lower_height,
+        upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        box_width=box_width, top_width=top_width)
+    left, right = base.traces; offset = right.x+right.width/2+gg+gw/2
+    box = max(base.width, 2*(offset+gw/2)+4*base.height) if box_width is None else base.width
+    return CrossSection(base.layers,
+        [left, right, Trace('ground_left', -offset, gw, left.y, left.thickness, ground=True),
+         Trace('ground_right', offset, gw, left.y, left.thickness, ground=True)], box, top='ground')
 
 
 def with_surface_mask(section, *, thickness, eps_r, tan_delta=0.0, gap_fill_height=0.0):
