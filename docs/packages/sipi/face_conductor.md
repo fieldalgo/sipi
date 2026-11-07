@@ -77,8 +77,8 @@ an actual extraction or physically valid geometry.
 `result.network(C=..., G=..., length=..., z_ref=...)` combines these losses with
 matched-geometry dielectric matrices and external+internal L through the existing
 RLGC network solver. The caller must match geometry, conductor order and frequency.
-This API does not itself add a saved transmission-line schema; existing saved
-whole-boundary contracts remain unchanged.
+[Saved line version 4](face_line.md) records these assignments and shares one mesh
+and C0 with dielectric extraction. Earlier whole-boundary contracts remain unchanged.
 
 ## Validation and limits
 

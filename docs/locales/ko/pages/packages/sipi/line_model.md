@@ -1,5 +1,7 @@
 # 재현 가능한 주파수별 선로 모델
 
+[저장 신호 면별 선로](face_line.md)는 transmission-line/4의 엄격한 면 배정과 한 메시/C0를 사용합니다.
+
 버전 3 (`sipi.transmission-line/3`)은 [도체별 surface-boundaries 입력](boundary_conductor.md)을
 지원합니다. 신호별 금속/거칠기와 하나의 공통 기준 금속을 지정하고 메시·C0 풀이를
 공유합니다. 각 금속의 표피깊이를 해당 기하에 검사하며 버전 1/2 및 기본 버전은 유지합니다.

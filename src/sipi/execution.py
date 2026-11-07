@@ -32,6 +32,7 @@ from .band import NetworkBandDocument, BandAssessment
 from .length_design import LineLengthDesignDocument, LengthGoalError
 from .ports3d_document import TEMPorts3DDocument
 from .boundary_conductor import BoundaryConductorLoss
+from .face_conductor import FaceConductorLoss
 from .yield_assessment import ImpedanceYieldDocument
 from .yield_design import YieldDesignDocument
 
@@ -45,7 +46,7 @@ _REGISTRY = {
     'sipi.aperture-section/1': ApertureSectionDocument,
     'sipi.aperture-study/1': ApertureStudyDocument,
     'sipi.aperture-design/1': ApertureDesignDocument,
-    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3)},
+    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4)},
     'sipi.volume-line/1': VolumeLineDocument,
     'sipi.lumped-network/1': LumpedNetworkDocument,
     'sipi.network-assembly/1': NetworkAssemblyDocument,
@@ -269,12 +270,18 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),
                 G_s_per_m=_array(result.G), C_f_per_m=_array(result.C),
                 network=_network(result.network), diagnostics=_diagnostics(result, diagnostics))
-            if isinstance(doc, TransmissionLineDocument) and isinstance(result.conductor, BoundaryConductorLoss):
+            if isinstance(doc, TransmissionLineDocument) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss)):
                 loss = result.conductor
                 out['result']['conductor_boundaries'] = dict(labels=list(loss.boundary_labels),
                     skin_depth_m=_array(loss.skin_depth), roughness_factor=_array(loss.roughness_factor),
                     surface_impedance_ohms=_array(loss.surface_impedance),
                     resistance_ohm_per_m=_array(loss.resistance_parts))
+                if isinstance(loss, FaceConductorLoss):
+                    out['result']['conductor_boundaries'].update(
+                        surface_current_factors_per_m=_array(loss.factors.parts),
+                        current_integrals=_array(loss.factors.current_integrals),
+                        whole_boundary_current_integrals=_array(loss.factors.base.current_integrals),
+                        current_flux_error=loss.factors.current_error)
         elif isinstance(doc, CircuitDocument):
             out['result'] = _circuit(result)
         elif isinstance(doc, LumpedNetworkDocument):

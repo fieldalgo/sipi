@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Saved signal-face lines](face_line.md) use transmission-line/4 with strict face assignments and one shared mesh/C0.
+
 [Signal-face surface loss](face_conductor.md) resolves bottom/top/left/right laws while retaining one common reference metal.
 
 [Three-layer broadside pairs](layered_broadside.md) retain independent lower/gap/upper dielectrics and use `z_diff_forward` in saved studies and goals.

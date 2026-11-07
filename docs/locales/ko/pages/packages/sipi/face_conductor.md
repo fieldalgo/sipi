@@ -67,7 +67,8 @@ factors.base는 분할 전 도체별 적분을, C0·L_external·names·current_e
 
 `result.network(C=..., G=..., length=..., z_ref=...)`는 같은 기하의 유전체 행렬과
 외부+내부 L을 기존 RLGC solver로 결합합니다. 기하·도체 순서·주파수 일치는 호출자 책임입니다.
-이 API 자체는 저장 transmission-line schema를 추가하지 않으며 기존 도체별 저장 계약을 유지합니다.
+[저장 선로 버전4](face_line.md)는 이 배정을 기록하고 유전체 추출과 하나의 메시·C0를 공유합니다.
+기존 도체별 저장 계약은 유지합니다.
 
 ## 검증·한계
 

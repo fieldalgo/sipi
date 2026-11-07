@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add transmission-line/4 face-metal JSON, shared mesh/C0 composition, retained face-current diagnostics and existing circuit replay.
+
 - Add separate bottom/top/side signal surface laws with one shared PEC current solve, conserved face contributions and retained skin-depth/flux gates.
 
 - Add a three-dielectric broadside pair with explicit outer clearances, signed offset and asymmetric forward-impedance study/material/goal reuse; validate independent fields, limits and mesh/box convergence.

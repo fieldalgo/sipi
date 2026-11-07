@@ -1,5 +1,7 @@
 # Reproducible frequency-dependent line models
 
+[Saved signal-face lines](face_line.md) use transmission-line/4 with strict face assignments and one shared mesh/C0.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/line_model.md)
 
 [Geometry JSON](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/design.md) · [Dielectrics](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/dielectrics.md) ·
