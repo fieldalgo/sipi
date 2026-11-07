@@ -29,16 +29,16 @@ class PeriodicTerminatedResponse:
     frequency_solution: TerminatedNetwork
 
 
-def _sources(network, sources, count):
+def _sources(network, sources, count, *, field='source_voltages'):
     if not isinstance(sources, Mapping) or not sources:
-        raise ValueError('source_voltages must be a nonempty mapping')
+        raise ValueError(field+' must be a nonempty mapping')
     result = np.zeros((count, len(network.port_names)))
     for name, raw in sources.items():
         if not isinstance(name, str) or name not in network.port_names:
-            raise ValueError('source_voltages contains an unknown port')
-        value = _real('source_voltages '+name, raw)
+            raise ValueError(field+' contains an unknown port')
+        value = _real(field+' '+name, raw)
         if value.ndim and value.shape != (count,):
-            raise ValueError('source_voltages needs a real constant or 2*frequencies-1 samples per port')
+            raise ValueError(field+' needs a real constant or 2*frequencies-1 samples per port')
         result[:, network.port_names.index(name)] = value
     return result
 

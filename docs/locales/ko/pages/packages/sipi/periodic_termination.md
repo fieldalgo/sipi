@@ -1,5 +1,7 @@
 # 주기 Thevenin 소스와 유한 종단
 
+[주기 Norton 전류원](periodic_norton.md)은 전류원·병렬 어드미턴스·개방 단자를 별도 경로로 제공합니다.
+
 [저장 회로와 공통 실행](periodic_circuit.md)에서 소스·부하·진단을 함께 보존합니다.
 
 `periodic_terminated_response`는 실수 주기 소스 전압과 유한 소스/부하 임피던스를

@@ -1,5 +1,7 @@
 # Periodic Thevenin sources and finite terminations
 
+[Periodic Norton sources](periodic_norton.md) provide a separate current-source, shunt-admittance and open-terminal path.
+
 [Saved circuits and common execution](periodic_circuit.md) preserve sources, loads and diagnostics together.
 
 `periodic_terminated_response` solves named real periodic source voltages with
