@@ -1,5 +1,7 @@
 # Reproducible frequency-dependent line models
 
+[Lossy scalar goals](line_goal.md) target Re(Zc) or attenuation with a separate refinement check.
+
 [Saved ground-face lines](ground_face_line.md) use explicit line/6 for per-face ground laws.
 
 [Saved reference-surface lines](reference_line.md) extend the shared extraction with line/5.

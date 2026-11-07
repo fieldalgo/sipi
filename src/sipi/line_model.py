@@ -213,7 +213,7 @@ class TransmissionLineResult:
 
 
 class TransmissionLineDocument:
-    """Strict sipi.transmission-line/1 through /4; no file I/O or implicit metal.
+    """Strict sipi.transmission-line/1 through /6; no file I/O or implicit metal.
 
     cross_section is a CrossSectionDocument. materials maps existing layer and local-region
     names to supported dielectric model objects; other layers stay constant.
