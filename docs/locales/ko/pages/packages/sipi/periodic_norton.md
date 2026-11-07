@@ -1,5 +1,7 @@
 # 주기 전류원과 개방 단자
 
+[주기 Norton 회로 저장](periodic_norton_circuit.md)으로 입력·시간 응답·전력을 재실행할 수 있습니다.
+
 `periodic_norton_response`는 `LineNetwork`에 실수 전류원 파형과 유한 수동
 병렬 어드미턴스를 적용합니다. [Norton 경계 솔버](norton_termination.md)와
 기존 [주기 격자·파동 규칙](periodic.md)을 결합하며 개방 단자를 포함한 모든
@@ -71,7 +73,8 @@ overflow를 거부합니다. 고조파 조건수 `1e12` 초과 또는 정규 잔
 
 이는 **주기 정상상태**이며 시작 과도응답이나 고립 펄스가 아닙니다. 순환 되감김,
 표본 대역폭과 원래 네트워크·모델의 유효범위를 따릅니다. 인과성·안정성·실측 보드
-정확도·새 전계 추출을 입증하지 않습니다. 이 API로 저장 스키마를 늘리지 않으며
-43종을 유지합니다. 새 경로의 앱·Windows 수락도 별개입니다.
+정확도·새 전계 추출을 입증하지 않습니다. 저장 입력은 별도의
+[periodic-norton-circuit/1](periodic_norton_circuit.md)을 사용합니다.
+새 경로의 앱·Windows 수락도 별개입니다.
 
 [Thevenin 주기 소스](periodic_termination.md) · [English](../../../../../packages/sipi/periodic_norton.md)

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add strict periodic Norton circuit JSON with explicit current/shunt tables, pre-field sample budgets and shared time/harmonic power execution.
 - Add real periodic Norton current-source responses with open terminals, frequency-dependent shunt currents, retained harmonic diagnostics and time/frequency power checks.
 - Add versioned Norton circuit inputs and shared execution with explicit final-basis source/admittance tables, pre-field frequency budgets, extraction identity checks and per-frequency powers.
 - Add explicit Norton current-source and open-terminal network solutions with passive finite shunt admittances, retained port voltages/currents, circuit diagnostics and topology-specific power accounting.

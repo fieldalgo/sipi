@@ -43,6 +43,7 @@ from .line_yield import LineQuantityYieldDocument
 from .periodic_document import PeriodicNetworkDocument
 from .periodic_circuit import PeriodicCircuitDocument
 from .norton_circuit import NortonCircuitDocument
+from .periodic_norton_circuit import PeriodicNortonCircuitDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -77,6 +78,7 @@ _REGISTRY = {
     'sipi.periodic-network/1': PeriodicNetworkDocument,
     'sipi.periodic-circuit/1': PeriodicCircuitDocument,
     'sipi.norton-circuit/1': NortonCircuitDocument,
+    'sipi.periodic-norton-circuit/1': PeriodicNortonCircuitDocument,
 }
 
 
@@ -251,6 +253,26 @@ def _periodic_circuit(result):
             frequency_power_w=powers), mean_power_w=mean)
 
 
+def _periodic_norton_circuit(result):
+    solution = result.solution
+    frequency = solution.frequency_solution
+    powers = {key:_array(getattr(frequency, attr)) for key,attr in
+              [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]}
+    with np.errstate(over='ignore', invalid='ignore'):
+        mean = {key:_array(np.sum(value)) for key,value in powers.items()}
+    return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
+        source_network=_network(result.source_network), response=_periodic_time(solution.response),
+        source_current_a=_array(solution.source_currents),
+        termination_current_a=_array(solution.termination_currents),
+        harmonics=dict(convention='dc-mean-positive-peak',
+            source_current_a=_array(frequency.source_currents), termination_admittance_s=_array(frequency.termination_admittances),
+            incident_sqrt_w=_array(frequency.a), reflected_sqrt_w=_array(frequency.b),
+            voltage_v=_array(frequency.voltage), current_a=_array(frequency.current),
+            condition_number=_array(frequency.condition_number),
+            kcl_residual=_array(frequency.kcl_residual), wave_residual=_array(frequency.wave_residual),
+            frequency_power_w=powers), mean_power_w=mean)
+
+
 def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnostics=()):
     """Run a strict saved document and return a finite sipi.execution/1 dict.
 
@@ -285,6 +307,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = _periodic(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, PeriodicCircuitDocument):
         out['result'] = _periodic_circuit(doc.analyze(max_evaluations=budget))
+    elif isinstance(doc, PeriodicNortonCircuitDocument):
+        out['result'] = _periodic_norton_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, NortonCircuitDocument):
         out['result'] = _norton_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument)):

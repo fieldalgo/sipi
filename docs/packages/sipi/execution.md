@@ -1,5 +1,7 @@
 # Shared execution of saved inputs
 
+[Saved periodic current sources](periodic_norton_circuit.md) retain time waveforms, open terminals and harmonic/mean powers.
+
 [Saved Norton circuits](norton_circuit.md) preserve explicit current sources, open terminals and per-frequency powers.
 
 `sipi.execution` gives browser Workers and local application processes the same
@@ -29,7 +31,7 @@ network validators perform small algebraic calculations. `saved_schemas()`
 lists the closed registry: cross-section/1–3, impedance-study/1–4,
 impedance-design/1–3, circular-aperture/1, aperture-section/1,
 aperture-study/1, aperture-design/1, transmission-line/1–6, volume-line/1,
-lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1.
+lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1.
 Each name has the `sipi.` prefix. Unknown versions, duplicate keys, nonfinite
 numbers (including exponent overflow) and non-text inputs are rejected.
 

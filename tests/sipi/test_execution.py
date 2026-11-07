@@ -139,11 +139,14 @@ def documents():
     from sipi.periodic_document import PeriodicNetworkDocument
     from sipi.periodic_circuit import PeriodicCircuitDocument
     from sipi.norton_circuit import NortonCircuitDocument
+    from sipi.periodic_norton_circuit import PeriodicNortonCircuitDocument
     base.append(PeriodicNetworkDocument(source(), incident={'near': [1, 0, -1], 'far': [0, 0, 0]}))
     base.append(PeriodicCircuitDocument(source(), source_voltages={'near': [1,0,-1], 'far': 0.},
                                         terminations={'near': 50., 'far': 75.}))
     base.append(NortonCircuitDocument(source(), source_currents={'near': .001, 'far': 0.},
                                       termination_admittances={'near': .02, 'far': 0.}))
+    base.append(PeriodicNortonCircuitDocument(source(), source_currents={'near': [.001,0,-.001], 'far': 0.},
+        termination_admittances={'near': .02, 'far': 0.}))
     base.append(NetworkBandDocument(source(),limits=[dict(name='through',input_port='near',output_port='far',
         frequency_hz=[0,1e9],minimum=0,maximum=None)]))
     from sipi.length_design import LineLengthDesignDocument

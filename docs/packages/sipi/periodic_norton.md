@@ -83,7 +83,7 @@ above `1e12` or normalized residual above `1e-10` is rejected.
 This is **periodic steady state**, not switching startup or an isolated pulse.
 Circular wrapping, sampled bandwidth and original network/model validity still
 apply. No causality, stability, measured-board accuracy or new field extraction
-is established. This API adds no saved schema (43 remain) and no application
-or Windows acceptance for the new path.
+is established. Saved inputs are available through [periodic-norton-circuit/1](periodic_norton_circuit.md).
+This API does not establish application or Windows acceptance for the new path.
 
 [Thevenin periodic sources](periodic_termination.md) · [한국어](../../locales/ko/pages/packages/sipi/periodic_norton.md)
