@@ -112,6 +112,9 @@ def documents():
     base.append(ImpedanceDesignDocument('stripline', dict(width=.5e-3, plane_spacing=1e-3, eps_r=1),
         variable='dk', bounds=[2,6], target=50., frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
         material_variables={'dk':dict(region='dielectric',path=['eps_r'])}))
+    from sipi.band import NetworkBandDocument
+    base.append(NetworkBandDocument(source(),limits=[dict(name='through',input_port='near',output_port='far',
+        frequency_hz=[0,1e9],minimum=0,maximum=None)]))
     base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
                                     ground=mesh.boundary['z0']))
     return base

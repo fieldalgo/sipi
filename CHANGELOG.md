@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved sampled network-band magnitude limits with explicit port direction, mixed-mode conversion, retained failures and finite shared-execution results.
+
 - Add saved single material-parameter impedance goals and a Python material factory, retaining the chosen model snapshot through refined-mesh acceptance and replay.
 
 - Add strict material-parameter study bindings with joint geometry/material sampling, retained per-row model inputs and failures, and shared saved execution.

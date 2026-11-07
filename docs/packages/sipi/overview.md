@@ -258,3 +258,5 @@ material and conductor extraction with RLGC/S.
 [Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.
 
 [Full-matrix forward-wave diagnostics](characteristic.md) support asymmetric reciprocal RLGC without changing the scalar-mode contract.
+
+[Sampled network-band limits](band.md) evaluate explicit insertion, reflection and crosstalk requirements.

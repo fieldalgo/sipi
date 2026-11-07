@@ -28,6 +28,7 @@ from .network_document import NetworkTransformDocument
 from .circuit_document import CircuitDocument
 from .modes import ModeTrackingError
 from .capacitance3d_document import Capacitance3DDocument
+from .band import NetworkBandDocument, BandAssessment
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -46,6 +47,7 @@ _REGISTRY = {
     **{f'sipi.network-transforms/{v}': NetworkTransformDocument for v in (1, 2)},
     'sipi.circuit/1': CircuitDocument,
     'sipi.capacitance-3d/1': Capacitance3DDocument,
+    'sipi.network-band/1': NetworkBandDocument,
 }
 
 
@@ -209,7 +211,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             out['status'] = 'incomplete'
     else:
         result = doc.analyze()
-        if isinstance(doc, CrossSectionDocument):
+        if isinstance(result, BandAssessment):
+            out['result'] = result.to_dict()
+        elif isinstance(doc, CrossSectionDocument):
             out['result'] = dict(names=list(result.names), C_f_per_m=_array(result.C),
                 C0_f_per_m=_array(result.C0), C_loss_f_per_m=_array(result.C_loss),
                 L_h_per_m=_array(result.L))
