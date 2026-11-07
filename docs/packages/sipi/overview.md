@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Separate reference surfaces](reference_surfaces.md) assign individual plane, wall and ground-trace surface laws in the Python API.
+
 [Extracted line-length boundaries](extracted_length.md) reuse one field extraction for sampled-band design with a retained attempt ledger.
 
 [Saved signal-face lines](face_line.md) use transmission-line/4 with strict face assignments and one shared mesh/C0.

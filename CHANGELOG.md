@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit reference-plane, side-wall and named ground-trace surface laws with conserved current partitions, individual skin-depth gates and unchanged common-reference behavior.
+
 - Add line-length-design/2 with one field-source extraction, frozen RLGC replay and complete extraction/length attempt accounting through success and failure.
 
 - Add transmission-line/4 face-metal JSON, shared mesh/C0 composition, retained face-current diagnostics and existing circuit replay.

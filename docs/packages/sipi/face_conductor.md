@@ -4,7 +4,8 @@
 
 `sipi.face_conductor` assigns a separate existing `SurfaceMetal` law to the
 bottom, top, left and right face of each finite rectangular or tapered signal
-`Trace`. All reference planes and explicit ground traces still share one metal.
+`Trace`. A `SurfaceMetal` reference combines all grounds; optional
+[reference assignments](reference_surfaces.md) separate planes/walls and ground traces.
 It integrates a single vacuum PEC current solution and retains every face's
 contribution. It is a high-frequency surface perturbation, not a bulk plating or
 finite-metal diffusion model.
@@ -33,7 +34,7 @@ left/right follow sloped faces when `top_width` differs from bottom width.
 `TraceFaceMetals.uniform(metal)` assigns one law to all four faces. Every signal
 name must appear exactly once in the mapping, and every face must be supplied.
 Arbitrary polygon signals and zero-thickness strips are rejected. Reference
-surfaces are not split by face in this API.
+surfaces can use the separate [reference-group API](reference_surfaces.md).
 
 ## Physical contract and diagnostics
 
@@ -65,7 +66,7 @@ At frequency f, `R = sum(Re(Zs_face)*Q_face)` in ohm/m and internal
 surface loss is solved. Output includes the common reference term. R and
 internal L retain full mutual terms; they are not independent scalar wire losses.
 
-For N signals there are P=4N+1 ordered face/reference entries. `frequency`, R and
+For N signals with a common reference there are P=4N+1 ordered face/reference entries. `frequency`, R and
 internal L have shapes (F,), (F,N,N), (F,N,N). `skin_depth`, `roughness_factor`
 and complex `surface_impedance` have shape (F,P). `factors.parts` is (P,N,N),
 `factors.current_integrals` is (P,N), and `resistance_parts` is (F,P,N,N).
@@ -93,6 +94,6 @@ Changing one face's roughness is checked against its retained power contribution
 Invalid mappings, unsupported geometry, skin-depth and current-flux gates reject.
 
 These are explicit model/geometry checks. No universal accuracy bound, reference
-foil-face separation, measured roughness acceptance, finite-metal diffusion,
+foil calibration, measured roughness acceptance, finite-metal diffusion,
 application integration or new platform support is claimed. Use independent mesh
 and outer-domain refinement for the actual geometry and frequencies of interest.

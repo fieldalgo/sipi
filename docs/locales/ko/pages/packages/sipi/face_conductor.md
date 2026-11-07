@@ -4,7 +4,8 @@
 
 `sipi.face_conductor`는 유한 두께의 직사각형·사다리꼴 신호 `Trace`의
 bottom/top/left/right에 각각 기존 `SurfaceMetal` 법칙을 적용합니다.
-접지면과 명시적인 ground trace는 여전히 하나의 공통 금속을 사용합니다.
+`SurfaceMetal` reference는 모든 접지를 합치며 선택적인
+[reference 배정](reference_surfaces.md)으로 기준면·측벽·ground trace를 분리할 수 있습니다.
 한 번의 진공 PEC 전류 풀이를 적분하고 각 면의 기여를 남깁니다.
 고주파 표면 섭동 모델이며 벌크 도금·금속 내부 확산 모델은 아닙니다.
 
@@ -31,7 +32,8 @@ np.testing.assert_allclose(result.resistance_parts.sum(axis=1), result.R, rtol=1
 `top_width`가 다른 사다리꼴의 기울어진 옆면을 따릅니다.
 `TraceFaceMetals.uniform(metal)`은 네 면에 같은 법칙을 지정합니다.
 mapping은 모든 신호 이름과 네 면을 빠짐없이 지정해야 합니다.
-임의 polygon 신호와 두께 0 도체는 거부하며 이 API는 reference 면을 나누지 않습니다.
+임의 polygon 신호와 두께 0 도체는 거부합니다. reference는 별도의
+[그룹 배정](reference_surfaces.md)으로 나눌 수 있습니다.
 
 ## 물리 계약·진단
 
@@ -58,7 +60,7 @@ flux 불일치 5% 초과는 거부합니다. 이는 전류 gradient 진단이며
 표면 손실에 의한 전류 재분포를 새로 풀지는 않습니다. 공통 reference 항을 포함하며
 R·내부 L의 상호 성분을 보존하므로 서로 독립인 스칼라 전선 손실로 바꾸지 않습니다.
 
-신호 N개에는 면/reference 항 P=4N+1개가 있습니다. frequency·R·내부 L shape은
+공통 reference와 신호 N개에는 면/reference 항 P=4N+1개가 있습니다. frequency·R·내부 L shape은
 (F,)·(F,N,N)·(F,N,N)이고, skin_depth·roughness_factor·복소 surface_impedance는
 (F,P)입니다. factors.parts는 (P,N,N), factors.current_integrals는 (P,N),
 resistance_parts는 (F,P,N,N)입니다. 저장 배열은 읽기 전용 snapshot입니다.
@@ -80,6 +82,6 @@ mesh/계산영역 R 변화는 별도로 5% 이하를 요구하며 분할 합·�
 검사합니다. 한 면의 거칠기 변경도 보존된 해당 면의 전력 기여와 비교합니다.
 입력 mapping·미지원 기하·skin-depth·전류 flux 오류는 거부합니다.
 
-명시한 모델·기하의 검증이며 모든 입력의 정확도 상한, reference 면별 동박,
+명시한 모델·기하의 검증이며 모든 입력의 정확도 상한, reference 동박 보정,
 실측 거칠기·금속 내부 확산·앱 연결·새 플랫폼 수락을 주장하지 않습니다.
 사용할 실제 기하·주파수에서 메시와 외곽 영역을 각각 세분해 확인해야 합니다.
