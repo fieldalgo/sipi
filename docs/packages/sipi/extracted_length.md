@@ -5,7 +5,7 @@
 `sipi.line-length-design/2` connects a saved cross-section line to the existing
 sampled-band length search. It extracts the entire declared frequency grid once,
 then holds R/L/G/C fixed while varying length. It accepts a `transmission-line`
-source using line/1–4 or a `volume-line` source using volume-line/1. The nested
+source using line/1–5 or a `volume-line` source using volume-line/1. The nested
 line's `length_m` must be zero. Version 1 remains the default explicit-RLGC contract.
 
 ```python

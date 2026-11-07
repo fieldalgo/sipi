@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[저장 reference 표면 선로](reference_line.md)는 line/5로 회로와 1회 추출 길이 역산을 재사용합니다.
+
 [reference 표면 분리](reference_surfaces.md)는 Python API에서 기준면·측벽·ground trace마다 표면 법칙을 지정합니다.
 
 [추출 선로 길이 경계](extracted_length.md)는 필드 1회 추출을 재사용해 표본 대역을 역산하며 모든 시도를 보존합니다.

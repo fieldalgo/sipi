@@ -20,7 +20,8 @@ from .dielectric import (DielectricSweep, dielectric_from_dict, dielectric_to_di
 from .conductor import ConductorLoss, _surface_samples, _surface_from_mesh
 from .boundary_conductor import (SurfaceMetal, BoundaryConductorLoss,
                                  _boundary_samples, _boundary_from_mesh)
-from .face_conductor import TraceFaceMetals, FaceConductorLoss, _face_samples, _face_from_mesh
+from .face_conductor import (TraceFaceMetals, ReferenceSurfaceMetals, FaceConductorLoss,
+                             _face_samples, _face_from_mesh)
 from .roughness import CausalHuray, GroissRMS, CannonballHuray
 from .network import LineNetwork, _frequencies, _scalar, rlgc_network
 
@@ -62,6 +63,23 @@ def _surface_metal(record):
                      relative_permeability=out.relative_permeability, roughness=rough)
 
 
+def _reference_metal(value, *, faces, schema):
+    if not isinstance(value, dict) or value.get('kind') != 'surfaces':
+        return _surface_metal(value)
+    if not faces or schema != 'sipi.transmission-line/5':
+        raise ValueError('reference surfaces require surface-faces in transmission-line/5')
+    _keys(value, ('kind', 'bottom', 'top', 'sides', 'conductors'), where='reference surfaces')
+    if not isinstance(value['conductors'], dict):
+        raise ValueError('reference conductors must be an object keyed by ground trace name')
+    models, records = {}, dict(kind='surfaces')
+    for name in ('bottom', 'top', 'sides'):
+        models[name], records[name] = ((None, None) if value[name] is None else _surface_metal(value[name]))
+    pairs = {name: _surface_metal(metal) for name, metal in value['conductors'].items()}
+    models['conductors'] = {name: pair[0] for name, pair in pairs.items()}
+    records['conductors'] = {name: pair[1] for name, pair in pairs.items()}
+    return ReferenceSurfaceMetals(**models), records
+
+
 def _conductor(value, section, frequency, schema):
     if not isinstance(value, dict):
         raise ValueError('conductor must explicitly select perfect, surface, surface-boundaries or surface-faces')
@@ -71,10 +89,10 @@ def _conductor(value, section, frequency, schema):
         return {'kind':'perfect'}, None
     if kind in ('surface-boundaries', 'surface-faces'):
         faces = kind == 'surface-faces'
-        if faces and schema != 'sipi.transmission-line/4':
-            raise ValueError('surface-faces requires transmission-line/4')
-        if not faces and schema not in ('sipi.transmission-line/3', 'sipi.transmission-line/4'):
-            raise ValueError('surface-boundaries requires transmission-line/3 or /4')
+        if faces and schema not in ('sipi.transmission-line/4', 'sipi.transmission-line/5'):
+            raise ValueError('surface-faces requires transmission-line/4 or /5')
+        if not faces and schema not in ('sipi.transmission-line/3', 'sipi.transmission-line/4', 'sipi.transmission-line/5'):
+            raise ValueError('surface-boundaries requires transmission-line/3, /4 or /5')
         _keys(value, ('kind', 'conductors', 'reference', 'ground_thickness'), where='boundary surface conductor')
         if not isinstance(value['conductors'], dict):
             raise ValueError('conductors must be an object keyed by signal name')
@@ -88,7 +106,7 @@ def _conductor(value, section, frequency, schema):
                 records[name] = {face: pair[1] for face, pair in parsed.items()}
             else:
                 models[name], records[name] = _surface_metal(record)
-        reference, reference_record = _surface_metal(value['reference'])
+        reference, reference_record = _reference_metal(value['reference'], faces=faces, schema=schema)
         thickness = _scalar('ground_thickness', value['ground_thickness'])
         samples = (_face_samples if faces else _boundary_samples)(section, frequency, models, reference, thickness)
         return dict(kind=kind, conductors=records, reference=reference_record,
@@ -192,6 +210,7 @@ class TransmissionLineDocument:
     roughness object instead of the legacy surface roughness_rms field.
     Version 3 also permits separate signal/reference surface metals.
     Version 4 additionally permits four signal-face laws and one reference law.
+    Version 5 also permits explicit reference-plane/wall/ground-trace laws.
     """
     def __init__(self, cross_section, frequency, *, materials, conductor, length, z_ref=50.0,
                  schema='sipi.transmission-line/1'):
@@ -210,7 +229,8 @@ class TransmissionLineDocument:
         _keys(data, ('schema','cross_section','frequency_hz','materials','conductor',
                      'length_m','reference_ohms'), where='transmission line')
         if data['schema'] not in ('sipi.transmission-line/1','sipi.transmission-line/2',
-                                  'sipi.transmission-line/3','sipi.transmission-line/4'):
+                                  'sipi.transmission-line/3','sipi.transmission-line/4',
+                                  'sipi.transmission-line/5'):
             raise ValueError('unsupported transmission-line schema')
         doc = CrossSectionDocument.from_dict(data['cross_section'])
         section = doc.section

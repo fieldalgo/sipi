@@ -2,6 +2,8 @@
 
 [한국어](../../locales/ko/pages/packages/sipi/face_line.md)
 
+[Version 5](reference_line.md) also saves separate reference planes, walls and ground traces.
+
 `sipi.transmission-line/4` adds an explicit `surface-faces` conductor record to
 the [shared-mesh line document](line_model.md). It reuses the validated
 [signal-face surface model](face_conductor.md) and the existing dielectric,

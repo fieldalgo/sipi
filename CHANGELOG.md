@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add transmission-line/5 reference-surface JSON with shared extraction diagnostics and existing circuit and sampled-length replay.
+
 - Add explicit reference-plane, side-wall and named ground-trace surface laws with conserved current partitions, individual skin-depth gates and unchanged common-reference behavior.
 
 - Add line-length-design/2 with one field-source extraction, frozen RLGC replay and complete extraction/length attempt accounting through success and failure.

@@ -1,5 +1,7 @@
 # 재현 가능한 주파수별 선로 모델
 
+[저장 reference 표면 선로](reference_line.md)는 line/5로 같은 추출 구성을 확장합니다.
+
 [저장 신호 면별 선로](face_line.md)는 transmission-line/4의 엄격한 면 배정과 한 메시/C0를 사용합니다.
 
 버전 3 (`sipi.transmission-line/3`)은 [도체별 surface-boundaries 입력](boundary_conductor.md)을

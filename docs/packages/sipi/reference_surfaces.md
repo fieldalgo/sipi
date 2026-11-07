@@ -5,7 +5,8 @@
 `ReferenceSurfaceMetals` extends the Python face-loss API with separate bottom,
 top, side-wall and named ground-trace metals. The older single `SurfaceMetal`
 reference still combines all grounds and retains its output shape. Saved line/4
-continues to accept that common reference only; this extension is a Python API.
+continues to accept that common reference only; [line/5](reference_line.md) saves
+the explicit reference groups and reuses the same extraction API.
 
 ```python
 import numpy as np

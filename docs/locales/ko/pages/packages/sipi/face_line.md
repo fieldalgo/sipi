@@ -2,6 +2,8 @@
 
 [English](../../../../../packages/sipi/face_line.md)
 
+[버전 5](reference_line.md)는 기준면·측벽·ground trace도 각각 저장합니다.
+
 `sipi.transmission-line/4`는 [공통 메시 선로 문서](line_model.md)에 명시적인
 `surface-faces` 도체 입력을 추가합니다. 검증된 [신호 면별 표면 모델](face_conductor.md)과
 기존 유전체·network·회로 API를 재사용하며 다른 field 근사를 새로 만들지 않습니다.

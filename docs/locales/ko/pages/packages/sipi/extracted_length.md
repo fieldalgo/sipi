@@ -4,7 +4,7 @@
 
 `sipi.line-length-design/2`는 저장된 단면 선로를 기존 표본 대역 길이 역산에
 연결합니다. 선언한 전체 주파수에서 한 번 추출하고 R/L/G/C를 고정한 채 길이만
-바꿉니다. line/1–4의 `transmission-line` 또는 volume-line/1의 `volume-line`
+바꿉니다. line/1–5의 `transmission-line` 또는 volume-line/1의 `volume-line`
 source를 받으며 내부 선로의 `length_m`는 0이어야 합니다. 기본 버전 1의 명시적
 RLGC 입력 계약은 그대로 유지합니다.
 

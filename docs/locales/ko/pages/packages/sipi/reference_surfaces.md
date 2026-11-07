@@ -5,7 +5,8 @@
 `ReferenceSurfaceMetals`는 Python 면별 손실 API에 아래·위 기준면, 측벽,
 이름별 접지 도체 금속을 각각 지정합니다. 기존 단일 `SurfaceMetal` reference는
 모든 접지를 합친 의미와 출력 형식을 유지합니다. 저장 line/4는 여전히 공통
-reference만 받으며 이번 확장은 Python API입니다.
+reference만 받습니다. [line/5](reference_line.md)는 명시적인 reference 그룹을
+저장하고 같은 추출 API를 재사용합니다.
 
 ```python
 import numpy as np
