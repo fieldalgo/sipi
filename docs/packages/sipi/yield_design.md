@@ -1,5 +1,7 @@
 # Select from fixed designs under a yield constraint
 
+[Explicit /2 lossy candidates](lossy_yield_design.md) compare line studies at one shared frequency and quantity. The default /1 contract below is unchanged.
+
 [한국어](../../locales/ko/pages/packages/sipi/yield_design.md)
 
 `sipi.yield_design.YieldDesignDocument` evaluates a **predeclared finite set** of

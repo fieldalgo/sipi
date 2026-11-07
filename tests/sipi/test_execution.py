@@ -161,6 +161,8 @@ def documents():
     base.append(YieldDesignDocument([dict(name='nominal', cost=1.,
         study=study_document(bounded('uniform', 2)).to_dict())],
         cost_unit='relative cost', minimum=45, maximum=55, minimum_yield=.9))
+    base.append(YieldDesignDocument([dict(name='nominal', cost=1., study=random_line.to_dict())],
+        cost_unit='relative cost', minimum=45, maximum=55, minimum_yield=.9, schema='sipi.yield-design/2'))
     return base
 
 

@@ -1,5 +1,7 @@
 # IID yield of lossy line quantities
 
+[Fixed candidate selection /2](lossy_yield_design.md) is the separate simultaneous-confidence contract for comparing multiple candidates.
+
 [한국어](../../locales/ko/pages/packages/sipi/line_yield.md) · [Scalar samples](line_study.md) · [Paired samples](differential_line_study.md) · [Quasi-static impedance yield](yield.md)
 
 `sipi.line-quantity-yield/1` assesses inclusive acceptance limits for one fixed

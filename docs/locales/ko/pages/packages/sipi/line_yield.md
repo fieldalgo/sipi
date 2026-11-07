@@ -1,5 +1,7 @@
 # 유손실 선로 물리량의 iid 수율
 
+[고정 후보 선택 /2](lossy_yield_design.md)는 여러 후보에 동시 신뢰구간을 적용하는 별도 계약입니다.
+
 [English](../../../../../packages/sipi/line_yield.md) · [단일 선로 표본](line_study.md) · [차동 표본](differential_line_study.md) · [준정적 임피던스 수율](yield.md)
 
 `sipi.line-quantity-yield/1`은 고정된 `LineQuantityStudyDocument`(/1 또는 /2)

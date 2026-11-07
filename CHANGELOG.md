@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit yield-design/2 for fixed lossy line candidates at one shared quantity/frequency, reusing conservative simultaneous bounds, full budgets and retained unresolved rows.
+
 - Add fixed-study iid yield for lossy scalar and differential quantities, with explicit units, retained unresolved rows and conservative exact binomial confidence bounds.
 
 - Add explicit line-quantity-study/2 for paired full-loss sampling, preserving correlated vectors, geometry/material constraints, failed rows and complete-only statistics.

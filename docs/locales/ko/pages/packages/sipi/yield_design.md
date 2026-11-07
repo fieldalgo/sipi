@@ -1,5 +1,7 @@
 # 수율 조건으로 고정 설계 후보 선택
 
+[명시적 /2 유손실 후보](lossy_yield_design.md)는 같은 주파수·물리량의 line study들을 비교합니다. 기본 /1의 계약은 아래와 같이 유지합니다.
+
 [English](../../../../../packages/sipi/yield_design.md)
 
 `sipi.yield_design.YieldDesignDocument`는 **결과를 보기 전에 지정한 유한 후보 집합**을

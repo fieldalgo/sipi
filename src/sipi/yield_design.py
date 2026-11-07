@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Fixed-candidate impedance-yield selection with simultaneous confidence."""
+"""Fixed-candidate yield selection with simultaneous confidence."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,6 +12,8 @@ from .document import _keys, _unique_object
 from .sampling import _integer
 from .study import ImpedanceStudyDocument
 from .yield_assessment import YieldAssessment, assess_impedance_yield, _criteria, _scalar
+from .line_study import LineQuantityStudyDocument
+from .line_yield import LineYieldAssessment, assess_line_yield
 
 __all__ = ['YieldDesignDocument', 'YieldDesignResult', 'YieldCandidateAssessment']
 
@@ -39,7 +41,7 @@ def _candidate_confidence(confidence, count):
 class YieldCandidateAssessment:
     name: str
     cost: float
-    assessment: YieldAssessment
+    assessment: YieldAssessment | LineYieldAssessment
 
     def to_dict(self):
         return dict(name=self.name, cost=self.cost, assessment=self.assessment.to_dict(),
@@ -79,7 +81,7 @@ class YieldDesignResult:
         index = self.selected_index
         selected = None if index is None else dict(index=index, name=self.candidates[index].name,
                                                    cost=self.candidates[index].cost)
-        return dict(status=self.status, selected=selected, cost_unit=data['cost_unit'],
+        out = dict(status=self.status, selected=selected, cost_unit=data['cost_unit'],
             confidence=data['confidence'], candidate_confidence=self.candidate_confidence,
             simultaneous_method='bonferroni-clopper-pearson-unresolved-envelope',
             minimum_yield=data['minimum_yield'],
@@ -87,26 +89,34 @@ class YieldDesignResult:
             quantity=self.candidates[0].assessment.study.quantity,
             evaluations=sum(len(c.assessment.study.rows) for c in self.candidates),
             unresolved=self.unresolved, candidates=[c.to_dict() for c in self.candidates])
+        if data['schema'] == 'sipi.yield-design/2':
+            out['unit'] = self.candidates[0].assessment.study.unit
+        return out
 
 
 class YieldDesignDocument:
-    """Strict sipi.yield-design/1; enumerate a fixed set before any field work.
+    """Enumerate a fixed candidate set before any field work, versions 1 and 2.
 
     Each candidate is exactly {name, cost, study}, where study is a saved random
     impedance-study dictionary. Cost is supplied by the caller in one explicit
     common unit; no executable objective or hidden geometric optimization runs.
+    Version 1 is the constructor default. Explicit version 2 instead takes
+    line-quantity-study/1 or /2 dictionaries and requires an identical lossy
+    quantity and positive frequency for all candidates. Units remain explicit.
     """
-    def __init__(self, candidates, *, cost_unit, minimum_yield, minimum=None, maximum=None, confidence=.95):
-        self._assign(dict(schema='sipi.yield-design/1', candidates=candidates, cost_unit=cost_unit,
+    def __init__(self, candidates, *, cost_unit, minimum_yield, minimum=None, maximum=None, confidence=.95,
+                 schema='sipi.yield-design/1'):
+        self._assign(dict(schema=schema, candidates=candidates, cost_unit=cost_unit,
             minimum=minimum, maximum=maximum, minimum_yield=minimum_yield, confidence=confidence))
 
     def _assign(self, data):
         _keys(data, ('schema', 'candidates', 'cost_unit', 'minimum', 'maximum', 'minimum_yield', 'confidence'),
               where='yield design')
-        if data['schema'] != 'sipi.yield-design/1':
+        if data['schema'] not in ('sipi.yield-design/1', 'sipi.yield-design/2'):
             raise ValueError('unsupported yield-design schema')
+        lossy = data['schema'] == 'sipi.yield-design/2'
         low, high, confidence, target = _criteria(data['minimum'], data['maximum'],
-                                                data['confidence'], data['minimum_yield'])
+            data['confidence'], data['minimum_yield'], quantity_name='line quantity' if lossy else 'impedance')
         if target is None:
             raise ValueError('yield design requires minimum_yield')
         cost_unit = _text('cost_unit', data['cost_unit'])
@@ -114,7 +124,7 @@ class YieldDesignDocument:
         if not isinstance(raw, list) or not 1 <= len(raw) <= 32:
             raise ValueError('candidates must be a list of 1..32 fixed entries')
         _candidate_confidence(confidence, len(raw))
-        candidates, names, quantities = [], set(), set()
+        candidates, names, quantities, frequencies = [], set(), set(), set()
         for entry in raw:
             _keys(entry, ('name', 'cost', 'study'), where='yield candidate')
             name = _text('candidate name', entry['name'])
@@ -122,13 +132,18 @@ class YieldDesignDocument:
                 raise ValueError('candidate names must be unique')
             names.add(name)
             cost = _scalar('candidate cost', entry['cost'], zero=True)
-            study = ImpedanceStudyDocument.from_dict(entry['study']).to_dict()
-            if study['sampling']['kind'] not in ('uniform', 'normal'):
+            study = (LineQuantityStudyDocument if lossy else ImpedanceStudyDocument).from_dict(entry['study']).to_dict()
+            source = study['study'] if lossy else study
+            if source['sampling']['kind'] not in ('uniform', 'normal'):
                 raise ValueError('yield candidates require iid uniform or normal sampling')
             quantities.add(study['quantity'])
+            if lossy:
+                frequencies.add(source['material_evaluation']['frequency_hz'])
             candidates.append(dict(name=name, cost=cost, study=study))
         if len(quantities) != 1:
-            raise ValueError('all candidates must use the same impedance quantity')
+            raise ValueError('all candidates must use the same '+('line quantity' if lossy else 'impedance quantity'))
+        if lossy and len(frequencies) != 1:
+            raise ValueError('all lossy candidates must use the same positive frequency')
         self._data = dict(schema=data['schema'], candidates=candidates, cost_unit=cost_unit,
                          minimum=low, maximum=high, confidence=confidence, minimum_yield=target)
 
@@ -154,14 +169,18 @@ class YieldDesignDocument:
     def analyze(self, *, max_evaluations=128):
         budget = _integer(max_evaluations, 2, 10000)
         data = self._data
-        total = sum(c['study']['sampling']['count'] for c in data['candidates'])
+        lossy = data['schema'] == 'sipi.yield-design/2'
+        total = sum((c['study']['study'] if lossy else c['study'])['sampling']['count']
+                    for c in data['candidates'])
         if total > budget:
             raise ValueError('all candidate samples exceed max_evaluations before any solve')
         level = _candidate_confidence(data['confidence'], len(data['candidates']))
         candidates = []
         for candidate in data['candidates']:
-            study = ImpedanceStudyDocument.from_dict(candidate['study']).analyze(max_evaluations=budget)
-            assessment = assess_impedance_yield(study, minimum=data['minimum'], maximum=data['maximum'],
+            study = (LineQuantityStudyDocument if lossy else ImpedanceStudyDocument).from_dict(
+                candidate['study']).analyze(max_evaluations=budget)
+            assessment = (assess_line_yield if lossy else assess_impedance_yield)(
+                study, minimum=data['minimum'], maximum=data['maximum'],
                 confidence=level, minimum_yield=data['minimum_yield'])
             candidates.append(YieldCandidateAssessment(candidate['name'], candidate['cost'], assessment))
         return YieldDesignResult(self.dumps(), tuple(candidates), level)
