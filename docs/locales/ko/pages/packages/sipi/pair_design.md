@@ -88,3 +88,5 @@ Jacobian 탐색점과 실패를 포함해 모두 계산합니다. 같은 물리 
 
 [단일 변수 역산](design.md) · [재료](material_impedance.md) ·
 [English](../../../../../packages/sipi/pair_design.md)
+
+[이름 있는 템플릿 목표 저장](pair_design_document.md)은 두 목표·순서 있는 변수·제약·고정 재료를 엄격한 JSON에 보존합니다.

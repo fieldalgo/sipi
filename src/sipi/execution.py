@@ -47,6 +47,8 @@ from .mixed_circuit import MixedCircuitDocument
 from .periodic_mixed_circuit import PeriodicMixedCircuitDocument
 from .periodic_norton_circuit import PeriodicNortonCircuitDocument
 from .conductivity_profile_document import ConductivityProfileDocument
+from .pair_design_document import PairImpedanceDesignDocument
+from .pair_design import PairImpedanceGoalError
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -85,6 +87,7 @@ _REGISTRY = {
     'sipi.periodic-mixed-circuit/1': PeriodicMixedCircuitDocument,
     'sipi.periodic-norton-circuit/1': PeriodicNortonCircuitDocument,
     'sipi.conductivity-profile/1': ConductivityProfileDocument,
+    'sipi.pair-impedance-design/1': PairImpedanceDesignDocument,
 }
 
 
@@ -375,6 +378,19 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = result.to_dict()
         if result.failed:
             out['status'] = 'incomplete'
+    elif isinstance(doc, PairImpedanceDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except PairImpedanceGoalError as exc:
+            out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
+                quantities=['z_diff', 'z_common'], unit='ohm', attempts=exc.attempts,
+                stage=exc.stage, failed_parameters=exc.failed_parameters, cause_type=exc.cause_type,
+                input=None if exc.input_json is None else json.loads(exc.input_json),
+                material_evaluation=(None if exc.material_evaluation_json is None
+                                     else json.loads(exc.material_evaluation_json)),
+                history=[row.to_dict() for row in exc.history]))
     elif isinstance(doc, LineQuantityDesignDocument):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')

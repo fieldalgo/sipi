@@ -101,3 +101,5 @@ validation, browser parity or Windows acceptance.
 
 [Single-parameter design](design.md) · [Materials](material_impedance.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/pair_design.md)
+
+[Saved named template goals](pair_design_document.md) retain both targets, ordered variables, constraints and fixed materials in strict JSON.

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add strict named two-parameter pair goals, constraint/material snapshots and shared execution with pre-solve budgets and complete failure context.
 - Add bounded two-parameter symmetric-pair impedance targets with actual attempt budgets, frozen refinement, failure histories and independent field checks.
 - Add unequal unbacked coplanar pairs with finite ground references, paired-width studies/goals and independent free-space and field checks.
 - Add strict conductivity-profile/1 JSON and shared execution with pre-integration budgets, exterior-plane metadata and exact kernel replay.

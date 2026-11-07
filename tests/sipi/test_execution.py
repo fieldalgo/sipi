@@ -185,6 +185,14 @@ def documents():
         cost_unit='relative cost', minimum=45, maximum=55, minimum_yield=.9))
     base.append(YieldDesignDocument([dict(name='nominal', cost=1., study=random_line.to_dict())],
         cost_unit='relative cost', minimum=45, maximum=55, minimum_yield=.9, schema='sipi.yield-design/2'))
+    from sipi import PairImpedanceDesignDocument
+    base.append(PairImpedanceDesignDocument('coupled_grounded_coplanar',
+        dict(width=.5e-3,gap=.3e-3,ground_gap=.2e-3,ground_width=1e-3,
+             substrate_height=.5e-3,eps_r=1.,box_width=12e-3,air_height=6e-3),
+        variables=['width','gap'],bounds=[[.3e-3,.7e-3],[.1e-3,.5e-3]],
+        targets={'z_diff':172.45677879183611,'z_common':65.9597000672247},
+        tolerances={'z_diff':1.5,'z_common':.5},max_evaluations=2,
+        mesh=dict(edge_size=2e-6,far_size=.125e-3,grade=.15)))
     return base
 
 
