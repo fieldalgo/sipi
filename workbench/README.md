@@ -83,6 +83,10 @@ The topic-only `workbench-candidate.yml` workflow builds exact first-party
 wheels, checks adapter behavior, audits installed payloads and invokes Nuitka
 2.8.10 with CPython 3.13.17 and the installed Visual Studio 2022 compiler. It
 uploads reports and notices only, never the EXE or third-party runtime binaries.
+Both the standalone and SciPy-vendored NumPy compatibility namespaces load
+FFT/linear-algebra modules dynamically. The pinned build explicitly includes
+those four modules, exercises the installed sources and requires them in the
+completed compiler report. This inclusion check does not replace EXE execution.
 For a matching prepared Windows environment:
 
 ```sh

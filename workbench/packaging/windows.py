@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from notice_inventory import supplemental_notices
+from frozen_imports import DYNAMIC_MODULES, preflight, verify_report
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / '.validation' / 'sipi-windows'
@@ -55,6 +56,7 @@ def main():
                  'engine_commit': (ROOT / 'workbench/packaging/engine-ref.txt').read_text().strip(),
                  'runtime': {}, 'build_tools': {}, 'release_status': 'internal validation candidate'}
     inventory['source_wheels'] = wheel_inventory(ROOT / '.validation' / 'wheels')
+    inventory['dynamic_module_sources'] = preflight()
     inventory['shared_commit'] = json.loads((ROOT / 'dependencies.json').read_text())['development_source']['commit']
     inventory['workbench_commit'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     import os
@@ -108,6 +110,7 @@ def main():
         '--company-name=FieldAlgo', '--product-name=SIPI', '--file-version=0.1.0.0',
         '--product-version=0.1.0.0', '--file-description=SIPI offline cross-section workbench',
         '--include-package=sipi', '--include-package=meshine', '--include-package=galerkin', '--include-package=shapely',
+        *['--include-module=' + name for name in DYNAMIC_MODULES],
         '--nofollow-import-to=pytest,matplotlib,tkinter,torch,jax,cupy,dask,IPython',
         '--include-data-dir=' + str(ROOT / 'workbench/ui') + '=ui',
         '--include-data-files=' + str(notice_path) + '=ui/notices.txt',
@@ -120,6 +123,7 @@ def main():
     report_path.write_text(json.dumps(inventory, indent=2), encoding='utf-8')
     try:
         subprocess.run(command, check=True, stdin=subprocess.DEVNULL, cwd=ROOT)
+        inventory['dynamic_modules_compiled'] = verify_report(OUTPUT / 'compilation.xml')
     except Exception as exc:
         inventory.update(status='failed', error=str(exc))
         report_path.write_text(json.dumps(inventory, indent=2), encoding='utf-8')

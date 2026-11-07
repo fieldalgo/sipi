@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Explicitly freeze the dynamic NumPy FFT/linear-algebra compatibility modules used by SciPy and array-api-compat, and reject completed-build reports that omit them before executable smoke.
+
 - Advance the workbench engine pin to the explicit-mesh 3D saved contract and exercise 3D input replay, result export and bounded capacitance in native, Worker and executable acceptance paths.
 
 - Validate shared layered tetrahedral meshing against the closed coaxial capacitance limit, with curved-boundary/radial refinement and explicit axial-resolution checks.
