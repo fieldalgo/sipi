@@ -11,7 +11,7 @@ from numbers import Real
 
 from .crosssection import CrossSection
 from .document import CrossSectionDocument
-from .impedance_material import _material_input, _analyze_material
+from .impedance_material import _material_input, _analyze_material, _frequency
 
 __all__ = ['ImpedanceDesign', 'DesignEvaluation', 'GoalSeekError', 'seek_impedance']
 
@@ -69,7 +69,8 @@ def _positive(name, value):
 
 
 def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
-                   mesh=None, max_evaluations=40, frequency=None, materials=None):
+                   mesh=None, max_evaluations=40, frequency=None, materials=None,
+                   material_factory=None):
     """Bisect a positive parameter range, then check a refined mesh.
 
     factory(parameter) returns a CrossSection. quantity is z0 (one signal),
@@ -88,6 +89,9 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     principal-axis models. Impedance still uses Re(C_complex) and vacuum L,
     not conductor R or a complex lossy characteristic impedance. The result's
     material_evaluation_json must accompany its geometry document for replay.
+    Alternatively, material_factory(parameter) returns the model mapping at
+    each search point. Supply a fixed frequency and omit materials. The chosen
+    mapping is captured once and reused unchanged for the refinement solve.
     """
     if not callable(factory):
         raise TypeError('factory must be callable')
@@ -104,7 +108,13 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     if isinstance(max_evaluations, bool) or not isinstance(max_evaluations, int) or max_evaluations < 3:
         raise ValueError('max_evaluations must be an integer >= 3')
     options = {} if mesh is None else dict(mesh)
-    material = _material_input(frequency, materials)
+    if material_factory is not None:
+        if not callable(material_factory) or materials is not None or frequency is None:
+            raise ValueError('material_factory requires fixed frequency, is callable, and excludes materials')
+        frequency = _frequency(frequency)
+        material = None
+    else:
+        material = _material_input(frequency, materials)
     history = []
 
     def evaluate(parameter):
@@ -112,10 +122,13 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             raise GoalSeekError('evaluation limit reached before target convergence', history)
         section = factory(parameter)
         doc = CrossSectionDocument(section, mesh=options)
-        line = doc.analyze() if material is None else _analyze_material(doc, material, quantity)
+        evaluated_material = (material if material_factory is None else
+                              _material_input(frequency, material_factory(parameter)))
+        line = (doc.analyze() if evaluated_material is None
+                else _analyze_material(doc, evaluated_material, quantity))
         value = impedance(line)
         history.append(DesignEvaluation(parameter, value, 'search'))
-        return value-target, doc
+        return value-target, doc, evaluated_material
 
     def impedance(line):
         value = line.even_odd()['z_diff'] if quantity == 'z_diff' else getattr(line, quantity)
@@ -123,10 +136,11 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             raise GoalSeekError('solver returned invalid impedance', history)
         return float(value)
 
-    fl, dl = evaluate(lower)
-    fu, du = evaluate(upper)
+    fl, dl, ml = evaluate(lower)
+    fu, du, mu = evaluate(upper)
     if abs(fl) <= tolerance or abs(fu) <= tolerance:
-        x, residual, doc = (lower, fl, dl) if abs(fl) <= abs(fu) else (upper, fu, du)
+        x, residual, doc, selected_material = ((lower, fl, dl, ml) if abs(fl) <= abs(fu)
+                                                else (upper, fu, du, mu))
     else:
         if (fl > 0) == (fu > 0):
             raise GoalSeekError('target is not bracketed by the endpoint impedances', history)
@@ -134,7 +148,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             x = lower+(upper-lower)/2
             if x == lower or x == upper:
                 raise GoalSeekError('parameter resolution exhausted before target convergence', history)
-            residual, doc = evaluate(x)
+            residual, doc, selected_material = evaluate(x)
             if abs(residual) <= tolerance:
                 break
             if (residual > 0) == (fl > 0):
@@ -146,11 +160,12 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     fine = section.mesh_settings(**doc.mesh_options)
     for key in ('edge_size', 'far_size', 'grade'):
         fine[key] /= 2
-    refined_line = (section.analyze(**fine) if material is None
-                    else _analyze_material(CrossSectionDocument(section, mesh=fine), material, quantity))
+    refined_line = (section.analyze(**fine) if selected_material is None
+                    else _analyze_material(CrossSectionDocument(section, mesh=fine), selected_material, quantity))
     refined = impedance(refined_line)
     history.append(DesignEvaluation(x, refined, 'refinement'))
     if abs(refined-target) > tolerance:
         raise GoalSeekError('refined mesh misses target; tighten mesh settings and rerun', history)
-    saved = None if material is None else json.dumps(material, sort_keys=True, allow_nan=False)
+    saved = (None if selected_material is None else
+             json.dumps(selected_material, sort_keys=True, allow_nan=False))
     return ImpedanceDesign(x, target, residual+target, refined, quantity, doc, tuple(history), saved)

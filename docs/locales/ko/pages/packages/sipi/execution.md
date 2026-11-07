@@ -24,7 +24,7 @@ print(saved_schemas())
 `normalize_saved`는 원래 스키마 버전과 확정 설정을 유지한 정규 JSON을 반환합니다.
 메시나 필드 계산은 하지 않지만 일부 네트워크 검증기는 작은 대수 계산을 합니다.
 `saved_schemas()`는 닫힌 목록을 반환합니다: cross-section/1–3,
-impedance-study/1–3, impedance-design/1–2, circular-aperture/1,
+impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–2,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
 circuit/1, capacitance-3d/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한

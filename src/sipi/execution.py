@@ -34,7 +34,7 @@ __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 _REGISTRY = {
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
-    **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2)},
+    **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2, 3)},
     'sipi.circular-aperture/1': ApertureDocument,
     'sipi.aperture-section/1': ApertureSectionDocument,
     'sipi.aperture-study/1': ApertureStudyDocument,

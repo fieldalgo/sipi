@@ -71,3 +71,5 @@ scikit-fem 12.0.2 복소 P1 계산과 임피던스 차이 1e−10, 엄격한 경
 ```sh
 python -m pytest -q tests/sipi/test_material_variables.py tests/sipi/test_material_impedance.py tests/sipi/test_study.py tests/sipi/test_stripline_studies.py tests/sipi/test_execution.py tests/sipi/test_sipi_references.py
 ```
+
+[단일 재료 파라미터 역산(design v3)](material_goals.md)은 선택 모델과 세분 메시 수락을 보존합니다.

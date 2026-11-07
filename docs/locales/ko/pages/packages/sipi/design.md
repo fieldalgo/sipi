@@ -181,3 +181,5 @@ Linux, Python 3.12.14, NumPy 2.5.4, SciPy 1.18.1에서 47개 시험이 통과했
 [상관 공차 분석과 고정 피치 샘플링](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/study.md).
 
 [지정 주파수 재료 공차·역산](material_impedance.md)은 스칼라·주축 재료 지정을 기하와 함께 보존합니다.
+
+[단일 재료 파라미터 역산(design v3)](material_goals.md)은 선택 모델과 세분 메시 수락을 보존합니다.

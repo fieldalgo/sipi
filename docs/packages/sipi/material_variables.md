@@ -79,3 +79,5 @@ field solver and does not establish measured material accuracy.
 ```sh
 python -m pytest -q tests/sipi/test_material_variables.py tests/sipi/test_material_impedance.py tests/sipi/test_study.py tests/sipi/test_stripline_studies.py tests/sipi/test_execution.py tests/sipi/test_sipi_references.py
 ```
+
+[Single material parameter goals (design v3)](material_goals.md) preserve the selected model and refined-mesh acceptance.

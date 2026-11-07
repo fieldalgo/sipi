@@ -109,6 +109,9 @@ def documents():
         quantity='z0', frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
         material_variables={'dk':dict(region='dielectric',path=['eps_r'])},
         sampling=dict(kind='sweep',count=2,variables=[dict(name='dk',lower=3,upper=5)])))
+    base.append(ImpedanceDesignDocument('stripline', dict(width=.5e-3, plane_spacing=1e-3, eps_r=1),
+        variable='dk', bounds=[2,6], target=50., frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
+        material_variables={'dk':dict(region='dielectric',path=['eps_r'])}))
     base.append(Capacitance3DDocument(mesh, conductors={'top': mesh.boundary['z1']},
                                     ground=mesh.boundary['z0']))
     return base

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved single material-parameter impedance goals and a Python material factory, retaining the chosen model snapshot through refined-mesh acceptance and replay.
+
 - Add strict material-parameter study bindings with joint geometry/material sampling, retained per-row model inputs and failures, and shared saved execution.
 
 - Explicitly freeze the dynamic NumPy FFT/linear-algebra compatibility modules used by SciPy and array-api-compat, and reject completed-build reports that omit them before executable smoke.

@@ -201,3 +201,5 @@ expand the underlying models' physical validity.
 [Correlated tolerance studies and fixed-pitch sampling](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/study.md).
 
 [Fixed-frequency material studies and goals](material_impedance.md) preserve scalar/principal-axis overrides alongside geometry.
+
+[Single material parameter goals (design v3)](material_goals.md) preserve the selected model and refined-mesh acceptance.
