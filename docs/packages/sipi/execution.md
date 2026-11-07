@@ -27,7 +27,7 @@ network validators perform small algebraic calculations. `saved_schemas()`
 lists the closed registry: cross-section/1–3, impedance-study/1–4,
 impedance-design/1–3, circular-aperture/1, aperture-section/1,
 aperture-study/1, aperture-design/1, transmission-line/1–3, volume-line/1,
-lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1 and tem-ports-3d/1.
+lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1, tem-ports-3d/1 and impedance-yield/1.
 Each name has the `sipi.` prefix. Unknown versions, duplicate keys, nonfinite
 numbers (including exponent overflow) and non-text inputs are rejected.
 
@@ -46,6 +46,7 @@ must separately record the exact engine commit and wheel/runtime hashes.
 | Cross section | ordered names, C/C0/C_loss in F/m, L in H/m; scalar z0 (ohm), effective permittivity and delay (s/m) for one signal |
 | Circular/elliptical aperture | ordered names and complex capacitance in F/m; scalar for circular, matrix for elliptical |
 | Study | quantity, unit, every row's index/parameters/document/value/error, failed count and summary |
+| Impedance yield | all rows and P/F/U counts, inclusive limits, observed-fraction bounds, exact binomial unresolved envelope and optional target status; see [contract](yield.md) |
 | Goal | quantity/unit, parameter, target/value/refined value, both residuals, completed history and resulting geometry; impedance material evaluation retained |
 | Transmission/volume line | conductor names, frequency in Hz, R/L/G/C in ohm/m, H/m, S/m, F/m; network and requested diagnostics |
 | Distinct-metal transmission line | additionally `conductor_boundaries`: labels, skin depths, roughness factors, complex surface impedances and per-boundary R contributions; see [contract](boundary_conductor.md) |
@@ -74,6 +75,8 @@ capacitance, propagation impedance or 3D via transition.
   validation certificate. Inspect optional diagnostic status separately.
 - `incomplete`: a study contains failed samples. All rows remain in order,
   with their errors, and summary is null. No resampling or partial yield is used.
+  Yield assessment likewise retains unresolved rows and uses `incomplete`,
+  with explicit conservative fraction/confidence bounds instead of dropping failures.
 - `failed`: a goal failed its bracket, budget or refined-mesh criterion.
   `result` is null; `error` retains type/message, value unit, completed history
   and the failing parameter when the underlying API supplies it.

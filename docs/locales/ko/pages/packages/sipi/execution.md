@@ -27,7 +27,7 @@ print(saved_schemas())
 impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–3,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1, capacitance-3d/1, network-band/1, line-length-design/1, tem-ports-3d/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
+circuit/1, capacitance-3d/1, network-band/1, line-length-design/1, tem-ports-3d/1, impedance-yield/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
 
 ## 결과 계약
@@ -68,6 +68,7 @@ NEXT/FEXT는 복소 전압비이며 시간 영역 피크나 dB가 아닙니다. 
 
 - `complete`: 기본 계산이 반환됨. 물리 정확도 인증이 아니며 선택 진단 상태는 별도입니다.
 - `incomplete`: 공차에 실패 샘플이 있음. 모든 행과 오류를 순서대로 보존하고 summary는 null입니다. 재샘플이나 부분 수율을 만들지 않습니다.
+  수율 평가도 미판정 행을 남기고 `incomplete`로 반환하며, 실패를 제외하는 대신 명시적인 표본 비율·신뢰구간 범위를 제공합니다.
 - `failed`: 목표의 bracket·예산·세분 메시 조건 실패. result는 null이며 error에 타입/메시지·값 단위·완료 이력과 원래 API가 제공하는 실패 parameter를 보존합니다.
 
 잘못된 입력과 다른 솔버 오류는 예외로 전달하므로 transport는 실패로 표시해야

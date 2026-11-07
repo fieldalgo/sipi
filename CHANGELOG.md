@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved iid impedance-yield assessment with retained unresolved rows, exact binomial confidence envelopes and explicit target uncertainty; no measured production-yield claim is implied.
+
 - Add transmission-line/3 saved signal/reference metal assignments on one shared mesh, retaining boundary diagnostics through common execution and existing network/circuit inputs.
 
 - Add separate signal/reference surface-metal laws with individual skin-depth gates, retained boundary power contributions and existing roughness contracts.

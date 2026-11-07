@@ -32,6 +32,7 @@ from .band import NetworkBandDocument, BandAssessment
 from .length_design import LineLengthDesignDocument, LengthGoalError
 from .ports3d_document import TEMPorts3DDocument
 from .boundary_conductor import BoundaryConductorLoss
+from .yield_assessment import ImpedanceYieldDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -53,6 +54,7 @@ _REGISTRY = {
     'sipi.network-band/1': NetworkBandDocument,
     'sipi.line-length-design/1': LineLengthDesignDocument,
     'sipi.tem-ports-3d/1': TEMPorts3DDocument,
+    'sipi.impedance-yield/1': ImpedanceYieldDocument,
 }
 
 
@@ -202,7 +204,12 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, LineLengthDesignDocument):
+    if isinstance(doc, ImpedanceYieldDocument):
+        result = doc.analyze(max_evaluations=budget)
+        out['result'] = result.to_dict()
+        if result.unresolved:
+            out['status'] = 'incomplete'
+    elif isinstance(doc, LineLengthDesignDocument):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')
         try:

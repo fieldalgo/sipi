@@ -28,6 +28,9 @@ import pytest
 
 SCHEMA = "openphysics.crosscheck/1"
 TOOLS = {
+    "scipy": {"module": "scipy", "license": "BSD-3-Clause",
+              "source": "https://github.com/scipy/scipy",
+              "use": "existing runtime dependency; independent reference APIs imported in tests"},
     "scikit-rf": {"module": "skrf", "license": "BSD-3-Clause",
                   "source": "https://github.com/scikit-rf/scikit-rf",
                   "use": "imported in-process from the sipi[test] test extra"},

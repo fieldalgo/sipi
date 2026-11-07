@@ -125,6 +125,9 @@ def documents():
                                     ground=mesh.boundary['z0']))
     from test_ports3d_document import document as tem_document
     base.append(tem_document())
+    from sipi.yield_assessment import ImpedanceYieldDocument
+    from test_study import document as study_document, bounded
+    base.append(ImpedanceYieldDocument(study_document(bounded('uniform', 2)), minimum=45, maximum=55))
     return base
 
 
