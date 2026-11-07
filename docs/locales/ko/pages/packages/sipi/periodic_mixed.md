@@ -73,6 +73,7 @@ S→Y 절점식으로 고정 전압/자유 전류 2포트를 독립 계산하고
 
 표본화된 주기 정상 상태이며 스위칭 시작 과도나 고립 펄스가 아닙니다. 순환 감김·
 유한 대역·원 네트워크 모델 한계를 유지합니다. 인과성·안정성·새 전계·실측 정확도를
-주장하지 않습니다. 저장 스키마는 45종 그대로이며 앱·Windows 수락을 추가하지 않습니다.
+주장하지 않습니다. 저장 입력은 [periodic-mixed-circuit/1](periodic_mixed_circuit.md)을
+사용하며 앱·Windows 수락을 추가하지 않습니다.
 
 [Thevenin 파형](periodic_termination.md) · [Norton 파형](periodic_norton.md) · [English](../../../../../packages/sipi/periodic_mixed.md)

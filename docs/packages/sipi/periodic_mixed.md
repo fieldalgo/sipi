@@ -80,6 +80,7 @@ above 1e12 and normalized residual above 1e-10 remain errors.
 This is sampled **periodic steady state**, not switching startup or an isolated
 pulse. Circular wrapping, finite bandwidth and inherited network-model limits
 remain. No causality/stability, new field or measured-board accuracy is claimed.
-This API adds no saved schema (45 remain) or application/Windows acceptance.
+Saved inputs use [periodic-mixed-circuit/1](periodic_mixed_circuit.md).
+This API establishes no application/Windows acceptance.
 
 [Thevenin waveforms](periodic_termination.md) · [Norton waveforms](periodic_norton.md) · [한국어](../../locales/ko/pages/packages/sipi/periodic_mixed.md)

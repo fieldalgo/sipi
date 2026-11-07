@@ -44,6 +44,7 @@ from .periodic_document import PeriodicNetworkDocument
 from .periodic_circuit import PeriodicCircuitDocument
 from .norton_circuit import NortonCircuitDocument
 from .mixed_circuit import MixedCircuitDocument
+from .periodic_mixed_circuit import PeriodicMixedCircuitDocument
 from .periodic_norton_circuit import PeriodicNortonCircuitDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
@@ -80,6 +81,7 @@ _REGISTRY = {
     'sipi.periodic-circuit/1': PeriodicCircuitDocument,
     'sipi.norton-circuit/1': NortonCircuitDocument,
     'sipi.mixed-circuit/1': MixedCircuitDocument,
+    'sipi.periodic-mixed-circuit/1': PeriodicMixedCircuitDocument,
     'sipi.periodic-norton-circuit/1': PeriodicNortonCircuitDocument,
 }
 
@@ -221,18 +223,22 @@ def _norton_circuit(result):
             [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]})
 
 
+def _mixed_response(r):
+    return dict(kinds=list(r.kinds), source_voltage_v=_array(r.source_voltages),
+        series_impedance_ohms=_array(r.series_impedances),
+        source_current_a=_array(r.source_currents), shunt_admittance_s=_array(r.shunt_admittances),
+        incident_sqrt_w=_array(r.a), reflected_sqrt_w=_array(r.b),
+        voltage_v=_array(r.voltage), current_a=_array(r.current),
+        condition_number=_array(r.condition_number), boundary_residual=_array(r.boundary_residual),
+        wave_residual=_array(r.wave_residual))
+
+
 def _mixed_circuit(result):
     r = result.response
     return dict(coverage='sampled-frequency-boundary',
         power_convention='dc-weight-one-positive-peak',
         source_network=_network(result.source_network), network=_network(result.network),
-        response=dict(kinds=list(r.kinds), source_voltage_v=_array(r.source_voltages),
-            series_impedance_ohms=_array(r.series_impedances),
-            source_current_a=_array(r.source_currents), shunt_admittance_s=_array(r.shunt_admittances),
-            incident_sqrt_w=_array(r.a), reflected_sqrt_w=_array(r.b),
-            voltage_v=_array(r.voltage), current_a=_array(r.current),
-            condition_number=_array(r.condition_number), boundary_residual=_array(r.boundary_residual),
-            wave_residual=_array(r.wave_residual)),
+        response=_mixed_response(r),
         frequency_power_w={name:_array(getattr(r, attribute)) for name,attribute in
             [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]})
 
@@ -291,6 +297,23 @@ def _periodic_norton_circuit(result):
             frequency_power_w=powers), mean_power_w=mean)
 
 
+def _periodic_mixed_circuit(result):
+    solution = result.solution
+    frequency = solution.frequency_solution
+    powers = {key:_array(getattr(frequency, attr)) for key,attr in
+              [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]}
+    with np.errstate(over='ignore', invalid='ignore'):
+        mean = {key:_array(np.sum(value)) for key,value in powers.items()}
+    harmonics = _mixed_response(frequency)
+    harmonics.update(convention='dc-mean-positive-peak', frequency_power_w=powers)
+    return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
+        source_network=_network(result.source_network), response=_periodic_time(solution.response),
+        source_voltage_v=_array(solution.source_voltages), source_current_a=_array(solution.source_currents),
+        termination_voltage_v=_array(solution.termination_voltages),
+        termination_current_a=_array(solution.termination_currents),
+        harmonics=harmonics, mean_power_w=mean)
+
+
 def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnostics=()):
     """Run a strict saved document and return a finite sipi.execution/1 dict.
 
@@ -327,6 +350,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = _periodic_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, PeriodicNortonCircuitDocument):
         out['result'] = _periodic_norton_circuit(doc.analyze(max_evaluations=budget))
+    elif isinstance(doc, PeriodicMixedCircuitDocument):
+        out['result'] = _periodic_mixed_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, MixedCircuitDocument):
         out['result'] = _mixed_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, NortonCircuitDocument):
