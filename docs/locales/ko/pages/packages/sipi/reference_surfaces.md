@@ -7,7 +7,8 @@
 모든 접지를 합친 의미와 출력 형식을 유지합니다. 저장 line/4는 여전히 공통
 reference만 받습니다. [line/5](reference_line.md)는 명시적인 reference 그룹을
 저장하되 접지 도체에는 전체 둘레 법칙 하나를 사용합니다. Python API는 추가로
-[접지 도체의 면별 법칙](ground_faces.md)을 지원하지만 line/5는 이 새 지정을 거부합니다.
+[접지 도체의 면별 법칙](ground_faces.md)을 지원하지만 line/5는 이 새 지정을 거부합니다. [line/6](ground_face_line.md)은
+이를 명시적으로 저장합니다.
 
 ```python
 import numpy as np

@@ -105,7 +105,7 @@ solve metal-interior diffusion, coating stacks, three-dimensional ground
 connections or measured manufacturing behavior. Check mesh and outer-domain
 convergence for the actual geometry and frequencies.
 
-This unit extends the Python API. Existing saved transmission-line/5 documents
-still accept one whole-perimeter metal per ground trace and reject four-face
-ground records; their meaning is unchanged. Application and Windows candidates
-are not advanced by this API extension.
+Existing transmission-line/5 accepts one whole-perimeter metal per ground trace
+and rejects four-face ground records. [Explicit line/6](ground_face_line.md) saves
+the four-face assignment without changing older schemas. Application and
+Windows candidate acceptance remains separate.

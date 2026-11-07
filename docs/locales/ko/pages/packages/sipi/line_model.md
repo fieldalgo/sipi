@@ -1,5 +1,7 @@
 # 재현 가능한 주파수별 선로 모델
 
+[접지 면 저장 선로](ground_face_line.md)는 명시적인 line/6으로 면별 접지 법칙을 저장합니다.
+
 [저장 reference 표면 선로](reference_line.md)는 line/5로 같은 추출 구성을 확장합니다.
 
 [저장 신호 면별 선로](face_line.md)는 transmission-line/4의 엄격한 면 배정과 한 메시/C0를 사용합니다.

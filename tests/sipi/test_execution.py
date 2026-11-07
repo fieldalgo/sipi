@@ -110,6 +110,8 @@ def documents():
     base.append(TransmissionLineDocument.from_dict(data))
     data = line().to_dict(); data['schema'] = 'sipi.transmission-line/5'
     base.append(TransmissionLineDocument.from_dict(data))
+    data = line().to_dict(); data['schema'] = 'sipi.transmission-line/6'
+    base.append(TransmissionLineDocument.from_dict(data))
     base.append(NetworkTransformDocument(source(), operations=[dict(kind='renormalize', reference_ohms=75)],
         schema='sipi.network-transforms/2'))
     base.append(DebyeFitDocument([1e5, 1e7], eps_real=[3., 2.], eps_loss=[.2, .3],

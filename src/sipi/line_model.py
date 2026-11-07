@@ -63,18 +63,30 @@ def _surface_metal(record):
                      relative_permeability=out.relative_permeability, roughness=rough)
 
 
+def _ground_reference_metal(value, schema):
+    if not isinstance(value, dict) or value.get('kind') != 'faces':
+        return _surface_metal(value)
+    if schema != 'sipi.transmission-line/6':
+        raise ValueError('ground trace faces require transmission-line/6')
+    names = ('bottom', 'top', 'left', 'right')
+    _keys(value, ('kind', *names), where='ground trace face metals')
+    parsed = {name: _surface_metal(value[name]) for name in names}
+    model = TraceFaceMetals(**{name: pair[0] for name, pair in parsed.items()})
+    return model, dict(kind='faces', **{name: pair[1] for name, pair in parsed.items()})
+
+
 def _reference_metal(value, *, faces, schema):
     if not isinstance(value, dict) or value.get('kind') != 'surfaces':
         return _surface_metal(value)
-    if not faces or schema != 'sipi.transmission-line/5':
-        raise ValueError('reference surfaces require surface-faces in transmission-line/5')
+    if not faces or schema not in ('sipi.transmission-line/5', 'sipi.transmission-line/6'):
+        raise ValueError('reference surfaces require surface-faces in transmission-line/5 or /6')
     _keys(value, ('kind', 'bottom', 'top', 'sides', 'conductors'), where='reference surfaces')
     if not isinstance(value['conductors'], dict):
         raise ValueError('reference conductors must be an object keyed by ground trace name')
     models, records = {}, dict(kind='surfaces')
     for name in ('bottom', 'top', 'sides'):
         models[name], records[name] = ((None, None) if value[name] is None else _surface_metal(value[name]))
-    pairs = {name: _surface_metal(metal) for name, metal in value['conductors'].items()}
+    pairs = {name: _ground_reference_metal(metal, schema) for name, metal in value['conductors'].items()}
     models['conductors'] = {name: pair[0] for name, pair in pairs.items()}
     records['conductors'] = {name: pair[1] for name, pair in pairs.items()}
     return ReferenceSurfaceMetals(**models), records
@@ -89,10 +101,12 @@ def _conductor(value, section, frequency, schema):
         return {'kind':'perfect'}, None
     if kind in ('surface-boundaries', 'surface-faces'):
         faces = kind == 'surface-faces'
-        if faces and schema not in ('sipi.transmission-line/4', 'sipi.transmission-line/5'):
-            raise ValueError('surface-faces requires transmission-line/4 or /5')
-        if not faces and schema not in ('sipi.transmission-line/3', 'sipi.transmission-line/4', 'sipi.transmission-line/5'):
-            raise ValueError('surface-boundaries requires transmission-line/3, /4 or /5')
+        if faces and schema not in ('sipi.transmission-line/4', 'sipi.transmission-line/5',
+                                    'sipi.transmission-line/6'):
+            raise ValueError('surface-faces requires transmission-line/4, /5 or /6')
+        if not faces and schema not in ('sipi.transmission-line/3', 'sipi.transmission-line/4',
+                                        'sipi.transmission-line/5', 'sipi.transmission-line/6'):
+            raise ValueError('surface-boundaries requires transmission-line/3, /4, /5 or /6')
         _keys(value, ('kind', 'conductors', 'reference', 'ground_thickness'), where='boundary surface conductor')
         if not isinstance(value['conductors'], dict):
             raise ValueError('conductors must be an object keyed by signal name')
@@ -211,6 +225,7 @@ class TransmissionLineDocument:
     Version 3 also permits separate signal/reference surface metals.
     Version 4 additionally permits four signal-face laws and one reference law.
     Version 5 also permits explicit reference-plane/wall/ground-trace laws.
+    Version 6 additionally permits four laws per finite ground trace.
     """
     def __init__(self, cross_section, frequency, *, materials, conductor, length, z_ref=50.0,
                  schema='sipi.transmission-line/1'):
@@ -230,7 +245,7 @@ class TransmissionLineDocument:
                      'length_m','reference_ohms'), where='transmission line')
         if data['schema'] not in ('sipi.transmission-line/1','sipi.transmission-line/2',
                                   'sipi.transmission-line/3','sipi.transmission-line/4',
-                                  'sipi.transmission-line/5'):
+                                  'sipi.transmission-line/5','sipi.transmission-line/6'):
             raise ValueError('unsupported transmission-line schema')
         doc = CrossSectionDocument.from_dict(data['cross_section'])
         section = doc.section

@@ -8,7 +8,8 @@ reference still combines all grounds and retains its output shape. Saved line/4
 continues to accept that common reference only; [line/5](reference_line.md) saves
 the explicit reference groups with one whole-perimeter law per ground trace.
 The Python API additionally supports [individual ground faces](ground_faces.md);
-line/5 continues to reject that newer assignment.
+line/5 continues to reject that newer assignment. [Line/6](ground_face_line.md)
+saves it explicitly.
 
 ```python
 import numpy as np

@@ -25,7 +25,7 @@ print(saved_schemas())
 메시나 필드 계산은 하지 않지만 일부 네트워크 검증기는 작은 대수 계산을 합니다.
 `saved_schemas()`는 닫힌 목록을 반환합니다: cross-section/1–3,
 impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
-aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–5,
+aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–6,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
 circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1, dielectric-fit/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
@@ -99,3 +99,5 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 [고정 후보 수율 설계](yield_design.md)의 `sipi.yield-design/1`도 지원합니다. 모든 후보의 계획 표본수 합을 풀이 전에 예산 검사하며, 한 행이라도 미완이면 실행은 `incomplete`입니다. 목표에 따른 후보 선택 상태와 계산 완료 상태는 별개입니다.
 
 [저장 면별 선로](face_line.md)는 `conductor_boundaries`에 Q·면별/전체 도체 적분전류·기존 전류 flux 진단을 추가로 보존합니다.
+
+[접지 면 저장](ground_face_line.md)은 line/6에서 확장된 접지 면 진단을 보존합니다.

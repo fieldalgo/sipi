@@ -1,5 +1,7 @@
 # Reproducible frequency-dependent line models
 
+[Saved ground-face lines](ground_face_line.md) use explicit line/6 for per-face ground laws.
+
 [Saved reference-surface lines](reference_line.md) extend the shared extraction with line/5.
 
 [Saved signal-face lines](face_line.md) use transmission-line/4 with strict face assignments and one shared mesh/C0.

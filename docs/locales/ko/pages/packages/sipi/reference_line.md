@@ -37,7 +37,7 @@ assert report['result']['conductor_boundaries']['labels'][-2:] == ['reference:bo
 둘레 전체에는 하나의 법칙을 적용하고 양 측벽도 하나를 공유합니다. 모든 접지는
 같은 PEC 전위이며 별도 포트가 아닙니다.
 
-이 변형은 버전 5의 `surface-faces`에만 허용합니다. 기존 tag 없는 공통 reference
+이 변형은 버전 5와 [버전 6](ground_face_line.md)의 `surface-faces`에 허용합니다. 기존 tag 없는 공통 reference
 metal은 버전 4와 5에서 유효합니다. 알 수 없는 필드·그룹 누락·열린 경계에 금속,
 접지 경계에 null·잘못된 금속·중복 JSON 키·비유한 수를 거부합니다. 기하·배정·국소
 표피 깊이 조건은 필드 계산 없이 정규화할 때 검사합니다.

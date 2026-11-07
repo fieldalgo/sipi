@@ -37,8 +37,8 @@ Each metal record retains `conductivity`, `relative_permeability` and an explici
 supported `roughness`. Ground traces keep one law over their whole perimeter;
 both side walls share one law. All grounds remain one PEC potential, not extra ports.
 
-This variant is accepted only for `surface-faces` in version 5. The old untagged
-common-reference metal remains valid in versions 4 and 5. Unknown fields, missing
+This variant is accepted for `surface-faces` in version 5 and [version 6](ground_face_line.md). The old untagged
+common-reference metal remains valid in versions 4 through 6. Unknown fields, missing
 groups, metals on open boundaries, null grounded boundaries, invalid metals,
 duplicate JSON keys and nonfinite numbers reject. All geometry, mapping and
 local skin-depth gates run during normalization before any field solve.

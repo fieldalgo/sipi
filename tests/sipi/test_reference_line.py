@@ -147,7 +147,7 @@ def test_length_design_extracts_new_reference_source_once_and_replays(monkeypatc
     assert old.history == result.history
 
 
-@pytest.mark.parametrize('case', ['schema1', 'schema2', 'schema3', 'schema4', 'schema6',
+@pytest.mark.parametrize('case', ['schema1', 'schema2', 'schema3', 'schema4', 'schema7',
     'boundary_kind', 'missing_kind', 'unknown_kind', 'extra_reference', 'missing_plane', 'null_plane',
     'open_plane', 'missing_ground', 'extra_ground', 'null_ground', 'wrong_map', 'missing_roughness',
     'unknown_roughness', 'extra_metal', 'boolean_sigma', 'infinite_sigma', 'plane_depth', 'trace_depth'])

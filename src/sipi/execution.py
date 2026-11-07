@@ -47,7 +47,7 @@ _REGISTRY = {
     'sipi.aperture-section/1': ApertureSectionDocument,
     'sipi.aperture-study/1': ApertureStudyDocument,
     'sipi.aperture-design/1': ApertureDesignDocument,
-    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4, 5)},
+    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4, 5, 6)},
     'sipi.volume-line/1': VolumeLineDocument,
     'sipi.lumped-network/1': LumpedNetworkDocument,
     'sipi.network-assembly/1': NetworkAssemblyDocument,
