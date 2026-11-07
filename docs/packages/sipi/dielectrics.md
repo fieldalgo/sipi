@@ -1,5 +1,7 @@
 # Frequency-dependent dielectric extraction
 
+[Fixed-pole fitting](dielectric_fit.md) produces passive Debye candidates with explicit sampled-error decisions.
+
 **English** | [한국어](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/dielectrics.md)
 
 [Cross-sections](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/overview.md) · [Uniform-line networks](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/network.md)

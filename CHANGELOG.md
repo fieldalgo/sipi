@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add fixed-pole passive Debye fitting with bounded coefficients, conditioning/optimality rejection and retained sampled residuals and acceptance limits.
+
 - Add transmission-line/5 reference-surface JSON with shared extraction diagnostics and existing circuit and sampled-length replay.
 
 - Add explicit reference-plane, side-wall and named ground-trace surface laws with conserved current partitions, individual skin-depth gates and unchanged common-reference behavior.

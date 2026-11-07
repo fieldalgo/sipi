@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Fixed-pole dielectric fitting](dielectric_fit.md) retains all samples and residuals while fitting passive Debye coefficients.
+
 [Saved reference-surface lines](reference_line.md) use line/5 and reuse circuit and once-extracted length analysis.
 
 [Separate reference surfaces](reference_surfaces.md) assign individual plane, wall and ground-trace surface laws in the Python API.

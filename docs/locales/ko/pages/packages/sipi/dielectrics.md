@@ -1,5 +1,7 @@
 # 주파수 의존 유전체 추출
 
+[고정 pole fitting](dielectric_fit.md)은 표본 오차 판정이 있는 수동 Debye 후보를 만듭니다.
+
 [English](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/dielectrics.md) | **한국어**
 
 [단면](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/overview.md) · [균일 전송선 네트워크](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)
