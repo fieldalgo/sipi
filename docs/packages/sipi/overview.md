@@ -1,5 +1,7 @@
 # sipi — signal and power integrity of PCB cross-sections
 
+[Shared saved-input execution](execution.md) provides finite JSON results for browser and local application transports.
+
 [Elliptical-aperture matrices](elliptical_aperture.md) retain coupling for single or paired round conductors.
 [Capacitance studies and goals](aperture_studies.md) reuse these sections with saved sampling and refined target checks.
 
