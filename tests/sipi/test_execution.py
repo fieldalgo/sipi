@@ -18,6 +18,7 @@ from sipi.volume_line import VolumeLineDocument
 from sipi.circuit_document import CircuitDocument
 from sipi.dielectric import ConstantDielectric
 from sipi.dielectric_fit import DebyeFitDocument
+from sipi.line_goal_document import LineQuantityDesignDocument
 
 
 def cross():
@@ -116,6 +117,10 @@ def documents():
         schema='sipi.network-transforms/2'))
     base.append(DebyeFitDocument([1e5, 1e7], eps_real=[3., 2.], eps_loss=[.2, .3],
                                 relaxation_hz=[1e6], max_error=.01))
+    base.append(LineQuantityDesignDocument(ImpedanceStudyDocument('stripline',
+        dict(width=.5e-3, plane_spacing=1e-3, eps_r=4.), quantity='z0', frequency=1e9, materials={},
+        sampling=dict(kind='sweep', count=2, variables=[dict(name='width', lower=.3e-3, upper=.8e-3)])),
+        conductor=dict(kind='perfect'), quantity='impedance_real', target=50., tolerance=.5))
     base.append(ImpedanceStudyDocument('stripline', dict(width=.5e-3, plane_spacing=1e-3, eps_r=1),
         quantity='z0', frequency=1e8, materials={'dielectric':ConstantDielectric(4)},
         material_variables={'dk':dict(region='dielectric',path=['eps_r'])},

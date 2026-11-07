@@ -1,5 +1,7 @@
 # 유손실 단일 선로의 목표 역산
 
+[목표 JSON 저장](line_goal_document.md)은 기존 geometry/material study 입력을 재사용합니다.
+
 [English](../../../../../packages/sipi/line_goal.md) · [선로 입력](line_model.md) · [전파](propagation.md)
 
 `sipi.line_goal.seek_line_quantity`는 사용자가 제공한 `TransmissionLineDocument`

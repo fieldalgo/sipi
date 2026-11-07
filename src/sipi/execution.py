@@ -36,6 +36,8 @@ from .face_conductor import FaceConductorLoss
 from .yield_assessment import ImpedanceYieldDocument
 from .yield_design import YieldDesignDocument
 from .dielectric_fit import DebyeFitDocument
+from .line_goal_document import LineQuantityDesignDocument
+from .line_goal import LineQuantityGoalError
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -61,6 +63,7 @@ _REGISTRY = {
     'sipi.impedance-yield/1': ImpedanceYieldDocument,
     'sipi.yield-design/1': YieldDesignDocument,
     'sipi.dielectric-fit/1': DebyeFitDocument,
+    'sipi.line-quantity-design/1': LineQuantityDesignDocument,
 }
 
 
@@ -221,6 +224,17 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = result.to_dict()
         if result.unresolved:
             out['status'] = 'incomplete'
+    elif isinstance(doc, LineQuantityDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except LineQuantityGoalError as exc:
+            out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
+                quantity=exc.quantity, unit=exc.unit, attempts=exc.attempts, stage=exc.stage,
+                failed_parameter=exc.failed_parameter, cause_type=exc.cause_type,
+                input=None if exc.input_json is None else json.loads(exc.input_json),
+                history=[row.to_dict() for row in exc.history]))
     elif isinstance(doc, LineLengthDesignDocument):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')

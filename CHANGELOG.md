@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add saved line-quantity-design/1 using existing scalar geometry/material study inputs, strict line/6 conductors and shared execution with retained goal failures.
+
 - Add bounded scalar-line goals for real lossy characteristic impedance or attenuation, with frozen input refinement, counted failures and complete replay snapshots.
 
 - Add transmission-line/6 ground-face JSON with strict pre-mesh validation, retained diagnostics and existing circuit and once-extracted length replay.

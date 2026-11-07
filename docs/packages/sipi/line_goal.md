@@ -1,5 +1,7 @@
 # Goals using lossy scalar-line quantities
 
+[Saved goal JSON](line_goal_document.md) reuses existing geometry/material study inputs.
+
 [한국어](../../locales/ko/pages/packages/sipi/line_goal.md) · [Saved line inputs](line_model.md) · [Propagation](propagation.md)
 
 `sipi.line_goal.seek_line_quantity` varies one positive parameter of a caller's
