@@ -135,3 +135,5 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 [외부 정전용량 입력 저장](debye_capacitive_startup_document.md)은 F와 F/m를 구분합니다.
 
 [외부 RL 입력 저장](debye_reactive_startup_document.md)은 Ω·H·F와 선로의 단위당 길이 입력을 구분합니다.
+
+[3·4신호 입력 저장](multiconductor_startup_document.md)은 명시 신호 수와 SI 입력·시간 행 예산을 보존합니다.

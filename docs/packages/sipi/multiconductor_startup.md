@@ -76,3 +76,5 @@ provide full-wave transients or infer measured TDR. Independently check
 source/time/spatial convergence for each intended input. Counts do not
 promise runtime or accuracy. See [development](../../development.md) for
 exact installed-artifact validation and reference-tool versions.
+
+[Saved three/four-signal inputs](multiconductor_startup_document.md) preserve explicit signal count, SI inputs and actual time-row budgets.

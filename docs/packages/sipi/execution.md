@@ -149,3 +149,5 @@ replace the numerical reference and convergence tests of each engine.
 [Saved external capacitive inputs](debye_capacitive_startup_document.md) distinguish F from F/m.
 
 [Saved external RL inputs](debye_reactive_startup_document.md) distinguish external ohm/H/F from per-length line inputs.
+
+[Saved three/four-signal inputs](multiconductor_startup_document.md) preserve explicit signal count, SI inputs and actual time-row budgets.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit three/four-signal constant RLGC inputs with strict SI keys, actual time-row budgets and full state/diagnostic identity checks.
+
 - Add an explicit three/four-signal constant RLGC startup API with independent modal/KCL convergence and finite line/source power checks.
 
 - Add explicitly selected saved wave version8 for external series-RL Debye inputs while preserving prior registries and physical power partitions.
