@@ -69,7 +69,7 @@ assert response.to_dict()['scope'] == 'finite-passive-two-signal-psd-debye-ladde
 are near_0,near_1,far_0,far_1, currents into the line. Polarization voltage,
 node-lumped charge and current are(time,node,pole,conductor). Internal states
 are omitted from JSON unless `include_states=True`. This independent response
-is not implicitly accepted by the current wave/saved adapters.
+does not implicitly enter prior contracts. The [terminal wave adapter](startup_waves.md) now explicitly accepts this response; saved wave v1..5 still reject PSD saved inputs.
 
 Independent diagonal/exchange scalar modes, zero-strength constant RLGC and
 strict-SPD full-state limits are checked. A separate noncommuting rank-one

@@ -12,6 +12,7 @@ from .norton_startup import NortonReactiveRLGCLadderResponse
 from .mixed_startup import MixedSourceRLGCLadderResponse
 from .debye_startup import DebyeRLGCLadderResponse
 from .coupled_debye_startup import CoupledDebyeRLGCLadderResponse
+from .psd_debye_startup import PSDCoupledDebyeRLGCLadderResponse
 
 __all__ = ['StartupPortWaves', 'startup_port_waves']
 
@@ -72,7 +73,8 @@ def startup_port_waves(response, *, z_ref):
 
     Accept LosslessLineResponse or RLGCLadderResponse (including its coupled,
     mixed and reactive subclasses), or NortonReactiveRLGCLadderResponse/MixedSourceRLGCLadderResponse,
-    or explicit DebyeRLGCLadderResponse/CoupledDebyeRLGCLadderResponse.
+    or explicit DebyeRLGCLadderResponse/CoupledDebyeRLGCLadderResponse,
+    or PSDCoupledDebyeRLGCLadderResponse.
     Terminal currents are distinct from injected currents or typed mixed drives;
     wave power is terminal V*I, excluding external source series/shunt losses.
     z_ref must be a vector of positive finite
@@ -91,7 +93,7 @@ def startup_port_waves(response, *, z_ref):
     dependent impedance is inferred. Far-port incident/outgoing directions
     reverse the +z/-z traveling-wave convention of a lossless scalar line.
     """
-    if not isinstance(response, (LosslessLineResponse, RLGCLadderResponse, NortonReactiveRLGCLadderResponse, MixedSourceRLGCLadderResponse, DebyeRLGCLadderResponse, CoupledDebyeRLGCLadderResponse)):
+    if not isinstance(response, (LosslessLineResponse, RLGCLadderResponse, NortonReactiveRLGCLadderResponse, MixedSourceRLGCLadderResponse, DebyeRLGCLadderResponse, CoupledDebyeRLGCLadderResponse, PSDCoupledDebyeRLGCLadderResponse)):
         raise ValueError('response must be a lossless or RLGC startup response')
     time = _times('time', response.time)
     voltage = _real('voltage', response.voltage); current = _real('current', response.current)

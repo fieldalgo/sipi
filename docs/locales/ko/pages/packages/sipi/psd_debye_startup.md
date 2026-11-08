@@ -65,7 +65,7 @@ assert response.to_dict()['scope'] == 'finite-passive-two-signal-psd-debye-ladde
 네 단자는 near_0,near_1,far_0,far_1이고 전류는 선로로 들어가는 방향입니다.
 분극 전압·노드 전하·전류는(time,node,pole,conductor) 모양입니다.
 JSON 내부 상태는 include_states=True일 때만 포함합니다. 독립된 이 응답은
-기존 파동·저장 어댑터에 암묵적으로 들어가지 않습니다.
+기존 계약에 암묵적으로 들어가지 않습니다. [단자 파동](startup_waves.md)은 이제 이 응답을 명시적으로 받으며 저장 파동 v1..5는 PSD 저장 입력을 계속 거부합니다.
 
 독립 대각·교환대칭 단일모드, 강도0 기존 RLGC 및 원래 SPD 전체상태 한계를
 검사합니다. 비가환 rank-one 전하 KCL을 후보 회로행렬과 별도로 DOP853로

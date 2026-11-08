@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept explicit PSD Debye terminal waves with rank-one mode limits and null-direction energy checks.
+
 - Save explicit PSD Debye startup inputs with singular-strength preservation, time-row budgets and complete state replay guards.
 
 - Add a separate two-signal Debye startup API for singular PSD strengths using canonical voltage states, with charge-KCL, modal and convergence checks.

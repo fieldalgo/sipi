@@ -264,3 +264,42 @@ infer dispersive eigenmodes or TDR impedance. Saved wave v1..4 still reject the
 [coupled Debye document](coupled_debye_startup_document.md); no implicit version upgrade.
 
 [Explicit saved version5](startup_waves_document.md) adds coupled Debye inputs.
+
+## Explicit four-terminal waves for PSD strengths
+
+[PSD Debye responses](psd_debye_startup.md) are accepted explicitly as
+`PSDCoupledDebyeRLGCLadderResponse`. Use terminal V/I ordered near_0,near_1,
+far_0,far_1 and four positive real references; the original reconstruction and
+power gates remain unchanged. Two source voltages and internal polarization
+currents cannot replace terminal currents. A canonical null-direction auxiliary
+voltage is not a separate traveling wave or loss contribution.
+
+Near-pair power is source_power-source_resistor_loss; far-pair power is
+-load_resistor_loss. The total is total_energy_rate+series_loss+shunt_loss+
+relaxation_loss, including observable polarization storage and loss only.
+
+```python
+from sipi import psd_coupled_debye_rlgc_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = psd_coupled_debye_rlgc_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4],
+    R=[[20., 3.], [3., 20.]], L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.])
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'PSDCoupledDebyeRLGCLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.total_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+```
+
+Checks cover rank-one diagonal/exchange scalar modes, noncommuting ramp/pulse,
+zero-strength and original strict-SPD wave limits, null-mode constant-line
+limits, nearly singular strengths, pole/conductor permutations, copies,
+strict references and internal-array rejection. Saved wave v1..5 still reject
+PSD saved inputs. This does not establish dispersive eigenmode/TDR inference,
+measured accuracy or browser/Windows integration.

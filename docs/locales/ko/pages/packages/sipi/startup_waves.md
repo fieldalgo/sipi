@@ -244,3 +244,39 @@ np.testing.assert_allclose(waves.port_power.sum(axis=1),
 거부하며 버전을 자동으로 올리지 않습니다.
 
 [명시적 저장 버전5](startup_waves_document.md)가 결합 Debye 입력을 추가합니다.
+
+## PSD 강도의 명시적 네 단자 파동
+
+[PSD Debye 응답](psd_debye_startup.md)도 `PSDCoupledDebyeRLGCLadderResponse`로
+명시적으로 받습니다. near_0,near_1,far_0,far_1의 단자 V/I와 네 개의 양의
+실수 기준 임피던스를 사용하며 원래 복원·전력 기준은 유지합니다. 두 소스
+전압이나 내부 분극 전류로 단자 전류를 대체하지 않습니다. null 방향의
+내부 필터 전압을 별도의 파동·손실로 해석하지 않습니다.
+
+근단 합은 source_power−source_resistor_loss, 원단 합은 −load_resistor_loss이며
+전체는 total_energy_rate+series_loss+shunt_loss+relaxation_loss입니다.
+
+```python
+from sipi import psd_coupled_debye_rlgc_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = psd_coupled_debye_rlgc_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4],
+    R=[[20., 3.], [3., 20.]], L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.])
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'PSDCoupledDebyeRLGCLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.total_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+```
+
+rank-one 대각·교환대칭 단일모드, 비가환 강도·ramp/pulse, 강도0 및 원래
+SPD 파동 한계, null 방향의 기존 상수 선로 한계, 거의 특이한 강도,
+극/도체 순열·복사·엄격한 기준·잘못된 내부배열 대입 거부를 검사합니다.
+저장 파동 v1..5는 여전히 PSD 저장 입력을 거부합니다. 이 연결은 일반
+분산 고유모드·TDR 역산·실측 정확도나 웹·Windows 수락을 뜻하지 않습니다.
