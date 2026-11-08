@@ -1,5 +1,7 @@
 # Two-signal finite RLGC startup circuit
 
+[Saved inputs](coupled_startup_document.md) preserve these matrices and connect to common execution.
+
 `coupled_rlgc_ladder_response` propagates a uniform **finite two-signal circuit**
 from zero stored energy. Full constant scalar-conductor matrices retain mutual
 inductance, capacitance, series resistance and shunt conductance. It extends

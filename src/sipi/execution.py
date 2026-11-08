@@ -53,6 +53,7 @@ from .sampled_design_document import SampledImpedanceDesignDocument
 from .sampled_design import SampledImpedanceGoalError
 from .startup_document import LosslessStartupDocument
 from .rlgc_startup_document import RLGCLadderDocument
+from .coupled_startup_document import CoupledRLGCLadderDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -96,6 +97,7 @@ _REGISTRY = {
     'sipi.sampled-impedance-design/1': SampledImpedanceDesignDocument,
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
+    'sipi.coupled-rlgc-startup/1': CoupledRLGCLadderDocument,
 }
 
 
@@ -338,7 +340,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     Conductivity profiles count frequencies before constitutive integration.
     Lossless startup counts required forward delay terms before waveforms,
     separately from its saved hard cap and output sample count.
-    Finite RLGC startup counts time samples before state propagation, retaining
+    Scalar and two-signal finite RLGC startup count time samples before state propagation, retaining
     the separate explicit cell count and its hard bound.
     Dielectric fitting counts input frequencies before matrix/optimizer work;
     completed execution keeps the fit's accepted flag as a separate decision.
@@ -360,7 +362,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument)):
+    if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, ConductivityProfileDocument):
         profile = doc.analyze(max_evaluations=budget)

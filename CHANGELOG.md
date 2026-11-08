@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save strict two-signal RLGC startup matrices and drives, preserving actual sample budgets, full-state replay and common finite execution output.
+
 - Add two-signal passive finite RLGC startup with full constant matrices, positive resistive ends, energy diagnostics and independent modal, asymmetric ODE and scalar-limit checks.
 
 - Save strict finite RLGC startup inputs with independent cell and sample bounds, exact API replay and shared execution that preserves numerical failures.

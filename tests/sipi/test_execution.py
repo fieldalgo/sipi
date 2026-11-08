@@ -219,6 +219,11 @@ def documents():
     base.append(RLGCLadderDocument([0.,1e-9,2e-9], [0.,1.,1.],
         R=20.,L=500e-9,G=.002,C=200e-12,length=.1,cells=8,
         source_resistance=25.,load_resistance=100.))
+    from sipi import CoupledRLGCLadderDocument
+    base.append(CoupledRLGCLadderDocument([0.,1e-9,2e-9], [[0.,0.],[1.,0.],[1.,0.]],
+        R=[[20.,3.],[3.,20.]],L=np.array([[500.,100.],[100.,500.]])*1e-9,
+        G=[[.002,-.0003],[-.0003,.002]],C=np.array([[220.,-40.],[-40.,220.]])*1e-12,
+        length=.1,cells=8,source_resistance=[25.,25.],load_resistance=[100.,100.]))
     return base
 
 
