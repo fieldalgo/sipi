@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit three/four-signal positive-strength Debye finite circuits, with independent charge-state/modal refinement checks and unchanged legacy two-signal response exports.
+
 - Read normalized Touchstone1.0 Y/Z/H/G with explicit port count and output references, preserving mixed physical units and qualified independent reference checks.
 
 - Read explicit Touchstone2 physical H/G at caller-selected references while preserving existing S/Y/Z parsing and documenting qualified triangular reference checks.

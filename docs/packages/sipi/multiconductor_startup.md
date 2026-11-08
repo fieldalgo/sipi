@@ -80,3 +80,6 @@ exact installed-artifact validation and reference-tool versions.
 [Saved three/four-signal inputs](multiconductor_startup_document.md) preserve explicit signal count, SI inputs and actual time-row budgets.
 
 [Terminal waves](startup_waves.md) explicitly accept this response with six/eight ports. Existing saved wavev1..8 keep their original input kinds.
+
+
+[Three/four-signal positive-strength Debye API](multiconductor_debye_startup.md) uses a separate explicit result type and bounded circuit contract.

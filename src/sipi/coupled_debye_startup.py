@@ -112,13 +112,13 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
 
 
 def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
-                             load_capacitance=None, load_branch=None):
+                             load_capacitance=None, load_branch=None, signals=2):
     """Shared circuit propagation; strict-SPD path preserves original arithmetic."""
     time, drive, r, l, g, c, length, n, rs, rl, delta, poles = data
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
     active = [index for index, matrix in enumerate(delta) if np.any(matrix)]
-    nv = 2*(n+1); base = nv+2*n; branch = base+len(active)*nv
-    size = branch+(2 if load_branch is not None else 0)
+    nv = signals*(n+1); base = nv+signals*n; branch = base+len(active)*nv
+    size = branch+(signals if load_branch is not None else 0)
     if load_branch is not None:
         if load_capacitance is None:
             raise ValueError('external branch requires explicit load capacitance')
@@ -134,24 +134,24 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             or (any(not np.any(x) or np.linalg.eigvalsh(x)[0] < 0 for x in conductance)
                 if psd_strength else any(np.linalg.eigvalsh(x)[0] <= 0 for x in conductance))):
         raise ValueError('Debye cell matrices or source slopes exceed finite scales')
-    mass = np.zeros((size, size)); k = np.zeros_like(mass); b = np.zeros((size, 2))
+    mass = np.zeros((size, size)); k = np.zeros_like(mass); b = np.zeros((size, signals))
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         mass[:nv, :nv] = np.kron(np.diag(dx*weights), c)
         mass[nv:base, nv:base] = np.kron(np.eye(n)*dx, l)
         if load_capacitance is not None:
-            mass[nv-2:nv, nv-2:nv] += load_capacitance
+            mass[nv-signals:nv, nv-signals:nv] += load_capacitance
         if load_branch is not None:
             mass[branch:, branch:] = lb
             k[branch:, branch:] = -rb
-            k[branch:, nv-2:nv] = np.eye(2)
-            k[nv-2:nv, branch:] = -np.eye(2)
+            k[branch:, nv-signals:nv] = np.eye(signals)
+            k[nv-signals:nv, branch:] = -np.eye(signals)
         k[:nv, :nv] = -np.kron(np.diag(dx*weights), g)
         k[nv:base, nv:base] = -np.kron(np.eye(n)*dx, r)
         for j in range(n):
-            near = slice(2*j, 2*j+2); far = slice(2*j+2, 2*j+4)
-            segment = slice(nv+2*j, nv+2*j+2)
-            k[near, segment] = -np.eye(2); k[far, segment] = np.eye(2)
-            k[segment, near] = np.eye(2); k[segment, far] = -np.eye(2)
+            near = slice(signals*j, signals*j+signals); far = slice(signals*j+signals, signals*j+2*signals)
+            segment = slice(nv+signals*j, nv+signals*j+signals)
+            k[near, segment] = -np.eye(signals); k[far, segment] = np.eye(signals)
+            k[segment, near] = np.eye(signals); k[segment, far] = -np.eye(signals)
         for slot, pole in enumerate(active):
             sl = slice(base+slot*nv, base+(slot+1)*nv)
             cap = np.kron(np.diag(dx*weights), delta[pole]); cond = cap/tau[pole]
@@ -162,15 +162,15 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             else:
                 mass[sl, sl] = cap; k[:nv, :nv] -= cond; k[sl, sl] -= cond
                 k[:nv, sl] += cond; k[sl, :nv] += cond
-        k[:2, :2] -= np.diag(1/rs); k[nv-2:nv, nv-2:nv] -= np.diag(1/rl)
-        b[:2] = np.diag(1/rs)
+        k[:signals, :signals] -= np.diag(1/rs); k[nv-signals:nv, nv-signals:nv] -= np.diag(1/rl)
+        b[:signals] = np.diag(1/rs)
     if not all(np.all(np.isfinite(x)) for x in (mass, k, b)):
         raise ValueError('Debye circuit coefficients exceed finite scales')
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         a = np.linalg.solve(mass, k); beta = np.linalg.solve(mass, b)
     if not all(np.all(np.isfinite(x)) for x in (a, beta)):
         raise ValueError('Debye normalized coefficients exceed finite scales')
-    _, _, x = propagator((a, beta, np.zeros((1, size)), np.zeros((1, 2))), drive, time, interp=True)
+    _, _, x = propagator((a, beta, np.zeros((1, size)), np.zeros((1, signals))), drive, time, interp=True)
     x = np.asarray(x)
     if x.shape != (len(time), size) or not np.all(np.isfinite(x)):
         raise ValueError('state propagation returned invalid shape or nonfinite values')
@@ -178,15 +178,31 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         raise ValueError('state propagation must preserve the zero initial state')
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         rhs = x@a.T+drive@beta.T
-        v = x[:, :nv].reshape(len(time), n+1, 2); i = x[:, nv:base].reshape(len(time), n, 2)
+        v = x[:, :nv].reshape(len(time), n+1, signals); i = x[:, nv:base].reshape(len(time), n, signals)
         dv = rhs[:, :nv].reshape(v.shape); di = rhs[:, nv:base].reshape(i.shape)
-        shape = (len(time), n+1, len(delta), 2)
+        shape = (len(time), n+1, len(delta), signals)
         w = np.zeros(shape); dw = np.zeros(shape); charge = np.zeros(shape); pcurrent = np.zeros(shape)
         for slot, pole in enumerate(active):
             w[:, :, pole] = x[:, base+slot*nv:base+(slot+1)*nv].reshape(v.shape)
             dw[:, :, pole] = rhs[:, base+slot*nv:base+(slot+1)*nv].reshape(v.shape)
+            if signals != 2:
+                # Factored relaxation avoids subtracting large matrix products.
+                dw[:, :, pole] = (v-w[:, :, pole])/tau[pole]
+                rhs[:, base+slot*nv:base+(slot+1)*nv] = dw[:, :, pole].reshape(len(time), nv)
             charge[:, :, pole] = dx*weights[None, :, None]*(w[:, :, pole]@delta[pole].T)
             pcurrent[:, :, pole] = dx*weights[None, :, None]*(dw[:, :, pole]@delta[pole].T)
+        if signals != 2:
+            if load_capacitance is not None or load_branch is not None:
+                raise ValueError('multiconductor Debye derivatives require resistive ends')
+            flow = np.zeros_like(v)
+            flow[:, :-1] -= i; flow[:, 1:] += i
+            flow[:, 0] += (drive-v[:, 0])/rs; flow[:, -1] -= v[:, -1]/rl
+            forcing = (flow-pcurrent.sum(axis=2))/(dx*weights[None, :, None])-v@g.T
+            dv = np.linalg.solve(c, forcing.reshape(-1, signals).T).T.reshape(v.shape)
+            forcing_i = (v[:, :-1]-v[:, 1:])/dx-i@r.T
+            di = np.linalg.solve(l, forcing_i.reshape(-1, signals).T).T.reshape(i.shape)
+            rhs[:, :nv] = dv.reshape(len(time), nv)
+            rhs[:, nv:base] = di.reshape(len(time), signals*n)
         energy = .5*dx*(np.sum(weights*_quadratic(v, c), axis=1)+np.sum(_quadratic(i, l), axis=1))
         rate = dx*(np.sum(weights*np.einsum('tni,ij,tnj->tn', v, c, dv), axis=1)
                    +np.sum(np.einsum('tni,ij,tnj->tn', i, l, di), axis=1))
@@ -209,12 +225,12 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             be = .5*_quadratic(bi, lb)
             br = np.einsum('ti,ij,tj->t', bi, lb, dbi)
             bl = _quadratic(bi, rb)
-            current[:, 2:] -= bi
+            current[:, signals:] -= bi
         series = dx*np.sum(_quadratic(i, r), axis=1)
         shunt = dx*np.sum(weights*_quadratic(v, g), axis=1)
-        power = np.sum(voltage*current, axis=1); supplied = np.sum(drive*current[:, :2], axis=1)
-        source_loss = np.sum(rs*current[:, :2]**2, axis=1)
-        load_loss = (np.sum(rl*current[:, 2:]**2, axis=1) if load_capacitance is None
+        power = np.sum(voltage*current, axis=1); supplied = np.sum(drive*current[:, :signals], axis=1)
+        source_loss = np.sum(rs*current[:, :signals]**2, axis=1)
+        load_loss = (np.sum(rl*current[:, signals:]**2, axis=1) if load_capacitance is None
                      else np.sum(v[:, -1]**2/rl, axis=1))
         total_rate = rate+pr; losses = series+shunt+relaxation
         combined_loss = source_loss+load_loss+losses
@@ -241,6 +257,8 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         L_h_per_m=l.tolist(), G_s_per_m=g.tolist(), C_inf_f_per_m=c.tolist(),
         delta_C_f_per_m=delta.tolist(), relaxation_hz=poles.tolist(), length_m=length,
         cells=n, source_resistance_ohm=rs.tolist(), load_resistance_ohm=rl.tolist())
+    if signals != 2:
+        data['signals'] = signals
     extra = ()
     if load_capacitance is not None:
         data['load_capacitance_f'] = load_capacitance.tolist()
