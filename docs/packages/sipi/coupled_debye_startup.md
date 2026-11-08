@@ -87,9 +87,10 @@ readonly/copy, strict matrix and numerical-failure checks supplement them.
 This model excludes ideal/open/short/current-source/reactive external ends,
 generic PSD strengths, automatic geometry/material extraction, conductor
 frequency dependence, arbitrary fitting, TDR interpretation and measured-board
-accuracy. Browser, Windows, saved requests and wave adapters require separate
-integration. Existing NumPy/SciPy and test-only scikit-rf versions/licenses are
+accuracy. Browser, Windows and wave adapters require separate integration. Existing NumPy/SciPy and test-only scikit-rf versions/licenses are
 retained; no new dependency is introduced.
 
 [Scalar Debye](debye_startup.md) · [Constant coupled RLGC](coupled_startup.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/coupled_debye_startup.md)
+
+[Saved inputs](coupled_debye_startup_document.md) provide a separate executable request.

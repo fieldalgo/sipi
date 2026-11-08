@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save coupled Debye startup matrices with exact pole order, strict time budgets and complete four-terminal/state/diagnostic replay guards.
+
 - Add bounded two-signal Debye startup with explicit positive matrix strengths, separate polarization storage/loss, independent charge-KCL and modal/time/space references.
 
 - Add explicitly selected saved port-wave version4 for scalar Debye startup, preserving prior nested registries and physical time/pole contracts.

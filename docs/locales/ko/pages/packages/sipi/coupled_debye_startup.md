@@ -84,9 +84,10 @@ ABCD 대비 32/64/128셀의 오차는 다음과 같습니다.
 
 이상·개방·단락·전류원·리액티브 외부 종단, 일반 준정부호 강도,
 자동 기하·재료 추출, 도체 주파수 의존성, 임의 맞춤, TDR 해석 및 실측
-기판 정확도는 범위 밖입니다. 웹·Windows·저장 요청·파동 어댑터 연결은
-별도입니다. 기존 NumPy/SciPy와 시험 전용 scikit-rf 버전·라이선스를
+기판 정확도는 범위 밖입니다. 웹·Windows·파동 어댑터 연결은 별도입니다. 기존 NumPy/SciPy와 시험 전용 scikit-rf 버전·라이선스를
 유지하며 새 의존성은 없습니다.
 
 [단일 신호 Debye](debye_startup.md) · [상수 결합 RLGC](coupled_startup.md) ·
 [English](../../../../../packages/sipi/coupled_debye_startup.md)
+
+[입력 저장](coupled_debye_startup_document.md)은 별도의 실행 가능한 요청입니다.
