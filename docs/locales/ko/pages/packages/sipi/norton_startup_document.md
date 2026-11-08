@@ -63,7 +63,7 @@ SPD 선로 L/C를 요구합니다. 집중 C[F]/분기 R[ohm]는 영·rank-one PS
 [전압원 저장 v4](coupled_reactive_startup_document.md)는 기존 스키마와 scope를 유지합니다.
 전압/전류 키·스키마 교차 로딩을 거부하며 단위 변환이나 버전 승격을 추정하지 않습니다.
 기존 [startup-port-waves/1](startup_waves_document.md)은 원래 6종 물리 스키마만 허용하고
-이 Norton 형식은 거부합니다. 파동 연결은 별도 명시적 계약이 필요합니다.
+이 Norton 형식은 거부합니다. 분석한 응답의 [직접 파동 진단](startup_waves.md)은 지원하며 저장 연결은 별도 계약이 필요합니다.
 
 6개 행렬/ramp/pulse와 6개 혼합 경계를 물리 API와 정확히 재현하고 영/rank-one 부하,
 무전파 파싱, 행 예산, 엄격 입력, 읽기 전용 상태, 출력 동일성, 실행 실패를 검사합니다.

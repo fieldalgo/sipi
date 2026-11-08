@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept current-driven startup terminal responses in real-reference port-wave diagnostics, preserving source-shunt power separation and the existing saved wrapper contract.
+
 - Save current-driven startup inputs with explicit ampere/shunt units, strict replay, independent time-row budgets and preserved voltage-source schemas.
 
 - Add explicit current-driven coupled startup with near shunt resistances, separate Norton source power/loss and independent LC, KCL, modal and settling validation.

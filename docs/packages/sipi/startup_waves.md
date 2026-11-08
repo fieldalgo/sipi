@@ -3,7 +3,8 @@
 `startup_port_waves(response, z_ref=...)` converts existing startup terminal V/I
 samples to incident/reflected real power waves. It accepts `LosslessLineResponse`
 and `RLGCLadderResponse`, including coupled, mixed, capacitive and reactive
-subclasses, and returns copied read-only `StartupPortWaves`. It does no propagation,
+subclasses, plus the separate `NortonReactiveRLGCLadderResponse`, and returns
+copied read-only `StartupPortWaves`. It does no propagation,
 FFT, resampling, delay alignment, periodic extension or missing-DC inference.
 
 ```python
@@ -84,3 +85,51 @@ general TDR/eye/BER or browser/Windows integration.
 [한국어](../../locales/ko/pages/packages/sipi/startup_waves.md)
 
 [Saved startup port waves](startup_waves_document.md)
+
+## Current-driven terminal waves
+
+The [Norton response](norton_startup.md) has four terminal ports. Use its
+`current`, not its two injected `source_currents`. Near terminal power is
+source supplied power minus the external source-shunt loss. At the far ports,
+into-line power is the negative sum of parallel-load resistor loss, external
+capacitor power, branch inductor energy rate and branch resistor loss.
+
+Finite positive shunts have a Thevenin equivalent with Vs=Iinj*Rsh. Equal line
+V/I therefore give equal waves at the same references, although supplied source
+power and resistor losses differ. Ideal current/open shunts, shorts and mixed
+boundaries need no singular source conversion. The response class name remains
+`NortonReactiveRLGCLadderResponse` in `source_kind`.
+
+```python
+import numpy as np
+from sipi import coupled_norton_reactive_ladder_response
+
+time = np.linspace(0., 12e-9, 121)
+current = np.column_stack((.02*np.minimum(time/2e-9, 1.), -.01*np.minimum(time/3e-9, 1.)))
+response = coupled_norton_reactive_ladder_response(time, current,
+    R=[[25., 2.], [2., 17.]], L=np.array([[510., 70.], [70., 430.]])*1e-9,
+    G=[[.003, -.0002], [-.0002, .0015]], C=np.array([[230., -30.], [-30., 190.]])*1e-12,
+    length=.1, cells=32, source_shunt_resistance=[None, 37.], load_resistance=[91., None],
+    load_capacitance=np.array([[20., -4.], [-4., 30.]])*1e-12,
+    load_branch_resistance=[[13., 1.], [1., 9.]],
+    load_branch_inductance=np.array([[12., 2.], [2., 8.]])*1e-9)
+assert response.voltage.shape == (121, 4)
+np.testing.assert_array_equal(response.current[:, 0], current[:, 0])
+assert response.total_power_balance_relative_error <= 1e-10
+assert np.all(response.source_shunt_resistor_loss >= 0)
+assert 'source_currents_a' in response.inputs and 'source_voltages_v' not in response.inputs
+assert not response.to_dict()['states_included']
+
+from sipi import startup_port_waves
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'NortonReactiveRLGCLadderResponse'
+assert waves.incident.shape == (121, 4)
+np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
+    response.source_power - response.source_shunt_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+Checks cover ramp/pulse Norton–Thevenin equivalence, six mixed-boundary cases,
+zero/rank-one external terms, zero input, reference changes, detached read-only
+results and rejection of injected-current shapes. The original reconstruction
+and power gates remain unchanged. The saved startup-port-waves/1 wrapper still
+rejects Norton inputs; this direct adapter does not change its closed registry.

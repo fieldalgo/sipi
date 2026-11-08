@@ -73,7 +73,8 @@ All state/diagnostic arrays are copied read-only. `inputs` returns copied SI dat
 with `source_currents_a` and `source_shunt_resistance_ohm`. Default finite JSON
 omits interior line states, while `to_dict(include_states=True)` includes them.
 Scope is `finite-passive-two-signal-norton-reactive-startup`. [Saved inputs](norton_startup_document.md) use a separate current-unit schema.
-The separate startup port-wave wrapper does not yet accept this response.
+[Direct port-wave diagnostics](startup_waves.md) accept this response using terminal
+V/I. The saved startup-port-waves/1 wrapper still rejects Norton input.
 
 ## Independent acceptance and settling limits
 

@@ -2,7 +2,8 @@
 
 `startup_port_waves(response, z_ref=...)`는 기존 시작 응답 단자 V/I 표본을 입사/반사
 실수 전력파로 변환합니다. `LosslessLineResponse`와 결합·혼합·용량성·RL 부하를 포함한
-`RLGCLadderResponse`를 받아 복사된 읽기 전용 `StartupPortWaves`를 반환합니다.
+`RLGCLadderResponse` 및 별도 `NortonReactiveRLGCLadderResponse`를 받아
+복사된 읽기 전용 `StartupPortWaves`를 반환합니다.
 전파·FFT·재표본·지연 정렬·주기 연장·누락 DC 추정은 하지 않습니다.
 
 ```python
@@ -73,3 +74,48 @@ scope `explicit-real-reference-startup-port-waves`, basis `single-ended`의 유�
 [English](../../../../../packages/sipi/startup_waves.md)
 
 [시작 응답 포트 파형 저장](startup_waves_document.md)
+
+## 전류 구동 단자 전력파
+
+[Norton 응답](norton_startup.md)은 4개 단자 포트를 가집니다. 두 주입 전류
+`source_currents` 대신 단자 `current`를 사용합니다. 근단 단자 전력은 소스 공급 전력에서
+외부 소스 병렬 손실을 뺀 값입니다. 원단의 선로 유입 전력은 병렬 부하 저항 손실·외부
+커패시터 전력·분기 인덕터 에너지 변화율·분기 저항 손실 합의 음수입니다.
+
+유한 양의 병렬 저항은 Vs=Iinj*Rsh인 Thevenin 등가를 가집니다. 동일한 선로 V/I는 같은
+기준에서 같은 전력파를 주지만 공급 전력과 소스 저항 손실은 다릅니다. 이상 전류원·
+단락·혼합 경계는 특이한 소스 변환 없이 직접 처리합니다. `source_kind`는 원래 클래스명
+`NortonReactiveRLGCLadderResponse`를 보존합니다.
+
+```python
+import numpy as np
+from sipi import coupled_norton_reactive_ladder_response
+
+time = np.linspace(0., 12e-9, 121)
+current = np.column_stack((.02*np.minimum(time/2e-9, 1.), -.01*np.minimum(time/3e-9, 1.)))
+response = coupled_norton_reactive_ladder_response(time, current,
+    R=[[25., 2.], [2., 17.]], L=np.array([[510., 70.], [70., 430.]])*1e-9,
+    G=[[.003, -.0002], [-.0002, .0015]], C=np.array([[230., -30.], [-30., 190.]])*1e-12,
+    length=.1, cells=32, source_shunt_resistance=[None, 37.], load_resistance=[91., None],
+    load_capacitance=np.array([[20., -4.], [-4., 30.]])*1e-12,
+    load_branch_resistance=[[13., 1.], [1., 9.]],
+    load_branch_inductance=np.array([[12., 2.], [2., 8.]])*1e-9)
+assert response.voltage.shape == (121, 4)
+np.testing.assert_array_equal(response.current[:, 0], current[:, 0])
+assert response.total_power_balance_relative_error <= 1e-10
+assert np.all(response.source_shunt_resistor_loss >= 0)
+assert 'source_currents_a' in response.inputs and 'source_voltages_v' not in response.inputs
+assert not response.to_dict()['states_included']
+
+from sipi import startup_port_waves
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'NortonReactiveRLGCLadderResponse'
+assert waves.incident.shape == (121, 4)
+np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
+    response.source_power - response.source_shunt_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+ramp/pulse Norton–Thevenin 등가, 6개 혼합 경계, 영/rank-one 외부 항, 영 입력, 기준 변경,
+독립 읽기 전용 결과와 주입 전류 형상의 거부를 검사합니다. 기존 복원·전력 기준은 그대로
+유지합니다. 저장 startup-port-waves/1 wrapper는 여전히 Norton 입력을 거부합니다.
+이번 직접 어댑터는 해당 닫힌 레지스트리를 바꾸지 않습니다.

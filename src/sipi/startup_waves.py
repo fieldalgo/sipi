@@ -8,6 +8,7 @@ import numpy as np
 from .network import _real
 from .startup import LosslessLineResponse, _times
 from .rlgc_startup import RLGCLadderResponse
+from .norton_startup import NortonReactiveRLGCLadderResponse
 
 __all__ = ['StartupPortWaves', 'startup_port_waves']
 
@@ -67,7 +68,10 @@ def startup_port_waves(response, *, z_ref):
     """Decompose qualified scalar/two-signal startup V/I at explicit real Zref.
 
     Accept LosslessLineResponse or RLGCLadderResponse (including its coupled,
-    mixed and reactive subclasses). z_ref must be a vector of positive finite
+    mixed and reactive subclasses), or NortonReactiveRLGCLadderResponse.
+    Norton terminal currents are distinct from injected source currents;
+    wave power is terminal V*I, excluding external source shunt loss.
+    z_ref must be a vector of positive finite
     real ohms, one per port; no scalar broadcasting or complex references.
     Preserve the response's exact times, port order, voltage and into-line
     currents. No propagation, FFT, resampling or frequency/DC inference.
@@ -83,7 +87,7 @@ def startup_port_waves(response, *, z_ref):
     dependent impedance is inferred. Far-port incident/outgoing directions
     reverse the +z/-z traveling-wave convention of a lossless scalar line.
     """
-    if not isinstance(response, (LosslessLineResponse, RLGCLadderResponse)):
+    if not isinstance(response, (LosslessLineResponse, RLGCLadderResponse, NortonReactiveRLGCLadderResponse)):
         raise ValueError('response must be a lossless or RLGC startup response')
     time = _times('time', response.time)
     voltage = _real('voltage', response.voltage); current = _real('current', response.current)
