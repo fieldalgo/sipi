@@ -457,3 +457,6 @@ conversion support does not silently change a saved schema. This does not
 establish general TDR inversion, measured accuracy or app/platform support.
 
 [Explicit saved version9](startup_waves_document.md) adds three/four-signal inputs with six/eight references while preserving prior versions.
+
+
+[Three/four-signal Debye waves](multiconductor_debye_startup_waves.md) explicitly preserve polarization/relaxation power and six/eight-port references.

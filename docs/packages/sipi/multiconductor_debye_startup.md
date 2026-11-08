@@ -72,7 +72,8 @@ np.testing.assert_allclose(result.total_energy,
 
 The copied read-only result is a `MulticonductorDebyeRLGCLadderResponse`.
 `to_dict` is a result export, not a versioned saved request or executable schema.
-The new type is not implicitly admitted to startup-wave adapters. Explicit
+[Explicit six/eight-port wave conversion](multiconductor_debye_startup_waves.md)
+accepts this type with caller-supplied positive real references. Explicit
 [versioned saved input](multiconductor_debye_startup_document.md) preserves this API contract.
 Inputs and exported dictionaries are detached; nonfinite propagation, invalid
 initial state or failed power checks raise instead of returning a plausible result.

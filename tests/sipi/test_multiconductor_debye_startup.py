@@ -191,7 +191,7 @@ def test_states_lumped_polarization_units_copy_and_passivity(signals,pulse,lossl
     assert not a.total_energy.flags.writeable and not a.total_energy_rate.flags.writeable
     with pytest.raises(ValueError):a.to_dict(include_states=1)
     with pytest.raises(ValueError):replace(a,polarization_voltage=np.full_like(a.polarization_voltage,np.nan))
-    with pytest.raises(ValueError,match='response must be'):startup_port_waves(a,z_ref=[50.]*(2*signals))
+    assert startup_port_waves(a,z_ref=[50.]*(2*signals)).incident.shape==(121,2*signals)
 
 
 @pytest.mark.parametrize('signals',[3,4])

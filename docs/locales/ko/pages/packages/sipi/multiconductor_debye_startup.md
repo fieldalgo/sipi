@@ -67,7 +67,8 @@ np.testing.assert_allclose(result.total_energy,
 
 결과 `MulticonductorDebyeRLGCLadderResponse`는 복사된 읽기 전용 배열입니다.
 `to_dict`는 결과 내보내기이며 버전 있는 저장 요청/실행 스키마가 아닙니다.
-새 결과형을 시작 파동 adapter에 자동 수락하지 않습니다. 명시한
+[명시한6·8단자 파동 변환](multiconductor_debye_startup_waves.md)은 호출자가
+제공한 양의 실수 기준 저항과 함께 이 결과형을 수락합니다. 명시한
 [버전 저장 입력](multiconductor_debye_startup_document.md)은 이 API 계약을 보존합니다. 입력과 내보낸
 사전은 독립적이며 비유한 전파·잘못된 초기 상태·전력 수지 실패는 오류입니다.
 

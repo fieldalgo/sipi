@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Admit explicit three/four-signal Debye responses to real-reference port waves, retaining terminal/polarization power, original formulas and legacy response outputs.
+
 - Save and execute explicit three/four-signal Debye requests with strict fourteen-key SI inputs, pre-propagation time budgets and complete state identity guards.
 
 - Add explicit three/four-signal positive-strength Debye finite circuits, with independent charge-state/modal refinement checks and unchanged legacy two-signal response exports.
