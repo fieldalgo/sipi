@@ -71,3 +71,5 @@ scope `explicit-real-reference-startup-port-waves`, basis `single-ended`의 유�
 
 [무손실 시작 응답](startup.md) · [RL 부하 시작 응답](coupled_reactive_startup.md) ·
 [English](../../../../../packages/sipi/startup_waves.md)
+
+[시작 응답 포트 파형 저장](startup_waves_document.md)

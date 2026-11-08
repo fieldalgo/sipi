@@ -242,6 +242,8 @@ def documents():
         length=.1,cells=8,source_resistance=[0.,37.],load_resistance=[91.,None],
         load_capacitance=np.array([[20.,-4.],[-4.,30.]])*1e-12,
         load_branch_resistance=[[13.,1.],[1.,9.]],load_branch_inductance=np.array([[12.,2.],[2.,8.]])*1e-9))
+    from sipi import StartupPortWavesDocument
+    base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.]))
     return base
 
 

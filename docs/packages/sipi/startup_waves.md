@@ -82,3 +82,5 @@ general TDR/eye/BER or browser/Windows integration.
 
 [Lossless startup](startup.md) · [Reactive startup](coupled_reactive_startup.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/startup_waves.md)
+
+[Saved startup port waves](startup_waves_document.md)
