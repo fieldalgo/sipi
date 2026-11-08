@@ -83,3 +83,5 @@ browser/Windows integration.
 
 [Mixed-boundary API](coupled_boundary_startup.md) · [Positive-only v1](coupled_startup_document.md) ·
 [Common execution](execution.md) · [한국어](../../locales/ko/pages/packages/sipi/coupled_boundary_startup_document.md)
+
+[Saved capacitive v3](coupled_capacitive_startup_document.md)

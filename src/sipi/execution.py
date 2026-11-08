@@ -55,6 +55,7 @@ from .startup_document import LosslessStartupDocument
 from .rlgc_startup_document import RLGCLadderDocument
 from .coupled_startup_document import CoupledRLGCLadderDocument
 from .coupled_boundary_startup_document import MixedBoundaryRLGCLadderDocument
+from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -100,6 +101,7 @@ _REGISTRY = {
     'sipi.rlgc-startup/1': RLGCLadderDocument,
     'sipi.coupled-rlgc-startup/1': CoupledRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/2': MixedBoundaryRLGCLadderDocument,
+    'sipi.coupled-rlgc-startup/3': CapacitiveRLGCLadderDocument,
 }
 
 
@@ -364,7 +366,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument)):
+    if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, ConductivityProfileDocument):
         profile = doc.analyze(max_evaluations=budget)

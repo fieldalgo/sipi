@@ -118,3 +118,5 @@ forms, browser/Windows integration and measured-board accuracy are separate work
 
 [Mixed resistive boundaries](coupled_boundary_startup.md) · [Positive two-signal circuit](coupled_startup.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/coupled_capacitive_startup.md)
+
+[Saved capacitive v3](coupled_capacitive_startup_document.md)

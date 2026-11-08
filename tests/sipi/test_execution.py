@@ -229,6 +229,12 @@ def documents():
         R=[[20.,3.],[3.,20.]],L=np.array([[500.,100.],[100.,500.]])*1e-9,
         G=[[.002,-.0003],[-.0003,.002]],C=np.array([[220.,-40.],[-40.,220.]])*1e-12,
         length=.1,cells=8,source_resistance=[0.,37.],load_resistance=[0.,None]))
+    from sipi import CapacitiveRLGCLadderDocument
+    base.append(CapacitiveRLGCLadderDocument([0.,1e-9,2e-9], [[0.,0.],[1.,0.],[1.,0.]],
+        R=[[20.,3.],[3.,20.]],L=np.array([[500.,100.],[100.,500.]])*1e-9,
+        G=[[.002,-.0003],[-.0003,.002]],C=np.array([[220.,-40.],[-40.,220.]])*1e-12,
+        length=.1,cells=8,source_resistance=[0.,37.],load_resistance=[91.,None],
+        load_capacitance=np.array([[20.,-4.],[-4.,30.]])*1e-12))
     return base
 
 

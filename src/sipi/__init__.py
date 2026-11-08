@@ -72,6 +72,7 @@ from .coupled_startup_document import CoupledRLGCLadderDocument
 from .coupled_boundary_startup import MixedBoundaryRLGCLadderResponse, coupled_boundary_ladder_response
 from .coupled_boundary_startup_document import MixedBoundaryRLGCLadderDocument
 from .coupled_capacitive_startup import CapacitiveRLGCLadderResponse, coupled_capacitive_ladder_response
+from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 from .pair_design import (PairImpedanceEvaluation, PairImpedanceDesign,
                           PairImpedanceGoalError, seek_pair_impedances)
 from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
@@ -97,7 +98,7 @@ from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
 __version__ = "0.1.0"
-__all__ = ['CapacitiveRLGCLadderResponse', 'coupled_capacitive_ladder_response', 'MixedBoundaryRLGCLadderDocument', 'MixedBoundaryRLGCLadderResponse', 'coupled_boundary_ladder_response', 'CoupledRLGCLadderDocument', 'CoupledRLGCLadderResponse', 'coupled_rlgc_ladder_response', 'RLGCLadderDocument', 'RLGCLadderResponse', 'rlgc_ladder_response', 'LosslessStartupDocument', 'LosslessLineResponse', 'lossless_line_response', 'SampledImpedanceDesignDocument', 'SampledImpedanceEvaluation', 'SampledImpedanceDesign', 'SampledImpedanceGoalError', 'seek_sampled_impedance',
+__all__ = ['CapacitiveRLGCLadderDocument', 'CapacitiveRLGCLadderResponse', 'coupled_capacitive_ladder_response', 'MixedBoundaryRLGCLadderDocument', 'MixedBoundaryRLGCLadderResponse', 'coupled_boundary_ladder_response', 'CoupledRLGCLadderDocument', 'CoupledRLGCLadderResponse', 'coupled_rlgc_ladder_response', 'RLGCLadderDocument', 'RLGCLadderResponse', 'rlgc_ladder_response', 'LosslessStartupDocument', 'LosslessLineResponse', 'lossless_line_response', 'SampledImpedanceDesignDocument', 'SampledImpedanceEvaluation', 'SampledImpedanceDesign', 'SampledImpedanceGoalError', 'seek_sampled_impedance',
            'PairImpedanceDesignDocument', 'PairImpedanceEvaluation', 'PairImpedanceDesign', 'PairImpedanceGoalError', 'seek_pair_impedances', "GaussianConductivityProfile", "ConductivityProfileResult", "ConductivityProfileDocument",
            "CircularAperture", "ApertureDocument",
            "RoundConductor", "EllipticalAperture", "MeshedAperture", "ApertureSectionDocument",

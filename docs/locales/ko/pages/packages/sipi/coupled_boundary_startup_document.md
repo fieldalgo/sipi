@@ -75,3 +75,5 @@ impulse를 추정하지 않습니다. 양쪽 경계 벡터는 각각 명시적 2
 
 [혼합 경계 API](coupled_boundary_startup.md) · [양의 저항 v1](coupled_startup_document.md) ·
 [공통 실행](execution.md) · [English](../../../../../packages/sipi/coupled_boundary_startup_document.md)
+
+[용량성 저장 v3](coupled_capacitive_startup_document.md)

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit capacitive-load startup v3 with separate external energy, exact physical replay, time-row budgets and unchanged v1/v2 contracts.
+
 - Add explicit passive load-capacitance matrices to coupled startup, separating internal and external energy and verifying LC, modal, KCL and settling limits.
 
 - Add explicit coupled startup saved v2 for per-conductor ideal/open/short boundaries, preserving positive-only v1, actual time-row budgets and exact mixed-circuit replay.
