@@ -1,5 +1,7 @@
 # 유한 수동 RLGC 시작 응답 회로
 
+[입력 저장](rlgc_startup_document.md)으로 엄격한 JSON과 공통 실행에 연결합니다.
+
 `rlgc_ladder_response`는 초기 에너지가 없는 균일한 단일 RLGC **유한 회로**를
 명시적 셀 수와 구간별 선형 입력으로 전파합니다. 기존 SciPy 상태공간 전파기를
 사용합니다. 정확한 연속 분포 선로 해나 Maxwell FDTD 솔버를 뜻하지 않습니다.

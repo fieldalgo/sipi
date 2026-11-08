@@ -215,6 +215,10 @@ def documents():
     base.append(LosslessStartupDocument([0.,1e-9,2e-9,3e-9],
         source_times=[0.],source_voltages=[1.],z0_ohm=50.,delay_s=1e-9,
         source_resistance=50.,load_resistance=None,max_terms=10000))
+    from sipi import RLGCLadderDocument
+    base.append(RLGCLadderDocument([0.,1e-9,2e-9], [0.,1.,1.],
+        R=20.,L=500e-9,G=.002,C=200e-12,length=.1,cells=8,
+        source_resistance=25.,load_resistance=100.))
     return base
 
 

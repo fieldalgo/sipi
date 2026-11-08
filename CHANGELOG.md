@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save strict finite RLGC startup inputs with independent cell and sample bounds, exact API replay and shared execution that preserves numerical failures.
+
 - Add finite passive scalar RLGC startup circuits with explicit cells, PWL zero-state drives, energy diagnostics and independent analytic, ODE and distributed-line refinement checks.
 
 - Save strict lossless-startup/1 inputs and execute them through the shared adapter, validating actual delay-term budgets without changing the saved hard cap or waveform model.

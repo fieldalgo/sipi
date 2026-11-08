@@ -1,5 +1,7 @@
 # Finite passive RLGC startup circuit
 
+[Saved inputs](rlgc_startup_document.md) provide strict JSON and common execution.
+
 `rlgc_ladder_response` propagates an initially unenergized, uniform scalar
 RLGC **finite circuit** with explicit cells and piecewise-linear source samples.
 It uses the existing SciPy state-space propagator. This is not an exact
