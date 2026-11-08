@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Read strict Touchstone 2.0 physical Y/Z data at explicit output references, preserving existing S parsing and rejecting implicit version1 normalization.
+
 - Convert explicit physical impedance/admittance samples to power-wave networks with cancellation, conditioning and residual guards, without inverting the physical matrices.
 
 - Save bounded grid/plate capacitance inputs with strict SI keys, pre-mesh resource checks and exact geometry/field identity on replay.

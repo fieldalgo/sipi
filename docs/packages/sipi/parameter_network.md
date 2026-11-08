@@ -75,3 +75,6 @@ reference change, consistent unit scaling, copied arrays and strict failure
 gates are covered separately. This algebraic conversion has no mesh or exterior
 boundary to refine. Existing field and propagation solvers are unchanged.
 The BSD-3-Clause reference remains test-only; no runtime dependency is added.
+
+
+[Separate Touchstone 2.0 physical Y/Z reader](touchstone_parameters.md) requires explicit output references and preserves the S reader contract.

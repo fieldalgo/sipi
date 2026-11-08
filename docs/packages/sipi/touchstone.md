@@ -99,3 +99,6 @@ Comparison checks include exact-grid subsets, complex phase residuals,
 analytically linear complex samples, mismatched labels/basis/references,
 extrapolation refusal and calculated-line export/import. These are file-format
 and numerical comparison tests, not a measured coupon validation.
+
+
+[Separate Touchstone 2.0 physical Y/Z reader](touchstone_parameters.md) requires explicit output references and preserves the S reader contract.

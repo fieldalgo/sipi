@@ -67,3 +67,6 @@ assert np.array_equal(opened.s[0], np.eye(2))
 기준저항 변경, 일관된 단위 배율, 복사 및 실패 기준은 별도로 확인합니다.
 대수 변환에는 세분할 메시나 외곽 경계가 없으며 기존 장/전파 솔버는 바꾸지 않습니다.
 BSD-3-Clause 기준 도구는 시험 전용으로 유지하며 실행 의존성을 추가하지 않습니다.
+
+
+[별도 Touchstone 2.0 물리 Y/Z reader](touchstone_parameters.md)는 출력 기준을 필수로 지정하며 기존 S reader 계약을 유지합니다.

@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Strict single-ended Touchstone S input and explicit-condition comparison.
+"""Strict single-ended Touchstone input and explicit-condition comparison.
 
 No file/network I/O, guessed port correspondence, impedance renormalization,
 extrapolation or material fitting. Arbitrary imported S need not be passive.
@@ -14,8 +14,9 @@ import re
 import numpy as np
 
 from .network import LineNetwork
+from .parameter_network import impedance_network, admittance_network
 
-__all__ = ['loads_touchstone', 'NetworkComparison', 'compare_networks']
+__all__ = ['loads_touchstone', 'loads_touchstone_parameters', 'NetworkComparison', 'compare_networks']
 
 _UNITS = {'hz':1.,'khz':1e3,'mhz':1e6,'ghz':1e9}
 _NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\Z')
@@ -36,8 +37,8 @@ def _count(value):
     return int(value)
 
 
-def _options(line):
-    unit,form,resistance = 'ghz','ma',50.
+def _options(line, *, allowed):
+    unit,form,resistance,parameter = 'ghz','ma',50.,'s'
     words,seen = line[1:].lower().split(),set()
     i = 0
     while i < len(words):
@@ -48,8 +49,9 @@ def _options(line):
             key,form = 'format',word
         elif word in ('s','y','z','h','g'):
             key = 'parameter'
-            if word != 's':
-                raise ValueError('only Touchstone S parameters are supported')
+            if word not in allowed:
+                raise ValueError('unsupported Touchstone parameter for this reader')
+            parameter = word
         elif word == 'r':
             key = 'reference'
             i += 1
@@ -64,7 +66,9 @@ def _options(line):
             raise ValueError('duplicate option category')
         seen.add(key)
         i += 1
-    return _UNITS[unit],form,resistance
+    if parameter not in allowed:
+        raise ValueError('explicit Y or Z parameter is required')
+    return _UNITS[unit],form,resistance,parameter
 
 
 def loads_touchstone(text, *, ports=None, port_names=None):
@@ -76,6 +80,32 @@ def loads_touchstone(text, *, ports=None, port_names=None):
     RI/MA/DB, real positive per-port references and Full/Lower/Upper matrices
     are supported. Mixed-mode, noise and non-S parameters are rejected.
     """
+    frequency,values,references,names,_ = _read_touchstone(
+        text, ports=ports, port_names=port_names, allowed=('s',))
+    return LineNetwork(frequency,values,references,names)
+
+
+def loads_touchstone_parameters(text, *, z_ref, ports=None, port_names=None):
+    """Read strict Touchstone2.0 physical Y/Z data at explicit target references.
+
+    Accept only single-ended version2 Y[siemens]/Z[ohms]; target z_ref is a
+    required positive real scalar/per-port value. File R/[Reference] values
+    are syntax-checked but do not normalize version2 physical matrices or
+    select the output reference. Use impedance_network/admittance_network
+    with their unchanged finite/conditioning/residual gates.
+
+    RI/MA/DB, frequency units, full/triangular matrices, two-port data order
+    and caller names follow the strict S reader. Version1, S/H/G, mixed-mode
+    and noise are rejected. No port pairing, passivity, physical accuracy,
+    interpolation or measurement provenance is inferred. No file/network I/O.
+    """
+    frequency,values,_,names,parameter = _read_touchstone(
+        text, ports=ports, port_names=port_names, allowed=('y','z'), require_version2=True)
+    convert = admittance_network if parameter == 'y' else impedance_network
+    return convert(frequency,values,z_ref=z_ref,names=names)
+
+
+def _read_touchstone(text, *, ports, port_names, allowed, require_version2=False):
     if not isinstance(text,str) or any(ord(c)>126 or (ord(c)<32 and c not in '\t\r\n') for c in text):
         raise ValueError('Touchstone input must be ASCII text')
     if ports is not None and (isinstance(ports,bool) or not isinstance(ports,Integral) or ports <= 0):
@@ -85,13 +115,15 @@ def loads_touchstone(text, *, ports=None, port_names=None):
     if not lines:
         raise ValueError('empty Touchstone input')
     version2 = bool(re.fullmatch(r'\[version\][ \t]+2\.0',lines[0],re.I))
+    if require_version2 and not version2:
+        raise ValueError('physical parameter reader requires Touchstone version2.0')
     if version2:
         lines = lines[1:]
     elif lines[0].lstrip().startswith('['):
         raise ValueError('unsupported or malformed Touchstone version')
     if not lines or not lines[0].lstrip().startswith('#'):
         raise ValueError('Touchstone option line is required first')
-    scale,form,reference = _options(lines[0].lstrip())
+    scale,form,reference,parameter = _options(lines[0].lstrip(), allowed=allowed)
     lines = lines[1:]
     metadata,values,rows = {},[],[]
     data,ended,information = not version2,False,False
@@ -198,7 +230,7 @@ def loads_touchstone(text, *, ports=None, port_names=None):
     names = tuple(f'port{i+1}' for i in range(n)) if port_names is None else tuple(port_names)
     if len(names) != n:
         raise ValueError('port_names count must match the file')
-    return LineNetwork(frequency,s,z,names)
+    return frequency,s,z,names,parameter
 
 
 @dataclass(frozen=True)

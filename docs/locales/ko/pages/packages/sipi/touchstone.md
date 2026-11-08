@@ -81,3 +81,6 @@ Python 3.12.14, NumPy 2.5.4, SciPy 1.18.1에서 독립 scikit-rf 2.2.0 리더와
 새 런타임 의존성은 없습니다. 비교 시험은 grid 부분집합·복소 위상 잔차·해석적인
 선형 복소 샘플·이름/basis/reference 불일치·외삽 거부·계산 선로의 출력/입력을 포함합니다.
 파일 형식과 수치 비교 시험이며 실측 쿠폰 검증은 아닙니다.
+
+
+[별도 Touchstone 2.0 물리 Y/Z reader](touchstone_parameters.md)는 출력 기준을 필수로 지정하며 기존 S reader 계약을 유지합니다.
