@@ -94,3 +94,5 @@ retained; no new dependency is introduced.
 [한국어](../../locales/ko/pages/packages/sipi/coupled_debye_startup.md)
 
 [Saved inputs](coupled_debye_startup_document.md) provide a separate executable request.
+
+[Separate PSD-strength API](psd_debye_startup.md) admits singular strengths explicitly; this page retains its strict SPD limits.

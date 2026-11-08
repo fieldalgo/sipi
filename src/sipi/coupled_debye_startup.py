@@ -103,21 +103,30 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
     field/material extraction, arbitrary fitting, wave/saved adaptation or
     measured-board accuracy is inferred. Check time,source and space limits.
     """
-    time, drive, r, l, g, c, length, n, rs, rl, delta, poles = _coupled_debye_input(
+    data = _coupled_debye_input(
         time, source_voltages, R=R, L=L, G=G, C_inf=C_inf, delta_C=delta_C,
         relaxation_hz=relaxation_hz, length=length, cells=cells,
         source_resistance=source_resistance, load_resistance=load_resistance)
+    return _propagate_coupled_debye(data, psd_strength=False,
+        result_type=CoupledDebyeRLGCLadderResponse, propagator=lsim)
+
+
+def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator):
+    """Shared circuit propagation; strict-SPD path preserves original arithmetic."""
+    time, drive, r, l, g, c, length, n, rs, rl, delta, poles = data
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
     active = [index for index, matrix in enumerate(delta) if np.any(matrix)]
     nv = 2*(n+1); base = nv+2*n; size = base+len(active)*nv
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         tau = 1/(2*np.pi*poles)
-        storage = [.5*dx*c, dx*l, *[.5*dx*delta[p] for p in active]]
+        storage = [.5*dx*c, dx*l] if psd_strength else [.5*dx*c, dx*l, *[.5*dx*delta[p] for p in active]]
         conductance = [dx*delta[p]/tau[p] for p in active]
         slopes = np.diff(drive, axis=0)/np.diff(time)[:, None]
     if (dx <= 0 or np.any(tau <= 0)
             or not all(np.all(np.isfinite(x)) for x in [tau, slopes, *storage, *conductance])
-            or any(np.linalg.eigvalsh(x)[0] <= 0 for x in storage+conductance)):
+            or any(np.linalg.eigvalsh(x)[0] <= 0 for x in storage)
+            or (any(not np.any(x) or np.linalg.eigvalsh(x)[0] < 0 for x in conductance)
+                if psd_strength else any(np.linalg.eigvalsh(x)[0] <= 0 for x in conductance))):
         raise ValueError('Debye cell matrices or source slopes exceed finite scales')
     mass = np.zeros((size, size)); k = np.zeros_like(mass); b = np.zeros((size, 2))
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
@@ -133,8 +142,13 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
         for slot, pole in enumerate(active):
             sl = slice(base+slot*nv, base+(slot+1)*nv)
             cap = np.kron(np.diag(dx*weights), delta[pole]); cond = cap/tau[pole]
-            mass[sl, sl] = cap; k[:nv, :nv] -= cond; k[sl, sl] -= cond
-            k[:nv, sl] += cond; k[sl, :nv] += cond
+            if psd_strength:
+                mass[sl, sl] = np.eye(nv); k[:nv, :nv] -= cond
+                k[sl, sl] = -np.eye(nv)/tau[pole]
+                k[:nv, sl] += cond; k[sl, :nv] = np.eye(nv)/tau[pole]
+            else:
+                mass[sl, sl] = cap; k[:nv, :nv] -= cond; k[sl, sl] -= cond
+                k[:nv, sl] += cond; k[sl, :nv] += cond
         k[:2, :2] -= np.diag(1/rs); k[nv-2:nv, nv-2:nv] -= np.diag(1/rl)
         b[:2] = np.diag(1/rs)
     if not all(np.all(np.isfinite(x)) for x in (mass, k, b)):
@@ -143,7 +157,7 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
         a = np.linalg.solve(mass, k); beta = np.linalg.solve(mass, b)
     if not all(np.all(np.isfinite(x)) for x in (a, beta)):
         raise ValueError('Debye normalized coefficients exceed finite scales')
-    _, _, x = lsim((a, beta, np.zeros((1, size)), np.zeros((1, 2))), drive, time, interp=True)
+    _, _, x = propagator((a, beta, np.zeros((1, size)), np.zeros((1, 2))), drive, time, interp=True)
     x = np.asarray(x)
     if x.shape != (len(time), size) or not np.all(np.isfinite(x)):
         raise ValueError('state propagation returned invalid shape or nonfinite values')
@@ -191,6 +205,6 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
         L_h_per_m=l.tolist(), G_s_per_m=g.tolist(), C_inf_f_per_m=c.tolist(),
         delta_C_f_per_m=delta.tolist(), relaxation_hz=poles.tolist(), length_m=length,
         cells=n, source_resistance_ohm=rs.tolist(), load_resistance_ohm=rl.tolist())
-    return CoupledDebyeRLGCLadderResponse(json.dumps(data, sort_keys=True, allow_nan=False),
+    return result_type(json.dumps(data, sort_keys=True, allow_nan=False),
         time, drive, v, i, voltage, current, energy, rate, series, shunt, power, supplied,
         source_loss, load_loss, w, charge, pcurrent, pe, pr, relaxation, error, terr)

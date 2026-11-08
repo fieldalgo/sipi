@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a separate two-signal Debye startup API for singular PSD strengths using canonical voltage states, with charge-KCL, modal and convergence checks.
+
 - Add explicitly selected saved wave version5 for coupled Debye inputs while preserving prior nested registries and physical budgets.
 
 - Accept explicit coupled Debye four-terminal waves with scalar-mode limits and polarization energy/loss balance.

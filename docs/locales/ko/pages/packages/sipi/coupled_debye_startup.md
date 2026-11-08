@@ -91,3 +91,5 @@ ABCD 대비 32/64/128셀의 오차는 다음과 같습니다.
 [English](../../../../../packages/sipi/coupled_debye_startup.md)
 
 [입력 저장](coupled_debye_startup_document.md)은 별도의 실행 가능한 요청입니다.
+
+[별도 PSD 강도 API](psd_debye_startup.md)는 특이 강도를 명시적으로 받습니다. 이 페이지 API의 SPD 제한은 그대로입니다.
