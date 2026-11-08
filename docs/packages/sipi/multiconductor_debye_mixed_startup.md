@@ -99,7 +99,9 @@ Independent finite-pi KCL aliases32/64/128 also agree with each time result with
 Prior low-loss PWL/short-horizon failures remain outside the accepted scope.
 
 No field extraction, arbitrary dispersion/initial energy, measured accuracy,
-automatic time selection, new dependency, saved/wave admission or application/
-platform integration is added. The library registry remains88 schemas/37 templates.
+automatic time selection, new dependency or application/platform integration is added.
+[Strict typed-source documents](multiconductor_debye_mixed_startup_document.md) are now
+available; wave admission remains separate. This saved addition brings the registry
+to89 schemas/37 templates.
 The earlier [two-signal constant mixed API](mixed_startup.md) has a separate boundary
 contract; its ideal voltage/short options are not inferred here.
