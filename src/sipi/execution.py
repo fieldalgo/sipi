@@ -56,6 +56,7 @@ from .rlgc_startup_document import RLGCLadderDocument
 from .coupled_startup_document import CoupledRLGCLadderDocument
 from .multiconductor_startup_document import MulticonductorRLGCLadderDocument
 from .grid_plate_document import GridPlateCapacitanceDocument
+from .strip_grid_document import StripGridCapacitanceDocument
 from .coupled_boundary_startup_document import MixedBoundaryRLGCLadderDocument
 from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 
@@ -116,6 +117,7 @@ _REGISTRY = {
     'sipi.coupled-rlgc-startup/1': CoupledRLGCLadderDocument,
     'sipi.multiconductor-rlgc-startup/1': MulticonductorRLGCLadderDocument,
     'sipi.grid-plate-capacitance/1': GridPlateCapacitanceDocument,
+    'sipi.strip-grid-capacitance/1': StripGridCapacitanceDocument,
     'sipi.coupled-rlgc-startup/2': MixedBoundaryRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/3': CapacitiveRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/4': ReactiveRLGCLadderDocument,
@@ -393,7 +395,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
     if isinstance(doc, (MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
-    elif isinstance(doc, GridPlateCapacitanceDocument):
+    elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, ConductivityProfileDocument):
         profile = doc.analyze(max_evaluations=budget)

@@ -78,8 +78,8 @@ The result exposes `capacitance_f`, original raw energy/charge/Maxwell diagnosti
 and the `Capacitance3D` field. Serialization reports energy capacitance in F,
 stored energy at1V as half that value in J, and ground charge at1V in C.
 `include_fields=True` includes mesh/materials and the1V potential. Compact output
-is the default. This API adds no versioned saved-input schema. Original field
-gates at1e-8 remain unchanged; exact result identity, shapes, finite positive
+is the default. Versioned inputs use the separate [saved-input adapter](strip_grid_document.md).
+Original field gates at1e-8 remain unchanged; exact result identity, shapes, finite positive
 capacitance/energy, negative ground charge and prescribed potentials are checked.
 
 Verification in `tests/sipi/test_strip_grid.py` includes three solid/full-width

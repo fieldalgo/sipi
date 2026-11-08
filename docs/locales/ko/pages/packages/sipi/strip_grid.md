@@ -66,8 +66,8 @@ h보다 커야 합니다. 두 반폭은 상대1e-12 반올림 차이 이내에�
 
 결과는 `capacitance_f`, 원래의 에너지·전하·Maxwell 진단과 `Capacitance3D` 장을 제공합니다.
 직렬화의 에너지 정전용량은 F,1V에서 저장 에너지는 그 절반인 J, 접지 전하는 C입니다.
-`include_fields=True`는 메시·재료·1V 전위를 포함합니다. 기본 결과는 간결하며 이번 API는
-버전 있는 저장 입력 스키마를 추가하지 않습니다. 원래1e-8 장 기준을 유지하며 결과 자료형·
+`include_fields=True`는 메시·재료·1V 전위를 포함합니다. 기본 결과는 간결하며 버전 있는 저장 입력은
+[별도 adapter](strip_grid_document.md)를 사용합니다. 원래1e-8 장 기준을 유지하며 결과 자료형·
 크기·유한 양의 C/에너지·음의 접지 전하·지정 전위를 검사합니다.
 
 `tests/sipi/test_strip_grid.py`는 solid/full-width 평행판3조건

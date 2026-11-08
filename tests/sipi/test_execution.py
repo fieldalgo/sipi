@@ -305,6 +305,10 @@ def documents():
     from sipi import GridPlateCapacitanceDocument
     base.append(GridPlateCapacitanceDocument(pitch=1e-3,width=.5e-3,height=.5e-3,
         backside_depth=1e-3,eps_r=3.8,cells_xy=4,cells_above=2,cells_below=4))
+    from sipi import StripGridCapacitanceDocument
+    base.append(StripGridCapacitanceDocument(pitch=1e-3,grid_width=.5e-3,trace_width=.5e-3,
+        height=.5e-3,top_clearance=1e-3,backside_depth=1e-3,eps_substrate=3.8,eps_above=1.,eps_below=1.,
+        transverse_periods=1,cells_per_pitch=4,cells_substrate=2,cells_above=4,cells_below=4))
     return base
 
 
