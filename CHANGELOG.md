@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit three/four-signal PSD Debye Norton current sources with external C/RL loads, separate source shunt loss, independent finite-circuit checks and qualified PWL continuum limits.
+
 - Add explicit saved wave version13 for multiconductor Debye series RL inputs, retaining versions1–12, external branch power meaning and original sample budgets.
 
 - Admit explicit multiconductor Debye series RL terminal waves with six/eight real references, retaining branch current, external storage and separate line power without changing conversion formulas.

@@ -94,3 +94,6 @@ scikit-rf2.2.0 독립 modal ABCD는 `Yload=1/R+jωCload+1/(Rbranch+jωLbranch)`�
 별도 결과형을 6·8개의 실수 기준 저항으로 수락합니다. 일반 RLC 토폴로지·장 추출·재료 피팅·FFT/TDR·
 플랫폼 연결·새 의존성은 추가하지 않습니다.
 [2신호 reactive 계약](debye_reactive_startup.md)을 참고하세요.
+
+
+[명시 주입 전류원](multiconductor_debye_norton_startup.md)은 별도 소스 컨덕턴스와 전력 분할을 사용합니다.

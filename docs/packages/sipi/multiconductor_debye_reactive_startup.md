@@ -103,3 +103,6 @@ preserve this model. [Explicit terminal waves](multiconductor_debye_reactive_sta
 admit this separate class with six/eight real references. No general RLC topology, field extraction,
 fitted material, FFT/TDR, platform integration or new dependency is added.
 See the [two-signal reactive contract](debye_reactive_startup.md).
+
+
+[Explicit injected-current sources](multiconductor_debye_norton_startup.md) use separate source conductance and power partitions.

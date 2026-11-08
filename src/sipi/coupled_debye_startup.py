@@ -112,7 +112,7 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
 
 
 def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
-                             load_capacitance=None, load_branch=None, signals=2):
+                             load_capacitance=None, load_branch=None, signals=2, source_conductance=None):
     """Shared circuit propagation; strict-SPD path preserves original arithmetic."""
     time, drive, r, l, g, c, length, n, rs, rl, delta, poles = data
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
@@ -162,8 +162,13 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             else:
                 mass[sl, sl] = cap; k[:nv, :nv] -= cond; k[sl, sl] -= cond
                 k[:nv, sl] += cond; k[sl, :nv] += cond
-        k[:signals, :signals] -= np.diag(1/rs); k[nv-signals:nv, nv-signals:nv] -= np.diag(1/rl)
-        b[:signals] = np.diag(1/rs)
+        if source_conductance is None:
+            k[:signals, :signals] -= np.diag(1/rs); k[nv-signals:nv, nv-signals:nv] -= np.diag(1/rl)
+            b[:signals] = np.diag(1/rs)
+        else:
+            k[:signals, :signals] -= np.diag(source_conductance)
+            k[nv-signals:nv, nv-signals:nv] -= np.diag(1/rl)
+            b[:signals] = np.eye(signals)
     if not all(np.all(np.isfinite(x)) for x in (mass, k, b)):
         raise ValueError('Debye circuit coefficients exceed finite scales')
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
@@ -194,7 +199,11 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         if signals != 2:
             flow = np.zeros_like(v)
             flow[:, :-1] -= i; flow[:, 1:] += i
-            flow[:, 0] += (drive-v[:, 0])/rs; flow[:, -1] -= v[:, -1]/rl
+            if source_conductance is None:
+                flow[:, 0] += (drive-v[:, 0])/rs; flow[:, -1] -= v[:, -1]/rl
+            else:
+                flow[:, 0] += drive-v[:, 0]*source_conductance
+                flow[:, -1] -= v[:, -1]/rl
             if load_branch is not None:
                 branch_current = x[:, branch:]
                 flow[:, -1] -= branch_current
@@ -221,13 +230,15 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             pr += dx*np.sum(weights*np.einsum('tni,ij,tnj->tn', wp, mat, dwp), axis=1)
             relaxation += dx/tau[pole]*np.sum(weights*_quadratic(v-wp, mat), axis=1)
         voltage = np.concatenate((v[:, 0], v[:, -1]), axis=1)
+        near_current = ((drive-v[:, 0])/rs if source_conductance is None
+                        else drive-v[:, 0]*source_conductance)
         if load_capacitance is None:
-            current = np.concatenate(((drive-v[:, 0])/rs, -v[:, -1]/rl), axis=1)
+            current = np.concatenate((near_current, -v[:, -1]/rl), axis=1)
         else:
             cap_current = dv[:, -1]@load_capacitance.T
             cap_energy = .5*_quadratic(v[:, -1], load_capacitance)
             cap_power = np.einsum('ti,ij,tj->t', v[:, -1], load_capacitance, dv[:, -1])
-            current = np.concatenate(((drive-v[:, 0])/rs, -v[:, -1]/rl-cap_current), axis=1)
+            current = np.concatenate((near_current, -v[:, -1]/rl-cap_current), axis=1)
         if load_branch is not None:
             bi = x[:, branch:]; dbi = rhs[:, branch:]
             be = .5*_quadratic(bi, lb)
@@ -236,8 +247,13 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             current[:, signals:] -= bi
         series = dx*np.sum(_quadratic(i, r), axis=1)
         shunt = dx*np.sum(weights*_quadratic(v, g), axis=1)
-        power = np.sum(voltage*current, axis=1); supplied = np.sum(drive*current[:, :signals], axis=1)
-        source_loss = np.sum(rs*current[:, :signals]**2, axis=1)
+        power = np.sum(voltage*current, axis=1)
+        if source_conductance is None:
+            supplied = np.sum(drive*current[:, :signals], axis=1)
+            source_loss = np.sum(rs*current[:, :signals]**2, axis=1)
+        else:
+            supplied = np.sum(drive*v[:, 0], axis=1)
+            source_loss = np.sum(source_conductance*v[:, 0]**2, axis=1)
         load_loss = (np.sum(rl*current[:, signals:]**2, axis=1) if load_capacitance is None
                      else np.sum(v[:, -1]**2/rl, axis=1))
         total_rate = rate+pr; losses = series+shunt+relaxation
@@ -265,6 +281,10 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         L_h_per_m=l.tolist(), G_s_per_m=g.tolist(), C_inf_f_per_m=c.tolist(),
         delta_C_f_per_m=delta.tolist(), relaxation_hz=poles.tolist(), length_m=length,
         cells=n, source_resistance_ohm=rs.tolist(), load_resistance_ohm=rl.tolist())
+    if source_conductance is not None:
+        data['source_currents_a'] = data.pop('source_voltages_v')
+        data.pop('source_resistance_ohm')
+        data['source_shunt_conductance_s'] = source_conductance.tolist()
     if signals != 2:
         data['signals'] = signals
     extra = ()
