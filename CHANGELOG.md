@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit partitioned-dielectric capacitance extraction with prescribed-electrode connectivity checks, preserving the original grounded-domain contract and shared numerical body.
+
 - Save finite-thickness ground-grid inputs with pre-mesh validation, exact volume/count/electrode identity and one physical field evaluation.
 
 - Add finite-thickness ground-grid cells with explicit PEC-volume removal, grounded component checks and qualified common-mesh thickness comparisons.

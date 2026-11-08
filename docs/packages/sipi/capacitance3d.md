@@ -170,3 +170,6 @@ monotonicity on nested spaces of one fixed geometry. The example is not a
 finite via, connector transition, or complete 3D geometry generator.
 
 [Thin-grid/plate reference cells](grid_plate.md) add explicit geometry, mesh alignment and bounded static boundaries.
+
+
+[Partitioned dielectric domains](partitioned_capacitance.md) use a separate prescribed-electrode contract; this API and its saved schema keep ground in every component.

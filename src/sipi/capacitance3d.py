@@ -81,7 +81,29 @@ def _node_set(value, count, name):
     return np.array(nodes, dtype=int, copy=True)
 
 
-def _prepare_inputs(mesh, eps_r, conductors, ground):
+def _require_electrode_connectivity(labels, components, signals, ground):
+    """Reject unanchored domains and globally unreferenced electrode groups."""
+    owners = np.full(components, -1, dtype=int)
+    parent = np.arange(len(signals)+1)
+    def find(value):
+        while parent[value] != value:
+            parent[value] = parent[parent[value]]
+            value = parent[value]
+        return value
+    for electrode, nodes in enumerate([ground, *signals]):
+        for component in np.unique(labels[nodes]):
+            other = owners[component]
+            if other < 0:
+                owners[component] = electrode
+            else:
+                parent[find(electrode)] = find(other)
+    if np.any(owners < 0):
+        raise ValueError('each dielectric component needs a prescribed electrode')
+    if any(find(electrode) != find(0) for electrode in range(1, len(signals)+1)):
+        raise ValueError('electrode-component network must connect every signal to ground')
+
+
+def _prepare_inputs(mesh, eps_r, conductors, ground, *, require_component_ground=True):
     """Validate detached inputs without assembling or solving the field."""
     mesh = _snapshot(mesh)
     relative = np.asarray(eps_r)
@@ -103,8 +125,11 @@ def _prepare_inputs(mesh, eps_r, conductors, ground):
     graph = coo_matrix((np.ones(3*len(tets)),
         (np.repeat(tets[:,0],3), tets[:,1:].ravel())), shape=(mesh.num_nodes,mesh.num_nodes)).tocsr()
     components, labels = connected_components(graph, directed=False)
-    if len(np.unique(labels[ground])) != components:
-        raise ValueError('every connected mesh component must contain ground')
+    if require_component_ground:
+        if len(np.unique(labels[ground])) != components:
+            raise ValueError('every connected mesh component must contain ground')
+    else:
+        _require_electrode_connectivity(labels, components, signals, ground)
     return mesh, relative, names, signals, ground, fixed
 
 
@@ -119,7 +144,11 @@ def extract_capacitance_3d(mesh, *, eps_r=1., conductors, ground):
     an arbitrary enclosing box is not automatically an open-space model.
     Geometric overlap/T-junction detection and meshing are not provided here.
     """
-    mesh, relative, names, signals, ground, fixed = _prepare_inputs(mesh, eps_r, conductors, ground)
+    return _extract_prepared(*_prepare_inputs(mesh, eps_r, conductors, ground))
+
+
+def _extract_prepared(mesh, relative, names, signals, ground, fixed):
+    """Common numerical body; caller selects an explicit component contract."""
     tets = mesh.tets
     with np.errstate(over='ignore', invalid='ignore', divide='ignore'):
         k = assemble_stiffness_3d(mesh, eps=epsilon_0*relative)
