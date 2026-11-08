@@ -1,5 +1,7 @@
 # Sampled periodic network response
 
+[Lossless scalar startup](startup.md) handles an explicit zero-energy initial condition and resistive ends.
+
 [Periodic sources and finite terminations](periodic_termination.md) solve source/load reflection feedback.
 
 [Saved JSON and common execution](periodic_document.md) preserve explicit port inputs and budgets.

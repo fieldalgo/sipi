@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add initially unenergized lossless scalar line responses with explicit PWL drives, resistive/open/short boundaries, finite reflection budgets and independent LC dynamics checks.
 - Reuse vacuum capacitance for exactly uniform scalar dielectric samples, preserving general tensor/nonuniform extraction and independently checked complex-field and convergence results.
 - Add strict saved finite-frequency impedance goals, validating all sampled material states before fields and preserving batch budgets and complete replay through shared execution.
 - Add bounded two-parameter impedance goals at explicit frequency samples, with batched fields, frozen material sweeps, complete failures and independent convergence checks.
