@@ -3,7 +3,7 @@
 `StartupPortWavesDocument` stores **sipi.startup-port-waves/1** by default, combining a
 complete supported startup document with explicit real port references for
 [wave diagnostics](startup_waves.md). Its constructor takes a supported document
-object, `z_ref` and optional explicit `version=2` or `version=3`; it copies canonical inputs, not an already computed response.
+object, `z_ref` and optional explicit `version=2`, `version=3` or `version=4`; it copies canonical inputs, not an already computed response.
 
 ```python
 import numpy as np
@@ -196,3 +196,34 @@ result identity and original propagation/cancellation failures are tested.
 The former invalid constructor version3 case now tests unsupported999; positive
 version3 behavior has its own acceptance. This adds a saved diagnostic contract,
 not a new physical propagation model or browser/Windows integration.
+
+## Explicit version 4: scalar Debye inputs
+
+`version=4` selects **sipi.startup-port-waves/4** and accepts the eight version-3
+schemas plus **sipi.debye-rlgc-startup/1**. Debye inputs have two explicit real
+port references. Pole order, strengths including zero, relaxation frequencies,
+C_inf and the entire original time grid remain in the nested document.
+Versions 1/2/3 retain their registries and reject Debye; the constructor still
+defaults to version1. Recursive wave documents are rejected at every version.
+
+```python
+from sipi import DebyeRLGCLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+
+startup = DebyeRLGCLadderDocument([0., 1e-9, 2e-9], [0., 1., 1.],
+    R=20., L=500e-9, G=.002, C_inf=200e-12,
+    delta_C=[150e-12, 50e-12], relaxation_hz=[1e9, 1e8],
+    length=.1, cells=8, source_resistance=25., load_resistance=100.)
+document = StartupPortWavesDocument(startup, z_ref=[35., 75.], version=4)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['input']['startup'] == startup.to_dict()
+assert out['result']['source_kind'] == 'DebyeRLGCLadderResponse'
+assert out['result'] == document.analyze(max_evaluations=3).to_dict()
+```
+
+Nine kinds with ramp/pulse give eighteen exact replays, including parity with
+each eligible prior wave version. Debye six-boundary/one-to-four-pole cases,
+actual time-row budgets, nested strict units, corruption guards and physical
+exceptions are checked. No implicit extension of time, geometry extraction,
+frequency-dependent mode or TDR interpretation is performed.
+[Debye saved contract](debye_startup_document.md) defines the underlying limits.

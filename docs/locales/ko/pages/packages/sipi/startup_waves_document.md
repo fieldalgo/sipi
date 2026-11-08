@@ -2,7 +2,7 @@
 
 `StartupPortWavesDocument`는 기본 **sipi.startup-port-waves/1**으로 완전한 시작 응답 문서와
 [파형 진단](startup_waves.md)의 명시적 실수 기준 임피던스를 함께 저장합니다. 생성자는
-지원 문서 객체·`z_ref`와 선택적인 명시적 `version=2` 또는 `version=3`를 받고, 이미 계산한 응답이 아닌 정규화된 입력을 복사합니다.
+지원 문서 객체·`z_ref`와 선택적인 명시적 `version=2`, `version=3` 또는 `version=4`를 받고, 이미 계산한 응답이 아닌 정규화된 입력을 복사합니다.
 
 ```python
 import numpy as np
@@ -179,3 +179,33 @@ Norton은v2/v3가 같습니다. 혼합6경계와 동종 소스2한계도 정확�
 실패를 검사합니다. 이전 미지원 생성자version3 시험은 미지원999로 바꾸며 새version3의
 양성 동작을 별도로 검사합니다. 저장 진단 계약의 확장이며 물리 전파 모델이나
 브라우저/Windows 통합의 추가를 뜻하지 않습니다.
+
+## 명시적 버전 4: 단일 신호 Debye 입력
+
+`version=4`는 **sipi.startup-port-waves/4**를 선택하고 버전 3의 8종에
+**sipi.debye-rlgc-startup/1**을 추가합니다. Debye 입력은 명시적 실수 포트
+기준 2개를 사용합니다. 극점 순서, 0을 포함한 강도, 완화 주파수, C_inf와
+전체 시간 배열은 원래 중첩 문서에 보존합니다. 버전 1/2/3은 기존 목록을
+유지하고 Debye를 거부하며 생성자 기본값도 버전 1입니다.
+모든 버전에서 파동 문서의 재귀 중첩을 거부합니다.
+
+```python
+from sipi import DebyeRLGCLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+
+startup = DebyeRLGCLadderDocument([0., 1e-9, 2e-9], [0., 1., 1.],
+    R=20., L=500e-9, G=.002, C_inf=200e-12,
+    delta_C=[150e-12, 50e-12], relaxation_hz=[1e9, 1e8],
+    length=.1, cells=8, source_resistance=25., load_resistance=100.)
+document = StartupPortWavesDocument(startup, z_ref=[35., 75.], version=4)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['input']['startup'] == startup.to_dict()
+assert out['result']['source_kind'] == 'DebyeRLGCLadderResponse'
+assert out['result'] == document.analyze(max_evaluations=3).to_dict()
+```
+
+9종의 ramp/pulse 총 18개 재실행과 해당하는 모든 구버전의 결과 일치를
+검증합니다. Debye 6종 경계·1–4극점, 실제 시간 행 예산, 중첩 단위 검증,
+결과 오염 검사와 물리 예외 전달도 확인합니다. 시간을 자동 연장하거나
+기하 추출·주파수 의존 모드·TDR 해석을 수행하지 않습니다.
+물리 제한은 [Debye 저장 계약](debye_startup_document.md)을 따릅니다.

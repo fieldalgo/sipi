@@ -263,6 +263,7 @@ def documents():
     base.append(DebyeRLGCLadderDocument([0.,1e-9,2e-9],[0.,1.,1.],
         R=20.,L=500e-9,G=.002,C_inf=200e-12,delta_C=[150e-12,50e-12],
         relaxation_hz=[1e9,1e8],length=.1,cells=8,source_resistance=25.,load_resistance=100.))
+    base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,75.],version=4))
     return base
 
 

@@ -202,3 +202,5 @@ RLGC 한계, 4극점 분할, 0 입력, 복사, 엄격한 기준값 및 내부 �
 저장 파동 스키마 v1/v2/v3는 여전히 Debye 입력 문서를 거부합니다.
 [Debye 물리 입력](debye_startup.md)과 [저장 입력](debye_startup_document.md)의
 명시적 시간·셀·극점 계약은 유지합니다.
+
+[명시적 저장 버전4](startup_waves_document.md)는 Debye 입력을 포함합니다.

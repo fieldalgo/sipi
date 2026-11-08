@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected saved port-wave version4 for scalar Debye startup, preserving prior nested registries and physical time/pole contracts.
+
 - Accept explicit scalar Debye terminal waves while preserving polarization energy/loss balance and excluding internal charge currents from terminal inputs.
 
 - Save explicit scalar Debye startup inputs with preserved poles, actual time-row budgets and complete state/diagnostic identity guards.

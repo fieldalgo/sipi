@@ -222,3 +222,5 @@ This is terminal decomposition, not a dispersive eigenmode or TDR inversion.
 Saved wave schemas v1/v2/v3 still reject the Debye input document.
 [Debye physical inputs](debye_startup.md) and [saved inputs](debye_startup_document.md)
 retain their explicit time, cell and pole contracts.
+
+[Explicit saved version4](startup_waves_document.md) includes Debye inputs.

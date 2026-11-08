@@ -87,7 +87,7 @@ def test_v3_no_propagation_parse_and_deep_copies(monkeypatch):
     assert d.dumps()==text and loaded.dumps()==text
 
 
-@pytest.mark.parametrize('version',[True,False,0,4,3.,'3',None])
+@pytest.mark.parametrize('version',[True,False,0,999,3.,'3',None])
 def test_constructor_requires_explicit_supported_integer_version(version):
     with pytest.raises((ValueError,TypeError)):StartupPortWavesDocument(source(),z_ref=[35.,45.,55.,65.],version=version)
 

@@ -54,3 +54,5 @@ assert out['status'] == 'complete'
 
 [공통 실행](execution.md) · [물리 API](debye_startup.md) ·
 [English](../../../../../packages/sipi/debye_startup_document.md)
+
+[저장 파동 버전4](startup_waves_document.md)는 이 요청을 명시적으로 중첩합니다.

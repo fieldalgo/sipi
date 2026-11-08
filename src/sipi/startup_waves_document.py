@@ -17,10 +17,11 @@ from .coupled_reactive_startup_document import ReactiveRLGCLadderDocument
 from .startup_waves import StartupPortWaves, startup_port_waves
 from .norton_startup_document import NortonReactiveRLGCLadderDocument
 from .mixed_startup_document import MixedSourceRLGCLadderDocument
+from .debye_startup_document import DebyeRLGCLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3)}
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -32,7 +33,8 @@ _STARTUPS = {
 
 _STARTUPS_V2 = {**_STARTUPS, 'sipi.norton-rlgc-startup/1': NortonReactiveRLGCLadderDocument}
 _STARTUPS_V3 = {**_STARTUPS_V2, 'sipi.mixed-rlgc-startup/1': MixedSourceRLGCLadderDocument}
-_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3}
+_STARTUPS_V4 = {**_STARTUPS_V3, 'sipi.debye-rlgc-startup/1': DebyeRLGCLadderDocument}
+_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4}
 
 
 def _startup(data, *, version=1):
@@ -52,10 +54,11 @@ class StartupPortWavesDocument:
     Nested parsing validates without propagation; no recursive wave documents.
     Default version1 retains its six original voltage-driven schemas. Explicit
     version2 also permits Norton current inputs; version3 adds typed mixed sources.
+    Explicit version4 additionally permits scalar Debye startup inputs.
     No nested version is upgraded.
     """
     def __init__(self, startup, *, z_ref, version=1):
-        version = _integer(version, 1, 3)
+        version = _integer(version, 1, 4)
         registry = _BY_VERSION[version]
         if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')
@@ -63,7 +66,7 @@ class StartupPortWavesDocument:
 
     def _assign(self, startup, z_ref, *, version):
         doc = _startup(startup, version=version)
-        ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument)) else 4
+        ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, DebyeRLGCLadderDocument)) else 4
         z = _real('z_ref', z_ref)
         if z.shape != (ports,) or np.any(z <= 0):
             raise ValueError('z_ref needs one explicit positive real value per startup port')
