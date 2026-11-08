@@ -82,3 +82,6 @@ PWL/정착 오차를 확인하며 horizon 차<=1e-8V입니다. 지정 fixture �
 별도 결과형을6·8개의 실수 기준 저항과 함께 수락합니다. 장 추출·임의 종단·분산 피팅·FFT/TDR·플랫폼·실측 정확도를
 추가하지 않습니다. 기존 의존성과 고지를 유지하며 새 의존성은 없습니다.
 [2신호 커패시터 계약](debye_capacitive_startup.md)을 참고하세요.
+
+
+[별도 직렬 RL 부하](multiconductor_debye_reactive_startup.md)가3·4신호 가지 전류·저장을 추가합니다.

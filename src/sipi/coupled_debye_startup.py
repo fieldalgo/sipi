@@ -192,11 +192,14 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             charge[:, :, pole] = dx*weights[None, :, None]*(w[:, :, pole]@delta[pole].T)
             pcurrent[:, :, pole] = dx*weights[None, :, None]*(dw[:, :, pole]@delta[pole].T)
         if signals != 2:
-            if load_branch is not None:
-                raise ValueError('multiconductor Debye derivatives do not support inductive branches')
             flow = np.zeros_like(v)
             flow[:, :-1] -= i; flow[:, 1:] += i
             flow[:, 0] += (drive-v[:, 0])/rs; flow[:, -1] -= v[:, -1]/rl
+            if load_branch is not None:
+                branch_current = x[:, branch:]
+                flow[:, -1] -= branch_current
+                branch_forcing = v[:, -1]-branch_current@rb.T
+                rhs[:, branch:] = np.linalg.solve(lb, branch_forcing.T).T
             forcing = (flow-pcurrent.sum(axis=2))/(dx*weights[None, :, None])-v@g.T
             dv = np.linalg.solve(c, forcing.reshape(-1, signals).T).T.reshape(v.shape)
             if load_capacitance is not None:

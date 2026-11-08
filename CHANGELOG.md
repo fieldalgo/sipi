@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add separate three/four-signal PSD Debye circuits with external C and series RL loads, qualified longer-horizon checks, independent charge/branch KCL, analytical limits and distinct branch energy/loss.
+
 - Add explicit saved wave version12 for multiconductor Debye capacitive inputs, retaining versions1–11, external capacitor power meaning and original sample budgets.
 
 - Admit explicit multiconductor Debye capacitive terminal waves with six/eight real references, retaining external capacitor current and separate line power without changing conversion formulas.

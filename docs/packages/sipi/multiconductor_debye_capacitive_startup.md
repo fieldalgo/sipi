@@ -90,3 +90,6 @@ now admits the separate response class with six/eight real references. No field 
 fitted dispersion, FFT/TDR, platform integration or measured accuracy is added.
 Existing dependencies and notices remain; no new dependency is introduced.
 See the [two-signal capacitive contract](debye_capacitive_startup.md).
+
+
+[Separate series RL loads](multiconductor_debye_reactive_startup.md) add explicit three/four-signal branch current and storage.
