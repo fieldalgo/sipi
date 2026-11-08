@@ -188,3 +188,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Saved multiconductor series RL inputs](multiconductor_debye_reactive_startup_document.md) preserve explicit branch state semantics and actual time-row budgets.
+
+
+[Explicit saved wave version13](startup_waves_document_v13.md) adds multiconductor Debye series RL inputs while retaining versions1–12.

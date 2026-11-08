@@ -471,3 +471,6 @@ measured accuracy or a general transient field solver.
 
 
 [Explicit saved wave version12](startup_waves_document_v12.md) adds multiconductor Debye capacitive inputs while preserving versions1–11.
+
+
+[Explicit saved wave version13](startup_waves_document_v13.md) adds multiconductor Debye series RL inputs while retaining versions1–12.

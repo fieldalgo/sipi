@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved wave version13 for multiconductor Debye series RL inputs, retaining versions1–12, external branch power meaning and original sample budgets.
+
 - Admit explicit multiconductor Debye series RL terminal waves with six/eight real references, retaining branch current, external storage and separate line power without changing conversion formulas.
 
 - Add a strict 17-key saved multiconductor Debye series RL input and common execution, preserving external SI matrices, branch state semantics, actual time budgets and all response shapes.

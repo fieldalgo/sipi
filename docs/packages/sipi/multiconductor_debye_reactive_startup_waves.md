@@ -76,6 +76,7 @@ The physical engine is unchanged. Its original eight-cycle settling failure
 and qualified longer-horizon scope remain. No arbitrary transient accuracy,
 FFT/TDR, propagation solver or runtime dependency is added. Explicit
 [saved physical inputs](multiconductor_debye_reactive_startup_document.md)
-are available; saved wave versions 1–12 still reject this response kind.
+are available, and [explicit saved wave version13](startup_waves_document_v13.md)
+admits this kind. Versions 1–12 still reject it.
 The registry stays at 85 schemas/37 templates at this addition, with no app
 or platform integration. See [startup power waves](startup_waves.md).

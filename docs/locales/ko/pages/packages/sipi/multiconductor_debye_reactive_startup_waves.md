@@ -74,6 +74,7 @@ rank-one/근영 C·0/rank-one/근영 branch 저항·명시 기준 저항·기존
 물리 엔진은 바꾸지 않습니다. 원래 8주기 정착 실패와 별도 긴 관측시간 수락
 범위도 유지합니다. 임의 transient 정확도·FFT/TDR·전파 솔버·런타임 의존성을
 추가하지 않습니다. [물리 입력 저장](multiconductor_debye_reactive_startup_document.md)은
-가능하지만 저장 파동 v1–12는 이 종류를 계속 거부합니다. 이 추가 시점
+가능하며 [명시 저장 파동 버전13](startup_waves_document_v13.md)이 이 종류를
+수락합니다. 기존 v1–12는 계속 거부합니다. 이 추가 시점
 85스키마·37template을 유지하며 앱·플랫폼 연결은 별도입니다.
 [시작응답 파동](startup_waves.md)을 참고하세요.
