@@ -99,6 +99,7 @@ Zero/rank-one/near-zero external matrices, storage/current partition,
 linearity/time/impedance/signal/pole invariants, declared zero strengths,
 strict inputs, readonly copies and original failures are checked. Existing96
 full-state outputs retain exact source/installed hashes. [Explicit saved inputs](multiconductor_debye_reactive_startup_document.md)
-preserve this model. This separate class does not yet enter wave APIs. No general RLC topology, field extraction,
+preserve this model. [Explicit terminal waves](multiconductor_debye_reactive_startup_waves.md)
+admit this separate class with six/eight real references. No general RLC topology, field extraction,
 fitted material, FFT/TDR, platform integration or new dependency is added.
 See the [two-signal reactive contract](debye_reactive_startup.md).

@@ -435,3 +435,6 @@ N3/4 × 결합/대각/무손실 × 램프/펄스, 독립 scalar 모드 파동 �
 
 
 [다신호 Debye 커패시터 파동](multiconductor_debye_capacitive_startup_waves.md)은 외부 커패시터 전류와 선로 저장의 구분을 유지합니다.
+
+
+[다신호 Debye reactive 파동](multiconductor_debye_reactive_startup_waves.md)은 branch 전류·외부 저장·선로 전력의 구분을 유지합니다.

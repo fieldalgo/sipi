@@ -233,7 +233,7 @@ def test_declared_poles_and_separate_export_contract(signals,mode):
     assert out['port_names']==[f'{end}_{j}' for end in ['near','far'] for j in range(signals)]
     out['input']['load_capacitance_f'][0][0]=9;assert a.inputs==saved
     with pytest.raises(ValueError):a.to_dict(include_states=1)
-    with pytest.raises(ValueError,match='response must be'):startup_port_waves(a,z_ref=[50.]*(2*signals))
+    assert startup_port_waves(a,z_ref=[50.]*(2*signals)).incident.shape==(121,2*signals)
 
 @pytest.mark.parametrize('signals',[3,4])
 @pytest.mark.parametrize('bad',['none','scalar','vector','shape','boolean','complex','string','asymmetric','negative','tiny-negative','nan','inf'])

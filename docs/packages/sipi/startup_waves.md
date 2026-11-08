@@ -466,3 +466,6 @@ establish general TDR inversion, measured accuracy or app/platform support.
 
 
 [Multiconductor Debye capacitive waves](multiconductor_debye_capacitive_startup_waves.md) retain external capacitor flow and separate line storage.
+
+
+[Multiconductor Debye reactive waves](multiconductor_debye_reactive_startup_waves.md) retain branch current, external storage and separate line power.
