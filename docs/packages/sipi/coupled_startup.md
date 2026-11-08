@@ -110,3 +110,5 @@ dispersion, general TDR/eye/BER, or browser/Windows support.
 [한국어](../../locales/ko/pages/packages/sipi/coupled_startup.md)
 
 [Explicit coupled Debye startup](coupled_debye_startup.md) retains matrix strengths and separate polarization power.
+
+- [Three/four-signal constant RLGC startup](multiconductor_startup.md)
