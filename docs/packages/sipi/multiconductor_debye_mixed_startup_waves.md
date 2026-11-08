@@ -94,6 +94,9 @@ arithmetic stay unchanged. Failed low-loss/short-horizon studies and the
 qualified damped PWL continuum scope retain their limits. There is no new
 arbitrary-transient accuracy, FFT/TDR, mode extraction or dependency claim.
 [Typed input saving](multiconductor_debye_mixed_startup_document.md) is supported;
-saved wave versions1–14 still reject this kind. The registry stays at
+saved wave versions1–14 still reject this kind. At the native-wave addition the registry contained
 89 schemas/37 templates. Browser/desktop candidates are unchanged.
 See [startup power waves](startup_waves.md).
+
+
+[Explicit saved wave version15](startup_waves_document_v15.md) adds typed multiconductor Debye inputs, preserving versions1–14. The registry becomes90 schemas/37 templates at this addition.

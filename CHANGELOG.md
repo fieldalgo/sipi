@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved wave version15 for multiconductor Debye typed sources, preserving original V/A objects, source loss partitions, versions1–14 and actual row budgets.
+
 - Admit explicit multiconductor Debye typed-source responses to six/eight-port power waves, keeping terminal current and both source loss partitions distinct.
 
 - Add strict versioned multiconductor Debye typed-source documents, preserving original V/A inputs, source loss partitions, exact state identity and actual sample budgets.

@@ -194,3 +194,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Explicit saved wave version14](startup_waves_document_v14.md) adds multiconductor Debye current-source inputs while retaining versions1–13.
+
+
+[Explicit saved wave version15](startup_waves_document_v15.md) adds typed multiconductor Debye inputs, preserving versions1–14. The registry becomes90 schemas/37 templates at this addition.
