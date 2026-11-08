@@ -314,6 +314,11 @@ def documents():
         height=.5e-3,top_clearance=1e-3,backside_depth=1e-3,ground_thickness=.25e-3,
         eps_substrate=3.8,eps_above=1.,eps_below=1.,transverse_periods=1,cells_per_pitch=4,
         cells_substrate=2,cells_above=4,cells_below=3,cells_grid=1))
+    from sipi import VolumeGridStripCapacitanceDocument
+    base.append(VolumeGridStripCapacitanceDocument(pitch=1e-3,grid_width=.5e-3,trace_width=.5e-3,
+        height=.5e-3,top_clearance=1e-3,backside_depth=1e-3,ground_thickness=.25e-3,trace_thickness=.25e-3,
+        eps_substrate=3.8,eps_above=1.,eps_below=1.,transverse_periods=1,cells_per_pitch=4,
+        cells_substrate=2,cells_above=4,cells_below=3,cells_grid=1,cells_trace=1))
     return base
 
 

@@ -68,7 +68,7 @@ resolved widths/edge indices. `include_mesh=True` adds arrays; result
 `include_fields=True` also adds the1V potential. Direct dataclass construction
 does not replace factory validation. Raw field1e-8 gates, result identity,
 shapes, finite positive C/energy, negative ground charge and prescribed potentials
-are checked. This unit adds no versioned saved-input adapter.
+are checked. Versioned inputs use the separate [saved-input adapter](volume_grid_strip_document.md).
 
 Verification includes three solid/full-width limits C=eps0*eps_substrate*p²M/h
 within1e-11, constant upper/lower potentials within1e-10, nested width monotonicity,
