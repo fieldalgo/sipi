@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict versioned multiconductor Debye Norton input documents and common execution with exact current/conductance identity, full-state replay and pre-propagation row budgets.
+
 - Add explicit three/four-signal PSD Debye Norton current sources with external C/RL loads, separate source shunt loss, independent finite-circuit checks and qualified PWL continuum limits.
 
 - Add explicit saved wave version13 for multiconductor Debye series RL inputs, retaining versions1–12, external branch power meaning and original sample budgets.
