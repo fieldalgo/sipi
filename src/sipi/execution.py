@@ -110,6 +110,7 @@ _REGISTRY = {
     'sipi.dielectric-fit/1': DebyeFitDocument,
     'sipi.line-quantity-design/1': LineQuantityDesignDocument,
     'sipi.line-quantity-design/2': LineQuantityDesignDocument,
+    'sipi.line-quantity-design/3': LineQuantityDesignDocument,
     'sipi.line-quantity-study/1': LineQuantityStudyDocument,
     'sipi.line-quantity-study/2': LineQuantityStudyDocument,
     'sipi.line-quantity-yield/1': LineQuantityYieldDocument,

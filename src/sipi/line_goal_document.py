@@ -14,16 +14,21 @@ __all__ = ['LineQuantityDesignDocument']
 
 
 class LineQuantityDesignDocument:
-    """Saved geometry/material factory and lossy target, versions 1 and 2.
+    """Saved geometry/material factory and lossy target, versions 1 through 3.
 
     study is a /3 or /4 ImpedanceStudyDocument (or its dictionary), with z0
-    for scalar goals or z_diff_forward for the explicit paired goal,
+    for scalar goals or z_diff_forward for either explicit paired goal,
     one positive fixed frequency, sweep count=2 and one positive-bounded variable.
     It specifies inputs only: no preliminary study or quasi-static goal runs.
     Version 1 (the constructor default) keeps the scalar contract. Explicit
     version 2 also accepts differential_forward_impedance_real with a paired
     z_diff_forward source. That is the full lossy Re(Zdd) at a forward launch
     with Ic=0, not a decoupled eigenmode or finite-terminal impedance.
+    Explicit version 3 also accepts common_forward_impedance_real: full lossy
+    Re(Zcc) with launch Id=0. The nested z_diff_forward label selects the paired
+    geometry/material input contract only; no quasi-static source study runs.
+    Neither paired target asserts a decoupled mode or zero cross-coordinate
+    voltage. Versions 1 and 2 retain their previous accepted quantities.
     The goal uses full lossy RLGC through seek_line_quantity. Existing fixed
     pitch and total stack-height constraints are preserved.
 
@@ -47,18 +52,22 @@ class LineQuantityDesignDocument:
         data = _copy(data)
         _keys(data, ('schema', 'study', 'conductor', 'quantity', 'target', 'tolerance',
                      'max_evaluations'), where='line quantity design')
-        if data['schema'] not in ('sipi.line-quantity-design/1', 'sipi.line-quantity-design/2'):
+        if data['schema'] not in ('sipi.line-quantity-design/1', 'sipi.line-quantity-design/2',
+                                  'sipi.line-quantity-design/3'):
             raise ValueError('unsupported line-quantity-design schema')
         quantity = data['quantity']
         allowed = ('impedance_real', 'attenuation')
-        if data['schema'] == 'sipi.line-quantity-design/2':
+        if data['schema'] in ('sipi.line-quantity-design/2', 'sipi.line-quantity-design/3'):
             allowed += ('differential_forward_impedance_real',)
+        if data['schema'] == 'sipi.line-quantity-design/3':
+            allowed += ('common_forward_impedance_real',)
         if not isinstance(quantity, str) or quantity not in allowed:
             raise ValueError('quantity must be '+' or '.join(allowed))
         target = _scalar('target', data['target'], zero=quantity == 'attenuation')
         tolerance = _scalar('tolerance', data['tolerance'])
         budget = _integer(data['max_evaluations'], 3, 10000)
-        study = _source_study(data['study'], paired=quantity == 'differential_forward_impedance_real')
+        study = _source_study(data['study'], paired=quantity in ('differential_forward_impedance_real',
+                                                               'common_forward_impedance_real'))
         sampling = study['sampling']
         if sampling['kind'] != 'sweep' or sampling['count'] != 2 or len(sampling['variables']) != 1:
             raise ValueError('goal study requires a sweep with count=2 and exactly one variable')

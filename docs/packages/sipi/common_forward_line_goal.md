@@ -1,5 +1,7 @@
 # Lossy common-current forward-impedance goal
 
+[Saved goal /3](common_forward_goal_document.md) connects supported geometry/material sources to this API.
+
 **English** | [한국어](../../locales/ko/pages/packages/sipi/common_forward_line_goal.md)
 
 `common_forward_impedance_real` targets Re(Zcc) in ohms for two ordered

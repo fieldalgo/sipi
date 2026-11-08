@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit version3 saved common-current forward-impedance goals with unchanged prior quantity admission, source constraints and execution budgets.
+
 - Add explicit common-current forward Re(Zcc) goals for lossy asymmetric pairs, retaining coupling, actual attempt budgets, frozen refinement and prior saved-schema admission.
 
 - Save independent-width finite-volume pairs with strict21-key input, separate sidewall geometry checks, one field evaluation and exact result identity.

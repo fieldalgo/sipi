@@ -209,7 +209,7 @@ def test_shared_execution_retains_pair_failures_and_available_input(monkeypatch,
 def test_strict_pair_input_rejection_before_mesh(monkeypatch, case):
     raw = document().to_dict(); study = raw['study']
     if case == 'v1': raw['schema'] = 'sipi.line-quantity-design/1'
-    if case == 'schema': raw['schema'] = 'sipi.line-quantity-design/3'
+    if case == 'schema': raw['schema'] = 'sipi.line-quantity-design/999'
     if case == 'scalar_quantity': raw['quantity'] = 'impedance_real'
     if case == 'scalar_source': raw['study'] = scalar_document().to_dict()['study']
     if case == 'modal_source':

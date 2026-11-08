@@ -1,5 +1,7 @@
 # 유손실 공통 전류 순방향 임피던스 목표
 
+[저장 목표 /3](common_forward_goal_document.md)은 지원 기하·재료 입력을 이 API에 연결합니다.
+
 [English](../../../../../packages/sipi/common_forward_line_goal.md) | **한국어**
 
 `common_forward_impedance_real`은 두 ordered 신호·고정 양의 주파수 하나에서

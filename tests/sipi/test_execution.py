@@ -407,6 +407,15 @@ def documents():
         top_clearance=1e-3,backside_depth=1e-3,eps_substrate=3.8,eps_above=1.,eps_below=1.,
         transverse_periods=3,cells_per_pitch=4,cells_substrate=2,cells_above=4,cells_below=3,
         ground_thickness=.25e-3,cells_grid=1,trace_thickness=.25e-3,cells_trace=1))
+    base.append(LineQuantityDesignDocument(ImpedanceStudyDocument('asymmetric_coupled_microstrip',
+        dict(left_width=.6e-3,right_width=.5e-3,gap=.4e-3,substrate_height=.5e-3,
+             eps_r=4.,tan_delta=.02,left_thickness=35e-6,right_thickness=50e-6,
+             air_height=10e-3,box_width=24e-3),quantity='z_diff_forward',frequency=1e9,
+        materials={},mesh=dict(edge_size=2.5e-6,far_size=.25e-3,grade=.075),
+        fixed_pitch_m=.95e-3,sampling=dict(kind='sweep',count=2,
+            variables=[dict(name='left_width',lower=.2e-3,upper=1e-3)])),
+        conductor=dict(kind='perfect'),quantity='common_forward_impedance_real',
+        target=40.,tolerance=.125,max_evaluations=24,schema='sipi.line-quantity-design/3'))
     return base
 
 
