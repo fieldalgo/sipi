@@ -66,3 +66,5 @@ N3/4 × 결합/대각/무손실 × 램프/펄스 총12개 전체 상태의 정�
 통합이나 실측 정확도를 주장하지 않습니다.
 
 [공통 실행](execution.md) · [물리 API](multiconductor_startup.md)
+
+[명시적 저장 버전9](startup_waves_document.md)이3·4신호 입력과6·8개 기준 저항을 추가하며 구버전은 유지합니다.

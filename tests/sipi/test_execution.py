@@ -301,6 +301,7 @@ def documents():
         signals=3,R=np.diag([20.,23.,26.]),L=np.diag([450.,470.,490.])*1e-9,
         G=np.diag([.002,.0022,.0024]),C=np.diag([210.,220.,230.])*1e-12,
         length=.1,cells=8,source_resistance=[25.]*3,load_resistance=[100.]*3))
+    base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.,75.,85.],version=9))
     return base
 
 

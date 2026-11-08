@@ -455,3 +455,5 @@ cancellation remain errors. No physical criterion is relaxed.
 Saved wave versions1..8 continue to reject this new startup kind; direct
 conversion support does not silently change a saved schema. This does not
 establish general TDR inversion, measured accuracy or app/platform support.
+
+[Explicit saved version9](startup_waves_document.md) adds three/four-signal inputs with six/eight references while preserving prior versions.

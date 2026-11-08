@@ -22,10 +22,11 @@ from .coupled_debye_startup_document import CoupledDebyeRLGCLadderDocument
 from .psd_debye_startup_document import PSDCoupledDebyeRLGCLadderDocument
 from .debye_capacitive_startup_document import DebyeCapacitiveLadderDocument
 from .debye_reactive_startup_document import DebyeReactiveLadderDocument
+from .multiconductor_startup_document import MulticonductorRLGCLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7, 8)}
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7, 8, 9)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -42,7 +43,8 @@ _STARTUPS_V5 = {**_STARTUPS_V4, 'sipi.coupled-debye-rlgc-startup/1': CoupledDeby
 _STARTUPS_V6 = {**_STARTUPS_V5, 'sipi.psd-coupled-debye-rlgc-startup/1': PSDCoupledDebyeRLGCLadderDocument}
 _STARTUPS_V7 = {**_STARTUPS_V6, 'sipi.debye-capacitive-startup/1': DebyeCapacitiveLadderDocument}
 _STARTUPS_V8 = {**_STARTUPS_V7, 'sipi.debye-reactive-startup/1': DebyeReactiveLadderDocument}
-_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7, 8: _STARTUPS_V8}
+_STARTUPS_V9 = {**_STARTUPS_V8, 'sipi.multiconductor-rlgc-startup/1': MulticonductorRLGCLadderDocument}
+_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7, 8: _STARTUPS_V8, 9: _STARTUPS_V9}
 
 
 def _startup(data, *, version=1):
@@ -67,10 +69,12 @@ class StartupPortWavesDocument:
     Explicit version6 additionally permits PSD coupled Debye startup inputs.
     Explicit version7 additionally permits external capacitive Debye inputs.
     Explicit version8 additionally permits external series RL Debye inputs.
+    Explicit version9 additionally permits three/four-signal constant RLGC
+    inputs with six/eight real port references, determined by explicit signals.
     No nested version is upgraded.
     """
     def __init__(self, startup, *, z_ref, version=1):
-        version = _integer(version, 1, 8)
+        version = _integer(version, 1, 9)
         registry = _BY_VERSION[version]
         if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')
@@ -78,7 +82,10 @@ class StartupPortWavesDocument:
 
     def _assign(self, startup, z_ref, *, version):
         doc = _startup(startup, version=version)
-        ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, DebyeRLGCLadderDocument)) else 4
+        if isinstance(doc, MulticonductorRLGCLadderDocument):
+            ports = 2*doc.to_dict()['signals']
+        else:
+            ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, DebyeRLGCLadderDocument)) else 4
         z = _real('z_ref', z_ref)
         if z.shape != (ports,) or np.any(z <= 0):
             raise ValueError('z_ref needs one explicit positive real value per startup port')

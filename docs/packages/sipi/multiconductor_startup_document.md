@@ -69,3 +69,5 @@ requires its own explicit six/eight-port contract. No new app/platform or
 measured-accuracy claim follows from storage support.
 
 [Common execution](execution.md) · [Physical API](multiconductor_startup.md)
+
+[Explicit saved version9](startup_waves_document.md) adds three/four-signal inputs with six/eight references while preserving prior versions.

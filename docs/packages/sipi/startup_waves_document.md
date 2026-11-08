@@ -3,7 +3,7 @@
 `StartupPortWavesDocument` stores **sipi.startup-port-waves/1** by default, combining a
 complete supported startup document with explicit real port references for
 [wave diagnostics](startup_waves.md). Its constructor takes a supported document
-object, `z_ref` and optional explicit `version=2`, `version=3` or `version=4`; it copies canonical inputs, not an already computed response.
+object, `z_ref` and an optional explicit integer `version` from2 through9; it copies canonical inputs, not an already computed response.
 
 ```python
 import numpy as np
@@ -410,3 +410,55 @@ strict SPD inductance and original zero initial branch current. Far-port
 power includes parallel resistor loss, capacitor power, branch energy rate
 and branch resistor loss. Zero/rank-one/full branch resistance and pulse
 replays preserve the direct result. No branch default or topology inference.
+
+
+## Explicit version9 for three/four-signal startup
+
+Explicit `version=9` selects `sipi.startup-port-waves/9` and adds only
+`sipi.multiconductor-rlgc-startup/1`, for fourteen nested schema kinds.
+That kind requires six/eight positive finite real references according to
+its explicit validated integer `signals=3/4`. Other kinds keep their two/four
+references. Default version1 and all version1..8 registries are unchanged;
+they still reject the new kind. Nested versions are never upgraded.
+
+The root keeps exactly `schema`, `startup` and `z_ref_ohm`. The nested
+multiconductor document retains twelve strict keys, SI units, matrices,
+positive terminal resistances, signal ordering, cell count and time rows.
+Input validation does not propagate states; recursive wave documents,
+wrong reference counts, inferred signal counts and scalar broadcasts fail.
+
+```python
+import numpy as np
+from sipi import MulticonductorRLGCLadderDocument, StartupPortWavesDocument
+from sipi.execution import normalize_saved, execute_saved
+
+startup = MulticonductorRLGCLadderDocument(
+    [0., 1e-9, 2e-9], [[0., 0., 0., 0.], [1., -.4, .2, -.1], [1., -.4, .2, -.1]],
+    signals=4, R=np.diag([20., 23., 26., 29.]),
+    L=np.diag([450., 470., 490., 510.])*1e-9,
+    G=np.diag([.002, .0022, .0024, .0026]),
+    C=np.diag([210., 220., 230., 240.])*1e-12,
+    length=.1, cells=16, source_resistance=[25.]*4, load_resistance=[100.]*4)
+document = StartupPortWavesDocument(startup,
+    z_ref=[35., 40., 45., 50., 65., 70., 75., 80.], version=9)
+assert normalize_saved(document.dumps()) == document.dumps()
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['input']['schema'] == 'sipi.startup-port-waves/9'
+assert out['input']['startup'] == startup.to_dict()
+assert out['result']['source_kind'] == 'MulticonductorRLGCLadderResponse'
+assert len(out['result']['incident_sqrt_w'][0]) == 8
+```
+
+The thirteen original kinds plus both new signal counts give fifteen test
+variants and thirty ramp/pulse exact replays, including all eligible prior
+versions. Separate coupled/diagonal/lossless tests preserve near/source-R,
+far/load-R and whole-line power partitions. Actual time-row budgets remain
+independent of cell/signal count; lossless inputs keep their delay-term budget.
+Copy, strict units/matrices/signals, duplicate/nonfinite, recursive inputs,
+identity corruption and original physical/wave failures are checked. Prior
+version tests and the numerical wave/physical implementations stay unchanged.
+
+[Multiconductor saved inputs](multiconductor_startup_document.md) define
+physical validity; [terminal waves](startup_waves.md) define port reference
+meaning. This storage contract does not establish app/platform integration,
+measured accuracy or a general transient field solver.

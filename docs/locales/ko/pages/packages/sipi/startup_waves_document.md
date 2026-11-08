@@ -2,7 +2,7 @@
 
 `StartupPortWavesDocument`는 기본 **sipi.startup-port-waves/1**으로 완전한 시작 응답 문서와
 [파형 진단](startup_waves.md)의 명시적 실수 기준 임피던스를 함께 저장합니다. 생성자는
-지원 문서 객체·`z_ref`와 선택적인 명시적 `version=2`, `version=3` 또는 `version=4`를 받고, 이미 계산한 응답이 아닌 정규화된 입력을 복사합니다.
+지원 문서 객체·`z_ref`와 선택적인 명시적 정수 버전2~9를 받고, 이미 계산한 응답이 아닌 정규화된 입력을 복사합니다.
 
 ```python
 import numpy as np
@@ -382,3 +382,52 @@ rank-one·교환대칭·비가환 행렬, 단일/강도0/중복/순서변경 극
 전류0을 보존합니다. far 단자 전력에는 병렬 저항 손실·커패시터 전력·
 가지 에너지 변화율·가지 저항 손실이 포함됩니다. 0/rank-one/full 가지
 저항과 pulse 재실행이 직접 결과를 보존하며 가지 기본값·구조 추론은 없습니다.
+
+
+## 3·4신호 시작 응답의 명시적 버전9
+
+`version=9`를 명시하면 `sipi.startup-port-waves/9`를 선택하고
+`sipi.multiconductor-rlgc-startup/1`만 추가하여 중첩 종류가14개가 됩니다.
+새 종류는 검증된 명시 정수 `signals=3/4`에 따라6/8개의 유한 양수 실수
+기준 저항을 요구합니다. 기존 종류는2/4개를 유지합니다. 기본 버전1과
+기존v1..8 등록은 그대로이며 새 종류를 계속 거부합니다. 중첩 버전을
+자동 승격하지 않습니다.
+
+루트 키는 `schema`, `startup`, `z_ref_ohm` 세 개 그대로입니다.
+중첩 다신호 문서의 엄격12키·SI단위·행렬·양수 종단 저항·신호 순서·셀 수·
+시간 행을 보존합니다. 검증 과정에서는 상태를 전파하지 않으며 파동 문서
+재귀·잘못된 기준 저항 개수·신호 수 추론·스칼라 확장을 거부합니다.
+
+```python
+import numpy as np
+from sipi import MulticonductorRLGCLadderDocument, StartupPortWavesDocument
+from sipi.execution import normalize_saved, execute_saved
+
+startup = MulticonductorRLGCLadderDocument(
+    [0., 1e-9, 2e-9], [[0., 0., 0., 0.], [1., -.4, .2, -.1], [1., -.4, .2, -.1]],
+    signals=4, R=np.diag([20., 23., 26., 29.]),
+    L=np.diag([450., 470., 490., 510.])*1e-9,
+    G=np.diag([.002, .0022, .0024, .0026]),
+    C=np.diag([210., 220., 230., 240.])*1e-12,
+    length=.1, cells=16, source_resistance=[25.]*4, load_resistance=[100.]*4)
+document = StartupPortWavesDocument(startup,
+    z_ref=[35., 40., 45., 50., 65., 70., 75., 80.], version=9)
+assert normalize_saved(document.dumps()) == document.dumps()
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['input']['schema'] == 'sipi.startup-port-waves/9'
+assert out['input']['startup'] == startup.to_dict()
+assert out['result']['source_kind'] == 'MulticonductorRLGCLadderResponse'
+assert len(out['result']['incident_sqrt_w'][0]) == 8
+```
+
+기존13종과 새 신호 수3/4의 두 경우를 합쳐15개 입력 변형, 램프/펄스30개
+정확 재현을 검사하고 지원되는 모든 구버전 결과와 대조합니다.
+결합/대각/무손실 시험은 near/소스 저항, far/부하 저항과 전체 선로의
+전력 구분을 보존합니다. 실제 시간 행 예산은 셀/신호 수와 독립이며
+무손실 입력의 지연 항 예산 의미도 유지합니다. 복사·엄격 단위/행렬/신호 수,
+중복/비유한 값·재귀·결과 동일성 훼손과 물리/파동 원래 실패를 검사합니다.
+구버전 시험과 물리·파동 수치 구현은 변경하지 않습니다.
+
+[다신호 입력 저장](multiconductor_startup_document.md)은 물리 유효범위를,
+[단자 파동](startup_waves.md)은 기준 저항의 의미를 정의합니다. 저장 계약은
+앱·플랫폼 통합, 실측 정확도나 일반 과도 전자기장 솔버 완료를 뜻하지 않습니다.
