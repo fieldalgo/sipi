@@ -168,3 +168,5 @@ resolution; exact equality is not assumed. These are fixture-specific gates.
 Curvature polygonization changes the domain, so this is not a proof of
 monotonicity on nested spaces of one fixed geometry. The example is not a
 finite via, connector transition, or complete 3D geometry generator.
+
+[Thin-grid/plate reference cells](grid_plate.md) add explicit geometry, mesh alignment and bounded static boundaries.

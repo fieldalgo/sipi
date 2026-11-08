@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add bounded thin-grid/broad-plate static capacitance with explicit conforming geometry, shared 3D P1 extraction and independent weak-form/refinement checks.
+
 - Add explicit saved wave version9 for three/four-signal startup with six/eight port references, preserving prior versions and physical budgets.
 
 - Accept explicit six/eight-port startup waves with independent modal and Z-to-S checks, preserving prior response port counts and numerical gates.
