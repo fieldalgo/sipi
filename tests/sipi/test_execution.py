@@ -202,6 +202,15 @@ def documents():
         mesh=dict(edge_size=1e-6,far_size=.125e-3,grade=.1),frequency=1e9,
         materials={'dielectric':DebyeDielectric(2.,[4.],[1e9])},
         material_variables={'strength':dict(region='dielectric',path=['strengths',0])}))
+    from sipi import SampledImpedanceDesignDocument
+    base.append(SampledImpedanceDesignDocument('coupled_stripline',
+        dict(width=.5e-3,gap=.1e-3,plane_spacing=1e-3,eps_r=1.,box_width=8e-3),
+        variables=['width','strength'],bounds=[[.3e-3,.7e-3],[2.,6.]],
+        frequencies=[1e8,1e10],targets=[57.23463009022641,97.84159316427296],
+        tolerances=[.5,.5],quantity='z_diff',max_evaluations=2,
+        mesh=dict(edge_size=1e-6,far_size=.125e-3,grade=.1),
+        materials={'dielectric':DebyeDielectric(2.,[4.],[1e9])},
+        material_variables={'strength':dict(region='dielectric',path=['strengths',0])}))
     return base
 
 

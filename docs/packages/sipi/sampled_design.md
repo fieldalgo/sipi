@@ -74,6 +74,9 @@ does not invent a current mapping from the previous row. Encoded models remain
 available if field validation fails. No saved input schema or callable
 serialization is added by this API.
 
+[Saved named frequency goals](sampled_design_document.md) retain template
+variables, sample lists, targets, constraints and explicit material bindings.
+
 ## Numerical policy and independent acceptance
 
 The existing two-parameter policy is shared with paired goals: normalize

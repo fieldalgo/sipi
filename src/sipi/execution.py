@@ -49,6 +49,8 @@ from .periodic_norton_circuit import PeriodicNortonCircuitDocument
 from .conductivity_profile_document import ConductivityProfileDocument
 from .pair_design_document import PairImpedanceDesignDocument
 from .pair_design import PairImpedanceGoalError
+from .sampled_design_document import SampledImpedanceDesignDocument
+from .sampled_design import SampledImpedanceGoalError
 
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
@@ -89,6 +91,7 @@ _REGISTRY = {
     'sipi.conductivity-profile/1': ConductivityProfileDocument,
     'sipi.pair-impedance-design/1': PairImpedanceDesignDocument,
     'sipi.pair-impedance-design/2': PairImpedanceDesignDocument,
+    'sipi.sampled-impedance-design/1': SampledImpedanceDesignDocument,
 }
 
 
@@ -325,6 +328,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
 
     Study sample counts and saved goal budgets must not exceed max_evaluations
     (2..10000); goals keep their original budget, never silently clamp it.
+    Sampled impedance goals count parameter batches, not internal frequency solves;
+    their separate frequency count is capped at 64 by the saved input contract.
     Bounded TEM-port 3D counts one evaluation per frequency before field work.
     Conductivity profiles count frequencies before constitutive integration.
     Dielectric fitting counts input frequencies before matrix/optimizer work;
@@ -379,6 +384,18 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = result.to_dict()
         if result.failed:
             out['status'] = 'incomplete'
+    elif isinstance(doc, SampledImpedanceDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved goal batch budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except SampledImpedanceGoalError as exc:
+            out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
+                quantity=exc.quantity, frequencies_hz=list(exc.frequencies), unit='ohm',
+                attempts=exc.attempts, stage=exc.stage, failed_parameters=exc.failed_parameters,
+                cause_type=exc.cause_type, input=None if exc.input_json is None else json.loads(exc.input_json),
+                material_sweep=None if exc.material_sweep_json is None else json.loads(exc.material_sweep_json),
+                history=[row.to_dict() for row in exc.history]))
     elif isinstance(doc, PairImpedanceDesignDocument):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')

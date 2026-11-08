@@ -62,6 +62,7 @@ from .templates import layered_coplanar_stripline, coupled_layered_coplanar_stri
 from .pair_design_document import PairImpedanceDesignDocument
 from .sampled_design import (SampledImpedanceEvaluation, SampledImpedanceDesign,
                              SampledImpedanceGoalError, seek_sampled_impedance)
+from .sampled_design_document import SampledImpedanceDesignDocument
 from .pair_design import (PairImpedanceEvaluation, PairImpedanceDesign,
                           PairImpedanceGoalError, seek_pair_impedances)
 from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
@@ -87,7 +88,7 @@ from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
 __version__ = "0.1.0"
-__all__ = ['SampledImpedanceEvaluation', 'SampledImpedanceDesign', 'SampledImpedanceGoalError', 'seek_sampled_impedance',
+__all__ = ['SampledImpedanceDesignDocument', 'SampledImpedanceEvaluation', 'SampledImpedanceDesign', 'SampledImpedanceGoalError', 'seek_sampled_impedance',
            'PairImpedanceDesignDocument', 'PairImpedanceEvaluation', 'PairImpedanceDesign', 'PairImpedanceGoalError', 'seek_pair_impedances', "GaussianConductivityProfile", "ConductivityProfileResult", "ConductivityProfileDocument",
            "CircularAperture", "ApertureDocument",
            "RoundConductor", "EllipticalAperture", "MeshedAperture", "ApertureSectionDocument",
