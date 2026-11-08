@@ -58,6 +58,9 @@ Cached candidates from an unsuccessful optimizer also retain their input and
 model. Factory functions are not serialized. Saved `pair-impedance-design/1`
 continues to support fixed materials only; this API changes no input schema.
 
+[Saved version 2 goals](pair_material_document.md) use explicit named numeric
+material bindings instead of serializing the callback.
+
 ## Independent acceptance and scope
 
 The test uses the Cohn thin coupled-stripline expressions, gap .1 mm, plane

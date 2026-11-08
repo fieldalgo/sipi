@@ -193,6 +193,15 @@ def documents():
         targets={'z_diff':172.45677879183611,'z_common':65.9597000672247},
         tolerances={'z_diff':1.5,'z_common':.5},max_evaluations=2,
         mesh=dict(edge_size=2e-6,far_size=.125e-3,grade=.15)))
+    from sipi.dielectric import DebyeDielectric
+    base.append(PairImpedanceDesignDocument('coupled_stripline',
+        dict(width=.5e-3,gap=.1e-3,plane_spacing=1e-3,eps_r=1.,box_width=8e-3),
+        variables=['width','strength'],bounds=[[.3e-3,.7e-3],[2.,6.]],
+        targets={'z_diff':69.86609070536932,'z_common':30.721416289368904},
+        tolerances={'z_diff':.5,'z_common':.2},max_evaluations=2,
+        mesh=dict(edge_size=1e-6,far_size=.125e-3,grade=.1),frequency=1e9,
+        materials={'dielectric':DebyeDielectric(2.,[4.],[1e9])},
+        material_variables={'strength':dict(region='dielectric',path=['strengths',0])}))
     return base
 
 

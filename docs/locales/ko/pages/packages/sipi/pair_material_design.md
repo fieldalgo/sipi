@@ -54,6 +54,9 @@ optimizer 실패 시 cache에 있는 후보의 기하·모델도 보존합니다
 않습니다. 저장 `pair-impedance-design/1`은 계속 고정 재료만 지원하며 새 입력 스키마는
 추가하지 않습니다.
 
+[저장 버전 2 목표](pair_material_document.md)는 함수를 직렬화하지 않고 명시적인
+이름과 재료 숫자 필드 연결을 저장합니다.
+
 ## 독립 수락과 범위
 
 시험은 Cohn 얇은 결합 stripline 식, 간격 .1mm·평면 간격 1mm·1GHz에서 균일한

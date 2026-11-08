@@ -1,6 +1,7 @@
 # 두 변수 임피던스 목표 저장
 
-`PairImpedanceDesignDocument`는 `sipi.pair-impedance-design/1`을 저장합니다.
+`PairImpedanceDesignDocument`는 기하 변수·고정 재료를 `sipi.pair-impedance-design/1`로
+저장하며 [버전 2](pair_material_document.md)는 명시적인 재료 숫자 필드 연결을 추가합니다.
 이름 있는 템플릿 변수를 [두 목표 API](pair_design.md)에 연결하며 callable이나
 임의 실행 코드를 JSON에 넣지 않습니다. 목표와 절대 허용 오차는 정확히
 `z_diff`, `z_common` 키를 가진 객체이고 단위는 Ω입니다. JSON 키 순서로 모드를
@@ -44,13 +45,14 @@ assert output['result']['evaluations'] == 2
 생성 입력과 반환 사전은 분리된 복사본입니다.
 
 기존 대칭쌍 study registry로 명목·네 모서리·초기 기하를 검증하고 명목 메시 설정을
-확정합니다. 읽는 동안 장해석·통계 study·optimizer를 실행하지 않습니다.
+확정합니다. 재료 override가 있으면 초기 재료의 유효성도 검사합니다.
+읽는 동안 장해석·통계 study·optimizer를 실행하지 않습니다.
 이 비메시 기하 사전 검사는 solve 시도 예산 밖입니다. 모서리가 유효해도 모든 내부점의
 기하 유효성이나 임피던스 범위를 보장하지 않으며 내부 실패는 solver 이력에 남습니다.
 
 `fixed_pitch_m`, `fixed_plane_spacing_m`은 기존 공차 제약을 재사용합니다.
 예를 들어 폭과 한 층 높이를 바꾸면서 간격과 다른 층 높이를 유도할 수 있습니다.
-유도되는 간격을 동시에 독립 변수로 삼을 수 없습니다. 이 버전은 material-leaf 별칭을
+유도되는 간격을 동시에 독립 변수로 삼을 수 없습니다. 버전 1은 material-leaf 별칭을
 저장하지 않습니다. 고정 주파수 scalar/주축 재료는 `frequency_hz`, `materials`를 가진
 정확한 `material_evaluation` 객체 또는 null을 사용합니다. 기존 재료 override와
 횡방향 대칭 제한은 유지합니다.

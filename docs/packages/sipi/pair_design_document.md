@@ -1,6 +1,8 @@
 # Saved two-parameter impedance goals
 
-`PairImpedanceDesignDocument` saves `sipi.pair-impedance-design/1`. It connects
+`PairImpedanceDesignDocument` saves `sipi.pair-impedance-design/1` for geometry
+variables and fixed materials. [Version 2](pair_material_document.md) adds
+explicit material-leaf bindings. It connects
 named template parameters to the [two-target API](pair_design.md), without
 serializing callables or running code from JSON. Targets and absolute tolerances
 are objects with exactly `z_diff` and `z_common` keys, in ohms; JSON key order
@@ -47,14 +49,15 @@ Constructor input and dictionary accessors are detached copies.
 
 The existing symmetric-pair study registry validates nominal, four corner and
 initial geometries, and resolves nominal mesh settings. It performs no field
-solve, statistical study or optimizer call while loading. This unmeshed geometry
+solve, statistical study or optimizer call while loading. Initial material
+validity is also checked when overrides are present. This unmeshed geometry
 preflight is outside the solve-attempt budget; corner validity neither proves
 validity of every interior point nor bounds impedance. Interior errors remain
 failures in the solver history.
 
 `fixed_pitch_m` and `fixed_plane_spacing_m` reuse study constraints. For example,
 width and one layer height can vary while gap and the other layer height are
-derived. A derived gap cannot also be an independent variable. This version
+derived. A derived gap cannot also be an independent variable. Version 1
 does not save material-leaf aliases: optional fixed-frequency scalar/principal
 models use the exact `material_evaluation` object (`frequency_hz`, `materials`)
 or null. Existing override and transverse-symmetry restrictions remain active.

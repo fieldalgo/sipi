@@ -88,6 +88,7 @@ _REGISTRY = {
     'sipi.periodic-norton-circuit/1': PeriodicNortonCircuitDocument,
     'sipi.conductivity-profile/1': ConductivityProfileDocument,
     'sipi.pair-impedance-design/1': PairImpedanceDesignDocument,
+    'sipi.pair-impedance-design/2': PairImpedanceDesignDocument,
 }
 
 

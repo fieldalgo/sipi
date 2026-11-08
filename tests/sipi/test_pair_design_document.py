@@ -41,7 +41,7 @@ def test_canonical_replay_isolation_and_no_fields_or_optimizer(monkeypatch):
 
 
 @pytest.mark.parametrize('mutate',[
-    lambda d:d.update(schema='sipi.pair-impedance-design/2'),
+    lambda d:d.update(schema='sipi.pair-impedance-design/999'),
     lambda d:d.update(extra=1),lambda d:d.pop('initial'),
     lambda d:d.update(variables=[]),lambda d:d['variables'][1].update(name='width'),
     lambda d:d['variables'][0].update(name=''),lambda d:d['variables'][0].update(name='unknown'),

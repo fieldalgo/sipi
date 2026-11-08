@@ -6,12 +6,14 @@ import json
 from .document import _keys, _unique_object
 from .sampling import _copy, _integer, _scalar
 from .study import ImpedanceStudyDocument, _parameters, _TEMPLATES
-from .impedance_material import _material_input, _models
+from .impedance_material import (_material_input, _models, _sample_material,
+                                 _validate_material_input)
 from .pair_design import seek_pair_impedances
 
 __all__ = ['PairImpedanceDesignDocument']
 
 _SCHEMA = 'sipi.pair-impedance-design/1'
+_MATERIAL_SCHEMA = 'sipi.pair-impedance-design/2'
 _QUANTITIES = ('z_diff', 'z_common')
 _FIELDS = ('schema', 'template', 'parameters', 'variables', 'targets_ohm',
            'tolerances_ohm', 'initial', 'max_evaluations', 'mesh',
@@ -26,30 +28,38 @@ class PairImpedanceDesignDocument:
     nominal, four corner and initial geometries without meshing or optimizing.
     The corner check is not a worst-case or statistical assessment. Fixed pitch,
     fixed plane spacing and fixed material overrides reuse the existing study
-    rules. No parameter-dependent material mapping is serialized.
+    rules. Version 2 adds explicit numeric material-leaf bindings, using the
+    same two ordered variables for geometry and material. Preflight also
+    validates the sampled initial material, without assuming valid corners
+    establish validity throughout the domain. Callbacks are not serialized.
     The attempt budget applies to solving; unmeshed geometry preflight is
     outside that count and does not run an impedance study.
     """
     def __init__(self, template, parameters, *, variables, bounds, targets,
                  tolerances, initial=None, max_evaluations=64, mesh=None,
                  fixed_pitch_m=None, fixed_plane_spacing_m=None,
-                 frequency=None, materials=None):
+                 frequency=None, materials=None, material_variables=None):
         if (not isinstance(variables, (tuple, list)) or len(variables) != 2
                 or not isinstance(bounds, (tuple, list)) or len(bounds) != 2):
             raise ValueError('variables and bounds must each contain two entries')
-        self._data = self._validate(dict(schema=_SCHEMA, template=template,
+        data = dict(schema=_SCHEMA, template=template,
             parameters=parameters, variables=[dict(name=name, bounds=bound)
                                               for name, bound in zip(variables, bounds)],
             targets_ohm=targets, tolerances_ohm=tolerances, initial=initial,
             max_evaluations=max_evaluations, mesh={} if mesh is None else mesh,
             fixed_pitch_m=fixed_pitch_m, fixed_plane_spacing_m=fixed_plane_spacing_m,
-            material_evaluation=_material_input(frequency, materials)))
+            material_evaluation=_material_input(frequency, materials))
+        if material_variables is not None:
+            data.update(schema=_MATERIAL_SCHEMA, material_variables=material_variables)
+        self._data = self._validate(data)
 
     @staticmethod
     def _study(data):
         evaluation = data['material_evaluation']
         kwargs = {} if evaluation is None else dict(
             frequency=evaluation['frequency_hz'], materials=_models(evaluation))
+        if 'material_variables' in data:
+            kwargs['material_variables'] = data['material_variables']
         return ImpedanceStudyDocument(data['template'], data['parameters'], quantity='z_diff',
             sampling=dict(kind='corners', variables=[dict(name=v['name'],
                 lower=v['bounds'][0], upper=v['bounds'][1]) for v in data['variables']]),
@@ -59,8 +69,10 @@ class PairImpedanceDesignDocument:
     @classmethod
     def _validate(cls, data):
         data = _copy(data)
-        _keys(data, _FIELDS, where='pair impedance design')
-        if data['schema'] != _SCHEMA:
+        version2 = isinstance(data, dict) and data.get('schema') == _MATERIAL_SCHEMA
+        _keys(data, (*_FIELDS, 'material_variables') if version2 else _FIELDS,
+              where='pair impedance design')
+        if data['schema'] not in (_SCHEMA, _MATERIAL_SCHEMA):
             raise ValueError('unsupported pair-impedance-design schema')
         variables = data['variables']
         if not isinstance(variables, list) or len(variables) != 2:
@@ -92,6 +104,8 @@ class PairImpedanceDesignDocument:
                     raise ValueError('initial must lie inside each variable bound')
             data['initial'] = initial
         evaluation = data['material_evaluation']
+        if version2 and evaluation is None:
+            raise ValueError('material variables require a fixed frequency and material evaluation')
         if evaluation is not None:
             _keys(evaluation, ('frequency_hz', 'materials'), where='material evaluation')
             if not isinstance(evaluation['materials'], dict):
@@ -101,9 +115,13 @@ class PairImpedanceDesignDocument:
             data[key] = study[key]
         data['fixed_plane_spacing_m'] = study.get('fixed_plane_spacing_m')
         data['material_evaluation'] = study.get('material_evaluation')
+        if version2:
+            data['material_variables'] = study['material_variables']
         if initial is None:
             initial = [v['bounds'][0]+(v['bounds'][1]-v['bounds'][0])/2 for v in variables]
-        _TEMPLATES[data['template']](**_parameters(study, initial))
+        section = _TEMPLATES[data['template']](**_parameters(study, initial))
+        if evaluation is not None:
+            _validate_material_input(_sample_material(study, initial), section, 'z_diff')
         return data
 
     @classmethod
@@ -129,6 +147,9 @@ class PairImpedanceDesignDocument:
         evaluation = data['material_evaluation']
         kwargs = {} if evaluation is None else dict(
             frequency=evaluation['frequency_hz'], materials=_models(evaluation))
+        if 'material_variables' in data:
+            kwargs = dict(frequency=evaluation['frequency_hz'],
+                material_factory=lambda a, b: _models(_sample_material(study, [a, b])))
         return seek_pair_impedances(factory, [v['bounds'] for v in data['variables']],
             [data['targets_ohm'][q] for q in _QUANTITIES],
             tolerances=[data['tolerances_ohm'][q] for q in _QUANTITIES],
