@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved wave version14 for multiconductor Debye current-source inputs, retaining versions1–13, source-shunt/terminal power distinctions and original sample budgets.
+
 - Admit explicit multiconductor Debye Norton responses to six/eight-port power-wave conversion, preserving terminal current, source shunt loss separation and existing wave formulas.
 
 - Add strict versioned multiconductor Debye Norton input documents and common execution with exact current/conductance identity, full-state replay and pre-propagation row budgets.

@@ -177,3 +177,6 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 
 
 [명시 저장 파동 버전13](startup_waves_document_v13.md)은 v1–12를 유지하며 다신호 Debye 직렬 RL 입력을 추가합니다.
+
+
+[명시 저장 파동 버전14](startup_waves_document_v14.md)는 v1–13을 유지하며 다신호 Debye 전류원 입력을 추가합니다.

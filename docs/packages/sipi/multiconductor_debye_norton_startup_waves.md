@@ -85,6 +85,9 @@ are unchanged. The engine's failed low-loss PWL/short-horizon conditions and
 qualified damped continuum scope remain. No arbitrary transient accuracy,
 FFT/TDR, eigenmode extraction or new dependency is added. Strict [saved current
 inputs](multiconductor_debye_norton_startup_document.md) are available; saved
-wave versions1–13 still reject this kind. The library registry remains at
+wave versions1–13 still reject this kind. At the native-wave addition the library registry contained
 87 schemas/37 templates, with no browser/desktop deployment change.
 See [startup power waves](startup_waves.md).
+
+
+[Explicit saved wave version14](startup_waves_document_v14.md) now admits this kind; versions1–13 retain their original rejection. This addition brings the common registry to88 schemas/37 templates.
