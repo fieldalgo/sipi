@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit passive series RL load branches to coupled startup, preserving separate line/capacitor/inductor energy and independent analytic, modal and KCL validation.
+
 - Save explicit capacitive-load startup v3 with separate external energy, exact physical replay, time-row budgets and unchanged v1/v2 contracts.
 
 - Add explicit passive load-capacitance matrices to coupled startup, separating internal and external energy and verifying LC, modal, KCL and settling limits.

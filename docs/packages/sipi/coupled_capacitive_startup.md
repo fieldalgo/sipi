@@ -120,3 +120,5 @@ forms, browser/Windows integration and measured-board accuracy are separate work
 [한국어](../../locales/ko/pages/packages/sipi/coupled_capacitive_startup.md)
 
 [Saved capacitive v3](coupled_capacitive_startup_document.md)
+
+[External series RL branch](coupled_reactive_startup.md)

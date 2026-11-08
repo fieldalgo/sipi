@@ -56,12 +56,15 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
 
 def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
                                length, cells, source_resistance, load_resistance,
-                               load_capacitance=None):
+                               load_capacitance=None, load_branch_resistance=None,
+                               load_branch_inductance=None):
     time, drive, r, l, g, c, length, n, rs, rl = _boundary_input(time, source_voltages,
         R=R, L=L, G=G, C=C, length=length, cells=cells,
         source_resistance=source_resistance, load_resistance=load_resistance)
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
-    nv = 2*(n+1); size = 4*n+2
+    nv = 2*(n+1); line_size = 4*n+2
+    has_branch = load_branch_inductance is not None
+    size = line_size+2 if has_branch else line_size
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         cap = c*dx*.5; ind = l*dx
         slope = np.vstack((np.diff(drive, axis=0)/np.diff(time)[:, None], [0., 0.]))
@@ -91,6 +94,11 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
             mass[s, s] = l*dx; stiffness[s, s] = -r*dx
             stiffness[s, 2*node:2*node+2] = np.eye(2)
             stiffness[s, 2*node+2:2*node+4] = -np.eye(2)
+    if has_branch:
+        mass[-2:, -2:] = load_branch_inductance
+        stiffness[-2:, -2:] = -load_branch_resistance
+        stiffness[-2:, 2*n:2*n+2] = np.eye(2)
+        stiffness[2*n:2*n+2, -2:] = -np.eye(2)
     if load_capacitance is not None:
         with np.errstate(over='ignore', invalid='ignore'):
             mass[2*n:2*n+2, 2*n:2*n+2] += load_capacitance
@@ -118,8 +126,8 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
         x = np.zeros((len(time), size)); rhs = np.zeros_like(x)
         x[:, free] = z-xp@transform.T; x[:, fixed] = xp
         rhs[:, free] = z@a.T+drive@beta.T-dp@transform.T; rhs[:, fixed] = dp
-        v = x[:, :nv].reshape(len(time), n+1, 2); i = x[:, nv:].reshape(len(time), n, 2)
-        dv = rhs[:, :nv].reshape(v.shape); di = rhs[:, nv:].reshape(i.shape)
+        v = x[:, :nv].reshape(len(time), n+1, 2); i = x[:, nv:line_size].reshape(len(time), n, 2)
+        dv = rhs[:, :nv].reshape(v.shape); di = rhs[:, nv:line_size].reshape(i.shape)
         voltage = v[:, [0, n], :].reshape(len(time), 4)
         current = np.zeros((len(time), 4))
         near = (dv[:, 0]@c.T+v[:, 0]@g.T)*dx*.5+i[:, 0]
@@ -132,6 +140,11 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
             for j in range(2):
                 if rl[j] != 0:
                     current[:, 2+j] -= cap_current[:, j]
+        if has_branch:
+            branch_current = x[:, -2:]; branch_derivative = rhs[:, -2:]
+            for j in range(2):
+                if rl[j] != 0:
+                    current[:, 2+j] -= branch_current[:, j]
         energy = .5*dx*(np.sum(_quadratic(v, c)*weights, axis=1)+np.sum(_quadratic(i, l), axis=1))
         rate = dx*(np.sum(np.einsum('tni,ij,tnj->tn', v, c, dv)*weights, axis=1)
                    +np.sum(np.einsum('tni,ij,tnj->tn', i, l, di), axis=1))
@@ -159,6 +172,9 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
         cells=n, source_resistance_ohm=rs.tolist(), load_resistance_ohm=list(rl))
     if load_capacitance is not None:
         data['load_capacitance_f'] = load_capacitance.tolist()
+    if has_branch:
+        data['load_branch_resistance_ohm'] = load_branch_resistance.tolist()
+        data['load_branch_inductance_h'] = load_branch_inductance.tolist()
     response = MixedBoundaryRLGCLadderResponse(json.dumps(data, sort_keys=True, allow_nan=False),
         time, drive, v, i, voltage, current, energy, rate, series, shunt, line_power,
         source_power, source_loss, load_loss, error)
@@ -169,12 +185,24 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
         cap_power = np.sum(v[:, -1]*cap_current, axis=1)
         total_rate = rate+cap_power
         total_loss = source_loss+load_loss+series+shunt
+        if has_branch:
+            branch_energy = .5*_quadratic(branch_current, load_branch_inductance)
+            branch_rate = np.einsum('ti,ij,tj->t', branch_current, load_branch_inductance, branch_derivative)
+            branch_loss = _quadratic(branch_current, load_branch_resistance)
+            total_rate = total_rate+branch_rate
+            total_loss = total_loss+branch_loss
         total_residual = total_rate-source_power+total_loss
     if (not np.all(np.isfinite(np.r_[cap_energy, cap_power, total_rate, total_loss, total_residual]))
             or np.any(cap_energy < 0)):
         raise ValueError('load capacitor diagnostics exceed finite scales')
+    if has_branch and (not np.all(np.isfinite(np.r_[branch_energy, branch_rate, branch_loss]))
+                       or np.any(branch_energy < 0) or np.any(branch_loss < 0)):
+        raise ValueError('load RL branch diagnostics exceed finite scales')
     total_scale = max(np.max(abs(total_rate)), np.max(abs(source_power)), np.max(abs(total_loss)))
     total_error = float(np.max(abs(total_residual))/total_scale) if total_scale > 0 else 0.
     if not np.isfinite(total_error) or total_error > 1e-10:
         raise ValueError('line plus load capacitor power balance exceeds relative 1e-10')
+    if has_branch:
+        return (response, cap_current, cap_energy, cap_power, total_error,
+                branch_current, branch_energy, branch_rate, branch_loss)
     return response, cap_current, cap_energy, cap_power, total_error

@@ -106,3 +106,5 @@ atol1e-12 및 전류 1e-13A 기준을 통과합니다. 원 200ns 실패를 보�
 [English](../../../../../packages/sipi/coupled_capacitive_startup.md)
 
 [용량성 저장 v3](coupled_capacitive_startup_document.md)
+
+[외부 직렬 RL 분기](coupled_reactive_startup.md)
