@@ -173,3 +173,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Explicit saved wave version10](startup_waves_document_v10.md) adds three/four-signal Debye inputs while preserving versions1–9.
+
+
+[Saved multiconductor PSD Debye inputs](psd_multiconductor_debye_startup_document.md) preserve singular losses/strengths and the original time-row budget.

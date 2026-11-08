@@ -159,3 +159,6 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 
 
 [명시 저장 파동 버전10](startup_waves_document_v10.md)은 버전1–9를 유지하며3·4신호 Debye 입력을 추가합니다.
+
+
+[다신호 PSD Debye 입력 저장](psd_multiconductor_debye_startup_document.md)은 특이 손실/강도와 원래 시간 행 예산을 보존합니다.

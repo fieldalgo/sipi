@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict saved multiconductor PSD Debye inputs and common execution, preserving singular matrices, null-state meaning, actual time budgets and full response identity.
+
 - Add a separate three/four-signal PSD Debye finite-circuit API with canonical null-direction states, independent charge-KCL and modal refinement checks, retaining original strict-strength models.
 
 - Add explicit saved wave version10 for three/four-signal Debye inputs, preserving older version admissions, canonical replay and time-row budgets.

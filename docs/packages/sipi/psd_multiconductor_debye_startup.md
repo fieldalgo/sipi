@@ -87,8 +87,9 @@ linearity/time/impedance scaling, slow/fast pole limits, original strict API
 rejection, readonly copies and original failure gates are checked.64 old
 full-state exports are retained exactly in source and installed runs.
 
-This API does not yet enter saved documents or terminal-wave conversion; its
-separate class avoids implicit admission through inheritance. It adds no
+[Explicit saved inputs](psd_multiconductor_debye_startup_document.md) now preserve
+this API. Terminal-wave conversion still rejects its separate response class;
+there is no implicit admission through inheritance. It adds no
 field extraction, fitted dispersion, arbitrary boundary, FFT/TDR, platform
 integration or measured accuracy. See the [two-signal PSD contract](psd_debye_startup.md).
 SciPy/scikit-rf remain existing dependencies/test references with existing

@@ -335,6 +335,14 @@ def documents():
         relaxation_hz=[8e7,7e8],length=.1,cells=4,
         source_resistance=[25.]*3,load_resistance=[100.]*3))
     base.append(StartupPortWavesDocument(base[-1], z_ref=[35.,45.,55.,65.,75.,85.], version=10))
+    from sipi import PSDMulticonductorDebyeRLGCLadderDocument
+    base.append(PSDMulticonductorDebyeRLGCLadderDocument(
+        [0.,1e-9,2e-9],[[0.,0.,0.],[1.,-.4,.2],[1.,-.4,.2]],signals=3,
+        R=np.diag([20.,0.,26.]),L=np.diag([450.,470.,490.])*1e-9,
+        G=np.diag([0.,.0022,.0024]),C_inf=np.diag([210.,220.,230.])*1e-12,
+        delta_C=np.array([np.diag([130.,0.,0.]),np.zeros((3,3))])*1e-12,
+        relaxation_hz=[8e7,7e8],length=.1,cells=4,
+        source_resistance=[25.]*3,load_resistance=[100.]*3))
     return base
 
 
