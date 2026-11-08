@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit external-capacitive Debye inputs with distinct F/F-per-m units, complete replay guards and actual time-row budgets.
+
 - Add a separate PSD Debye startup API with external capacitive loads and distinct line/full-circuit energy balances.
 
 - Add explicitly selected saved wave version6 for PSD Debye inputs while preserving prior nested registries and physical budgets.

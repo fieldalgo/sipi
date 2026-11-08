@@ -86,3 +86,5 @@ reference versions/licenses are reused; no new dependency, geometry/material
 extraction, browser/Windows integration or automatic resampling is introduced.
 
 [한국어](../../locales/ko/pages/packages/sipi/debye_capacitive_startup.md)
+
+[Saved external capacitive inputs](debye_capacitive_startup_document.md) distinguish F from F/m.

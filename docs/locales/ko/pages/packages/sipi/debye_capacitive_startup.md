@@ -80,3 +80,5 @@ include_states=True일 때만 포함합니다. 독립된 이 클래스는 기존
 연결·자동 재표본화를 추가하지 않습니다.
 
 [English](../../../../../packages/sipi/debye_capacitive_startup.md)
+
+[외부 정전용량 입력 저장](debye_capacitive_startup_document.md)은 F와 F/m를 구분합니다.
