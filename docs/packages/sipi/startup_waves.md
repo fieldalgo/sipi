@@ -460,3 +460,6 @@ establish general TDR inversion, measured accuracy or app/platform support.
 
 
 [Three/four-signal Debye waves](multiconductor_debye_startup_waves.md) explicitly preserve polarization/relaxation power and six/eight-port references.
+
+
+[Three/four-signal PSD Debye waves](psd_multiconductor_debye_startup_waves.md) explicitly retain null-direction meaning and terminal power.

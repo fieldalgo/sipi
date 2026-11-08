@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Admit explicit three/four-signal PSD Debye terminal waves with six/eight real references, retaining null-direction power meaning and original conversion formulas.
+
 - Add strict saved multiconductor PSD Debye inputs and common execution, preserving singular matrices, null-state meaning, actual time budgets and full response identity.
 
 - Add a separate three/four-signal PSD Debye finite-circuit API with canonical null-direction states, independent charge-KCL and modal refinement checks, retaining original strict-strength models.

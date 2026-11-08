@@ -83,8 +83,8 @@ V1e-10/I1e-12로, 별도의 비가환 전하 상태 node KCL DOP853을 V1e-8/I1e
 정확한 해시를 유지합니다.
 
 [명시 입력 저장](psd_multiconductor_debye_startup_document.md)이 이 API를
-보존합니다. 단자 파동 변환은 별도 결과형을 계속 거부하며 상속에 따른 암묵적
-수락은 없습니다. 장 추출·분산 피팅·임의 종단·FFT/TDR·플랫폼
+보존합니다. [명시 단자 파동 변환](psd_multiconductor_debye_startup_waves.md)이
+별도 결과형을6·8개의 양의 실수 기준 저항과 함께 수락합니다. 장 추출·분산 피팅·임의 종단·FFT/TDR·플랫폼
 연결·실측 정확도를 추가하지 않습니다. [2신호 PSD 계약](psd_debye_startup.md)을
 참고하세요. SciPy/scikit-rf는 기존 의존성/시험 기준과 고지를 유지하며 새
 의존성은 추가하지 않습니다.

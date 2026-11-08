@@ -429,3 +429,6 @@ N3/4 × 결합/대각/무손실 × 램프/펄스, 독립 scalar 모드 파동 �
 
 
 [3·4신호 Debye 파동](multiconductor_debye_startup_waves.md)은 분극/완화 전력과6·8단자 기준 저항을 명시적으로 보존합니다.
+
+
+[3·4신호 PSD Debye 파동](psd_multiconductor_debye_startup_waves.md)은 null 방향의 의미와 단자 전력을 명시적으로 유지합니다.
