@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Convert explicit physical impedance/admittance samples to power-wave networks with cancellation, conditioning and residual guards, without inverting the physical matrices.
+
 - Save bounded grid/plate capacitance inputs with strict SI keys, pre-mesh resource checks and exact geometry/field identity on replay.
 
 - Add bounded thin-grid/broad-plate static capacitance with explicit conforming geometry, shared 3D P1 extraction and independent weak-form/refinement checks.

@@ -115,3 +115,6 @@ single-ended 내보내기만 지원합니다. mixed-mode 파일 출력,
 [Touchstone 입력·조건을 명시한 측정 비교](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/touchstone.md)는 별도 API로 지원합니다.
 
 [종단 네트워크와 주파수 NEXT/FEXT](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/termination.md)는 소스/부하 임피던스를 명시적으로 받습니다.
+
+
+[명시 물리 Z/Y 표본](parameter_network.md)도 같은 전력파 네트워크 표현으로 변환합니다.

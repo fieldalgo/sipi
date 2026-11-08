@@ -132,3 +132,6 @@ For layer-dependent dispersive extraction, see [dielectric models](https://githu
 [Touchstone input and explicit measured-network comparison](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/touchstone.md) are available through a separate API.
 
 [Terminated networks and frequency NEXT/FEXT](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/termination.md) accept explicit source/load impedances.
+
+
+[Explicit physical Z/Y samples](parameter_network.md) use the same power-wave network representation.
