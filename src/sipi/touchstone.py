@@ -15,8 +15,9 @@ import numpy as np
 
 from .network import LineNetwork
 from .parameter_network import impedance_network, admittance_network
+from .hybrid_parameters import hybrid_network, inverse_hybrid_network
 
-__all__ = ['loads_touchstone', 'loads_touchstone_parameters', 'NetworkComparison', 'compare_networks']
+__all__ = ['loads_touchstone', 'loads_touchstone_parameters', 'loads_touchstone_hybrid', 'NetworkComparison', 'compare_networks']
 
 _UNITS = {'hz':1.,'khz':1e3,'mhz':1e6,'ghz':1e9}
 _NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\Z')
@@ -67,7 +68,7 @@ def _options(line, *, allowed):
         seen.add(key)
         i += 1
     if parameter not in allowed:
-        raise ValueError('explicit Y or Z parameter is required')
+        raise ValueError('explicit '+' or '.join(p.upper() for p in allowed)+' parameter is required')
     return _UNITS[unit],form,resistance,parameter
 
 
@@ -103,6 +104,30 @@ def loads_touchstone_parameters(text, *, z_ref, ports=None, port_names=None):
         text, ports=ports, port_names=port_names, allowed=('y','z'), require_version2=True)
     convert = admittance_network if parameter == 'y' else impedance_network
     return convert(frequency,values,z_ref=z_ref,names=names)
+
+
+def loads_touchstone_hybrid(text, *, z_ref, ports=None, port_names=None):
+    """Read strict Touchstone2.0 physical H/G data at explicit target references.
+
+    Exactly two single-ended ports and an explicit H or G option are required.
+    Mixed physical units follow hybrid_network/inverse_hybrid_network; version2
+    R/[Reference] values are validated but do not scale H/G or select target
+    z_ref. Convert directly with the existing finite/conditioning/residual gates.
+
+    RI/MA/DB, frequency units, both two-port orders and Full/Lower/Upper formats
+    follow the shared strict parser. Triangles mean numerical transpose symmetry,
+    not hybrid reciprocity. Version1, S/Y/Z/defaultS, mixed mode and noise are
+    rejected. No inferred passivity, physical accuracy, port pairing, interpolation
+    or measurement provenance; no file/network I/O.
+    """
+    if isinstance(port_names, str):
+        raise ValueError('port_names must be a sequence, not a string')
+    frequency, values, _, names, parameter = _read_touchstone(
+        text, ports=ports, port_names=port_names, allowed=('h', 'g'), require_version2=True)
+    if values.shape[1:] != (2, 2):
+        raise ValueError('hybrid Touchstone data requires exactly two ports')
+    convert = hybrid_network if parameter == 'h' else inverse_hybrid_network
+    return convert(frequency, values, z_ref=z_ref, names=names)
 
 
 def _read_touchstone(text, *, ports, port_names, allowed, require_version2=False):

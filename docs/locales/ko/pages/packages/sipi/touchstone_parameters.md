@@ -75,3 +75,6 @@ Hz/kHz/MHz/GHz, full 또는 전치 대칭 lower/upper를 받습니다. 2포트�
 변경하지 않았고 parser 분리 전후 110개 기존 S fixture의 출력 바이트를 대조했습니다.
 BSD-3-Clause 도구는 시험 전용이며 실행 의존성을 추가하지 않습니다. 파일·대수 단계에는
 공간 메시나 외곽 절단이 없고 기존 물리 솔버도 변경하지 않습니다.
+
+
+[별도 Touchstone2 물리 H/G 읽기](touchstone_hybrid.md)는 두 포트와 명시한 출력 기준 저항을 요구합니다.

@@ -83,3 +83,6 @@ unchanged, and 110 pre-change S fixture outputs were checked byte-for-byte after
 the shared parser refactor. The reference tool is test-only BSD-3-Clause, with
 no new runtime dependency. This file-format/algebraic step has no spatial mesh
 or exterior truncation; existing physical solvers are unchanged.
+
+
+[Separate Touchstone2 physical H/G reader](touchstone_hybrid.md) requires two ports and explicit target references.

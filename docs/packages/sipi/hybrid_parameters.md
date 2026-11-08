@@ -89,4 +89,5 @@ recorded pilot; this is agreement on these algebraic cases, not measured accurac
 
 The BSD-3-Clause scikit-rf reference is test-only; its copyright/conditions/
 disclaimer are retained in validation records. No runtime dependency, saved
-schema, Touchstone H/G parser, application or platform support is added.
+schema, application or platform support is added. Physical Touchstone2 files
+use the separate [H/G reader](touchstone_hybrid.md).
