@@ -109,7 +109,7 @@ _REGISTRY = {
     'sipi.coupled-rlgc-startup/2': MixedBoundaryRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/3': CapacitiveRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/4': ReactiveRLGCLadderDocument,
-    'sipi.startup-port-waves/1': StartupPortWavesDocument,
+    **{f'sipi.startup-port-waves/{v}': StartupPortWavesDocument for v in (1, 2)},
     'sipi.norton-rlgc-startup/1': NortonReactiveRLGCLadderDocument,
 }
 

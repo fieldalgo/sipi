@@ -6,7 +6,7 @@ import json
 import numpy as np
 
 from .document import _keys, _unique_object
-from .sampling import _copy
+from .sampling import _copy, _integer
 from .network import _real
 from .startup_document import LosslessStartupDocument
 from .rlgc_startup_document import RLGCLadderDocument
@@ -15,10 +15,11 @@ from .coupled_boundary_startup_document import MixedBoundaryRLGCLadderDocument
 from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 from .coupled_reactive_startup_document import ReactiveRLGCLadderDocument
 from .startup_waves import StartupPortWaves, startup_port_waves
+from .norton_startup_document import NortonReactiveRLGCLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMA = 'sipi.startup-port-waves/1'
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -28,11 +29,13 @@ _STARTUPS = {
     'sipi.coupled-rlgc-startup/4': ReactiveRLGCLadderDocument,
 }
 
+_STARTUPS_V2 = {**_STARTUPS, 'sipi.norton-rlgc-startup/1': NortonReactiveRLGCLadderDocument}
 
-def _startup(data):
+
+def _startup(data, *, version=1):
     if not isinstance(data, dict) or not isinstance(data.get('schema'), str):
         raise ValueError('startup must be a supported saved startup object')
-    cls = _STARTUPS.get(data['schema'])
+    cls = (_STARTUPS if version == 1 else _STARTUPS_V2).get(data['schema'])
     if cls is None:
         raise ValueError('unsupported nested startup schema')
     return cls.from_dict(data)
@@ -44,28 +47,32 @@ class StartupPortWavesDocument:
     The caller's budget retains its underlying meaning: actual forward delay
     terms for lossless startup, actual time rows for finite RLGC startup.
     Nested parsing validates without propagation; no recursive wave documents.
+    Default version1 retains its six original voltage-driven schemas. Explicit
+    version2 also permits Norton current inputs, without upgrading nested versions.
     """
-    def __init__(self, startup, *, z_ref):
-        if not isinstance(startup, tuple(_STARTUPS.values())):
+    def __init__(self, startup, *, z_ref, version=1):
+        version = _integer(version, 1, 2)
+        registry = _STARTUPS if version == 1 else _STARTUPS_V2
+        if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')
-        self._assign(startup.to_dict(), z_ref)
+        self._assign(startup.to_dict(), z_ref, version=version)
 
-    def _assign(self, startup, z_ref):
-        doc = _startup(startup)
+    def _assign(self, startup, z_ref, *, version):
+        doc = _startup(startup, version=version)
         ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument)) else 4
         z = _real('z_ref', z_ref)
         if z.shape != (ports,) or np.any(z <= 0):
             raise ValueError('z_ref needs one explicit positive real value per startup port')
-        self._data = dict(schema=_SCHEMA, startup=doc.to_dict(), z_ref_ohm=z.tolist())
+        self._data = dict(schema=f'sipi.startup-port-waves/{version}', startup=doc.to_dict(), z_ref_ohm=z.tolist())
 
     @classmethod
     def from_dict(cls, data):
         data = _copy(data)
         _keys(data, ('schema', 'startup', 'z_ref_ohm'), where='startup port waves')
-        if data['schema'] != _SCHEMA:
+        if not isinstance(data['schema'], str) or data['schema'] not in _SCHEMAS:
             raise ValueError('unsupported startup-port-waves schema')
         out = cls.__new__(cls)
-        out._assign(data['startup'], data['z_ref_ohm'])
+        out._assign(data['startup'], data['z_ref_ohm'], version=_SCHEMAS[data['schema']])
         return out
 
     @classmethod
@@ -82,7 +89,7 @@ class StartupPortWavesDocument:
 
     def analyze(self, *, max_evaluations=128):
         data = self.to_dict()
-        response = _startup(data['startup']).analyze(max_evaluations=max_evaluations)
+        response = _startup(data['startup'], version=_SCHEMAS[data['schema']]).analyze(max_evaluations=max_evaluations)
         result = startup_port_waves(response, z_ref=data['z_ref_ohm'])
         shape = response.voltage.shape
         if (not isinstance(result, StartupPortWaves)

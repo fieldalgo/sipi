@@ -118,4 +118,4 @@ np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
 ramp/pulse Norton–Thevenin 등가, 6개 혼합 경계, 영/rank-one 외부 항, 영 입력, 기준 변경,
 독립 읽기 전용 결과와 주입 전류 형상의 거부를 검사합니다. 기존 복원·전력 기준은 그대로
 유지합니다. 저장 startup-port-waves/1 wrapper는 여전히 Norton 입력을 거부합니다.
-이번 직접 어댑터는 해당 닫힌 레지스트리를 바꾸지 않습니다.
+[저장 version2](startup_waves_document.md)는 version1을 보존하면서 Norton을 명시적으로 추가합니다.

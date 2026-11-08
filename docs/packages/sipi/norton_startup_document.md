@@ -69,7 +69,8 @@ schema and scope. Current/voltage source keys and schemas reject cross-loading;
 there is no implicit unit conversion or version upgrade. Existing
 [startup-port-waves/1](startup_waves_document.md) still accepts only its six original
 nested physical schemas and rejects this Norton schema. [Direct wave analysis](startup_waves.md) is available on the analyzed response;
-saved wave adaptation requires a separate explicit contract.
+saved wave adaptation requires explicit `version=2` in
+[StartupPortWavesDocument](startup_waves_document.md).
 
 Checks replay six matrix/ramp/pulse and six mixed-boundary cases exactly against
 the physical API, plus zero/rank-one loads, no-solve parsing, independent row

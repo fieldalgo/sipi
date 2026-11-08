@@ -69,7 +69,8 @@ assert not response.to_dict()['states_included']
 내부 선로 상태를 생략하고 `to_dict(include_states=True)`는 포함합니다. scope는
 `finite-passive-two-signal-norton-reactive-startup`입니다. [입력 저장](norton_startup_document.md)은 별도 전류 단위 스키마를 사용합니다.
 [직접 포트 파동 진단](startup_waves.md)은 단자 V/I로 이 응답을 지원합니다.
-저장 startup-port-waves/1 wrapper는 아직 Norton 입력을 거부합니다.
+[파동 저장](startup_waves_document.md)은 Norton에 명시적 version2를 요구하며
+version1은 Norton 입력을 계속 거부합니다.
 
 ## 독립 수락과 정착 한계
 

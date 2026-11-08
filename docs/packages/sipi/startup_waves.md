@@ -132,4 +132,4 @@ Checks cover ramp/pulse Norton–Thevenin equivalence, six mixed-boundary cases,
 zero/rank-one external terms, zero input, reference changes, detached read-only
 results and rejection of injected-current shapes. The original reconstruction
 and power gates remain unchanged. The saved startup-port-waves/1 wrapper still
-rejects Norton inputs; this direct adapter does not change its closed registry.
+rejects Norton inputs; [saved version2](startup_waves_document.md) explicitly adds Norton while preserving version1.

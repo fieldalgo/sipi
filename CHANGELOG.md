@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected startup port-wave saved v2 for current-source inputs, preserving v1 rejection, nested versions and original delay-term/time-row budgets.
+
 - Accept current-driven startup terminal responses in real-reference port-wave diagnostics, preserving source-shunt power separation and the existing saved wrapper contract.
 
 - Save current-driven startup inputs with explicit ampere/shunt units, strict replay, independent time-row budgets and preserved voltage-source schemas.
