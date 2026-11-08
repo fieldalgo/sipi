@@ -252,6 +252,12 @@ def documents():
         load_capacitance=np.array([[20.,-4.],[-4.,30.]])*1e-12,
         load_branch_resistance=[[13.,1.],[1.,9.]],load_branch_inductance=np.array([[12.,2.],[2.,8.]])*1e-9))
     base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.],version=2))
+    from sipi import MixedSourceRLGCLadderDocument
+    data=base[-2].to_dict();data['schema']='sipi.mixed-rlgc-startup/1'
+    currents=data.pop('source_currents_a');shunts=data.pop('source_shunt_resistance_ohm')
+    data['sources']=[dict(kind='voltage',voltage_v=[0.,1.,1.],series_resistance_ohm=0.),
+        dict(kind='current',current_a=[row[1] for row in currents],shunt_resistance_ohm=shunts[1])]
+    base.append(MixedSourceRLGCLadderDocument.from_dict(data))
     return base
 
 

@@ -83,8 +83,8 @@ C/L contributions. Line and combined source/loss/RHS balances require relative
 All arrays and derived energy arrays are detached read-only finite values.
 `to_dict()` omits internal line states by default; `include_states=True` includes
 them. Scope is `finite-passive-two-signal-mixed-source-reactive-startup`.
-This separate response currently has no saved-input schema or port-wave adapter.
-Those connections need their own contracts; no existing schema is repurposed.
+[Saved inputs](mixed_startup_document.md) retain typed sources in a separate schema.
+The port-wave adapter remains a separate pending connection.
 
 ## Independent checks and limitations
 
