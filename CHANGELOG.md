@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add bounded finite trace and ground-grid volumes with explicit PEC exclusion, partitioned dielectric fields and fixed-boundary thin-trace validation.
+
 - Add explicit partitioned-dielectric capacitance extraction with prescribed-electrode connectivity checks, preserving the original grounded-domain contract and shared numerical body.
 
 - Save finite-thickness ground-grid inputs with pre-mesh validation, exact volume/count/electrode identity and one physical field evaluation.

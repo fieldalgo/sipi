@@ -96,3 +96,6 @@ This bounded electrostatic model does not infer finite trace thickness,
 return-current inductance, per-length RLGC, impedance, conductor loss, propagation,
 radiation or measured accuracy. The reference tool stays test-only; no runtime
 dependency, website or executable change is included.
+
+
+[Finite trace and ground volumes](volume_grid_strip.md) provide a separate model when both metal thicknesses are explicit.
