@@ -187,4 +187,4 @@ Six mixed boundaries,ramp/pulse equivalents,homogeneous limits,zero/rank-one
 loads,zero inputs,reference changes,readonly copies and rejection of two-column
 mixed drive data are checked. The reconstruction/power gates and propagation
 remain unchanged. Saved startup-port-waves version1 and2 still reject the mixed
-input schema; extending that stored contract is a separate step.
+input schema; [saved version3](startup_waves_document.md) explicitly adds mixed inputs.

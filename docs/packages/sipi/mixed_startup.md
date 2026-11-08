@@ -85,7 +85,8 @@ All arrays and derived energy arrays are detached read-only finite values.
 them. Scope is `finite-passive-two-signal-mixed-source-reactive-startup`.
 [Saved inputs](mixed_startup_document.md) retain typed sources in a separate schema.
 [Direct port-wave diagnostics](startup_waves.md) use the four terminal V/I columns.
-The saved wave wrappers still reject mixed inputs pending a separate version.
+[Saved wave version3](startup_waves_document.md) explicitly accepts mixed input;
+versions1/2 retain their earlier registries.
 
 ## Independent checks and limitations
 

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected startup port-wave saved v3 for typed mixed sources, preserving earlier nested registries, source units and physical budgets.
+
 - Accept mixed voltage/current startup terminals in port-wave diagnostics, preserving both source-loss partitions and rejecting typed drive arrays as terminal currents.
 
 - Save typed mixed-source startup inputs with exact V/A source keys, source-loss identity guards and unchanged physical time-row budgets.

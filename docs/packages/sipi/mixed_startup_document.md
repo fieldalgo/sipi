@@ -80,7 +80,8 @@ line/external energy diagnostics. A failed solve is not a partial success.
 Original voltage and Norton schemas keep their own scopes and reject cross-loading.
 The [saved wave wrappers](startup_waves_document.md),both version1 and2,continue
 rejecting this new mixed schema. [Direct wave diagnostics](startup_waves.md) accept the analyzed mixed response;
-saved wave adaptation still requires an explicit subsequent version.
+saved wave adaptation requires explicit `version=3` in
+[StartupPortWavesDocument](startup_waves_document.md).
 
 Checks cover six matrix/ramp/pulse full-state replays,eight source/boundary cases,
 all required keys,strict nested units,duplicates,no-solve parsing,copies,budgets,

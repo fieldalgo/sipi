@@ -2,7 +2,7 @@
 
 `StartupPortWavesDocument`는 기본 **sipi.startup-port-waves/1**으로 완전한 시작 응답 문서와
 [파형 진단](startup_waves.md)의 명시적 실수 기준 임피던스를 함께 저장합니다. 생성자는
-지원 문서 객체·`z_ref`와 선택적인 명시적 `version=2`를 받고, 이미 계산한 응답이 아닌 정규화된 입력을 복사합니다.
+지원 문서 객체·`z_ref`와 선택적인 명시적 `version=2` 또는 `version=3`를 받고, 이미 계산한 응답이 아닌 정규화된 입력을 복사합니다.
 
 ```python
 import numpy as np
@@ -115,3 +115,67 @@ Norton은 명시적 기준 4개와 실제 시간 행 예산을 사용합니다. 
 검사합니다. Norton 혼합 경계6종, 엄격한 버전/단위/재귀 거부, 무전파 파싱, 입력 복사,
 원래 지연 항/시간 행 예산, 출력 동일성과 실행 실패를 검사합니다. 원version1 시험은
 그대로 유지합니다. 물리 범위·소스 수렴·실측 검증·앱 통합의 확대를 뜻하지 않습니다.
+
+## 단위가 명시된 혼합 소스를 위한 version3
+
+`version=3`는 **sipi.startup-port-waves/3**를 선택하고 version2의7종에
+[sipi.mixed-rlgc-startup/1](mixed_startup_document.md)을 추가합니다. version1은6종,
+version2는7종 그대로입니다. 생성자 기본값은version1이므로 혼합 입력에는 명시적인
+version3가 필요합니다. 로딩은 root버전과 중첩 물리/소스 단위 키를 보존하며 자동 승격·
+종류 변환을 하지 않습니다. root3키·기준·재귀 금지·원래 물리 예산도 그대로입니다.
+
+```python
+import numpy as np
+from sipi import MixedSourceRLGCLadderDocument
+
+time = np.linspace(0., 12e-9, 121)
+sources = [dict(kind='voltage', voltage_v=np.minimum(time/2e-9, 1.),
+                series_resistance_ohm=0.),
+           dict(kind='current', current_a=-.008*np.minimum(time/3e-9, 1.),
+                shunt_resistance_ohm=None)]
+document = MixedSourceRLGCLadderDocument(time, sources,
+    R=[[25., 2.], [2., 17.]], L=np.array([[510., 70.], [70., 430.]])*1e-9,
+    G=[[.003, -.0002], [-.0002, .0015]], C=np.array([[230., -30.], [-30., 190.]])*1e-12,
+    length=.1, cells=16, load_resistance=[91., None],
+    load_capacitance=np.array([[20., -4.], [-4., 30.]])*1e-12,
+    load_branch_resistance=[[13., 1.], [1., 9.]],
+    load_branch_inductance=np.array([[12., 2.], [2., 8.]])*1e-9)
+from sipi.execution import normalize_saved, execute_saved
+text = document.dumps()
+assert normalize_saved(text) == text and document.samples == 121
+out = execute_saved(text, max_evaluations=121)
+assert out['status'] == 'complete'
+assert out['input']['schema'] == 'sipi.mixed-rlgc-startup/1'
+assert out['result']['source_units'] == ['V', 'A']
+response = document.analyze(max_evaluations=121)
+assert response.source_kinds == ('voltage', 'current')
+assert response.source_units == ('V', 'A')
+np.testing.assert_array_equal(response.voltage[:, 0], sources[0]['voltage_v'])
+np.testing.assert_array_equal(response.current[:, 1], sources[1]['current_a'])
+assert response.total_power_balance_relative_error <= 1e-10
+assert not response.to_dict()['states_included']
+assert np.all(response.source_series_resistor_loss == 0.)
+assert np.all(response.source_shunt_resistor_loss == 0.)
+
+from sipi import StartupPortWavesDocument
+wrapped = StartupPortWavesDocument(document, z_ref=[35., 45., 55., 65.], version=3)
+assert normalize_saved(wrapped.dumps()) == wrapped.dumps()
+result = execute_saved(wrapped.dumps(), max_evaluations=121)
+assert result['input']['schema'] == 'sipi.startup-port-waves/3'
+assert result['input']['startup']['schema'] == 'sipi.mixed-rlgc-startup/1'
+assert result['result']['source_kind'] == 'MixedSourceRLGCLadderResponse'
+np.testing.assert_allclose(np.array(result['result']['port_power_w'])[:, :2].sum(axis=1),
+    response.source_power - response.source_series_resistor_loss
+    - response.source_shunt_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+혼합 결과는4개 단자V/I 열과 혼합 응답 클래스명을 보존합니다. 근단 파동 전력은 공급
+전력에서 소스 직렬/병렬 손실 모두를 뺀 값입니다. V/A 단위가 다른 입력값을 단자
+전류로 사용하지 않습니다.
+
+version3의8종 스키마×ramp/pulse16개를 재실행합니다. 원6종은v1/v2/v3 결과가 같고
+Norton은v2/v3가 같습니다. 혼합6경계와 동종 소스2한계도 정확한 파동을 유지합니다.
+기본/v1/v2의 혼합 거부·엄격 버전·중첩 단위·재귀·복사·예산·출력 동일성과 전파/상쇄
+실패를 검사합니다. 이전 미지원 생성자version3 시험은 미지원999로 바꾸며 새version3의
+양성 동작을 별도로 검사합니다. 저장 진단 계약의 확장이며 물리 전파 모델이나
+브라우저/Windows 통합의 추가를 뜻하지 않습니다.

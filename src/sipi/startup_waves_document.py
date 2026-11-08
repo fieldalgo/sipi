@@ -16,10 +16,11 @@ from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 from .coupled_reactive_startup_document import ReactiveRLGCLadderDocument
 from .startup_waves import StartupPortWaves, startup_port_waves
 from .norton_startup_document import NortonReactiveRLGCLadderDocument
+from .mixed_startup_document import MixedSourceRLGCLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2)}
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -30,12 +31,14 @@ _STARTUPS = {
 }
 
 _STARTUPS_V2 = {**_STARTUPS, 'sipi.norton-rlgc-startup/1': NortonReactiveRLGCLadderDocument}
+_STARTUPS_V3 = {**_STARTUPS_V2, 'sipi.mixed-rlgc-startup/1': MixedSourceRLGCLadderDocument}
+_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3}
 
 
 def _startup(data, *, version=1):
     if not isinstance(data, dict) or not isinstance(data.get('schema'), str):
         raise ValueError('startup must be a supported saved startup object')
-    cls = (_STARTUPS if version == 1 else _STARTUPS_V2).get(data['schema'])
+    cls = _BY_VERSION[version].get(data['schema'])
     if cls is None:
         raise ValueError('unsupported nested startup schema')
     return cls.from_dict(data)
@@ -48,11 +51,12 @@ class StartupPortWavesDocument:
     terms for lossless startup, actual time rows for finite RLGC startup.
     Nested parsing validates without propagation; no recursive wave documents.
     Default version1 retains its six original voltage-driven schemas. Explicit
-    version2 also permits Norton current inputs, without upgrading nested versions.
+    version2 also permits Norton current inputs; version3 adds typed mixed sources.
+    No nested version is upgraded.
     """
     def __init__(self, startup, *, z_ref, version=1):
-        version = _integer(version, 1, 2)
-        registry = _STARTUPS if version == 1 else _STARTUPS_V2
+        version = _integer(version, 1, 3)
+        registry = _BY_VERSION[version]
         if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')
         self._assign(startup.to_dict(), z_ref, version=version)

@@ -77,7 +77,8 @@ C/직렬RL/저항 부하이며 임의 netlist가 아닙니다.
 내부 선로 상태를 생략하고 `include_states=True`는 포함합니다. scope는
 `finite-passive-two-signal-mixed-source-reactive-startup`입니다. [입력 저장](mixed_startup_document.md)은 별도 스키마로 종류·단위를 보존합니다.
 [직접 포트 파동 진단](startup_waves.md)은4개 단자 V/I 열을 사용합니다.
-저장 파동 wrapper는 별도 버전 연결 전까지 혼합 입력을 거부합니다.
+[파동 저장 version3](startup_waves_document.md)은 혼합 입력을 명시적으로 지원하며
+version1/2의 이전 레지스트리는 유지합니다.
 
 ## 독립 검증과 한계
 

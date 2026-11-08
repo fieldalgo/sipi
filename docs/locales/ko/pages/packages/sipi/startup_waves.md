@@ -169,4 +169,4 @@ np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
 혼합6경계·ramp/pulse 등가·동종 한계·영/rank-one 부하·영 입력·기준 변경·읽기 전용
 복사와2열 혼합 입력의 거부를 검사합니다. 복원/전력 기준과 전파는 바뀌지 않습니다.
 저장 startup-port-waves version1/2는 혼합 입력 스키마를 여전히 거부하며 저장 계약 확장은
-별도 후속 작업입니다.
+[저장 version3](startup_waves_document.md)에서 명시적으로 지원합니다.

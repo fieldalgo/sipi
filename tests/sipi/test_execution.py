@@ -258,6 +258,7 @@ def documents():
     data['sources']=[dict(kind='voltage',voltage_v=[0.,1.,1.],series_resistance_ohm=0.),
         dict(kind='current',current_a=[row[1] for row in currents],shunt_resistance_ohm=shunts[1])]
     base.append(MixedSourceRLGCLadderDocument.from_dict(data))
+    base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.],version=3))
     return base
 
 

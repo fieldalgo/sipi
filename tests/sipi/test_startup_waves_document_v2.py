@@ -87,7 +87,7 @@ def test_v2_parsing_is_no_propagation_and_copies_nested_values(kind,monkeypatch)
     assert d.dumps()==text and loaded.dumps()==text
 
 
-@pytest.mark.parametrize('version',[True,False,0,3,2.,'2',None])
+@pytest.mark.parametrize('version',[True,False,0,999,2.,'2',None])
 def test_constructor_version_must_be_explicit_supported_integer(version):
     with pytest.raises((ValueError,TypeError)):StartupPortWavesDocument(source(),z_ref=[35.,45.,55.,65.],version=version)
 

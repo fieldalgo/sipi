@@ -3,7 +3,7 @@
 `StartupPortWavesDocument` stores **sipi.startup-port-waves/1** by default, combining a
 complete supported startup document with explicit real port references for
 [wave diagnostics](startup_waves.md). Its constructor takes a supported document
-object, `z_ref` and optional explicit `version=2`; it copies canonical inputs, not an already computed response.
+object, `z_ref` and optional explicit `version=2` or `version=3`; it copies canonical inputs, not an already computed response.
 
 ```python
 import numpy as np
@@ -128,3 +128,71 @@ boundaries, strict version/unit/recursion checks, no-propagation parsing, copied
 inputs, original delay-term/time-row budgets, output identity and runtime failures
 are checked. Original version1 tests remain unchanged. No extra physical scope,
 source convergence, measurement validation or application integration is implied.
+
+## Explicit version3 for typed mixed sources
+
+`version=3` selects **sipi.startup-port-waves/3**, adding
+[sipi.mixed-rlgc-startup/1](mixed_startup_document.md) to the seven version2
+schemas. Version1 remains six schemas; version2 remains seven. The constructor
+default stays version1, so typed mixed input requires an explicit version3.
+Loading preserves the root version and all nested physical/source unit keys;
+there is no automatic upgrade or kind conversion. Three root keys,references,
+no-recursion rules and original physical budgets remain unchanged.
+
+```python
+import numpy as np
+from sipi import MixedSourceRLGCLadderDocument
+
+time = np.linspace(0., 12e-9, 121)
+sources = [dict(kind='voltage', voltage_v=np.minimum(time/2e-9, 1.),
+                series_resistance_ohm=0.),
+           dict(kind='current', current_a=-.008*np.minimum(time/3e-9, 1.),
+                shunt_resistance_ohm=None)]
+document = MixedSourceRLGCLadderDocument(time, sources,
+    R=[[25., 2.], [2., 17.]], L=np.array([[510., 70.], [70., 430.]])*1e-9,
+    G=[[.003, -.0002], [-.0002, .0015]], C=np.array([[230., -30.], [-30., 190.]])*1e-12,
+    length=.1, cells=16, load_resistance=[91., None],
+    load_capacitance=np.array([[20., -4.], [-4., 30.]])*1e-12,
+    load_branch_resistance=[[13., 1.], [1., 9.]],
+    load_branch_inductance=np.array([[12., 2.], [2., 8.]])*1e-9)
+from sipi.execution import normalize_saved, execute_saved
+text = document.dumps()
+assert normalize_saved(text) == text and document.samples == 121
+out = execute_saved(text, max_evaluations=121)
+assert out['status'] == 'complete'
+assert out['input']['schema'] == 'sipi.mixed-rlgc-startup/1'
+assert out['result']['source_units'] == ['V', 'A']
+response = document.analyze(max_evaluations=121)
+assert response.source_kinds == ('voltage', 'current')
+assert response.source_units == ('V', 'A')
+np.testing.assert_array_equal(response.voltage[:, 0], sources[0]['voltage_v'])
+np.testing.assert_array_equal(response.current[:, 1], sources[1]['current_a'])
+assert response.total_power_balance_relative_error <= 1e-10
+assert not response.to_dict()['states_included']
+assert np.all(response.source_series_resistor_loss == 0.)
+assert np.all(response.source_shunt_resistor_loss == 0.)
+
+from sipi import StartupPortWavesDocument
+wrapped = StartupPortWavesDocument(document, z_ref=[35., 45., 55., 65.], version=3)
+assert normalize_saved(wrapped.dumps()) == wrapped.dumps()
+result = execute_saved(wrapped.dumps(), max_evaluations=121)
+assert result['input']['schema'] == 'sipi.startup-port-waves/3'
+assert result['input']['startup']['schema'] == 'sipi.mixed-rlgc-startup/1'
+assert result['result']['source_kind'] == 'MixedSourceRLGCLadderResponse'
+np.testing.assert_allclose(np.array(result['result']['port_power_w'])[:, :2].sum(axis=1),
+    response.source_power - response.source_series_resistor_loss
+    - response.source_shunt_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+Mixed results use four terminal V/I columns and keep the mixed response class
+name. Near wave power is supplied source power minus both source series and
+shunt losses. Typed V/A drive values are never used as terminal currents.
+
+Sixteen ramp/pulse replays cover all eight version3 source schemas. The original
+six match versions1/2/3 and Norton matches versions2/3. Six mixed boundaries and
+two homogeneous source-kind limits retain exact waves. Default/v1/v2 rejection
+of mixed,strict constructor versions,nested units,recursion,copies,budgets,
+result identity and original propagation/cancellation failures are tested.
+The former invalid constructor version3 case now tests unsupported999; positive
+version3 behavior has its own acceptance. This adds a saved diagnostic contract,
+not a new physical propagation model or browser/Windows integration.
