@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit passive scalar Debye startup with separate polarization storage/loss, bounded poles, independent charge/continuous-line references and time/space convergence checks.
+
 - Add explicitly selected startup port-wave saved v3 for typed mixed sources, preserving earlier nested registries, source units and physical budgets.
 
 - Accept mixed voltage/current startup terminals in port-wave diagnostics, preserving both source-loss partitions and rejecting typed drive arrays as terminal currents.

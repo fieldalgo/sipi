@@ -105,3 +105,5 @@ accuracy. Browser and Windows integration require separate validation.
 
 [Exact lossless response](startup.md) · [Periodic response](periodic.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/rlgc_startup.md)
+
+[Explicit Debye startup](debye_startup.md)

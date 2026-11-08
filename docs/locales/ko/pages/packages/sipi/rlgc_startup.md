@@ -93,3 +93,5 @@ eye/BER나 실측 기판 정확도를 의미하지 않습니다. 브라우저/Wi
 
 [정확 무손실 응답](startup.md) · [주기 응답](periodic.md) ·
 [English](../../../../../packages/sipi/rlgc_startup.md)
+
+[명시적 Debye 시작 응답](debye_startup.md)
