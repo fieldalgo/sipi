@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved wave version12 for multiconductor Debye capacitive inputs, retaining versions1–11, external capacitor power meaning and original sample budgets.
+
 - Admit explicit multiconductor Debye capacitive terminal waves with six/eight real references, retaining external capacitor current and separate line power without changing conversion formulas.
 
 - Add a strict 15-key saved multiconductor Debye capacitive input and common execution, preserving external storage, SI capacitance, actual time budgets and all response shapes.

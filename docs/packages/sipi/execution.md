@@ -182,3 +182,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Saved multiconductor capacitive inputs](multiconductor_debye_capacitive_startup_document.md) preserve explicit external storage and actual time-row budgets.
+
+
+[Explicit saved wave version12](startup_waves_document_v12.md) adds multiconductor Debye capacitive inputs while preserving versions1–11.

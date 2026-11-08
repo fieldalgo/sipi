@@ -82,9 +82,9 @@ with existing BSD-3-Clause notices.
 This adapter does not infer propagation modes, TDR inversion, b/a or V/I
 ratios, delay alignment, gating, FFT or frequency-dependent references.
 [Saved circuit input](multiconductor_debye_capacitive_startup_document.md) is available,
-but saved wave versions1–11 still reject this new kind. Wave conversion adds
-no saved schema, numerical solver, runtime dependency, application or platform
-support. See the [general wave contract](startup_waves.md).
+and [explicit saved wave version12](startup_waves_document_v12.md) admits
+this kind. Versions1–11 still reject it. Wave conversion adds no numerical
+solver, runtime dependency, application or platform support. See the [general wave contract](startup_waves.md).
 
 With explicitly zero external capacitance, null-only drives preserve constant-line
 terminal waves while canonical auxiliary

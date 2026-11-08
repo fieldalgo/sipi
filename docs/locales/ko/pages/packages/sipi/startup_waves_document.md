@@ -437,3 +437,6 @@ assert len(out['result']['incident_sqrt_w'][0]) == 8
 
 
 [명시 저장 파동 버전11](startup_waves_document_v11.md)은 버전1–10을 유지하며3·4신호 PSD Debye 입력을 추가합니다.
+
+
+[명시 저장 파동 버전12](startup_waves_document_v12.md)은 버전1–11을 유지하며 다신호 Debye 외부 커패시터 입력을 추가합니다.

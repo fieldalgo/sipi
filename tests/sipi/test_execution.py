@@ -353,6 +353,7 @@ def documents():
         relaxation_hz=[8e7,7e8],length=.1,cells=4,
         source_resistance=[25.]*3,load_resistance=[100.]*3,
         load_capacitance=np.diag([30.,0.,20.])*1e-12))
+    base.append(StartupPortWavesDocument(base[-1], z_ref=[35.,45.,55.,65.,75.,85.], version=12))
     return base
 
 

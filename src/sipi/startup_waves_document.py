@@ -25,10 +25,11 @@ from .debye_reactive_startup_document import DebyeReactiveLadderDocument
 from .multiconductor_startup_document import MulticonductorRLGCLadderDocument
 from .multiconductor_debye_startup_document import MulticonductorDebyeRLGCLadderDocument
 from .psd_multiconductor_debye_startup_document import PSDMulticonductorDebyeRLGCLadderDocument
+from .multiconductor_debye_capacitive_startup_document import MulticonductorDebyeCapacitiveLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)}
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -48,7 +49,8 @@ _STARTUPS_V8 = {**_STARTUPS_V7, 'sipi.debye-reactive-startup/1': DebyeReactiveLa
 _STARTUPS_V9 = {**_STARTUPS_V8, 'sipi.multiconductor-rlgc-startup/1': MulticonductorRLGCLadderDocument}
 _STARTUPS_V10 = {**_STARTUPS_V9, 'sipi.multiconductor-debye-rlgc-startup/1': MulticonductorDebyeRLGCLadderDocument}
 _STARTUPS_V11 = {**_STARTUPS_V10, 'sipi.psd-multiconductor-debye-rlgc-startup/1': PSDMulticonductorDebyeRLGCLadderDocument}
-_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7, 8: _STARTUPS_V8, 9: _STARTUPS_V9, 10: _STARTUPS_V10, 11: _STARTUPS_V11}
+_STARTUPS_V12 = {**_STARTUPS_V11, 'sipi.multiconductor-debye-capacitive-startup/1': MulticonductorDebyeCapacitiveLadderDocument}
+_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7, 8: _STARTUPS_V8, 9: _STARTUPS_V9, 10: _STARTUPS_V10, 11: _STARTUPS_V11, 12: _STARTUPS_V12}
 
 
 def _startup(data, *, version=1):
@@ -79,10 +81,12 @@ class StartupPortWavesDocument:
     Debye inputs with the same explicit six/eight reference requirement.
     Explicit version11 additionally permits three/four-signal PSD Debye
     inputs, preserving singular matrices and their canonical null directions.
+    Explicit version12 additionally permits three/four-signal PSD Debye
+    inputs with external capacitive load storage and current.
     No nested version is upgraded.
     """
     def __init__(self, startup, *, z_ref, version=1):
-        version = _integer(version, 1, 11)
+        version = _integer(version, 1, 12)
         registry = _BY_VERSION[version]
         if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')
@@ -90,7 +94,7 @@ class StartupPortWavesDocument:
 
     def _assign(self, startup, z_ref, *, version):
         doc = _startup(startup, version=version)
-        if isinstance(doc, (MulticonductorRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument)):
+        if isinstance(doc, (MulticonductorRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeCapacitiveLadderDocument)):
             ports = 2*doc.to_dict()['signals']
         else:
             ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, DebyeRLGCLadderDocument)) else 4
