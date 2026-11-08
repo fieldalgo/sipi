@@ -3,7 +3,7 @@
 `coupled_reactive_ladder_response` adds an explicit two-current **series RL branch**
 in parallel with the load capacitance and per-conductor resistive terminations.
 It returns `ReactiveRLGCLadderResponse`. The [capacitive API](coupled_capacitive_startup.md)
-and its saved v3 retain their contracts; this separate API has no saved schema yet.
+and its saved v3 retain their contracts; explicit saved v4 is documented in the link below.
 
 ```python
 import numpy as np
@@ -97,3 +97,5 @@ simulation, general TDR/eye/BER, measured-board accuracy or browser/Windows pari
 
 [Capacitive load](coupled_capacitive_startup.md) · [Mixed boundaries](coupled_boundary_startup.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/coupled_reactive_startup.md)
+
+[Saved reactive v4](coupled_reactive_startup_document.md)

@@ -3,7 +3,7 @@
 `coupled_reactive_ladder_response`는 부하 커패시턴스·도체별 저항 종단과 병렬인
 명시적 두 전류 **직렬 RL 분기**를 추가하고 `ReactiveRLGCLadderResponse`를 반환합니다.
 [용량성 API](coupled_capacitive_startup.md)와 저장 v3의 계약은 그대로이며 이 별도 API에는
-아직 저장 스키마가 없습니다.
+명시적 저장 v4를 아래 링크에서 설명합니다.
 
 ```python
 import numpy as np
@@ -86,3 +86,5 @@ Maxwell 시간 해석·일반 TDR/eye/BER·실측 정확도·브라우저/Window
 
 [용량성 부하](coupled_capacitive_startup.md) · [혼합 경계](coupled_boundary_startup.md) ·
 [English](../../../../../packages/sipi/coupled_reactive_startup.md)
+
+[리액티브 저장 v4](coupled_reactive_startup_document.md)

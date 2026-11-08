@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit coupled startup v4 with external C/R/L matrices, exact physical replay and preserved earlier-version contracts and time-row budgets.
+
 - Add explicit passive series RL load branches to coupled startup, preserving separate line/capacitor/inductor energy and independent analytic, modal and KCL validation.
 
 - Save explicit capacitive-load startup v3 with separate external energy, exact physical replay, time-row budgets and unchanged v1/v2 contracts.
