@@ -204,3 +204,41 @@ RLGC 한계, 4극점 분할, 0 입력, 복사, 엄격한 기준값 및 내부 �
 명시적 시간·셀·극점 계약은 유지합니다.
 
 [명시적 저장 버전4](startup_waves_document.md)는 Debye 입력을 포함합니다.
+
+## 명시적인 두 신호 Debye 단자 파동
+
+[결합 Debye 시작 응답](coupled_debye_startup.md)의
+`CoupledDebyeRLGCLadderResponse`를 명시적으로 받습니다. near_0, near_1,
+far_0, far_1 순서의 네 단자 V/I를 사용하며, 두 소스 전압이나 4차원 내부
+분극 전류를 단자 전류로 쓰지 않습니다. 네 개의 유한한 양의 실수 기준
+임피던스가 필요하며 기존 복원·전력 오차 기준은 그대로입니다.
+근단 두 파동 전력의 합은 소스 전력에서 소스 저항 손실을 뺀 값이고,
+원단 합은 부하 저항 손실의 음수입니다. 전체 합에는 순간·분극 에너지
+변화율과 R/G/완화 손실이 모두 포함됩니다. 기준 임피던스를 바꾸면
+파동 값은 달라져도 단자 전력은 같습니다.
+
+```python
+from sipi import coupled_debye_rlgc_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = coupled_debye_rlgc_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4],
+    R=[[20., 3.], [3., 20.]], L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -25.], [-25., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.])
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'CoupledDebyeRLGCLadderResponse'
+assert waves.port_names == ('near_0', 'near_1', 'far_0', 'far_1')
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.total_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+```
+
+대각·교환대칭 행렬의 독립 단일신호 모드, 비가환 행렬, ramp/pulse,
+강도 0의 기존 결합 모델 한계, 극·도체 순열, 입력 0, 복사·엄격한 기준
+입력을 검사합니다. 분산 고유모드나 TDR 임피던스를 추정하지 않습니다.
+저장 파동 v1..4는 여전히 [결합 Debye 문서](coupled_debye_startup_document.md)를
+거부하며 버전을 자동으로 올리지 않습니다.

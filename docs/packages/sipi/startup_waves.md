@@ -224,3 +224,41 @@ Saved wave schemas v1/v2/v3 still reject the Debye input document.
 retain their explicit time, cell and pole contracts.
 
 [Explicit saved version4](startup_waves_document.md) includes Debye inputs.
+
+## Explicit two-signal Debye terminal waves
+
+[Coupled Debye startup](coupled_debye_startup.md) is accepted explicitly as
+`CoupledDebyeRLGCLadderResponse`. Use its four terminal V/I columns in order
+near_0, near_1, far_0, far_1. Two source voltages or four-dimensional internal
+polarization currents are not terminal currents. Supply four finite positive
+real references; the original reconstruction and power gates remain unchanged.
+Near-pair wave power equals source power minus source resistor loss. Far-pair
+power is minus load resistor loss. Their sum includes both instantaneous and
+polarization energy rate plus R/G/relaxation loss. Changing references preserves
+terminal power, while changing wave values.
+
+```python
+from sipi import coupled_debye_rlgc_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = coupled_debye_rlgc_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4],
+    R=[[20., 3.], [3., 20.]], L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -25.], [-25., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.])
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'CoupledDebyeRLGCLadderResponse'
+assert waves.port_names == ('near_0', 'near_1', 'far_0', 'far_1')
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.total_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+```
+
+Diagonal and exchange-symmetric scalar-mode wave limits, noncommuting matrices,
+ramp/pulse, zero-strength original coupled limits, pole/conductor permutations,
+zero drive, copies and strict references are checked. This adapter does not
+infer dispersive eigenmodes or TDR impedance. Saved wave v1..4 still reject the
+[coupled Debye document](coupled_debye_startup_document.md); no implicit version upgrade.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept explicit coupled Debye four-terminal waves with scalar-mode limits and polarization energy/loss balance.
+
 - Save coupled Debye startup matrices with exact pole order, strict time budgets and complete four-terminal/state/diagnostic replay guards.
 
 - Add bounded two-signal Debye startup with explicit positive matrix strengths, separate polarization storage/loss, independent charge-KCL and modal/time/space references.
