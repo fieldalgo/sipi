@@ -392,6 +392,14 @@ def documents():
         load_branch_resistance=np.diag([30.,0.,40.]),
         load_branch_inductance=np.diag([180.,200.,220.])*1e-9))
     base.append(StartupPortWavesDocument(base[-1], z_ref=[35.,45.,55.,65.,75.,85.], version=15))
+    from sipi import MixedBoundaryMulticonductorRLGCLadderDocument
+    base.append(MixedBoundaryMulticonductorRLGCLadderDocument(
+        [0.,1e-9,2e-9],[[0.,0.,0.],[1.,-.4,.2],[1.,-.4,.2]],signals=3,
+        R=np.array([[20.,-20.,0.],[-20.,20.,0.],[0.,0.,0.]]),
+        L=np.array([[450.,60.,0.],[60.,480.,60.],[0.,60.,510.]])*1e-9,
+        G=np.array([[0.,0.,0.],[0.,.002,.002],[0.,.002,.002]]),
+        C=np.array([[210.,-20.,0.],[-20.,220.,-20.],[0.,-20.,230.]])*1e-12,
+        length=.1,cells=2,source_resistance=[0.,25.,0.],load_resistance=[None,0.,75.]))
     return base
 
 

@@ -55,6 +55,7 @@ from .startup_document import LosslessStartupDocument
 from .rlgc_startup_document import RLGCLadderDocument
 from .coupled_startup_document import CoupledRLGCLadderDocument
 from .multiconductor_startup_document import MulticonductorRLGCLadderDocument
+from .multiconductor_boundary_startup_document import MixedBoundaryMulticonductorRLGCLadderDocument
 from .multiconductor_debye_startup_document import MulticonductorDebyeRLGCLadderDocument
 from .psd_multiconductor_debye_startup_document import PSDMulticonductorDebyeRLGCLadderDocument
 from .multiconductor_debye_capacitive_startup_document import MulticonductorDebyeCapacitiveLadderDocument
@@ -125,6 +126,7 @@ _REGISTRY = {
     'sipi.rlgc-startup/1': RLGCLadderDocument,
     'sipi.coupled-rlgc-startup/1': CoupledRLGCLadderDocument,
     'sipi.multiconductor-rlgc-startup/1': MulticonductorRLGCLadderDocument,
+    'sipi.multiconductor-boundary-startup/1': MixedBoundaryMulticonductorRLGCLadderDocument,
     'sipi.multiconductor-debye-rlgc-startup/1': MulticonductorDebyeRLGCLadderDocument,
     'sipi.psd-multiconductor-debye-rlgc-startup/1': PSDMulticonductorDebyeRLGCLadderDocument,
     'sipi.multiconductor-debye-capacitive-startup/1': MulticonductorDebyeCapacitiveLadderDocument,
@@ -411,7 +413,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, (MixedSourceMulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
+    if isinstance(doc, (MixedBoundaryMulticonductorRLGCLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument, ThickGridStripCapacitanceDocument, VolumeGridStripCapacitanceDocument, VolumeGridPairCapacitanceDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()

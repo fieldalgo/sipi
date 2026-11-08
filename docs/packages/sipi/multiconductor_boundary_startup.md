@@ -90,3 +90,6 @@ all old numerical source and tests are unchanged. The separate response is
 not implicitly accepted by saved or terminal-wave APIs. The registry remains
 90schemas/37templates. No new dependency, browser/desktop update or platform
 support is added. See [development validation](../../development.md).
+
+
+[Explicit saved mixed-boundary inputs](multiconductor_boundary_startup_document.md) preserve ideal/open/short values without changing the numerical model; terminal-wave admission remains separate.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict multiconductor mixed-boundary saved inputs, preserving ideal voltage/open/short entries, PSD losses, actual sample budgets and exact result identity.
+
 - Add a separate three/four-signal constant PSD RLGC circuit with ideal/resistive voltage sources and open/short/resistive loads, retaining mutual endpoint capacitance and explicit terminal power balances.
 
 - Add explicit saved wave version15 for multiconductor Debye typed sources, preserving original V/A objects, source loss partitions, versions1–14 and actual row budgets.
