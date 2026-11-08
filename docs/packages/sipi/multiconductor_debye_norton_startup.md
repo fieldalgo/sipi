@@ -109,10 +109,13 @@ The candidate equations and thresholds were unchanged through these studies.
 Qualified fixtures do not guarantee arbitrary bandwidth, horizon or measured
 board accuracy. The last-four-cycle phasor window must itself be settled.
 
-The separate result can be replayed through the strict saved-input document;
-terminal-wave APIs do not yet admit it.
+The separate result can be replayed through the strict saved-input document
+and converted through explicit six/eight-port terminal waves.
 No general SPICE topology, ideal source short, field extraction, FFT/TDR,
 platform integration or new runtime dependency is added.
 
 
 [Saved current-source inputs](multiconductor_debye_norton_startup_document.md) preserve explicit amperes and source conductances with a strict versioned schema.
+
+
+[Current-source multiconductor port waves](multiconductor_debye_norton_startup_waves.md) preserve terminal current and exclude source shunt loss from near power.

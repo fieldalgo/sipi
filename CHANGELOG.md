@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Admit explicit multiconductor Debye Norton responses to six/eight-port power-wave conversion, preserving terminal current, source shunt loss separation and existing wave formulas.
+
 - Add strict versioned multiconductor Debye Norton input documents and common execution with exact current/conductance identity, full-state replay and pre-propagation row budgets.
 
 - Add explicit three/four-signal PSD Debye Norton current sources with external C/RL loads, separate source shunt loss, independent finite-circuit checks and qualified PWL continuum limits.

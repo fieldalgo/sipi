@@ -469,3 +469,6 @@ establish general TDR inversion, measured accuracy or app/platform support.
 
 
 [Multiconductor Debye reactive waves](multiconductor_debye_reactive_startup_waves.md) retain branch current, external storage and separate line power.
+
+
+[Current-source multiconductor port waves](multiconductor_debye_norton_startup_waves.md) preserve terminal current and exclude source shunt loss from near power.
