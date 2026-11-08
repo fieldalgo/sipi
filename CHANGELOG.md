@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Convert explicit physical two-port H/G samples directly to power waves, with analytic boundary relations, qualified independent RF comparisons and strict conditioning gates.
+
 - Save paired finite-volume traces with strict SI gap/width inputs, explicit electrode and volume identity and one field evaluation.
 
 - Add bounded paired finite-thickness traces over a ground-grid volume with explicit Maxwell capacitance, independent field comparisons and separate refinement checks.

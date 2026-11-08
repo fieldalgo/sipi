@@ -70,3 +70,6 @@ BSD-3-Clause 기준 도구는 시험 전용으로 유지하며 실행 의존성�
 
 
 [별도 Touchstone 2.0 물리 Y/Z reader](touchstone_parameters.md)는 출력 기준을 필수로 지정하며 기존 S reader 계약을 유지합니다.
+
+
+[물리 2포트 H/G 변환](hybrid_parameters.md)은 명시한 혼합 단위와 직접 파동 식을 사용합니다.

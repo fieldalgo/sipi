@@ -78,3 +78,6 @@ The BSD-3-Clause reference remains test-only; no runtime dependency is added.
 
 
 [Separate Touchstone 2.0 physical Y/Z reader](touchstone_parameters.md) requires explicit output references and preserves the S reader contract.
+
+
+[Physical two-port H/G conversion](hybrid_parameters.md) uses explicit mixed units and direct wave equations.
