@@ -75,8 +75,8 @@ assert np.all(response.source_shunt_resistor_loss == 0.)
 
 원래 전압원·Norton 스키마는 자신의 scope를 유지하고 교차 로딩을 거부합니다.
 [파동 저장 wrapper](startup_waves_document.md)의version1/2 모두 이 새 혼합 스키마를
-계속 거부합니다. 직접 파동 어댑터도 혼합 응답을 위한 별도 계약이 필요하며 저장 기능이
-조용히 지원 범위를 넓히지 않습니다.
+계속 거부합니다. [직접 파동 진단](startup_waves.md)은 분석한 혼합 응답을 지원합니다. 저장 파동 연결은
+명시적 후속 버전이 필요합니다.
 
 행렬/ramp/pulse6개 전체 상태,소스/경계8개,모든 필수 키,엄격한 중첩 단위·중복·무전파
 파싱·복사·예산·출력 오염·영/rank-one 부하·읽기 전용·원래 실행 실패를 검사합니다.

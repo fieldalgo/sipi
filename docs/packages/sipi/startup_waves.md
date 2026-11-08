@@ -3,7 +3,8 @@
 `startup_port_waves(response, z_ref=...)` converts existing startup terminal V/I
 samples to incident/reflected real power waves. It accepts `LosslessLineResponse`
 and `RLGCLadderResponse`, including coupled, mixed, capacitive and reactive
-subclasses, plus the separate `NortonReactiveRLGCLadderResponse`, and returns
+subclasses, plus the separate `NortonReactiveRLGCLadderResponse` and
+`MixedSourceRLGCLadderResponse`, and returns
 copied read-only `StartupPortWaves`. It does no propagation,
 FFT, resampling, delay alignment, periodic extension or missing-DC inference.
 
@@ -133,3 +134,57 @@ zero/rank-one external terms, zero input, reference changes, detached read-only
 results and rejection of injected-current shapes. The original reconstruction
 and power gates remain unchanged. The saved startup-port-waves/1 wrapper still
 rejects Norton inputs; [saved version2](startup_waves_document.md) explicitly adds Norton while preserving version1.
+
+## Mixed-source terminal waves
+
+[Mixed voltage/current startup](mixed_startup.md) is accepted explicitly. Its
+`source_values` columns may have different V/A units and must never substitute
+for the four terminal voltage/current columns. The diagnostic preserves terminal
+samples and the source class name `MixedSourceRLGCLadderResponse`.
+
+Near wave power equals supplied source power minus **both** voltage-source
+series loss and current-source shunt loss. Far into-line wave power is the negative
+external capacitor/branch/resistor power. Finite mixed-source circuits and their
+Thevenin equivalents have the same terminal waves at equal references, although
+supplied powers and individual source losses differ. Homogeneous source-kind
+limits match the earlier voltage-only/current-only wave results.
+
+```python
+import numpy as np
+from sipi import coupled_mixed_source_ladder_response
+
+time = np.linspace(0., 12e-9, 121)
+sources = [dict(kind='voltage', voltage_v=np.minimum(time/2e-9, 1.),
+                series_resistance_ohm=0.),
+           dict(kind='current', current_a=-.008*np.minimum(time/3e-9, 1.),
+                shunt_resistance_ohm=None)]
+response = coupled_mixed_source_ladder_response(time, sources,
+    R=[[25., 2.], [2., 17.]], L=np.array([[510., 70.], [70., 430.]])*1e-9,
+    G=[[.003, -.0002], [-.0002, .0015]], C=np.array([[230., -30.], [-30., 190.]])*1e-12,
+    length=.1, cells=16, load_resistance=[91., None],
+    load_capacitance=np.array([[20., -4.], [-4., 30.]])*1e-12,
+    load_branch_resistance=[[13., 1.], [1., 9.]],
+    load_branch_inductance=np.array([[12., 2.], [2., 8.]])*1e-9)
+assert response.source_kinds == ('voltage', 'current')
+assert response.source_units == ('V', 'A')
+np.testing.assert_array_equal(response.voltage[:, 0], sources[0]['voltage_v'])
+np.testing.assert_array_equal(response.current[:, 1], sources[1]['current_a'])
+assert response.total_power_balance_relative_error <= 1e-10
+assert not response.to_dict()['states_included']
+assert np.all(response.source_series_resistor_loss == 0.)
+assert np.all(response.source_shunt_resistor_loss == 0.)
+
+from sipi import startup_port_waves
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'MixedSourceRLGCLadderResponse'
+assert waves.incident.shape == (121, 4)
+np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
+    response.source_power - response.source_series_resistor_loss
+    - response.source_shunt_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+Six mixed boundaries,ramp/pulse equivalents,homogeneous limits,zero/rank-one
+loads,zero inputs,reference changes,readonly copies and rejection of two-column
+mixed drive data are checked. The reconstruction/power gates and propagation
+remain unchanged. Saved startup-port-waves version1 and2 still reject the mixed
+input schema; extending that stored contract is a separate step.

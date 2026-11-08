@@ -76,7 +76,8 @@ C/직렬RL/저항 부하이며 임의 netlist가 아닙니다.
 모든 배열·합계 에너지 배열은 복사된 읽기 전용 유한 값입니다. `to_dict()`는 기본적으로
 내부 선로 상태를 생략하고 `include_states=True`는 포함합니다. scope는
 `finite-passive-two-signal-mixed-source-reactive-startup`입니다. [입력 저장](mixed_startup_document.md)은 별도 스키마로 종류·단위를 보존합니다.
-포트 파동 연결은 아직 별도 후속 작업입니다.
+[직접 포트 파동 진단](startup_waves.md)은4개 단자 V/I 열을 사용합니다.
+저장 파동 wrapper는 별도 버전 연결 전까지 혼합 입력을 거부합니다.
 
 ## 독립 검증과 한계
 

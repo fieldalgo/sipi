@@ -2,7 +2,8 @@
 
 `startup_port_waves(response, z_ref=...)`는 기존 시작 응답 단자 V/I 표본을 입사/반사
 실수 전력파로 변환합니다. `LosslessLineResponse`와 결합·혼합·용량성·RL 부하를 포함한
-`RLGCLadderResponse` 및 별도 `NortonReactiveRLGCLadderResponse`를 받아
+`RLGCLadderResponse` 및 별도 `NortonReactiveRLGCLadderResponse`,
+`MixedSourceRLGCLadderResponse`를 받아
 복사된 읽기 전용 `StartupPortWaves`를 반환합니다.
 전파·FFT·재표본·지연 정렬·주기 연장·누락 DC 추정은 하지 않습니다.
 
@@ -119,3 +120,53 @@ ramp/pulse Norton–Thevenin 등가, 6개 혼합 경계, 영/rank-one 외부 항
 독립 읽기 전용 결과와 주입 전류 형상의 거부를 검사합니다. 기존 복원·전력 기준은 그대로
 유지합니다. 저장 startup-port-waves/1 wrapper는 여전히 Norton 입력을 거부합니다.
 [저장 version2](startup_waves_document.md)는 version1을 보존하면서 Norton을 명시적으로 추가합니다.
+
+## 혼합 소스 단자 전력파
+
+[전압원·전류원 혼합 시작 응답](mixed_startup.md)을 명시적으로 지원합니다.
+`source_values`의 각 열은 V/A 단위가 다를 수 있으므로4개 단자 전압/전류 열을 대신할 수
+없습니다. 진단은 단자 표본과 원래 클래스명 `MixedSourceRLGCLadderResponse`를 보존합니다.
+
+근단 파동 전력은 공급 전력에서 전압원 직렬 손실과 전류원 병렬 손실 **둘 다** 뺀 값입니다.
+원단의 선로 유입 파동 전력은 외부 커패시터/분기/저항 전력의 음수입니다. 유한 혼합 소스와
+Thevenin 등가 회로는 같은 기준에서 같은 단자 파형을 갖지만 공급 전력·개별 소스 손실은
+다릅니다. 동종 소스 한계는 기존 전압원/전류원 파동 결과와 같습니다.
+
+```python
+import numpy as np
+from sipi import coupled_mixed_source_ladder_response
+
+time = np.linspace(0., 12e-9, 121)
+sources = [dict(kind='voltage', voltage_v=np.minimum(time/2e-9, 1.),
+                series_resistance_ohm=0.),
+           dict(kind='current', current_a=-.008*np.minimum(time/3e-9, 1.),
+                shunt_resistance_ohm=None)]
+response = coupled_mixed_source_ladder_response(time, sources,
+    R=[[25., 2.], [2., 17.]], L=np.array([[510., 70.], [70., 430.]])*1e-9,
+    G=[[.003, -.0002], [-.0002, .0015]], C=np.array([[230., -30.], [-30., 190.]])*1e-12,
+    length=.1, cells=16, load_resistance=[91., None],
+    load_capacitance=np.array([[20., -4.], [-4., 30.]])*1e-12,
+    load_branch_resistance=[[13., 1.], [1., 9.]],
+    load_branch_inductance=np.array([[12., 2.], [2., 8.]])*1e-9)
+assert response.source_kinds == ('voltage', 'current')
+assert response.source_units == ('V', 'A')
+np.testing.assert_array_equal(response.voltage[:, 0], sources[0]['voltage_v'])
+np.testing.assert_array_equal(response.current[:, 1], sources[1]['current_a'])
+assert response.total_power_balance_relative_error <= 1e-10
+assert not response.to_dict()['states_included']
+assert np.all(response.source_series_resistor_loss == 0.)
+assert np.all(response.source_shunt_resistor_loss == 0.)
+
+from sipi import startup_port_waves
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'MixedSourceRLGCLadderResponse'
+assert waves.incident.shape == (121, 4)
+np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
+    response.source_power - response.source_series_resistor_loss
+    - response.source_shunt_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+혼합6경계·ramp/pulse 등가·동종 한계·영/rank-one 부하·영 입력·기준 변경·읽기 전용
+복사와2열 혼합 입력의 거부를 검사합니다. 복원/전력 기준과 전파는 바뀌지 않습니다.
+저장 startup-port-waves version1/2는 혼합 입력 스키마를 여전히 거부하며 저장 계약 확장은
+별도 후속 작업입니다.

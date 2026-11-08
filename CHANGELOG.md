@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept mixed voltage/current startup terminals in port-wave diagnostics, preserving both source-loss partitions and rejecting typed drive arrays as terminal currents.
+
 - Save typed mixed-source startup inputs with exact V/A source keys, source-loss identity guards and unchanged physical time-row budgets.
 
 - Add explicitly typed mixed voltage/current startup sources, separate source series/shunt losses, and independent analytic, KCL and continuous-line refinement checks.

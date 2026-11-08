@@ -84,7 +84,8 @@ All arrays and derived energy arrays are detached read-only finite values.
 `to_dict()` omits internal line states by default; `include_states=True` includes
 them. Scope is `finite-passive-two-signal-mixed-source-reactive-startup`.
 [Saved inputs](mixed_startup_document.md) retain typed sources in a separate schema.
-The port-wave adapter remains a separate pending connection.
+[Direct port-wave diagnostics](startup_waves.md) use the four terminal V/I columns.
+The saved wave wrappers still reject mixed inputs pending a separate version.
 
 ## Independent checks and limitations
 
