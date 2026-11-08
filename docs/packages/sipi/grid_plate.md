@@ -89,3 +89,6 @@ and measured accuracy are outside this contract. A static cell C cannot be
 substituted for a validated grid-return transmission-line model.
 
 [Saved bounded grid/plate inputs](grid_plate_document.md) preserve SI geometry, explicit cell counts and one static field evaluation.
+
+
+[Finite-width thin trace with three dielectric regions](strip_grid.md) has separate mesh, transverse, top and backside refinement checks.
