@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved wave version11 for three/four-signal PSD Debye inputs, retaining versions1–10, null-direction power meaning and actual sample budgets.
+
 - Admit explicit three/four-signal PSD Debye terminal waves with six/eight real references, retaining null-direction power meaning and original conversion formulas.
 
 - Add strict saved multiconductor PSD Debye inputs and common execution, preserving singular matrices, null-state meaning, actual time budgets and full response identity.

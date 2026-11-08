@@ -465,3 +465,6 @@ measured accuracy or a general transient field solver.
 
 
 [Explicit saved wave version10](startup_waves_document_v10.md) adds three/four-signal Debye inputs while preserving versions1–9.
+
+
+[Explicit saved wave version11](startup_waves_document_v11.md) adds three/four-signal PSD Debye inputs while preserving versions1–10.

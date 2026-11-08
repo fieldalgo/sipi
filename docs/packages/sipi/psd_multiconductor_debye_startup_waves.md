@@ -73,9 +73,9 @@ with existing BSD-3-Clause notices.
 This adapter does not infer propagation modes, TDR inversion, b/a or V/I
 ratios, delay alignment, gating, FFT or frequency-dependent references.
 [Saved circuit input](psd_multiconductor_debye_startup_document.md) is available,
-but saved wave versions1–10 still reject this new kind. Wave conversion adds
-no saved schema, numerical solver, runtime dependency, application or platform
-support. See the [general wave contract](startup_waves.md).
+and [explicit saved wave version11](startup_waves_document_v11.md) admits
+this kind. Versions1–10 still reject it. Wave conversion adds no numerical
+solver, runtime dependency, application or platform support. See the [general wave contract](startup_waves.md).
 
 Null-only drives preserve constant-line terminal waves while canonical auxiliary
 voltage may remain nonzero. Zero polarization charge/energy/relaxation loss
