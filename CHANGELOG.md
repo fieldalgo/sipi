@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Admit explicit multiconductor Debye capacitive terminal waves with six/eight real references, retaining external capacitor current and separate line power without changing conversion formulas.
+
 - Add a strict 15-key saved multiconductor Debye capacitive input and common execution, preserving external storage, SI capacitance, actual time budgets and all response shapes.
 
 - Add explicit passive external capacitive loads to three/four-signal PSD Debye startup circuits, with separate storage/current and independent charge-KCL, RC and modal refinement checks.

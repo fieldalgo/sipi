@@ -85,7 +85,8 @@ fixtures, not arbitrary-band or measured-board accuracy guarantees.
 Zero/rank-one/near-zero load matrices, pole columns, signal/pole permutations,
 linearity/time/impedance scaling, current/storage partition, copies, finite
 guards and original exceptions are tested. [Explicit saved inputs](multiconductor_debye_capacitive_startup_document.md)
-preserve this model. The separate response class still does not enter wave APIs. No field extraction, arbitrary termination,
+preserve this model. [Explicit terminal-wave conversion](multiconductor_debye_capacitive_startup_waves.md)
+now admits the separate response class with six/eight real references. No field extraction, arbitrary termination,
 fitted dispersion, FFT/TDR, platform integration or measured accuracy is added.
 Existing dependencies and notices remain; no new dependency is introduced.
 See the [two-signal capacitive contract](debye_capacitive_startup.md).

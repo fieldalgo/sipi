@@ -463,3 +463,6 @@ establish general TDR inversion, measured accuracy or app/platform support.
 
 
 [Three/four-signal PSD Debye waves](psd_multiconductor_debye_startup_waves.md) explicitly retain null-direction meaning and terminal power.
+
+
+[Multiconductor Debye capacitive waves](multiconductor_debye_capacitive_startup_waves.md) retain external capacitor flow and separate line storage.

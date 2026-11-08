@@ -78,6 +78,7 @@ PWL/정착 오차를 확인하며 horizon 차<=1e-8V입니다. 지정 fixture �
 
 0/rank-one/근영 부하·pole 열·신호/pole 순열·선형/시간/임피던스 스케일·전류/저장
 분리·복사·유한성·원래 예외를 검사합니다. [명시 입력 저장](multiconductor_debye_capacitive_startup_document.md)이
-이 모델을 보존합니다. 별도 결과형은 아직 파동 API에 연결하지 않습니다. 장 추출·임의 종단·분산 피팅·FFT/TDR·플랫폼·실측 정확도를
+이 모델을 보존합니다. [명시 단자 파동 변환](multiconductor_debye_capacitive_startup_waves.md)이
+별도 결과형을6·8개의 실수 기준 저항과 함께 수락합니다. 장 추출·임의 종단·분산 피팅·FFT/TDR·플랫폼·실측 정확도를
 추가하지 않습니다. 기존 의존성과 고지를 유지하며 새 의존성은 없습니다.
 [2신호 커패시터 계약](debye_capacitive_startup.md)을 참고하세요.

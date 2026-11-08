@@ -18,6 +18,7 @@ from .debye_reactive_startup import DebyeReactiveLadderResponse
 from .multiconductor_startup import MulticonductorRLGCLadderResponse
 from .multiconductor_debye_startup import MulticonductorDebyeRLGCLadderResponse
 from .psd_multiconductor_debye_startup import PSDMulticonductorDebyeRLGCLadderResponse
+from .multiconductor_debye_capacitive_startup import MulticonductorDebyeCapacitiveLadderResponse
 
 __all__ = ['StartupPortWaves', 'startup_port_waves']
 
@@ -81,7 +82,8 @@ def startup_port_waves(response, *, z_ref):
     or explicit DebyeRLGCLadderResponse/CoupledDebyeRLGCLadderResponse,
     or PSDCoupledDebyeRLGCLadderResponse/DebyeCapacitiveLadderResponse/DebyeReactiveLadderResponse.
     MulticonductorRLGCLadderResponse, MulticonductorDebyeRLGCLadderResponse and
-    PSDMulticonductorDebyeRLGCLadderResponse explicitly permit six/eight ports; all
+    PSDMulticonductorDebyeRLGCLadderResponse/MulticonductorDebyeCapacitiveLadderResponse
+    explicitly permit six/eight ports; all
     original types retain their two/four-port shapes.
     Terminal currents are distinct from injected currents or typed mixed drives;
     wave power is terminal V*I, excluding external source series/shunt losses.
@@ -101,12 +103,12 @@ def startup_port_waves(response, *, z_ref):
     dependent impedance is inferred. Far-port incident/outgoing directions
     reverse the +z/-z traveling-wave convention of a lossless scalar line.
     """
-    if not isinstance(response, (LosslessLineResponse, RLGCLadderResponse, NortonReactiveRLGCLadderResponse, MixedSourceRLGCLadderResponse, DebyeRLGCLadderResponse, CoupledDebyeRLGCLadderResponse, PSDCoupledDebyeRLGCLadderResponse, DebyeCapacitiveLadderResponse, DebyeReactiveLadderResponse, MulticonductorRLGCLadderResponse, MulticonductorDebyeRLGCLadderResponse, PSDMulticonductorDebyeRLGCLadderResponse)):
+    if not isinstance(response, (LosslessLineResponse, RLGCLadderResponse, NortonReactiveRLGCLadderResponse, MixedSourceRLGCLadderResponse, DebyeRLGCLadderResponse, CoupledDebyeRLGCLadderResponse, PSDCoupledDebyeRLGCLadderResponse, DebyeCapacitiveLadderResponse, DebyeReactiveLadderResponse, MulticonductorRLGCLadderResponse, MulticonductorDebyeRLGCLadderResponse, PSDMulticonductorDebyeRLGCLadderResponse, MulticonductorDebyeCapacitiveLadderResponse)):
         raise ValueError('response must be a lossless or RLGC startup response')
     time = _times('time', response.time)
     voltage = _real('voltage', response.voltage); current = _real('current', response.current)
     names = tuple(response.port_names); ports = len(names)
-    allowed_ports = (6, 8) if isinstance(response, (MulticonductorRLGCLadderResponse, MulticonductorDebyeRLGCLadderResponse, PSDMulticonductorDebyeRLGCLadderResponse)) else (2, 4)
+    allowed_ports = (6, 8) if isinstance(response, (MulticonductorRLGCLadderResponse, MulticonductorDebyeRLGCLadderResponse, PSDMulticonductorDebyeRLGCLadderResponse, MulticonductorDebyeCapacitiveLadderResponse)) else (2, 4)
     if (ports not in allowed_ports or len(set(names)) != ports
             or any(not isinstance(name, str) or not name for name in names)
             or voltage.shape != (len(time), ports) or current.shape != voltage.shape):
