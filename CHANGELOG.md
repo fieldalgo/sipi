@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Reuse vacuum capacitance for exactly uniform scalar dielectric samples, preserving general tensor/nonuniform extraction and independently checked complex-field and convergence results.
 - Add strict saved finite-frequency impedance goals, validating all sampled material states before fields and preserving batch budgets and complete replay through shared execution.
 - Add bounded two-parameter impedance goals at explicit frequency samples, with batched fields, frozen material sweeps, complete failures and independent convergence checks.
 - Add strict saved pair material-variable goals, validating sampled initial models and preserving both geometry and per-row material inputs through shared execution.

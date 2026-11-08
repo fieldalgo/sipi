@@ -84,8 +84,11 @@ kind는 `constant`, `debye`, `wideband`, `table`입니다. parameters에는 기�
 `dispersive_line(section, frequency, materials=..., **mesh_options)`의 materials는
 기존 층 이름과 위 모델의 매핑입니다. 지정하지 않은 층은 기존 상수 eps_r·tan_delta를
 유지합니다. 알 수 없는 층·미지원 모델·잘못된 주파수·표 범위 이탈은 메시 생성 전에
-거부합니다. 메시와 진공 C0는 각각 한 번 만들고, 매 주파수에 실제 요소별 복소
-유전율을 넣어 다시 풀므로 이질 재료의 전기장 재분포와 유전체 손실을 반영합니다.
+거부합니다. 메시와 진공 C0는 각각 한 번 만듭니다. 각 주파수의 실제 모든
+요소가 정확히 같은 스칼라 계수이면 `C_complex=eps*C0`를 사용합니다.
+비균일 또는 텐서 계수는 기존 복소 정전문제를 풀어 장 재분포와 유전체 손실을
+포함합니다. 정확한 선택 조건, 독립 비교와 별도 메시/외곽 수락은
+[균일 스칼라 재사용](uniform_dielectric.md)을 참고하세요.
 
 `DielectricSweep`은 복사한 읽기 전용 frequency, 신호 names, `(F,N,N)`형
 C_complex, `(N,N)`형 C0와 외부 `L=mu0*eps0*inv(C0)`, 읽기 전용 매핑의 실제

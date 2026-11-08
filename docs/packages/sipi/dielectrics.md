@@ -90,9 +90,12 @@ not yet load this new material schema.
 mapping from existing layer names to these model objects. Unspecified layers
 retain their section's constant eps_r/tan_delta. Unknown names, unsupported
 models, frequency errors and out-of-table samples fail before meshing. The mesh
-is generated once; vacuum C0 is solved once. Each frequency gets a new complex
-electrostatic solve with the actual per-element permittivity, including both
-field redistribution and dielectric loss in heterogeneous layers.
+is generated once; vacuum C0 is solved once. At each frequency, an exactly
+uniform scalar coefficient across all actual elements uses `C_complex=eps*C0`.
+Nonuniform or tensor coefficients retain the complex electrostatic solve,
+including field redistribution and dielectric loss in heterogeneous layers.
+See [uniform scalar reuse](uniform_dielectric.md) for the exact guard,
+independent comparisons and separate mesh/domain acceptance.
 
 `DielectricSweep` records copied read-only `frequency`, signal `names`,
 `C_complex` of shape `(F,N,N)`, `C0` and external `L=mu0*eps0*inv(C0)` of shape

@@ -340,5 +340,11 @@ def _dispersive_from_mesh(meshed, f, samples, *, c0=None):
         values = {name: (value[index]*np.eye(2) if tensor and value.ndim == 1 else value[index])
                   for name, value in samples.items()}
         eps = np.array([values[name] for name in regions])
-        complex_c.append(capacitance_matrix(mesh, eps, signals, ground))
+        # A spatially constant scalar scales the stiffness and energy but not
+        # the Dirichlet potentials. Compare actual elements exactly: matching
+        # region labels or approximately equal coefficients are insufficient.
+        # Tensors retain the general solver, including isotropic tensors.
+        uniform = (eps.ndim == 1 and eps.size > 0 and np.all(np.isfinite(eps))
+                   and eps[0].real > 0 and eps[0].imag <= 0 and np.all(eps == eps[0]))
+        complex_c.append(eps[0]*c0 if uniform else capacitance_matrix(mesh, eps, signals, ground))
     return DielectricSweep(f, tuple(signals), complex_c, c0, inductance, samples)
