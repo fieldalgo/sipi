@@ -15,6 +15,7 @@ factory의 양수 매개변수 하나를 바꿉니다. 지정한 표면 법칙�
 | `impedance_real` | 단일 신호의 순방향 진행파 Zc 실수부 | ohm |
 | `attenuation` | 단일 신호의 순방향 전파상수 gamma 실수부 | Np/m |
 | `differential_forward_impedance_real` | 두 신호의 Ic=0 순방향 입력 Zdd 실수부 | ohm |
+| `common_forward_impedance_real` | 두 신호의 Id=0 순방향 입력 Zcc 실수부 | ohm |
 
 Re(Zc)는 크기나 종단 부하와 다릅니다. 감쇠량은 길이당 진폭 감소이며 부정합도
 포함하는 유한 선로 삽입손실과 다릅니다. 기존 `seek_impedance`는 실수 준정적
@@ -46,7 +47,7 @@ saved_selected_line = width_goal.document.dumps()
 ```
 
 factory는 기하 또는 재료 매개변수를 바꿀 수 있습니다. 단일 선로 물리량은 신호
-하나, 명시적 차동 물리량은 정확히 두 신호를 요구합니다. 순서가 있는 신호 이름과
+하나, 명시적 차동·공통 물리량은 정확히 두 신호를 요구합니다. 순서가 있는 신호 이름과
 양수 주파수 하나를 유지하고 `length_m=0`이어야 합니다. bounds는 양수이고 factory
 매개변수 단위를 따릅니다. 기하만으로 임의 모드나 모드 추적을 추정하지 않으며
 결합 성분을 투영해 없애지 않습니다. 기존 저장 `line-quantity-design/1`과
@@ -99,3 +100,6 @@ json.dumps(report, allow_nan=False)
 ```sh
 python -m pytest -q tests/sipi/test_line_goal.py tests/sipi/test_line_model.py tests/sipi/test_propagation.py tests/sipi/test_design_documents.py
 ```
+
+
+[공통 전류 순방향 목표](common_forward_line_goal.md)는 Id=0 입력·Re(Zcc)를 명시하며 저장 목표/공차 v1–2는 이 물리량을 수락하지 않습니다.

@@ -13,7 +13,8 @@ __all__ = ['LineQuantityEvaluation', 'LineQuantityDesign', 'LineQuantityGoalErro
            'seek_line_quantity']
 
 _UNITS = {'impedance_real': 'ohm', 'attenuation': 'Np/m',
-          'differential_forward_impedance_real': 'ohm'}
+          'differential_forward_impedance_real': 'ohm',
+          'common_forward_impedance_real': 'ohm'}
 
 
 @dataclass(frozen=True)
@@ -88,6 +89,8 @@ class LineQuantityDesign:
             input=self.document.to_dict(), refined_input=self.refined_document.to_dict(),
             scope=('bounded-single-parameter-differential-forward-line-goal'
                    if self.quantity == 'differential_forward_impedance_real'
+                   else 'bounded-single-parameter-common-forward-line-goal'
+                   if self.quantity == 'common_forward_impedance_real'
                    else 'bounded-single-parameter-scalar-line-goal'))
 
 
@@ -106,8 +109,11 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
     targets Re(Zdd) in ohms with Vd=V1-V2, Id=(I1-I2)/2 and launch Ic=I1+I2=0.
     Zdd=[1,-1] Zc [1,-1]^T uses the full forward characteristic matrix.
     Asymmetric coupling remains: common voltage need not vanish and Ic need
-    not remain zero downstream. This is not an eigenmode, abs(Zdd), finite
-    terminal impedance or insertion loss. No mode tracking is performed.
+    not remain zero downstream. The separate common_forward_impedance_real
+    target is Re(Zcc), with Vc=(V1+V2)/2, Ic=I1+I2 and launch Id=0:
+    Zcc=.25*[1,1] Zc [1,1]^T. Differential voltage need not vanish and Id
+    need not remain zero downstream. Neither target is an eigenmode, magnitude,
+    finite terminal impedance or insertion loss. No mode tracking is performed.
 
     Both endpoints must evaluate successfully. An endpoint within tolerance
     is eligible; otherwise residual signs must bracket zero. Bisection is not
@@ -126,8 +132,8 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
     if not callable(factory):
         raise TypeError('factory must be callable')
     if not isinstance(quantity, str) or quantity not in _UNITS:
-        raise ValueError('quantity must be impedance_real, attenuation or differential_forward_impedance_real')
-    paired = quantity == 'differential_forward_impedance_real'
+        raise ValueError('quantity must be impedance_real, attenuation, differential_forward_impedance_real or common_forward_impedance_real')
+    paired = quantity in ('differential_forward_impedance_real', 'common_forward_impedance_real')
     try:
         lower, upper = bounds
     except (TypeError, ValueError) as exc:
@@ -187,7 +193,8 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
                 if (characteristic.basis != 'single-ended' or tuple(characteristic.names) != names
                         or tuple(characteristic.frequency) != tuple(frequency)):
                     raise ValueError('characteristic changed signal coordinates or frequency')
-                value = float(characteristic.mixed_mode().z_characteristic[0, 0, 0].real)
+                index = 1 if quantity == 'common_forward_impedance_real' else 0
+                value = float(characteristic.mixed_mode().z_characteristic[0, index, index].real)
             else:
                 propagation = line.propagation()
                 if propagation.modes != ('single',) or tuple(propagation.frequency) != tuple(frequency):

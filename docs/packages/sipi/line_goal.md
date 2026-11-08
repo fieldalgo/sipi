@@ -15,6 +15,7 @@ dielectric R/L/G/C, including the selected surface laws, to target an explicit q
 | `impedance_real` | real part of forward traveling-wave Zc; one signal | ohm |
 | `attenuation` | real part of forward propagation constant gamma; one signal | Np/m |
 | `differential_forward_impedance_real` | real part of Zdd for a two-signal forward launch with Ic=0 | ohm |
+| `common_forward_impedance_real` | real part of Zcc for a two-signal forward launch with Id=0 | ohm |
 
 Re(Zc) is neither its magnitude nor a terminal load. Attenuation is amplitude
 decay per length, not finite-line insertion loss, which also depends on mismatch.
@@ -47,13 +48,13 @@ saved_selected_line = width_goal.document.dumps()
 ```
 
 The factory may change geometry or material parameters. Scalar quantities require
-exactly one signal; the explicit differential quantity requires exactly two.
+exactly one signal; both explicit paired quantities require exactly two.
 Ordered signal names, one positive frequency and `length_m=0` stay fixed.
 Bounds are positive in the factory parameter's units. No arbitrary modal target
 or tracking is inferred from geometry. The API does not project away coupling.
 The existing saved `line-quantity-design/1` and `line-quantity-study/1` schemas
 remain scalar-only; use this Python factory API or explicit
-[saved /2](differential_goal_document.md) for the paired quantity.
+[saved /2](differential_goal_document.md) for the differential quantity. Common-current goals currently use the Python factory API.
 
 Both endpoints must be valid. An endpoint within tolerance can be selected;
 otherwise residual signs must bracket zero. Bisection does not prove continuity,
@@ -107,3 +108,6 @@ measured manufacturing accuracy, application or Windows acceptance.
 ```sh
 python -m pytest -q tests/sipi/test_line_goal.py tests/sipi/test_line_model.py tests/sipi/test_propagation.py tests/sipi/test_design_documents.py
 ```
+
+
+[Common-current forward goals](common_forward_line_goal.md) use explicit Id=0 launch and Re(Zcc); saved goal/study versions1–2 do not admit this quantity.

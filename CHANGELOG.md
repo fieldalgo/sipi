@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit common-current forward Re(Zcc) goals for lossy asymmetric pairs, retaining coupling, actual attempt budgets, frozen refinement and prior saved-schema admission.
+
 - Save independent-width finite-volume pairs with strict21-key input, separate sidewall geometry checks, one field evaluation and exact result identity.
 
 - Add bounded unequal-width finite-volume trace pairs over a ground grid, preserving independent widths, explicit metal surfaces, Maxwell capacitance and qualified mesh/exterior checks.
