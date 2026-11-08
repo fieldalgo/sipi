@@ -302,6 +302,9 @@ def documents():
         G=np.diag([.002,.0022,.0024]),C=np.diag([210.,220.,230.])*1e-12,
         length=.1,cells=8,source_resistance=[25.]*3,load_resistance=[100.]*3))
     base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.,75.,85.],version=9))
+    from sipi import GridPlateCapacitanceDocument
+    base.append(GridPlateCapacitanceDocument(pitch=1e-3,width=.5e-3,height=.5e-3,
+        backside_depth=1e-3,eps_r=3.8,cells_xy=4,cells_above=2,cells_below=4))
     return base
 
 

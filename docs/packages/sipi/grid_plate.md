@@ -87,3 +87,5 @@ Finite trace or sheet thickness, an actual signal trace, return-current L,
 RLGC, loss, wave ports, radiation, frequency validity, general flex geometry
 and measured accuracy are outside this contract. A static cell C cannot be
 substituted for a validated grid-return transmission-line model.
+
+[Saved bounded grid/plate inputs](grid_plate_document.md) preserve SI geometry, explicit cell counts and one static field evaluation.

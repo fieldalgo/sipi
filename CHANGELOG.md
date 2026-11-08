@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save bounded grid/plate capacitance inputs with strict SI keys, pre-mesh resource checks and exact geometry/field identity on replay.
+
 - Add bounded thin-grid/broad-plate static capacitance with explicit conforming geometry, shared 3D P1 extraction and independent weak-form/refinement checks.
 
 - Add explicit saved wave version9 for three/four-signal startup with six/eight port references, preserving prior versions and physical budgets.
