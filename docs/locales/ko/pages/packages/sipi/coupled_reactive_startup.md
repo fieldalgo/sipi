@@ -90,3 +90,5 @@ Maxwell 시간 해석·일반 TDR/eye/BER·실측 정확도·브라우저/Window
 [리액티브 저장 v4](coupled_reactive_startup_document.md)
 
 [명시적 포트 파형 진단](startup_waves.md)
+
+[전류 구동 Norton 시작 응답](norton_startup.md)

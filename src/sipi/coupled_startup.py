@@ -45,16 +45,17 @@ def _passive_matrix(name, value):
     return m
 
 
-def _coupled_core_input(time, source_voltages, *, R, L, G, C, length, cells):
+def _coupled_core_input(time, source_voltages, *, R, L, G, C, length, cells,
+                        _drive_name='source_voltages'):
     time = _times('time', time)
     if not 2 <= len(time) <= 10000 or time[0] != 0:
         raise ValueError('time needs 2..10000 samples starting at zero')
     dt = np.diff(time)
     if not np.allclose(dt, dt[0], rtol=1e-10, atol=0):
         raise ValueError('time spacing must be uniform within relative 1e-10')
-    drive = _real('source_voltages', source_voltages)
+    drive = _real(_drive_name, source_voltages)
     if drive.shape != (len(time), 2) or np.any(drive[0] != 0):
-        raise ValueError('source_voltages needs shape (times,2) and a zero first row')
+        raise ValueError(f'{_drive_name} needs shape (times,2) and a zero first row')
     r, l, g, c = [_passive_matrix(name, value) for name,value in [('R',R),('L',L),('G',G),('C',C)]]
     length = _scalar('length', length); cells = _integer(cells, 1, 128)
     return time, drive, r, l, g, c, length, cells

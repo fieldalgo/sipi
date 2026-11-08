@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit current-driven coupled startup with near shunt resistances, separate Norton source power/loss and independent LC, KCL, modal and settling validation.
+
 - Save startup port-wave diagnostics with strict nested physical inputs, explicit references, unchanged source versions and delegated delay-term/time-row budgets.
 
 - Add explicit real-reference startup port waves with preserved terminal samples, direction-aware reflection checks, independent phasor comparisons and reconstruction/power guards.
