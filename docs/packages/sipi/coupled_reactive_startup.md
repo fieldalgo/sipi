@@ -103,3 +103,5 @@ simulation, general TDR/eye/BER, measured-board accuracy or browser/Windows pari
 [Explicit port-wave diagnostics](startup_waves.md)
 
 [Current-driven Norton startup](norton_startup.md)
+
+[Mixed voltage/current startup](mixed_startup.md)

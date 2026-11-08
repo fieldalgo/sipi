@@ -99,3 +99,5 @@ rtol1e-10/atol1e-12 DC 기준을 만족합니다. 가장 느린 감쇠 시간은
 
 [전압 구동 리액티브 시작 응답](coupled_reactive_startup.md) ·
 [English](../../../../../packages/sipi/norton_startup.md)
+
+[전압원·전류원 혼합 시작 응답](mixed_startup.md)

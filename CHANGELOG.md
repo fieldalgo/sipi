@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly typed mixed voltage/current startup sources, separate source series/shunt losses, and independent analytic, KCL and continuous-line refinement checks.
+
 - Add explicitly selected startup port-wave saved v2 for current-source inputs, preserving v1 rejection, nested versions and original delay-term/time-row budgets.
 
 - Accept current-driven startup terminal responses in real-reference port-wave diagnostics, preserving source-shunt power separation and the existing saved wrapper contract.

@@ -45,6 +45,44 @@ def _norton_input(time, source_currents, *, R, L, G, C, length, cells,
     return (*data, rs, rl)
 
 
+def _mixed_input(time, sources, *, R, L, G, C, length, cells, load_resistance):
+    if not isinstance(sources, (list, tuple)) or len(sources) != 2:
+        raise ValueError('sources need two explicit voltage/current objects')
+    columns = []; kinds = []; resistances = []
+    for source in sources:
+        if not isinstance(source, dict) or source.get('kind') not in ('voltage', 'current'):
+            raise ValueError('each source needs voltage or current kind')
+        kind = source['kind']
+        value_key, resistance_key = (('voltage_v', 'series_resistance_ohm') if kind == 'voltage'
+                                     else ('current_a', 'shunt_resistance_ohm'))
+        if set(source) != {'kind', value_key, resistance_key}:
+            raise ValueError('source keys must match its explicit kind and units')
+        values = _real(value_key, source[value_key])
+        if values.ndim != 1:
+            raise ValueError('each source waveform must be a one-dimensional sequence')
+        raw = source[resistance_key]
+        resistance = None if kind == 'current' and raw is None else _scalar(resistance_key, raw, zero=True)
+        columns.append(values); kinds.append(kind); resistances.append(resistance)
+    if columns[0].shape != columns[1].shape:
+        raise ValueError('source waveforms must share the time rows')
+    data = _coupled_core_input(time, np.column_stack(columns),
+        R=R, L=L, G=G, C=C, length=length, cells=cells, _drive_name='source_values')
+    raw_load = np.asarray(load_resistance, dtype=object)
+    if raw_load.shape != (2,):
+        raise ValueError('load resistances need two explicit entries')
+    rl = tuple(None if x is None else _scalar('load_resistance', x, zero=True) for x in raw_load)
+    return (*data, tuple(resistances), rl, tuple(kinds))
+
+
+def _mixed_sources_data(drive, resistances, kinds):
+    out = []
+    for j, kind in enumerate(kinds):
+        value_key, resistance_key = (('voltage_v', 'series_resistance_ohm') if kind == 'voltage'
+                                     else ('current_a', 'shunt_resistance_ohm'))
+        out.append(dict(kind=kind, **{value_key:drive[:, j].tolist(), resistance_key:resistances[j]}))
+    return out
+
+
 def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
                                      length, cells, source_resistance, load_resistance):
     """Propagate a two-signal passive finite circuit with explicit mixed ends.
@@ -70,11 +108,17 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
 def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
                                length, cells, source_resistance, load_resistance,
                                load_capacitance=None, load_branch_resistance=None,
-                               load_branch_inductance=None, norton=False):
-    validator = _norton_input if norton else _boundary_input
-    time, drive, r, l, g, c, length, n, rs, rl = validator(time, source_voltages,
-        R=R, L=L, G=G, C=C, length=length, cells=cells,
-        source_resistance=source_resistance, load_resistance=load_resistance)
+                               load_branch_inductance=None, norton=False, mixed_sources=False):
+    if mixed_sources:
+        time, drive, r, l, g, c, length, n, rs, rl, kinds = _mixed_input(time, source_voltages,
+            R=R, L=L, G=G, C=C, length=length, cells=cells, load_resistance=load_resistance)
+        current_source = tuple(kind == 'current' for kind in kinds)
+    else:
+        validator = _norton_input if norton else _boundary_input
+        time, drive, r, l, g, c, length, n, rs, rl = validator(time, source_voltages,
+            R=R, L=L, G=G, C=C, length=length, cells=cells,
+            source_resistance=source_resistance, load_resistance=load_resistance)
+        current_source = (norton, norton)
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
     nv = 2*(n+1); line_size = 4*n+2
     has_branch = load_branch_inductance is not None
@@ -95,8 +139,8 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
             if node < n: stiffness[s, nv+2*node:nv+2*node+2] = -np.eye(2)
         for j in range(2):
             if rs[j] == 0:
-                fixed.append(j); fixed_drive.append(np.zeros(2) if norton else np.eye(2)[j])
-            elif norton:
+                fixed.append(j); fixed_drive.append(np.zeros(2) if current_source[j] else np.eye(2)[j])
+            elif current_source[j]:
                 if rs[j] is not None: stiffness[j, j] -= 1/rs[j]
                 b[j, j] = 1.
             else:
@@ -150,7 +194,7 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
         near = (dv[:, 0]@c.T+v[:, 0]@g.T)*dx*.5+i[:, 0]
         far = (dv[:, -1]@c.T+v[:, -1]@g.T)*dx*.5-i[:, -1]
         for j in range(2):
-            if norton:
+            if current_source[j]:
                 current[:, j] = near[:, j] if rs[j] == 0 else drive[:, j]-(0. if rs[j] is None else v[:, 0, j]/rs[j])
             else:
                 current[:, j] = near[:, j] if rs[j] == 0 else (drive[:, j]-v[:, 0, j])/rs[j]
@@ -171,7 +215,17 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
         series = dx*np.sum(_quadratic(i, r), axis=1)
         shunt = dx*np.sum(_quadratic(v, g)*weights, axis=1)
         line_power = np.sum(voltage*current, axis=1)
-        if norton:
+        if mixed_sources:
+            source_power = np.zeros(len(time)); source_series = np.zeros(len(time)); source_shunt = np.zeros(len(time))
+            for j in range(2):
+                if current_source[j]:
+                    source_power += drive[:, j]*voltage[:, j]
+                    if rs[j] is not None and rs[j] > 0: source_shunt += voltage[:, j]**2/rs[j]
+                else:
+                    source_power += drive[:, j]*current[:, j]
+                    source_series += rs[j]*current[:, j]**2
+            source_loss = source_series+source_shunt
+        elif norton:
             source_power = np.sum(drive*voltage[:, :2], axis=1)
             source_loss = np.zeros(len(time))
             for j in range(2):
@@ -196,7 +250,9 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
     data = dict(time_s=time.tolist(), R_ohm_per_m=r.tolist(),
         L_h_per_m=l.tolist(), G_s_per_m=g.tolist(), C_f_per_m=c.tolist(), length_m=length,
         cells=n, load_resistance_ohm=list(rl))
-    if norton:
+    if mixed_sources:
+        data.update(sources=_mixed_sources_data(drive, rs, kinds))
+    elif norton:
         data.update(source_currents_a=drive.tolist(), source_shunt_resistance_ohm=list(rs))
     else:
         data.update(source_voltages_v=drive.tolist(), source_resistance_ohm=rs.tolist())
@@ -205,7 +261,15 @@ def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
     if has_branch:
         data['load_branch_resistance_ohm'] = load_branch_resistance.tolist()
         data['load_branch_inductance_h'] = load_branch_inductance.tolist()
-    if norton:
+    if mixed_sources:
+        response = dict(input_json=json.dumps(data, sort_keys=True, allow_nan=False),
+            time=time, source_values=drive, node_voltage=v, segment_current=i,
+            voltage=voltage, current=current, energy=energy, energy_rate=rate,
+            series_loss=series, shunt_loss=shunt, line_power=line_power,
+            source_power=source_power, source_series_resistor_loss=source_series,
+            source_shunt_resistor_loss=source_shunt,
+            load_resistor_loss=load_loss, power_balance_relative_error=error)
+    elif norton:
         response = dict(input_json=json.dumps(data, sort_keys=True, allow_nan=False),
             time=time, source_currents=drive, node_voltage=v, segment_current=i,
             voltage=voltage, current=current, energy=energy, energy_rate=rate,

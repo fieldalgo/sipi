@@ -109,3 +109,5 @@ board accuracy, browser/Windows parity or latest-head full validation is inferre
 
 [Voltage-driven reactive startup](coupled_reactive_startup.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/norton_startup.md)
+
+[Mixed voltage/current startup](mixed_startup.md)
