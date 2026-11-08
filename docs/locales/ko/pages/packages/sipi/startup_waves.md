@@ -367,7 +367,7 @@ np.testing.assert_allclose(waves.port_power[:, 2:].sum(axis=1),
 CL0/큰 가지 L의 독립 단일 신호 모드와 큰 가지 L의 기존 C 부하 파동, 강도0의 기존 상수 RL 부하
 파동, 비가환 행렬/ramp/pulse, 0/rank-one/full C 부하·null/거의 특이 강도·
 순열·기준 전력·복사·내부 배열 거부를 검사합니다. 저장 파동 v1–7은
-[외부 C 저장](debye_reactive_startup_document.md)을 계속 거부합니다.
+[외부 직렬 RL 저장](debye_reactive_startup_document.md)을 계속 거부합니다.
 이 연결은 분산 고유모드/TDR 추론, 실측 정확도나 웹·Windows 통합을 뜻하지 않습니다.
 
 가지 전류는 선로에서 부하로 나갑니다. 가지 단자 전력은 가지 에너지
@@ -377,3 +377,50 @@ CL0/큰 가지 L의 독립 단일 신호 모드와 큰 가지 L의 기존 C 부�
 외부 C와 L 저장을 모두 포함합니다.
 
 [명시적 저장 버전8](startup_waves_document.md)이 외부 직렬 RL Debye 입력을 추가합니다.
+
+
+## 명시적 6·8단자 파동
+
+[3·4신호 회로](multiconductor_startup.md)의
+`MulticonductorRLGCLadderResponse`를 6·8단자로 명시 수락합니다. 기존 모든
+응답 종류는 계속2·4단자만 허용합니다. 변환 산술과 전압·전류·파동 전력의
+상대1e-10 검사 기준을 유지합니다. 단자마다 유한 양의 실수 기준 저항을
+명시하며 모드 임피던스 추론이나 스칼라 자동 확장은 하지 않습니다.
+
+단자 순서는 near0..N-1 다음 far0..N-1입니다. near 전력 합은 소스 전력에서
+소스 저항 손실을 뺀 값, far 전력 합은 부하 저항 손실의 음수입니다.
+전체 단자 전력 합은 선로 에너지 변화율과 직렬·병렬 손실의 합입니다.
+소스·노드·구간 배열을 단자 전류 대신 넣지 않습니다. 단자 V/I 표본을
+변환하며 전파·FFT·재표본화를 하지 않습니다.
+
+```python
+import numpy as np
+from sipi import multiconductor_rlgc_ladder_response, startup_port_waves
+
+time = np.linspace(0., 12e-9, 121)
+response = multiconductor_rlgc_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4, .2], signals=3,
+    R=np.diag([20., 23., 26.]), L=np.diag([450., 470., 490.])*1e-9,
+    G=np.diag([.002, .0022, .0024]), C=np.diag([210., 220., 230.])*1e-12,
+    length=.1, cells=16, source_resistance=[25., 25., 25.],
+    load_resistance=[100., 100., 100.])
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65., 75., 85.])
+assert waves.incident.shape == (121, 6)
+assert waves.source_kind == 'MulticonductorRLGCLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.energy_rate+response.series_loss+response.shunt_loss, rtol=1e-10, atol=1e-12)
+np.testing.assert_allclose(waves.port_power[:, 3:].sum(axis=1),
+    -response.load_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+N3/4 × 결합/대각/무손실 × 램프/펄스, 독립 scalar 모드 파동 재구성,
+도체 순열, 영입력, 복사, 기준 저항과 무관한 단자 전력을 검사합니다.
+별도 합성6·8단자 임피던스는500MHz에서 scikit-rf2.2.0 Z-to-S와 실수
+표본을 대조하며 최대 파동 오차 기준은1e-10 sqrt(W)입니다. 이 합성 표본은
+전파된 선로가 아닙니다. 잘못된 기준/단자 모양, 6·8단자로 위조한 기존
+자료형, 내부 전류, 표현할 수 없는 산술·상쇄는 오류로 처리하며 물리
+허용 기준을 완화하지 않습니다.
+
+저장 파동v1..8은 이 새로운 시작 응답 종류를 계속 거부합니다. 직접 변환
+지원이 저장 스키마를 암묵적으로 바꾸지 않습니다. 일반 TDR 역산, 실측
+정확도나 앱·플랫폼 지원을 확인한 결과가 아닙니다.

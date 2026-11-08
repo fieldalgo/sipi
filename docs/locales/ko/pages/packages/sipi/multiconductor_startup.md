@@ -72,3 +72,5 @@ scikit-rf 2.2.0의 연속 scalar 모드 ABCD와 대조합니다. 고정 시험 �
 [개발 문서](../../../../../development.ko.md)를 따릅니다.
 
 [3·4신호 입력 저장](multiconductor_startup_document.md)은 명시 신호 수와 SI 입력·시간 행 예산을 보존합니다.
+
+[단자 파동](startup_waves.md)이 이 응답을 명시적으로6·8단자로 수락합니다. 기존 저장 파동v1..8의 입력 종류는 유지합니다.

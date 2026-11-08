@@ -155,7 +155,7 @@ def test_states_boundaries_copy_and_passivity(signals,pulse,lossless):
         value=getattr(a,name);assert not value.flags.writeable
         changed=np.array(value);b=replace(a,**{name:changed});changed[:]=9;np.testing.assert_array_equal(getattr(b,name),value)
     with pytest.raises(ValueError):a.to_dict(include_states=1)
-    with pytest.raises(ValueError):startup_port_waves(a,z_ref=[50.]*(2*signals))
+    assert startup_port_waves(a,z_ref=[50.]*(2*signals)).incident.shape==(121,2*signals)
 
 
 @pytest.mark.parametrize('signals',[3,4])

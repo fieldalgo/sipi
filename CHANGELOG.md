@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept explicit six/eight-port startup waves with independent modal and Z-to-S checks, preserving prior response port counts and numerical gates.
+
 - Save explicit three/four-signal constant RLGC inputs with strict SI keys, actual time-row budgets and full state/diagnostic identity checks.
 
 - Add an explicit three/four-signal constant RLGC startup API with independent modal/KCL convergence and finite line/source power checks.

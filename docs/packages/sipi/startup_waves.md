@@ -395,7 +395,7 @@ Checks cover independent scalar modes at CL0/large branch L and original capacit
 constant reactive-line waves at zero strength, noncommuting ramp/pulse,
 zero/rank-one/full external capacitance, null/nearly singular strengths,
 permutations, reference power, copies and internal-array rejection. Saved
-wave v1–7 still reject [external capacitive saved inputs](debye_reactive_startup_document.md).
+wave v1–7 still reject [external series RL saved inputs](debye_reactive_startup_document.md).
 This does not establish dispersive eigenmode/TDR inference, measured accuracy
 or browser/Windows integration.
 
@@ -406,3 +406,52 @@ checked. Neither branch current nor capacitor current alone is a line-port
 current. Whole-circuit energy includes both external C and L storage.
 
 [Explicit saved version8](startup_waves_document.md) adds external series RL Debye inputs.
+
+
+## Explicit six/eight-terminal waves
+
+`MulticonductorRLGCLadderResponse` from the
+[three/four-signal circuit](multiconductor_startup.md) is explicitly accepted
+with six/eight terminals. All previous response kinds still require two/four
+terminals. The converter retains its arithmetic and relative1e-10 voltage,
+current and wave-power checks. Supply one finite positive real reference per
+terminal; do not infer a modal impedance or broadcast a scalar.
+
+The port order is near0..N-1 then far0..N-1. Near power sums to source power
+minus source-resistor loss; far power sums to negative load-resistor loss.
+All terminal power sums to line energy rate plus series/shunt loss. Source,
+node and segment arrays are not terminal-current substitutes. The converter
+uses the terminal V/I samples without propagation, FFT or resampling.
+
+```python
+import numpy as np
+from sipi import multiconductor_rlgc_ladder_response, startup_port_waves
+
+time = np.linspace(0., 12e-9, 121)
+response = multiconductor_rlgc_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4, .2], signals=3,
+    R=np.diag([20., 23., 26.]), L=np.diag([450., 470., 490.])*1e-9,
+    G=np.diag([.002, .0022, .0024]), C=np.diag([210., 220., 230.])*1e-12,
+    length=.1, cells=16, source_resistance=[25., 25., 25.],
+    load_resistance=[100., 100., 100.])
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65., 75., 85.])
+assert waves.incident.shape == (121, 6)
+assert waves.source_kind == 'MulticonductorRLGCLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.energy_rate+response.series_loss+response.shunt_loss, rtol=1e-10, atol=1e-12)
+np.testing.assert_allclose(waves.port_power[:, 3:].sum(axis=1),
+    -response.load_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+Tests cover N3/4 times coupled/diagonal/lossless times ramp/pulse, independent
+scalar-mode wave reconstruction, conductor permutation, zero input, copies
+and reference-independent terminal power. Separate synthetic six/eight-port
+impedance fixtures compare real samples against scikit-rf2.2.0 Z-to-S at
+500MHz with maximum wave error1e-10 sqrt(W); these fixtures do not represent
+propagated lines. Wrong reference/terminal shapes, old response types forged
+with six/eight ports, internal currents, and unrepresentable arithmetic or
+cancellation remain errors. No physical criterion is relaxed.
+
+Saved wave versions1..8 continue to reject this new startup kind; direct
+conversion support does not silently change a saved schema. This does not
+establish general TDR inversion, measured accuracy or app/platform support.
