@@ -94,3 +94,5 @@ atol1e-12, 최대 간격은 최소 모드 지연/(5*cells)입니다. 같은 유�
 
 [단일 유한 회로](rlgc_startup.md) · [주파수 네트워크](network.md) ·
 [English](../../../../../packages/sipi/coupled_startup.md)
+
+[명시적 결합 Debye 시작 응답](coupled_debye_startup.md)은 행렬 강도와 별도 분극 전력을 보존합니다.

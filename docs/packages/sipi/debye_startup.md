@@ -90,3 +90,5 @@ Browser and Windows require separate integration.
 [한국어](../../locales/ko/pages/packages/sipi/debye_startup.md)
 
 [Saved inputs](debye_startup_document.md) provide a separate executable request.
+
+[Explicit coupled Debye startup](coupled_debye_startup.md) retains matrix strengths and separate polarization power.

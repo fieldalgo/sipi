@@ -108,3 +108,5 @@ dispersion, general TDR/eye/BER, or browser/Windows support.
 
 [Scalar finite circuit](rlgc_startup.md) · [Frequency networks](network.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/coupled_startup.md)
+
+[Explicit coupled Debye startup](coupled_debye_startup.md) retains matrix strengths and separate polarization power.

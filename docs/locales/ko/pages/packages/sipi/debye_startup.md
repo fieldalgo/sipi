@@ -88,3 +88,5 @@ API는 사용자의 시간 간격이나 관측 길이를 자동 변경하지 않
 [English](../../../../../packages/sipi/debye_startup.md)
 
 [입력 저장](debye_startup_document.md)은 별도의 실행 가능한 요청 계약입니다.
+
+[명시적 결합 Debye 시작 응답](coupled_debye_startup.md)은 행렬 강도와 별도 분극 전력을 보존합니다.
