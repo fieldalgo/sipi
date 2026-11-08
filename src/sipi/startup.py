@@ -96,28 +96,9 @@ class LosslessLineResponse:
             forward_voltage_v=self.forward_voltage.tolist(), backward_voltage_v=self.backward_voltage.tolist())
 
 
-def lossless_line_response(time, *, source_times, source_voltages, z0_ohm, delay_s,
-                           source_resistance, load_resistance, max_terms=10000):
-    """Exact finite delay sum for an initially unenergized scalar lossless line.
-
-    All times are seconds, voltages volts and resistances ohms. Z0 and one-way
-    delay are positive. The source is finite nonnegative Thevenin resistance;
-    the load is finite nonnegative resistance, or None for an explicit open.
-    Source knots are real PWL samples: zero before the first knot, hold the
-    last value afterwards. One knot permits an explicit step. Times must be
-    nonnegative and strictly increasing; a single output sample is allowed.
-
-    Sum every potentially active forward round-trip term up to the requested
-    horizon, including zero-valued terms, with no geometric-tail truncation.
-    The integer max_terms (1..10000) is checked before waveform evaluation.
-    An exactly zero round-trip coefficient needs at most one forward term,
-    but still retains the returning load wave. The budget is not a runtime
-    or memory guarantee. Unresolved shifted knots/nonfinite results raise.
-
-    Both currents point into the line. This API has explicit zero initial
-    energy, no periodic extension, and no reactive load, loss, dispersion,
-    multiconductor coupling or conversion from arbitrary frequency samples.
-    """
+def _startup_input(time, *, source_times, source_voltages, z0_ohm, delay_s,
+                   source_resistance, load_resistance, max_terms=10000):
+    """Shared unmeshed/uninterpolated validation and horizon term preflight."""
     time = _times('time', time)
     knots = _times('source_times', source_times)
     values = _real('source_voltages', source_voltages)
@@ -145,6 +126,42 @@ def lossless_line_response(time, *, source_times, source_voltages, z0_ohm, delay
                 if n == budget:
                     raise ValueError('required delay terms exceed max_terms before waveform evaluation')
                 terms += 1
+    data = dict(time=time, source_times=knots, source_voltages=values,
+        z0_ohm=z, delay_s=delay, source_resistance=rs, load_resistance=rl,
+        max_terms=budget)
+    return data, (gain, hs, invs, gl, hl, invl, reflection), terms
+
+
+def lossless_line_response(time, *, source_times, source_voltages, z0_ohm, delay_s,
+                           source_resistance, load_resistance, max_terms=10000):
+    """Exact finite delay sum for an initially unenergized scalar lossless line.
+
+    All times are seconds, voltages volts and resistances ohms. Z0 and one-way
+    delay are positive. The source is finite nonnegative Thevenin resistance;
+    the load is finite nonnegative resistance, or None for an explicit open.
+    Source knots are real PWL samples: zero before the first knot, hold the
+    last value afterwards. One knot permits an explicit step. Times must be
+    nonnegative and strictly increasing; a single output sample is allowed.
+
+    Sum every potentially active forward round-trip term up to the requested
+    horizon, including zero-valued terms, with no geometric-tail truncation.
+    The integer max_terms (1..10000) is checked before waveform evaluation.
+    An exactly zero round-trip coefficient needs at most one forward term,
+    but still retains the returning load wave. The budget is not a runtime
+    or memory guarantee. Unresolved shifted knots/nonfinite results raise.
+
+    Both currents point into the line. This API has explicit zero initial
+    energy, no periodic extension, and no reactive load, loss, dispersion,
+    multiconductor coupling or conversion from arbitrary frequency samples.
+    """
+    data, coefficients, terms = _startup_input(time, source_times=source_times,
+        source_voltages=source_voltages, z0_ohm=z0_ohm, delay_s=delay_s,
+        source_resistance=source_resistance, load_resistance=load_resistance,
+        max_terms=max_terms)
+    time, knots, values = (data[k] for k in ('time', 'source_times', 'source_voltages'))
+    z, delay, rs, rl, budget = (data[k] for k in
+        ('z0_ohm', 'delay_s', 'source_resistance', 'load_resistance', 'max_terms'))
+    gain, hs, invs, gl, hl, invl, reflection = coefficients
     drive = _drive(time, knots, values, 0.)
     outgoing = np.zeros_like(time); returning = np.zeros_like(time); incident = np.zeros_like(time)
     weight = gain

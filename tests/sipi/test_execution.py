@@ -211,6 +211,10 @@ def documents():
         mesh=dict(edge_size=1e-6,far_size=.125e-3,grade=.1),
         materials={'dielectric':DebyeDielectric(2.,[4.],[1e9])},
         material_variables={'strength':dict(region='dielectric',path=['strengths',0])}))
+    from sipi import LosslessStartupDocument
+    base.append(LosslessStartupDocument([0.,1e-9,2e-9,3e-9],
+        source_times=[0.],source_voltages=[1.],z0_ohm=50.,delay_s=1e-9,
+        source_resistance=50.,load_resistance=None,max_terms=10000))
     return base
 
 

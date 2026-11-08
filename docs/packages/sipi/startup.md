@@ -1,5 +1,7 @@
 # Lossless scalar line startup
 
+[Saved inputs](startup_document.md) connect this model to strict JSON and common execution.
+
 `lossless_line_response` evaluates an **initially unenergized, uniform,
 nondispersive, lossless scalar line**. Specify real positive characteristic
 impedance and one-way delay, a piecewise-linear Thevenin drive and resistive
