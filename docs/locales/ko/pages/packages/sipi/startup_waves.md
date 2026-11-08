@@ -323,3 +323,5 @@ CL0에서 독립 단일 신호 모드·기존 PSD 파동, 강도0에서 기존 �
 순열·기준 전력·복사·내부 배열 거부를 검사합니다. 저장 파동 v1–6은
 [외부 C 저장](debye_capacitive_startup_document.md)을 계속 거부합니다.
 이 연결은 분산 고유모드/TDR 추론, 실측 정확도나 웹·Windows 통합을 뜻하지 않습니다.
+
+[명시적 저장 버전7](startup_waves_document.md)이 외부 정전용량 Debye 입력을 추가합니다.

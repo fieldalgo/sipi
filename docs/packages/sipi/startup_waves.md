@@ -349,3 +349,5 @@ permutations, reference power, copies and internal-array rejection. Saved
 wave v1–6 still reject [external capacitive saved inputs](debye_capacitive_startup_document.md).
 This does not establish dispersive eigenmode/TDR inference, measured accuracy
 or browser/Windows integration.
+
+[Explicit saved version7](startup_waves_document.md) adds external capacitive Debye inputs.

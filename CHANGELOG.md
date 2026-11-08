@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected saved wave version7 for external capacitive Debye inputs with original nested versions and energy partitions preserved.
+
 - Accept explicit capacitive Debye terminal waves with separate internal line and external capacitor power balances.
 
 - Save explicit external-capacitive Debye inputs with distinct F/F-per-m units, complete replay guards and actual time-row budgets.

@@ -308,3 +308,50 @@ failures are checked. The old v5 unsupported-version6 fixture uses999; positive
 v6 has its own tests. This does not establish app/platform or measured accuracy.
 [PSD saved inputs](psd_debye_startup_document.md) define physical validity;
 [terminal waves](startup_waves.md) define reference and null-state meaning.
+
+## Explicit version 7: external capacitive Debye inputs
+
+`version=7` selects **sipi.startup-port-waves/7** and adds
+**sipi.debye-capacitive-startup/1** to the eleven version-6 input kinds.
+Supply four positive real references in near_0,near_1,far_0,far_1 order.
+Singular and nearly singular PSD strengths, declared pole order/zeros/repeats,
+finite terminal resistances and original PWL times remain unchanged. There
+is no eigenvalue repair, rank clipping, resampling or implicit nested upgrade.
+The root retains exactly schema, startup and z_ref_ohm; underlying cell/pole
+limits and actual time-row budgets remain distinct. Default version1 and
+all versions1..6 retain their registries and reject external capacitive Debye inputs.
+
+```python
+from sipi import DebyeCapacitiveLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+import numpy as np
+
+startup = DebyeCapacitiveLadderDocument([0., 1e-9, 2e-9],
+    [[0., 0.], [1., -.4], [1., -.4]], R=[[20., 3.], [3., 20.]],
+    L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.],
+    load_capacitance=np.array([[30., -5.], [-5., 30.]])*1e-12)
+document = StartupPortWavesDocument(startup, z_ref=[35., 45., 55., 65.], version=7)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['result']['source_kind'] == 'DebyeCapacitiveLadderResponse'
+assert out['input']['startup'] == startup.to_dict()
+assert len(out['result']['incident_sqrt_w'][0]) == 4
+```
+
+Twenty-four ramp/pulse replays cover all twelve kinds and each eligible prior
+version. Diagonal rank-one/exchange/noncommuting matrices, one/zero/repeated/
+reordered poles, near-singular and null-mode saved inputs are preserved.
+Strict units/recursion/copies/budgets/identity and original physical/wave
+failures are checked. The old v6 unsupported-version7 fixture uses999; positive
+v7 has its own tests. This does not establish app/platform or measured accuracy.
+[External capacitive saved inputs](debye_capacitive_startup_document.md) define physical validity;
+[terminal waves](startup_waves.md) define reference and null-state meaning.
+
+External `load_capacitance_f` is in F, distinct from internal F/m material
+strengths. Zero/rank-one/full matrices and pulse replays preserve capacitor
+current and signed charging/discharging power. Terminal power sums to internal
+line energy rate plus losses; total circuit energy additionally includes the
+external capacitor. No missing capacitance is inferred or defaulted.

@@ -20,10 +20,11 @@ from .mixed_startup_document import MixedSourceRLGCLadderDocument
 from .debye_startup_document import DebyeRLGCLadderDocument
 from .coupled_debye_startup_document import CoupledDebyeRLGCLadderDocument
 from .psd_debye_startup_document import PSDCoupledDebyeRLGCLadderDocument
+from .debye_capacitive_startup_document import DebyeCapacitiveLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6)}
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -38,7 +39,8 @@ _STARTUPS_V3 = {**_STARTUPS_V2, 'sipi.mixed-rlgc-startup/1': MixedSourceRLGCLadd
 _STARTUPS_V4 = {**_STARTUPS_V3, 'sipi.debye-rlgc-startup/1': DebyeRLGCLadderDocument}
 _STARTUPS_V5 = {**_STARTUPS_V4, 'sipi.coupled-debye-rlgc-startup/1': CoupledDebyeRLGCLadderDocument}
 _STARTUPS_V6 = {**_STARTUPS_V5, 'sipi.psd-coupled-debye-rlgc-startup/1': PSDCoupledDebyeRLGCLadderDocument}
-_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6}
+_STARTUPS_V7 = {**_STARTUPS_V6, 'sipi.debye-capacitive-startup/1': DebyeCapacitiveLadderDocument}
+_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7}
 
 
 def _startup(data, *, version=1):
@@ -61,10 +63,11 @@ class StartupPortWavesDocument:
     Explicit version4 additionally permits scalar Debye startup inputs.
     Explicit version5 additionally permits coupled Debye startup inputs.
     Explicit version6 additionally permits PSD coupled Debye startup inputs.
+    Explicit version7 additionally permits external capacitive Debye inputs.
     No nested version is upgraded.
     """
     def __init__(self, startup, *, z_ref, version=1):
-        version = _integer(version, 1, 6)
+        version = _integer(version, 1, 7)
         registry = _BY_VERSION[version]
         if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')

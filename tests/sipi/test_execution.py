@@ -285,6 +285,7 @@ def documents():
         delta_C=np.array([[[150.,-150.],[-150.,150.]]])*1e-12,relaxation_hz=[1e9],
         length=.1,cells=8,source_resistance=[25.,25.],load_resistance=[100.,100.],
         load_capacitance=np.array([[30.,-5.],[-5.,30.]])*1e-12))
+    base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.],version=7))
     return base
 
 

@@ -285,3 +285,48 @@ rank-one·교환대칭·비가환 행렬, 단일/강도0/중복/순서변경 극
 상수만999로 바꾸고 양의 v6 경로를 별도로 검사합니다. 앱·플랫폼이나
 실측 정확도 수락은 아닙니다. 물리 조건은 [PSD 저장](psd_debye_startup_document.md),
 기준 임피던스·null 상태 의미는 [단자 파동](startup_waves.md)을 따릅니다.
+
+## 명시적 버전 7: 외부 정전용량 Debye 입력
+
+`version=7`은 **sipi.startup-port-waves/7**을 선택하고 버전6의 11종에
+**sipi.debye-capacitive-startup/1**을 추가합니다. near_0,near_1,far_0,
+far_1 순서의 네 양의 실수 기준 임피던스를 지정합니다. 특이·거의 특이한
+PSD 강도, 극점 순서·강도0·중복, 유한 종단 저항과 원래 PWL 시간을
+그대로 보존합니다. 고유값 보정·rank 클리핑·재표본화·중첩 버전 자동 승격은
+없습니다. root는 schema,startup,z_ref_ohm 세 키만 가지며 셀·극점 제한과
+실제 시간 행 예산을 구분합니다. 기본 버전1 및 기존 버전1..6의 등록
+목록은 유지하고 외부 정전용량 Debye 입력을 거부합니다.
+
+```python
+from sipi import DebyeCapacitiveLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+import numpy as np
+
+startup = DebyeCapacitiveLadderDocument([0., 1e-9, 2e-9],
+    [[0., 0.], [1., -.4], [1., -.4]], R=[[20., 3.], [3., 20.]],
+    L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.],
+    load_capacitance=np.array([[30., -5.], [-5., 30.]])*1e-12)
+document = StartupPortWavesDocument(startup, z_ref=[35., 45., 55., 65.], version=7)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['result']['source_kind'] == 'DebyeCapacitiveLadderResponse'
+assert out['input']['startup'] == startup.to_dict()
+assert len(out['result']['incident_sqrt_w'][0]) == 4
+```
+
+12종×ramp/pulse 24개와 지원되는 이전 버전의 출력을 비교합니다. 대각
+rank-one·교환대칭·비가환 행렬, 단일/강도0/중복/순서변경 극점과 거의
+특이한 행렬·null 방향 입력을 보존합니다. 엄격한 단위·재귀·복사·예산·
+결과 동일성 및 원래 물리·파동 실패를 검사합니다. 기존 v6의 미지원7
+상수만999로 바꾸고 양의 v7 경로를 별도로 검사합니다. 앱·플랫폼이나
+실측 정확도 수락은 아닙니다. 물리 조건은 [외부 정전용량 저장](debye_capacitive_startup_document.md),
+기준 임피던스·null 상태 의미는 [단자 파동](startup_waves.md)을 따릅니다.
+
+외부 `load_capacitance_f`는 F이며 내부 재료 강도의 F/m와 구분합니다.
+0/rank-one/full 행렬과 pulse 재실행은 커패시터 전류와 충·방전 전력을
+보존합니다. 단자 전력 합은 내부 선로 에너지 변화율과 손실의 합이고,
+전체 회로 에너지는 외부 커패시터도 포함합니다. 누락된 부하 C를 추측하거나
+기본값으로 채우지 않습니다.

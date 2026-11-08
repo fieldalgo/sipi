@@ -72,3 +72,5 @@ inference or negative-eigenvalue repair occurs. External current has shape
 includes instantaneous and polarization storage; `total_energy` additionally
 includes the external capacitor. Saving and replay preserve this partition.
 PSD/strict-SPD/scalar saved inputs and wave schemas v1–6 reject this distinct kind.
+
+[Explicit saved version7](startup_waves_document.md) adds external capacitive Debye inputs.
