@@ -449,3 +449,6 @@ assert len(out['result']['incident_sqrt_w'][0]) == 8
 
 
 [명시 저장 파동 버전15](startup_waves_document_v15.md)는 v1–14를 유지하며 다신호 Debye 혼합 입력을 추가합니다. 이 추가로90스키마·37템플릿입니다.
+
+
+[명시 저장 파동 버전16](startup_waves_document_v16.md)은 v1–15를 유지하며 다신호 혼합 종단 입력을 추가합니다. 이 추가로92스키마·37템플릿입니다.

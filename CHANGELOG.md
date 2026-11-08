@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved wave version16 for multiconductor mixed boundaries, preserving ideal/open/short entries, versions1–15, actual budgets and terminal power identities.
+
 - Admit explicit multiconductor mixed-boundary terminal power waves, retaining ideal-source displacement current and open/short wave identities.
 
 - Add strict multiconductor mixed-boundary saved inputs, preserving ideal voltage/open/short entries, PSD losses, actual sample budgets and exact result identity.

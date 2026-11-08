@@ -400,6 +400,7 @@ def documents():
         G=np.array([[0.,0.,0.],[0.,.002,.002],[0.,.002,.002]]),
         C=np.array([[210.,-20.,0.],[-20.,220.,-20.],[0.,-20.,230.]])*1e-12,
         length=.1,cells=2,source_resistance=[0.,25.,0.],load_resistance=[None,0.,75.]))
+    base.append(StartupPortWavesDocument(base[-1], z_ref=[35.,45.,55.,65.,75.,85.], version=16))
     return base
 
 

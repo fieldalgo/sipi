@@ -81,6 +81,9 @@ convergence limits remain as documented by the underlying engine; this
 addition does not establish new field, measured or arbitrary-transient accuracy.
 
 [Saved inputs](multiconductor_boundary_startup_document.md) are supported.
-Saved wave versions1–15 still reject this separate kind. The registry remains
+Saved wave versions1–15 still reject this separate kind. At the native-wave addition the registry contained
 91schemas/37templates. No new dependency, FFT/TDR, mode extraction or
 browser/desktop update is added. See [startup power waves](startup_waves.md).
+
+
+[Explicit saved wave version16](startup_waves_document_v16.md) adds multiconductor mixed-boundary inputs, preserving versions1–15. At this addition the registry becomes92schemas/37templates.

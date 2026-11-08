@@ -480,3 +480,6 @@ measured accuracy or a general transient field solver.
 
 
 [Explicit saved wave version15](startup_waves_document_v15.md) adds typed multiconductor Debye inputs, preserving versions1–14. The registry becomes90 schemas/37 templates at this addition.
+
+
+[Explicit saved wave version16](startup_waves_document_v16.md) adds multiconductor mixed-boundary inputs, preserving versions1–15. At this addition the registry becomes92schemas/37templates.

@@ -29,10 +29,11 @@ from .multiconductor_debye_capacitive_startup_document import MulticonductorDeby
 from .multiconductor_debye_reactive_startup_document import MulticonductorDebyeReactiveLadderDocument
 from .multiconductor_debye_norton_startup_document import NortonMulticonductorDebyeReactiveLadderDocument
 from .multiconductor_debye_mixed_startup_document import MixedSourceMulticonductorDebyeReactiveLadderDocument
+from .multiconductor_boundary_startup_document import MixedBoundaryMulticonductorRLGCLadderDocument
 
 __all__ = ['StartupPortWavesDocument']
 
-_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)}
+_SCHEMAS = {f'sipi.startup-port-waves/{v}': v for v in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)}
 _STARTUPS = {
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -56,7 +57,8 @@ _STARTUPS_V12 = {**_STARTUPS_V11, 'sipi.multiconductor-debye-capacitive-startup/
 _STARTUPS_V13 = {**_STARTUPS_V12, 'sipi.multiconductor-debye-reactive-startup/1': MulticonductorDebyeReactiveLadderDocument}
 _STARTUPS_V14 = {**_STARTUPS_V13, 'sipi.multiconductor-debye-norton-startup/1': NortonMulticonductorDebyeReactiveLadderDocument}
 _STARTUPS_V15 = {**_STARTUPS_V14, 'sipi.multiconductor-debye-mixed-startup/1': MixedSourceMulticonductorDebyeReactiveLadderDocument}
-_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7, 8: _STARTUPS_V8, 9: _STARTUPS_V9, 10: _STARTUPS_V10, 11: _STARTUPS_V11, 12: _STARTUPS_V12, 13: _STARTUPS_V13, 14: _STARTUPS_V14, 15: _STARTUPS_V15}
+_STARTUPS_V16 = {**_STARTUPS_V15, 'sipi.multiconductor-boundary-startup/1': MixedBoundaryMulticonductorRLGCLadderDocument}
+_BY_VERSION = {1: _STARTUPS, 2: _STARTUPS_V2, 3: _STARTUPS_V3, 4: _STARTUPS_V4, 5: _STARTUPS_V5, 6: _STARTUPS_V6, 7: _STARTUPS_V7, 8: _STARTUPS_V8, 9: _STARTUPS_V9, 10: _STARTUPS_V10, 11: _STARTUPS_V11, 12: _STARTUPS_V12, 13: _STARTUPS_V13, 14: _STARTUPS_V14, 15: _STARTUPS_V15, 16: _STARTUPS_V16}
 
 
 def _startup(data, *, version=1):
@@ -95,10 +97,12 @@ class StartupPortWavesDocument:
     Norton current inputs with source shunts and external C/series RL loads.
     Explicit version15 additionally permits three/four-signal PSD Debye
     typed voltage/current inputs with external C/series RL loads.
+    Explicit version16 additionally permits three/four-signal constant RLGC
+    ideal/resistive voltage sources with open/short/resistive loads.
     No nested version is upgraded.
     """
     def __init__(self, startup, *, z_ref, version=1):
-        version = _integer(version, 1, 15)
+        version = _integer(version, 1, 16)
         registry = _BY_VERSION[version]
         if not isinstance(startup, tuple(registry.values())):
             raise ValueError('startup must be a supported startup document')
@@ -106,7 +110,7 @@ class StartupPortWavesDocument:
 
     def _assign(self, startup, z_ref, *, version):
         doc = _startup(startup, version=version)
-        if isinstance(doc, (MulticonductorRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument)):
+        if isinstance(doc, (MulticonductorRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument, MixedBoundaryMulticonductorRLGCLadderDocument)):
             ports = 2*doc.to_dict()['signals']
         else:
             ports = 2 if isinstance(doc, (LosslessStartupDocument, RLGCLadderDocument, DebyeRLGCLadderDocument)) else 4
