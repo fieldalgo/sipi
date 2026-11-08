@@ -78,3 +78,6 @@ BSD-3-Clause 도구는 시험 전용이며 실행 의존성을 추가하지 않�
 
 
 [별도 Touchstone2 물리 H/G 읽기](touchstone_hybrid.md)는 두 포트와 명시한 출력 기준 저항을 요구합니다.
+
+
+[별도 정규화 v1 Y/Z/H/G 읽기](touchstone_normalized.md)는 입력 스칼라 기준으로 물리 단위를 복원합니다.

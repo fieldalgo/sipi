@@ -90,3 +90,6 @@ are valid. The corresponding file test uses its independent closed form.
 Reference scikit-rf remains test-only with its existing BSD-3-Clause notices.
 No runtime dependency, saved schema, physical field model, application or
 platform support is added. Network algebra has no spatial convergence claim.
+
+
+[Separate normalized v1 Y/Z/H/G reader](touchstone_normalized.md) restores physical units using the scalar input reference.

@@ -86,3 +86,6 @@ or exterior truncation; existing physical solvers are unchanged.
 
 
 [Separate Touchstone2 physical H/G reader](touchstone_hybrid.md) requires two ports and explicit target references.
+
+
+[Separate normalized v1 Y/Z/H/G reader](touchstone_normalized.md) restores physical units using the scalar input reference.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Read normalized Touchstone1.0 Y/Z/H/G with explicit port count and output references, preserving mixed physical units and qualified independent reference checks.
+
 - Read explicit Touchstone2 physical H/G at caller-selected references while preserving existing S/Y/Z parsing and documenting qualified triangular reference checks.
 
 - Convert explicit physical two-port H/G samples directly to power waves, with analytic boundary relations, qualified independent RF comparisons and strict conditioning gates.

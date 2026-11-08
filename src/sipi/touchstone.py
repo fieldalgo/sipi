@@ -17,7 +17,7 @@ from .network import LineNetwork
 from .parameter_network import impedance_network, admittance_network
 from .hybrid_parameters import hybrid_network, inverse_hybrid_network
 
-__all__ = ['loads_touchstone', 'loads_touchstone_parameters', 'loads_touchstone_hybrid', 'NetworkComparison', 'compare_networks']
+__all__ = ['loads_touchstone', 'loads_touchstone_parameters', 'loads_touchstone_hybrid', 'loads_touchstone_normalized', 'NetworkComparison', 'compare_networks']
 
 _UNITS = {'hz':1.,'khz':1e3,'mhz':1e6,'ghz':1e9}
 _NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\Z')
@@ -130,7 +130,49 @@ def loads_touchstone_hybrid(text, *, z_ref, ports=None, port_names=None):
     return convert(frequency, values, z_ref=z_ref, names=names)
 
 
-def _read_touchstone(text, *, ports, port_names, allowed, require_version2=False):
+def loads_touchstone_normalized(text, *, ports, z_ref, port_names=None):
+    """Read strict version1.0 normalized Y/Z/H/G with explicit output references.
+
+    ports and target z_ref are required; H/G need exactly two ports. The
+    scalar option R (default50ohms) normalizes input values, independently of
+    the positive-real output target. Recover physical Z=R*Zn and Y=Yn/R;
+    H11=R*Hn11,H22=Hn22/R;G11=Gn11/R,G22=R*Gn22. Hybrid off-diagonals
+    remain dimensionless. Reject nonfinite recovered values before conversion.
+
+    Reuse strict RI/MA/DB, Hz/kHz/MHz/GHz and the version1 two-port21_12 order.
+    Call the existing physical converter once with its unchanged numerical gates.
+    Version2, S/defaultS, multiple reference values, mixed/noise and unsupported
+    metadata are rejected. No implicit port count, file I/O, interpolation,
+    passivity/causality or measurement provenance is inferred.
+    """
+    if isinstance(port_names, str):
+        raise ValueError('port_names must be a sequence, not a string')
+    frequency, values, references, names, parameter = _read_touchstone(
+        text, ports=ports, port_names=port_names, allowed=('y', 'z', 'h', 'g'),
+        require_version1=True)
+    if parameter in ('h', 'g') and values.shape[1:] != (2, 2):
+        raise ValueError('hybrid Touchstone data requires exactly two ports')
+    resistance = references[0]
+    physical = np.array(values, dtype=complex, copy=True)
+    with np.errstate(over='ignore', under='ignore', invalid='ignore', divide='ignore'):
+        if parameter == 'z':
+            physical *= resistance
+        elif parameter == 'y':
+            physical /= resistance
+        elif parameter == 'h':
+            physical[:, 0, 0] *= resistance
+            physical[:, 1, 1] /= resistance
+        else:
+            physical[:, 0, 0] /= resistance
+            physical[:, 1, 1] *= resistance
+    if not np.all(np.isfinite(physical)):
+        raise ValueError('normalized input exceeds finite physical scales')
+    convert = {'z': impedance_network, 'y': admittance_network,
+               'h': hybrid_network, 'g': inverse_hybrid_network}[parameter]
+    return convert(frequency, physical, z_ref=z_ref, names=names)
+
+
+def _read_touchstone(text, *, ports, port_names, allowed, require_version2=False, require_version1=False):
     if not isinstance(text,str) or any(ord(c)>126 or (ord(c)<32 and c not in '\t\r\n') for c in text):
         raise ValueError('Touchstone input must be ASCII text')
     if ports is not None and (isinstance(ports,bool) or not isinstance(ports,Integral) or ports <= 0):
@@ -142,6 +184,8 @@ def _read_touchstone(text, *, ports, port_names, allowed, require_version2=False
     version2 = bool(re.fullmatch(r'\[version\][ \t]+2\.0',lines[0],re.I))
     if require_version2 and not version2:
         raise ValueError('physical parameter reader requires Touchstone version2.0')
+    if require_version1 and version2:
+        raise ValueError('normalized parameter reader requires Touchstone version1.0')
     if version2:
         lines = lines[1:]
     elif lines[0].lstrip().startswith('['):
