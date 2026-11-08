@@ -94,3 +94,6 @@ Jacobian 탐색점과 실패를 포함해 모두 계산합니다. 같은 물리 
 [English](../../../../../packages/sipi/pair_design.md)
 
 [이름 있는 템플릿 목표 저장](pair_design_document.md)은 두 목표·순서 있는 변수·제약·고정 재료를 엄격한 JSON에 보존합니다.
+
+[주파수 샘플 목표](sampled_design.md)는 두 변수로 명시한 여러 주파수의 한 실수
+임피던스량을 맞추며 지정하지 않은 주파수를 제약하지 않습니다.

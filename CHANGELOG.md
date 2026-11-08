@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Add bounded two-parameter impedance goals at explicit frequency samples, with batched fields, frozen material sweeps, complete failures and independent convergence checks.
 - Add strict saved pair material-variable goals, validating sampled initial models and preserving both geometry and per-row material inputs through shared execution.
 - Add parameter-dependent material factories to pair impedance targets, retaining per-attempt model snapshots, frozen refinement and independently checked width/material recovery.
 - Add strict named two-parameter pair goals, constraint/material snapshots and shared execution with pre-solve budgets and complete failure context.

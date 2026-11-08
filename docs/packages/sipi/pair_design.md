@@ -108,3 +108,6 @@ validation, browser parity or Windows acceptance.
 [한국어](../../locales/ko/pages/packages/sipi/pair_design.md)
 
 [Saved named template goals](pair_design_document.md) retain both targets, ordered variables, constraints and fixed materials in strict JSON.
+
+[Sampled frequency goals](sampled_design.md) fit one real impedance quantity at
+explicit frequencies using two parameters; they do not constrain unsampled frequencies.

@@ -15,6 +15,19 @@ __all__ = ['PairImpedanceEvaluation', 'PairImpedanceDesign',
            'PairImpedanceGoalError', 'seek_pair_impedances']
 
 
+def _least_squares_two(objective, initial, budget, optimizer):
+    """Shared numerical policy; callers own caches, budgets and diagnostics."""
+    def jacobian(u):
+        columns = []
+        for i in range(2):
+            left, right = u.copy(), u.copy()
+            left[i], right[i] = max(0., u[i]-.01), min(1., u[i]+.01)
+            columns.append((objective(right)-objective(left))/(right[i]-left[i]))
+        return np.array(columns).T
+    return optimizer(objective, initial, jac=jacobian, bounds=(0., 1.),
+                     xtol=1e-4, ftol=1e-4, gtol=1e-3, max_nfev=budget-1)
+
+
 @dataclass(frozen=True)
 class PairImpedanceEvaluation:
     parameters: tuple[float, float]
@@ -215,20 +228,11 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
             cache[parameters] = evaluate(parameters)
         return cache[parameters][1].copy()
 
-    def jacobian(u):
-        columns = []
-        for i in range(2):
-            left, right = u.copy(), u.copy()
-            left[i], right[i] = max(0., u[i]-.01), min(1., u[i]+.01)
-            columns.append((objective(right)-objective(left))/(right[i]-left[i]))
-        return np.array(columns).T
-
     u = (start-lower)/span
     residual = objective(u)
     if np.any(abs(residual) > 1):
         try:
-            result = least_squares(objective, u, jac=jacobian, bounds=(0., 1.),
-                xtol=1e-4, ftol=1e-4, gtol=1e-3, max_nfev=budget-1)
+            result = _least_squares_two(objective, u, budget, least_squares)
         except PairImpedanceGoalError:
             raise
         except Exception as exc:
