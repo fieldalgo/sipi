@@ -89,3 +89,5 @@ browser/Windows integration is established.
 [한국어](../../locales/ko/pages/packages/sipi/debye_reactive_startup.md)
 
 [Saved external RL inputs](debye_reactive_startup_document.md) distinguish external ohm/H/F from per-length line inputs.
+
+[Terminal waves](startup_waves.md) now explicitly accept this response while separating internal line and external C/L power. Saved wave v1–7 keep their original input kinds.

@@ -325,3 +325,53 @@ CL0에서 독립 단일 신호 모드·기존 PSD 파동, 강도0에서 기존 �
 이 연결은 분산 고유모드/TDR 추론, 실측 정확도나 웹·Windows 통합을 뜻하지 않습니다.
 
 [명시적 저장 버전7](startup_waves_document.md)이 외부 정전용량 Debye 입력을 추가합니다.
+
+## 외부 정전용량·직렬 RL 부하의 명시 4단자 파동
+
+[외부 부하 C Debye 응답](debye_reactive_startup.md)의
+`DebyeReactiveLadderResponse`를 명시적으로 받습니다. 4단자 전압과 선로로
+들어가는 전류, 4개의 양의 실수 기준 저항을 사용하며 기존 계산·오차 기준은
+그대로입니다. 입력 전압·분극 전류·외부 커패시터·가지 전류를 단자 전류로 대체하지 않습니다.
+
+near 전력은 source_power-source_resistor_loss, far 전력은
+-load_resistor_loss-load_capacitor_power-load_branch_energy_rate-load_branch_resistor_loss입니다. 전체 단자 전력은
+line_energy_rate+series_loss+shunt_loss+relaxation_loss이며 외부 저장까지
+포함하는 total_energy_rate와 구분합니다. 커패시터 전력은 충·방전에서
+양수/음수일 수 있지만 에너지와 저항 손실은 음수가 아닙니다.
+
+```python
+from sipi import psd_coupled_debye_reactive_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = psd_coupled_debye_reactive_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4],
+    R=[[20., 3.], [3., 20.]], L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.],
+    load_capacitance=np.array([[30., -5.], [-5., 30.]])*1e-12,
+    load_branch_resistance=[[150., 20.], [20., 150.]],
+    load_branch_inductance=np.array([[200., 30.], [30., 200.]])*1e-9)
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'DebyeReactiveLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.line_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+np.testing.assert_allclose(waves.port_power[:, 2:].sum(axis=1),
+    -response.load_resistor_loss-response.load_capacitor_power
+    -response.load_branch_energy_rate-response.load_branch_resistor_loss, rtol=1e-10, atol=1e-12)
+```
+
+CL0/큰 가지 L의 독립 단일 신호 모드와 큰 가지 L의 기존 C 부하 파동, 강도0의 기존 상수 RL 부하
+파동, 비가환 행렬/ramp/pulse, 0/rank-one/full C 부하·null/거의 특이 강도·
+순열·기준 전력·복사·내부 배열 거부를 검사합니다. 저장 파동 v1–7은
+[외부 C 저장](debye_reactive_startup_document.md)을 계속 거부합니다.
+이 연결은 분산 고유모드/TDR 추론, 실측 정확도나 웹·Windows 통합을 뜻하지 않습니다.
+
+가지 전류는 선로에서 부하로 나갑니다. 가지 단자 전력은 가지 에너지
+변화율과 저항 손실의 합이며 병렬 부하 저항 손실과 분리합니다.
+0/rank-one/full 가지 저항과 pulse 에너지 방출을 검사합니다. 가지 또는
+커패시터 전류만을 선로 단자 전류로 쓰지 않습니다. 전체 회로 에너지는
+외부 C와 L 저장을 모두 포함합니다.

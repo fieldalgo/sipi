@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept explicit reactive Debye terminal waves with separate internal line, capacitor and series-RL branch power partitions.
+
 - Save explicit Debye capacitive/series-RL load inputs with strict SI units, complete branch-state replay and actual time-row budgets.
 
 - Add a separate PSD Debye startup API with external capacitive and series RL loads, independent charge-KCL/modal convergence and distinct line/branch energy balances.

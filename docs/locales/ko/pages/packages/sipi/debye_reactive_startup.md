@@ -82,3 +82,5 @@ scikit-rf 버전·고지를 재사용하며 새 의존성은 없습니다. 기�
 [English](../../../../../packages/sipi/debye_reactive_startup.md)
 
 [외부 RL 입력 저장](debye_reactive_startup_document.md)은 Ω·H·F와 선로의 단위당 길이 입력을 구분합니다.
+
+[단자 파동](startup_waves.md)이 이 응답을 명시 수락하며 내부 선로/외부 C/L 전력을 구분합니다. 저장 파동 v1–7의 입력 종류는 그대로입니다.
