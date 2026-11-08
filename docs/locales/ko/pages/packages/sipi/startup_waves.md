@@ -170,3 +170,35 @@ np.testing.assert_allclose(waves.port_power[:, :2].sum(axis=1),
 복사와2열 혼합 입력의 거부를 검사합니다. 복원/전력 기준과 전파는 바뀌지 않습니다.
 저장 startup-port-waves version1/2는 혼합 입력 스키마를 여전히 거부하며 저장 계약 확장은
 [저장 version3](startup_waves_document.md)에서 명시적으로 지원합니다.
+
+## 명시적 Debye 단자 파동
+
+`DebyeRLGCLadderResponse`도 명시적으로 수락합니다. 두 단자 전압과 선로
+안으로 들어가는 전류를 사용하며 내부 분극 전류로 단자 전류를 대신할 수
+없습니다. 기존 재구성·전력 기준을 그대로 적용합니다. 근단 파동 전력은
+소스 공급 전력에서 소스 저항 손실을 뺀 값이고, 원단은 부하 저항 손실의
+음수입니다. 합계는 순간·분극 에너지 변화율과 직렬·누설·완화 손실의
+합입니다. 기준 임피던스를 바꿔도 단자 전력은 보존합니다.
+
+```python
+from sipi import debye_rlgc_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = debye_rlgc_ladder_response(time, np.minimum(time/2e-9, 1.),
+    R=20., L=500e-9, G=.002, C_inf=200e-12,
+    delta_C=[150e-12, 50e-12], relaxation_hz=[1e9, 1e8],
+    length=.1, cells=16, source_resistance=25., load_resistance=100.)
+waves = startup_port_waves(response, z_ref=[35., 75.])
+assert waves.source_kind == 'DebyeRLGCLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.total_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+```
+
+6종 경계의 ramp/pulse, 독립 1셀 완화·인덕터 해석 파동, 강도 0의 상수
+RLGC 한계, 4극점 분할, 0 입력, 복사, 엄격한 기준값 및 내부 배열 거부를
+시험합니다. 분산 고유모드나 TDR 역해석이 아니라 단자 분해입니다.
+저장 파동 스키마 v1/v2/v3는 여전히 Debye 입력 문서를 거부합니다.
+[Debye 물리 입력](debye_startup.md)과 [저장 입력](debye_startup_document.md)의
+명시적 시간·셀·극점 계약은 유지합니다.

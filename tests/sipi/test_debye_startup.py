@@ -171,7 +171,7 @@ def test_linear_time_impedance_and_pole_permutation_invariants():
     np.testing.assert_allclose(permute.polarization_charge,a.polarization_charge[:,:,::-1],rtol=1e-10,atol=1e-22)
 
 
-def test_copies_units_json_zero_and_no_implicit_wave_admission():
+def test_copies_units_json_zero_and_explicit_wave_admission():
     t=np.linspace(0,12e-9,121);d=np.minimum(t/2e-9,1.);delta=np.array([150e-12,50e-12]);f=np.array([1e9,1e8]);a=run(t,d,delta_C=delta,relaxation_hz=f)
     t[:]=7;d[:]=7;delta[:]=7;f[:]=7
     assert a.inputs['delta_C_f_per_m']==[150e-12,50e-12] and a.time[0]==0
@@ -184,7 +184,7 @@ def test_copies_units_json_zero_and_no_implicit_wave_admission():
     np.testing.assert_allclose(a.polarization_charge,a.polarization_voltage*dx*weights[None,:,None]*np.array([150e-12,50e-12]),rtol=1e-14,atol=0)
     json.dumps(states,allow_nan=False)
     with pytest.raises(ValueError):a.to_dict(include_states=1)
-    with pytest.raises(ValueError):startup_port_waves(a,z_ref=[50.,50.])
+    assert startup_port_waves(a,z_ref=[50.,50.]).source_kind=='DebyeRLGCLadderResponse'
     z=run(drive=np.zeros(121));assert not np.any(z.total_energy) and z.power_balance_relative_error==0
     assert z.total_power_balance_relative_error==0
     with pytest.raises(ValueError):replace(a,polarization_voltage=np.full((121,17,2),np.nan))

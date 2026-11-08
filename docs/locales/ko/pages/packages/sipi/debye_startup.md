@@ -81,7 +81,8 @@ API는 사용자의 시간 간격이나 관측 길이를 자동 변경하지 않
 범위는 유한 수동 회로입니다. 일반 분산장 추출, 주파수 의존 도체 손실,
 결합 Debye 행렬, 임의 부하, TDR 해석이나 실측 기판 정확도를 뜻하지 않습니다.
 새 의존성은 없으며 SciPy 1.18.1과 시험 전용 scikit-rf 2.2.0은 기존
-라이선스·고지 검토를 따릅니다. 웹·Windows·파동 어댑터 연결은 별도입니다.
+라이선스·고지 검토를 따릅니다. 웹·Windows 연결은 별도입니다.
+[명시적 단자 파동](startup_waves.md)은 분극 전력 보존을 유지합니다.
 
 [상수 RLGC](rlgc_startup.md) · [주파수 유전체](dielectrics.md) ·
 [English](../../../../../packages/sipi/debye_startup.md)

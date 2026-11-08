@@ -188,3 +188,37 @@ loads,zero inputs,reference changes,readonly copies and rejection of two-column
 mixed drive data are checked. The reconstruction/power gates and propagation
 remain unchanged. Saved startup-port-waves version1 and2 still reject the mixed
 input schema; [saved version3](startup_waves_document.md) explicitly adds mixed inputs.
+
+## Explicit Debye terminal waves
+
+`DebyeRLGCLadderResponse` is also accepted explicitly. It contributes the two
+terminal voltages and into-line currents; polarization currents are internal
+states and cannot substitute for terminal current. The same reconstruction
+and power gates apply. Wave power at the near port equals source power minus
+source resistor loss, and far-port power is minus load resistor loss. Their
+sum equals instantaneous plus polarization energy rate and series, leakage
+and relaxation loss. A reference change preserves terminal power.
+
+```python
+from sipi import debye_rlgc_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = debye_rlgc_ladder_response(time, np.minimum(time/2e-9, 1.),
+    R=20., L=500e-9, G=.002, C_inf=200e-12,
+    delta_C=[150e-12, 50e-12], relaxation_hz=[1e9, 1e8],
+    length=.1, cells=16, source_resistance=25., load_resistance=100.)
+waves = startup_port_waves(response, z_ref=[35., 75.])
+assert waves.source_kind == 'DebyeRLGCLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.total_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+```
+
+Six boundaries with ramp/pulse, independent one-cell relaxation/inductor
+analytic waves, zero-strength constant-RLGC limits, four-pole splitting,
+zero inputs, copies, strict references and internal-array rejection are checked.
+This is terminal decomposition, not a dispersive eigenmode or TDR inversion.
+Saved wave schemas v1/v2/v3 still reject the Debye input document.
+[Debye physical inputs](debye_startup.md) and [saved inputs](debye_startup_document.md)
+retain their explicit time, cell and pole contracts.

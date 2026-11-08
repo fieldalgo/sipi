@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept explicit scalar Debye terminal waves while preserving polarization energy/loss balance and excluding internal charge currents from terminal inputs.
+
 - Save explicit scalar Debye startup inputs with preserved poles, actual time-row budgets and complete state/diagnostic identity guards.
 
 - Add explicit passive scalar Debye startup with separate polarization storage/loss, bounded poles, independent charge/continuous-line references and time/space convergence checks.
