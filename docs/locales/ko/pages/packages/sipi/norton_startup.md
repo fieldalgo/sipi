@@ -67,9 +67,8 @@ assert not response.to_dict()['states_included']
 상태/진단 배열은 복사된 읽기 전용입니다. `inputs`는 `source_currents_a`,
 `source_shunt_resistance_ohm`을 포함한 SI 입력 복사를 반환합니다. 기본 유한 JSON은
 내부 선로 상태를 생략하고 `to_dict(include_states=True)`는 포함합니다. scope는
-`finite-passive-two-signal-norton-reactive-startup`입니다. 이 API에는 아직 저장 입력
-스키마가 없고 별도 startup port-wave wrapper도 지원하지 않습니다. 해당 연결은
-별도의 명시적 후속 계약이 필요합니다.
+`finite-passive-two-signal-norton-reactive-startup`입니다. [입력 저장](norton_startup_document.md)은 별도 전류 단위 스키마를 사용합니다.
+별도 startup port-wave wrapper는 아직 이 응답을 지원하지 않습니다.
 
 ## 독립 수락과 정착 한계
 

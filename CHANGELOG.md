@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save current-driven startup inputs with explicit ampere/shunt units, strict replay, independent time-row budgets and preserved voltage-source schemas.
+
 - Add explicit current-driven coupled startup with near shunt resistances, separate Norton source power/loss and independent LC, KCL, modal and settling validation.
 
 - Save startup port-wave diagnostics with strict nested physical inputs, explicit references, unchanged source versions and delegated delay-term/time-row budgets.

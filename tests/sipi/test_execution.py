@@ -244,6 +244,13 @@ def documents():
         load_branch_resistance=[[13.,1.],[1.,9.]],load_branch_inductance=np.array([[12.,2.],[2.,8.]])*1e-9))
     from sipi import StartupPortWavesDocument
     base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.]))
+    from sipi import NortonReactiveRLGCLadderDocument
+    base.append(NortonReactiveRLGCLadderDocument([0.,1e-9,2e-9], [[0.,0.],[.02,0.],[.02,0.]],
+        R=[[20.,3.],[3.,20.]],L=np.array([[500.,100.],[100.,500.]])*1e-9,
+        G=[[.002,-.0003],[-.0003,.002]],C=np.array([[220.,-40.],[-40.,220.]])*1e-12,
+        length=.1,cells=8,source_shunt_resistance=[None,37.],load_resistance=[91.,None],
+        load_capacitance=np.array([[20.,-4.],[-4.,30.]])*1e-12,
+        load_branch_resistance=[[13.,1.],[1.,9.]],load_branch_inductance=np.array([[12.,2.],[2.,8.]])*1e-9))
     return base
 
 

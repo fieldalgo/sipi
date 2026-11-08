@@ -72,9 +72,8 @@ energy/loss and finite arithmetic. Source and terminal power may be negative.
 All state/diagnostic arrays are copied read-only. `inputs` returns copied SI data
 with `source_currents_a` and `source_shunt_resistance_ohm`. Default finite JSON
 omits interior line states, while `to_dict(include_states=True)` includes them.
-Scope is `finite-passive-two-signal-norton-reactive-startup`. This API currently
-has no saved-input schema and is not yet accepted by the separate startup
-port-wave wrapper; those adapters require explicit subsequent contracts.
+Scope is `finite-passive-two-signal-norton-reactive-startup`. [Saved inputs](norton_startup_document.md) use a separate current-unit schema.
+The separate startup port-wave wrapper does not yet accept this response.
 
 ## Independent acceptance and settling limits
 
