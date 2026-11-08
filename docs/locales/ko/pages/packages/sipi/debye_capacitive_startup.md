@@ -84,3 +84,5 @@ include_states=True일 때만 포함합니다. 독립된 이 클래스는 기존
 [외부 정전용량 입력 저장](debye_capacitive_startup_document.md)은 F와 F/m를 구분합니다.
 
 [단자 파동](startup_waves.md)은 이제 이 응답을 명시 수락하며 선로/외부 저장 전력을 구분합니다. 저장 파동 v1–6의 입력 종류는 그대로입니다.
+
+[별도 직렬 RL 부하](debye_reactive_startup.md)는 가지 전류·저장·손실을 추가합니다.

@@ -112,12 +112,17 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
 
 
 def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
-                             load_capacitance=None):
+                             load_capacitance=None, load_branch=None):
     """Shared circuit propagation; strict-SPD path preserves original arithmetic."""
     time, drive, r, l, g, c, length, n, rs, rl, delta, poles = data
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
     active = [index for index, matrix in enumerate(delta) if np.any(matrix)]
-    nv = 2*(n+1); base = nv+2*n; size = base+len(active)*nv
+    nv = 2*(n+1); base = nv+2*n; branch = base+len(active)*nv
+    size = branch+(2 if load_branch is not None else 0)
+    if load_branch is not None:
+        if load_capacitance is None:
+            raise ValueError('external branch requires explicit load capacitance')
+        rb, lb = load_branch
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         tau = 1/(2*np.pi*poles)
         storage = [.5*dx*c, dx*l] if psd_strength else [.5*dx*c, dx*l, *[.5*dx*delta[p] for p in active]]
@@ -135,6 +140,11 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         mass[nv:base, nv:base] = np.kron(np.eye(n)*dx, l)
         if load_capacitance is not None:
             mass[nv-2:nv, nv-2:nv] += load_capacitance
+        if load_branch is not None:
+            mass[branch:, branch:] = lb
+            k[branch:, branch:] = -rb
+            k[branch:, nv-2:nv] = np.eye(2)
+            k[nv-2:nv, branch:] = -np.eye(2)
         k[:nv, :nv] = -np.kron(np.diag(dx*weights), g)
         k[nv:base, nv:base] = -np.kron(np.eye(n)*dx, r)
         for j in range(n):
@@ -194,6 +204,12 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             cap_energy = .5*_quadratic(v[:, -1], load_capacitance)
             cap_power = np.einsum('ti,ij,tj->t', v[:, -1], load_capacitance, dv[:, -1])
             current = np.concatenate(((drive-v[:, 0])/rs, -v[:, -1]/rl-cap_current), axis=1)
+        if load_branch is not None:
+            bi = x[:, branch:]; dbi = rhs[:, branch:]
+            be = .5*_quadratic(bi, lb)
+            br = np.einsum('ti,ij,tj->t', bi, lb, dbi)
+            bl = _quadratic(bi, rb)
+            current[:, 2:] -= bi
         series = dx*np.sum(_quadratic(i, r), axis=1)
         shunt = dx*np.sum(weights*_quadratic(v, g), axis=1)
         power = np.sum(voltage*current, axis=1); supplied = np.sum(drive*current[:, :2], axis=1)
@@ -203,6 +219,8 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         total_rate = rate+pr; losses = series+shunt+relaxation
         combined_loss = source_loss+load_loss+losses
         source_rate = total_rate if load_capacitance is None else total_rate+cap_power
+        if load_branch is not None:
+            combined_loss += bl; source_rate += br
         residual = total_rate-power+losses; total = source_rate-supplied+combined_loss
     if (not all(np.all(np.isfinite(a)) for a in (rhs, energy, pe, total_rate, power, supplied, losses, combined_loss, residual, total))
             or any(np.any(a < 0) for a in (energy, pe, relaxation, series, shunt, source_loss, load_loss))):
@@ -210,6 +228,9 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
     if load_capacitance is not None and (not all(np.all(np.isfinite(value))
             for value in (cap_current, cap_energy, cap_power, source_rate)) or np.any(cap_energy < 0)):
         raise ValueError('external capacitive energy diagnostics exceed finite scales')
+    if load_branch is not None and (not all(np.all(np.isfinite(value))
+            for value in (bi, dbi, be, br, bl, source_rate)) or np.any(be < 0) or np.any(bl < 0)):
+        raise ValueError('external branch energy diagnostics exceed finite scales')
     scale = max(np.max(abs(total_rate)), np.max(abs(power)), np.max(abs(losses)))
     tscale = max(np.max(abs(source_rate)), np.max(abs(supplied)), np.max(abs(combined_loss)))
     error = float(np.max(abs(residual))/scale) if scale else 0.
@@ -224,6 +245,10 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
     if load_capacitance is not None:
         data['load_capacitance_f'] = load_capacitance.tolist()
         extra = (cap_current, cap_energy, cap_power)
+    if load_branch is not None:
+        data['load_branch_resistance_ohm'] = rb.tolist()
+        data['load_branch_inductance_h'] = lb.tolist()
+        extra += (bi, be, br, bl)
     return result_type(json.dumps(data, sort_keys=True, allow_nan=False),
         time, drive, v, i, voltage, current, energy, rate, series, shunt, power, supplied,
         source_loss, load_loss, w, charge, pcurrent, pe, pr, relaxation, error, terr, *extra)

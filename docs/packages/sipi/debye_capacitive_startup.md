@@ -90,3 +90,5 @@ extraction, browser/Windows integration or automatic resampling is introduced.
 [Saved external capacitive inputs](debye_capacitive_startup_document.md) distinguish F from F/m.
 
 [Terminal waves](startup_waves.md) now explicitly accept this response while separating line/external storage power. Saved wave v1–6 keep their original input kinds.
+
+[Separate series RL loads](debye_reactive_startup.md) add explicit branch current, storage and loss.
