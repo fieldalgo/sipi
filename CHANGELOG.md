@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit scalar Debye startup inputs with preserved poles, actual time-row budgets and complete state/diagnostic identity guards.
+
 - Add explicit passive scalar Debye startup with separate polarization storage/loss, bounded poles, independent charge/continuous-line references and time/space convergence checks.
 
 - Add explicitly selected startup port-wave saved v3 for typed mixed sources, preserving earlier nested registries, source units and physical budgets.

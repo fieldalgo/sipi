@@ -83,7 +83,9 @@ This is a finite passive circuit, not general dispersive field extraction,
 frequency-dependent conductor loss, coupled Debye matrices, arbitrary loads,
 TDR interpretation or measured-board accuracy. No new dependencies are added:
 SciPy 1.18.1 and test-only scikit-rf 2.2.0 use the existing license/notice review.
-Browser, Windows, saved requests and wave adapters require separate integration.
+Browser, Windows and wave adapters require separate integration.
 
 [Constant RLGC](rlgc_startup.md) · [Frequency-dependent dielectric](dielectrics.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/debye_startup.md)
+
+[Saved inputs](debye_startup_document.md) provide a separate executable request.
