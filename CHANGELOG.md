@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add bounded paired finite-thickness traces over a ground-grid volume with explicit Maxwell capacitance, independent field comparisons and separate refinement checks.
+
 - Save finite trace and ground-grid volumes with strict SI inputs, pre-mesh checks, exact surface/volume/count identity and one field evaluation.
 
 - Add bounded finite trace and ground-grid volumes with explicit PEC exclusion, partitioned dielectric fields and fixed-boundary thin-trace validation.

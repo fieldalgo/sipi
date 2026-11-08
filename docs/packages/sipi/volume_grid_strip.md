@@ -97,3 +97,6 @@ This is a rectangular perfect-conductor electrostatic model. It does not infer
 finite conductivity, roughness, return-current inductance, line RLGC, impedance,
 propagation, radiation or measured accuracy. Existing APIs/schemas and shared
 solvers remain unchanged; no new dependency, application or platform support.
+
+
+[Paired finite-volume traces](volume_grid_pair.md) provide a separate two-signal Maxwell capacitance matrix.
