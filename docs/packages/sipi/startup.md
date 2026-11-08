@@ -1,5 +1,7 @@
 # Lossless scalar line startup
 
+[Finite passive RLGC circuit](rlgc_startup.md) covers explicit constant-loss circuit cells.
+
 [Saved inputs](startup_document.md) connect this model to strict JSON and common execution.
 
 `lossless_line_response` evaluates an **initially unenergized, uniform,

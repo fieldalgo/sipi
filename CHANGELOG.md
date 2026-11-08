@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add finite passive scalar RLGC startup circuits with explicit cells, PWL zero-state drives, energy diagnostics and independent analytic, ODE and distributed-line refinement checks.
+
 - Save strict lossless-startup/1 inputs and execute them through the shared adapter, validating actual delay-term budgets without changing the saved hard cap or waveform model.
 - Add initially unenergized lossless scalar line responses with explicit PWL drives, resistive/open/short boundaries, finite reflection budgets and independent LC dynamics checks.
 - Reuse vacuum capacitance for exactly uniform scalar dielectric samples, preserving general tensor/nonuniform extraction and independently checked complex-field and convergence results.

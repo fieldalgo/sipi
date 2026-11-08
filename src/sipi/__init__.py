@@ -65,6 +65,7 @@ from .sampled_design import (SampledImpedanceEvaluation, SampledImpedanceDesign,
 from .sampled_design_document import SampledImpedanceDesignDocument
 from .startup import LosslessLineResponse, lossless_line_response
 from .startup_document import LosslessStartupDocument
+from .rlgc_startup import RLGCLadderResponse, rlgc_ladder_response
 from .pair_design import (PairImpedanceEvaluation, PairImpedanceDesign,
                           PairImpedanceGoalError, seek_pair_impedances)
 from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
@@ -90,7 +91,7 @@ from .network_document import NetworkTransformDocument, NetworkTransformResult
 from .assembly_document import NetworkAssemblyDocument, NetworkAssemblyResult
 
 __version__ = "0.1.0"
-__all__ = ['LosslessStartupDocument', 'LosslessLineResponse', 'lossless_line_response', 'SampledImpedanceDesignDocument', 'SampledImpedanceEvaluation', 'SampledImpedanceDesign', 'SampledImpedanceGoalError', 'seek_sampled_impedance',
+__all__ = ['RLGCLadderResponse', 'rlgc_ladder_response', 'LosslessStartupDocument', 'LosslessLineResponse', 'lossless_line_response', 'SampledImpedanceDesignDocument', 'SampledImpedanceEvaluation', 'SampledImpedanceDesign', 'SampledImpedanceGoalError', 'seek_sampled_impedance',
            'PairImpedanceDesignDocument', 'PairImpedanceEvaluation', 'PairImpedanceDesign', 'PairImpedanceGoalError', 'seek_pair_impedances', "GaussianConductivityProfile", "ConductivityProfileResult", "ConductivityProfileDocument",
            "CircularAperture", "ApertureDocument",
            "RoundConductor", "EllipticalAperture", "MeshedAperture", "ApertureSectionDocument",

@@ -1,5 +1,7 @@
 # 무손실 단일 선로 시작 응답
 
+[유한 수동 RLGC 회로](rlgc_startup.md)는 상수 손실을 포함한 명시적 회로 셀을 다룹니다.
+
 [입력 저장](startup_document.md)으로 엄격한 JSON 및 공통 실행에 연결할 수 있습니다.
 
 `lossless_line_response`는 **초기 에너지가 없고 균일하며 분산과 손실이 없는
