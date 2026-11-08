@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit real-reference startup port waves with preserved terminal samples, direction-aware reflection checks, independent phasor comparisons and reconstruction/power guards.
+
 - Save explicit coupled startup v4 with external C/R/L matrices, exact physical replay and preserved earlier-version contracts and time-row budgets.
 
 - Add explicit passive series RL load branches to coupled startup, preserving separate line/capacitor/inductor energy and independent analytic, modal and KCL validation.

@@ -88,3 +88,5 @@ Maxwell 시간 해석·일반 TDR/eye/BER·실측 정확도·브라우저/Window
 [English](../../../../../packages/sipi/coupled_reactive_startup.md)
 
 [리액티브 저장 v4](coupled_reactive_startup_document.md)
+
+[명시적 포트 파형 진단](startup_waves.md)

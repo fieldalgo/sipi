@@ -99,3 +99,5 @@ record = response.to_dict()
 
 [주기 응답](periodic.md) · [네트워크](network.md) ·
 [English](../../../../../packages/sipi/startup.md)
+
+[명시적 포트 파형 진단](startup_waves.md)

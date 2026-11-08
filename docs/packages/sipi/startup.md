@@ -108,3 +108,5 @@ validation.
 
 [Periodic response](periodic.md) · [Network](network.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/startup.md)
+
+[Explicit port-wave diagnostics](startup_waves.md)

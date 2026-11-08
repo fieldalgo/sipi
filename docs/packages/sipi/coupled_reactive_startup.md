@@ -99,3 +99,5 @@ simulation, general TDR/eye/BER, measured-board accuracy or browser/Windows pari
 [한국어](../../locales/ko/pages/packages/sipi/coupled_reactive_startup.md)
 
 [Saved reactive v4](coupled_reactive_startup_document.md)
+
+[Explicit port-wave diagnostics](startup_waves.md)
