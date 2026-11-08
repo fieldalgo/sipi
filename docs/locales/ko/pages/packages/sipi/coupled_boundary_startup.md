@@ -1,5 +1,7 @@
 # 두 신호 시작 응답의 혼합 경계
 
+[명시적 저장 v2](coupled_boundary_startup_document.md)로 혼합 종단을 JSON/공통 실행에 연결합니다.
+
 `coupled_boundary_ladder_response`는 이상/저항 소스와 저항/개방/단락 부하를
 각각 선택하는 유한 수동 두 신호 RLGC 회로입니다.
 [양의 저항 회로](coupled_startup.md)와 별도 API이며 기존 API 및 저장 v1의

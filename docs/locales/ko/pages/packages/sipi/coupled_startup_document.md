@@ -1,5 +1,7 @@
 # 두 신호 RLGC 시작 응답 입력 저장
 
+[명시적 혼합 경계 v2](coupled_boundary_startup_document.md)는 이상/개방/단락을 별도로 지원하며 v1은 양의 저항 전용을 유지합니다.
+
 `CoupledRLGCLadderDocument`는 [상수 두 신호 유한 회로](coupled_startup.md)의
 `sipi.coupled-rlgc-startup/1` 입력을 저장합니다. 명시적 수동 행렬과 양의 저항
 종단으로 같은 초기 에너지 0의 PWL 전파를 재현합니다. 저장하면서 분산 모델을

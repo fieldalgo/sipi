@@ -1,5 +1,7 @@
 # Mixed boundaries for two-signal startup
 
+[Explicit saved v2](coupled_boundary_startup_document.md) connects mixed ends to strict JSON and common execution.
+
 `coupled_boundary_ladder_response` solves the finite passive two-signal RLGC
 circuit with independently selected ideal/resistive sources and resistive,
 open or short loads. It is a separate API from the

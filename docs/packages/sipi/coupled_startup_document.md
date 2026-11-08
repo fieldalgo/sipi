@@ -1,5 +1,7 @@
 # Saved two-signal RLGC startup inputs
 
+[Explicit mixed-boundary v2](coupled_boundary_startup_document.md) separately supports ideal/open/short ends; v1 stays positive-only.
+
 `CoupledRLGCLadderDocument` stores `sipi.coupled-rlgc-startup/1` for the
 [constant two-signal finite circuit](coupled_startup.md). It replays the same
 zero-state PWL propagation with explicit passive matrices and positive resistive

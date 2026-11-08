@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit coupled startup saved v2 for per-conductor ideal/open/short boundaries, preserving positive-only v1, actual time-row budgets and exact mixed-circuit replay.
+
 - Add explicit mixed ideal/resistive/open/short boundaries for two-signal startup, preserving mutual endpoint capacitance with mass-matrix state elimination and independent analytic/ODE/refinement checks.
 
 - Save strict two-signal RLGC startup matrices and drives, preserving actual sample budgets, full-state replay and common finite execution output.
