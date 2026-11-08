@@ -85,3 +85,5 @@ rank-one·거의 특이한 행렬·null 전하, 스케일·순열, 엄격한 입
 [English](../../../../../packages/sipi/psd_debye_startup.md)
 
 [별도 PSD 저장 입력](psd_debye_startup_document.md)은 특이 행렬과 원래 시간 표본을 보존합니다. 파동 저장은 별도입니다.
+
+[외부 부하 정전용량 API](debye_capacitive_startup.md)는 선로 내부 분극과 외부 저장을 구분합니다.

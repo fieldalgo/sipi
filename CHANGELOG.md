@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a separate PSD Debye startup API with external capacitive loads and distinct line/full-circuit energy balances.
+
 - Add explicitly selected saved wave version6 for PSD Debye inputs while preserving prior nested registries and physical budgets.
 
 - Accept explicit PSD Debye terminal waves with rank-one mode limits and null-direction energy checks.

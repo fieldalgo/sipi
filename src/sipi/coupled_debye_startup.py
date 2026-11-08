@@ -111,7 +111,8 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
         result_type=CoupledDebyeRLGCLadderResponse, propagator=lsim)
 
 
-def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator):
+def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
+                             load_capacitance=None):
     """Shared circuit propagation; strict-SPD path preserves original arithmetic."""
     time, drive, r, l, g, c, length, n, rs, rl, delta, poles = data
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
@@ -132,6 +133,8 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator):
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
         mass[:nv, :nv] = np.kron(np.diag(dx*weights), c)
         mass[nv:base, nv:base] = np.kron(np.eye(n)*dx, l)
+        if load_capacitance is not None:
+            mass[nv-2:nv, nv-2:nv] += load_capacitance
         k[:nv, :nv] = -np.kron(np.diag(dx*weights), g)
         k[nv:base, nv:base] = -np.kron(np.eye(n)*dx, r)
         for j in range(n):
@@ -184,19 +187,31 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator):
             pr += dx*np.sum(weights*np.einsum('tni,ij,tnj->tn', wp, mat, dwp), axis=1)
             relaxation += dx/tau[pole]*np.sum(weights*_quadratic(v-wp, mat), axis=1)
         voltage = np.concatenate((v[:, 0], v[:, -1]), axis=1)
-        current = np.concatenate(((drive-v[:, 0])/rs, -v[:, -1]/rl), axis=1)
+        if load_capacitance is None:
+            current = np.concatenate(((drive-v[:, 0])/rs, -v[:, -1]/rl), axis=1)
+        else:
+            cap_current = dv[:, -1]@load_capacitance.T
+            cap_energy = .5*_quadratic(v[:, -1], load_capacitance)
+            cap_power = np.einsum('ti,ij,tj->t', v[:, -1], load_capacitance, dv[:, -1])
+            current = np.concatenate(((drive-v[:, 0])/rs, -v[:, -1]/rl-cap_current), axis=1)
         series = dx*np.sum(_quadratic(i, r), axis=1)
         shunt = dx*np.sum(weights*_quadratic(v, g), axis=1)
         power = np.sum(voltage*current, axis=1); supplied = np.sum(drive*current[:, :2], axis=1)
-        source_loss = np.sum(rs*current[:, :2]**2, axis=1); load_loss = np.sum(rl*current[:, 2:]**2, axis=1)
+        source_loss = np.sum(rs*current[:, :2]**2, axis=1)
+        load_loss = (np.sum(rl*current[:, 2:]**2, axis=1) if load_capacitance is None
+                     else np.sum(v[:, -1]**2/rl, axis=1))
         total_rate = rate+pr; losses = series+shunt+relaxation
         combined_loss = source_loss+load_loss+losses
-        residual = total_rate-power+losses; total = total_rate-supplied+combined_loss
+        source_rate = total_rate if load_capacitance is None else total_rate+cap_power
+        residual = total_rate-power+losses; total = source_rate-supplied+combined_loss
     if (not all(np.all(np.isfinite(a)) for a in (rhs, energy, pe, total_rate, power, supplied, losses, combined_loss, residual, total))
             or any(np.any(a < 0) for a in (energy, pe, relaxation, series, shunt, source_loss, load_loss))):
         raise ValueError('passive Debye energy diagnostics exceed finite scales')
+    if load_capacitance is not None and (not all(np.all(np.isfinite(value))
+            for value in (cap_current, cap_energy, cap_power, source_rate)) or np.any(cap_energy < 0)):
+        raise ValueError('external capacitive energy diagnostics exceed finite scales')
     scale = max(np.max(abs(total_rate)), np.max(abs(power)), np.max(abs(losses)))
-    tscale = max(np.max(abs(total_rate)), np.max(abs(supplied)), np.max(abs(combined_loss)))
+    tscale = max(np.max(abs(source_rate)), np.max(abs(supplied)), np.max(abs(combined_loss)))
     error = float(np.max(abs(residual))/scale) if scale else 0.
     terr = float(np.max(abs(total))/tscale) if tscale else 0.
     if not all(np.isfinite(e) and e <= 1e-10 for e in (error, terr)):
@@ -205,6 +220,10 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator):
         L_h_per_m=l.tolist(), G_s_per_m=g.tolist(), C_inf_f_per_m=c.tolist(),
         delta_C_f_per_m=delta.tolist(), relaxation_hz=poles.tolist(), length_m=length,
         cells=n, source_resistance_ohm=rs.tolist(), load_resistance_ohm=rl.tolist())
+    extra = ()
+    if load_capacitance is not None:
+        data['load_capacitance_f'] = load_capacitance.tolist()
+        extra = (cap_current, cap_energy, cap_power)
     return result_type(json.dumps(data, sort_keys=True, allow_nan=False),
         time, drive, v, i, voltage, current, energy, rate, series, shunt, power, supplied,
-        source_loss, load_loss, w, charge, pcurrent, pe, pr, relaxation, error, terr)
+        source_loss, load_loss, w, charge, pcurrent, pe, pr, relaxation, error, terr, *extra)
