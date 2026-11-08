@@ -106,3 +106,6 @@ or a combined open-boundary limit. Reassess other geometries/materials and coupl
 refinement. Strict inputs, preallocation budgets, layer volumes, electrode labels,
 readonly copies, field corruption and original solver failures are also tested.
 The BSD-3-Clause reference remains test-only; no new dependency is introduced.
+
+For a finite ground thickness with a thin trace, use the separate
+[thick ground-grid cell](thick_grid_strip.md).
