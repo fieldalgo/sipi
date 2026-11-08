@@ -1,5 +1,7 @@
 # Finite passive RLGC startup circuit
 
+[Two-signal coupled circuits](coupled_startup.md) accept explicit passive 2x2 matrices and positive resistive ends.
+
 [Saved inputs](rlgc_startup_document.md) provide strict JSON and common execution.
 
 `rlgc_ladder_response` propagates an initially unenergized, uniform scalar

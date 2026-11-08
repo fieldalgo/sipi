@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add two-signal passive finite RLGC startup with full constant matrices, positive resistive ends, energy diagnostics and independent modal, asymmetric ODE and scalar-limit checks.
+
 - Save strict finite RLGC startup inputs with independent cell and sample bounds, exact API replay and shared execution that preserves numerical failures.
 
 - Add finite passive scalar RLGC startup circuits with explicit cells, PWL zero-state drives, energy diagnostics and independent analytic, ODE and distributed-line refinement checks.

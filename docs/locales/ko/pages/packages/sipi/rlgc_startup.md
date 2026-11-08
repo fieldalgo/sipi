@@ -1,5 +1,7 @@
 # 유한 수동 RLGC 시작 응답 회로
 
+[두 신호 결합 회로](coupled_startup.md)는 명시적 수동 2x2 행렬과 양의 저항 종단을 다룹니다.
+
 [입력 저장](rlgc_startup_document.md)으로 엄격한 JSON과 공통 실행에 연결합니다.
 
 `rlgc_ladder_response`는 초기 에너지가 없는 균일한 단일 RLGC **유한 회로**를
