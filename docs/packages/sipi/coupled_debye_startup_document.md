@@ -60,3 +60,5 @@ general material extraction or measured-board accuracy.
 
 [Physical API](coupled_debye_startup.md) · [Scalar saved inputs](debye_startup_document.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/coupled_debye_startup_document.md)
+
+[Explicit saved version5](startup_waves_document.md) adds coupled Debye inputs.

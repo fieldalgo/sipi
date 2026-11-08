@@ -227,3 +227,44 @@ actual time-row budgets, nested strict units, corruption guards and physical
 exceptions are checked. No implicit extension of time, geometry extraction,
 frequency-dependent mode or TDR interpretation is performed.
 [Debye saved contract](debye_startup_document.md) defines the underlying limits.
+
+## Explicit version 5: two-signal Debye inputs
+
+`version=5` selects **sipi.startup-port-waves/5** and adds
+**sipi.coupled-debye-rlgc-startup/1** to the nine version-4 input kinds.
+This kind requires four finite positive real port references, in near_0,
+near_1, far_0, far_1 order. Its symmetric matrices, one/two declared poles,
+zero strengths, original pole order, finite positive terminal resistances and
+PWL time samples remain unchanged. The physical cell/pole limits and actual
+time-row budget retain their original meanings. The root still has exactly
+schema, startup and z_ref_ohm. No source synthesis, resampling or implicit
+nested version upgrade occurs. Default version1 and versions1..4 keep their
+original registries and reject coupled Debye inputs.
+
+```python
+from sipi import CoupledDebyeRLGCLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+import numpy as np
+
+startup = CoupledDebyeRLGCLadderDocument([0., 1e-9, 2e-9],
+    [[0., 0.], [1., -.4], [1., -.4]], R=[[20., 3.], [3., 20.]],
+    L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -25.], [-25., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.])
+document = StartupPortWavesDocument(startup, z_ref=[35., 45., 55., 65.], version=5)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['result']['source_kind'] == 'CoupledDebyeRLGCLadderResponse'
+assert out['input']['startup'] == startup.to_dict()
+assert len(out['result']['incident_sqrt_w'][0]) == 4
+```
+
+Twenty ramp/pulse replays cover all ten kinds and each eligible prior version.
+Diagonal/exchange/noncommuting matrices with one/zero/repeated/reordered poles,
+strict nested units/recursion, copied input, independent time/cell budgets,
+output identity and original physical/wave failures are checked. The old v4
+unsupported-version5 fixture now uses999; positive v5 has separate coverage.
+This is an engine saved contract, not browser/Windows integration or measured
+accuracy. [Coupled Debye saved inputs](coupled_debye_startup_document.md) define
+physical limits; [terminal waves](startup_waves.md) define reference meaning.

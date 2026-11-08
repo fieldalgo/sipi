@@ -262,3 +262,5 @@ ramp/pulse, zero-strength original coupled limits, pole/conductor permutations,
 zero drive, copies and strict references are checked. This adapter does not
 infer dispersive eigenmodes or TDR impedance. Saved wave v1..4 still reject the
 [coupled Debye document](coupled_debye_startup_document.md); no implicit version upgrade.
+
+[Explicit saved version5](startup_waves_document.md) adds coupled Debye inputs.

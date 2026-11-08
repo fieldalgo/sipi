@@ -58,3 +58,5 @@ assert r.polarization_charge.shape == (3, 9, 1, 2)
 
 [물리 API](coupled_debye_startup.md) · [단일 신호 저장](debye_startup_document.md) ·
 [English](../../../../../packages/sipi/coupled_debye_startup_document.md)
+
+[명시적 저장 버전5](startup_waves_document.md)가 결합 Debye 입력을 추가합니다.

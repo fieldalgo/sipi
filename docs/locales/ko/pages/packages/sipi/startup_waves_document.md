@@ -209,3 +209,41 @@ assert out['result'] == document.analyze(max_evaluations=3).to_dict()
 결과 오염 검사와 물리 예외 전달도 확인합니다. 시간을 자동 연장하거나
 기하 추출·주파수 의존 모드·TDR 해석을 수행하지 않습니다.
 물리 제한은 [Debye 저장 계약](debye_startup_document.md)을 따릅니다.
+
+## 명시적 버전 5: 두 신호 Debye 입력
+
+`version=5`는 **sipi.startup-port-waves/5**를 선택하고 버전4의 9종에
+**sipi.coupled-debye-rlgc-startup/1**을 추가합니다. 이 종류는 near_0,
+near_1, far_0, far_1 순서로 네 개의 유한한 양의 실수 기준 임피던스가
+필요합니다. 대칭 행렬, 1–2개의 선언된 극점, 강도0, 원래 극점 순서,
+유한한 양의 종단 저항과 PWL 시간 표본을 보존합니다. 물리 셀·극점 제한과
+실제 시간 행 예산의 의미도 같습니다. root는 schema, startup, z_ref_ohm
+세 키만 가집니다. 소스 합성·재표본화·중첩 버전 자동 승격은 없습니다.
+기본 버전1과 기존 버전1..4의 등록 목록은 그대로이며 결합 Debye를 거부합니다.
+
+```python
+from sipi import CoupledDebyeRLGCLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+import numpy as np
+
+startup = CoupledDebyeRLGCLadderDocument([0., 1e-9, 2e-9],
+    [[0., 0.], [1., -.4], [1., -.4]], R=[[20., 3.], [3., 20.]],
+    L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -25.], [-25., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.])
+document = StartupPortWavesDocument(startup, z_ref=[35., 45., 55., 65.], version=5)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['result']['source_kind'] == 'CoupledDebyeRLGCLadderResponse'
+assert out['input']['startup'] == startup.to_dict()
+assert len(out['result']['incident_sqrt_w'][0]) == 4
+```
+
+10종×ramp/pulse 20개와 각각 지원되는 이전 버전의 재실행 결과를 비교합니다.
+대각·교환대칭·비가환 행렬, 단일/강도0/중복/순서변경 극점, 엄격한 중첩
+단위·재귀, 입력 복사, 시간·셀 예산 분리, 결과 동일성과 원래 물리·파동
+실패를 검사합니다. 기존 v4 시험의 미지원 버전5 상수만999로 바꾸며 양의
+v5 경로를 별도로 검증합니다. 웹·Windows 연결이나 실측 정확도 검증은
+아닙니다. 물리 제한은 [결합 Debye 저장](coupled_debye_startup_document.md),
+기준 임피던스 의미는 [단자 파동](startup_waves.md)을 따릅니다.

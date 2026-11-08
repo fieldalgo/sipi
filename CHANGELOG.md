@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected saved wave version5 for coupled Debye inputs while preserving prior nested registries and physical budgets.
+
 - Accept explicit coupled Debye four-terminal waves with scalar-mode limits and polarization energy/loss balance.
 
 - Save coupled Debye startup matrices with exact pole order, strict time budgets and complete four-terminal/state/diagnostic replay guards.

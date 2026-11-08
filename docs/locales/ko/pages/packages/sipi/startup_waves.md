@@ -242,3 +242,5 @@ np.testing.assert_allclose(waves.port_power.sum(axis=1),
 입력을 검사합니다. 분산 고유모드나 TDR 임피던스를 추정하지 않습니다.
 저장 파동 v1..4는 여전히 [결합 Debye 문서](coupled_debye_startup_document.md)를
 거부하며 버전을 자동으로 올리지 않습니다.
+
+[명시적 저장 버전5](startup_waves_document.md)가 결합 Debye 입력을 추가합니다.

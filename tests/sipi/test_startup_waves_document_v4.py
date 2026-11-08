@@ -58,7 +58,7 @@ def test_no_propagation_canonical_copies_and_unchanged_default(monkeypatch):
     assert StartupPortWavesDocument(source('scalar'),z_ref=[50.,50.]).to_dict()['schema']=='sipi.startup-port-waves/1'
 
 
-@pytest.mark.parametrize('version',[True,False,0,5,4.,'4',None])
+@pytest.mark.parametrize('version',[True,False,0,999,4.,'4',None])
 def test_explicit_integer_version_required(version):
     with pytest.raises((ValueError,TypeError)):StartupPortWavesDocument(source(),z_ref=[35.,75.],version=version)
 
