@@ -55,6 +55,7 @@ from .startup_document import LosslessStartupDocument
 from .rlgc_startup_document import RLGCLadderDocument
 from .coupled_startup_document import CoupledRLGCLadderDocument
 from .multiconductor_startup_document import MulticonductorRLGCLadderDocument
+from .multiconductor_debye_startup_document import MulticonductorDebyeRLGCLadderDocument
 from .grid_plate_document import GridPlateCapacitanceDocument
 from .strip_grid_document import StripGridCapacitanceDocument
 from .thick_grid_strip_document import ThickGridStripCapacitanceDocument
@@ -119,6 +120,7 @@ _REGISTRY = {
     'sipi.rlgc-startup/1': RLGCLadderDocument,
     'sipi.coupled-rlgc-startup/1': CoupledRLGCLadderDocument,
     'sipi.multiconductor-rlgc-startup/1': MulticonductorRLGCLadderDocument,
+    'sipi.multiconductor-debye-rlgc-startup/1': MulticonductorDebyeRLGCLadderDocument,
     'sipi.grid-plate-capacitance/1': GridPlateCapacitanceDocument,
     'sipi.strip-grid-capacitance/1': StripGridCapacitanceDocument,
     'sipi.thick-grid-strip-capacitance/1': ThickGridStripCapacitanceDocument,
@@ -399,7 +401,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line or volume-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
-    if isinstance(doc, (MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
+    if isinstance(doc, (MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument, ThickGridStripCapacitanceDocument, VolumeGridStripCapacitanceDocument, VolumeGridPairCapacitanceDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()

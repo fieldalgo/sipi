@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save and execute explicit three/four-signal Debye requests with strict fourteen-key SI inputs, pre-propagation time budgets and complete state identity guards.
+
 - Add explicit three/four-signal positive-strength Debye finite circuits, with independent charge-state/modal refinement checks and unchanged legacy two-signal response exports.
 
 - Read normalized Touchstone1.0 Y/Z/H/G with explicit port count and output references, preserving mixed physical units and qualified independent reference checks.

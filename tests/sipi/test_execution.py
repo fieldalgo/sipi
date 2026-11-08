@@ -326,6 +326,14 @@ def documents():
         eps_substrate=3.8,eps_above=1.,eps_below=1.,transverse_periods=3,
         cells_per_pitch=4,cells_substrate=2,cells_above=4,cells_below=4,
         cells_grid=1,cells_trace=1))
+    from sipi import MulticonductorDebyeRLGCLadderDocument
+    base.append(MulticonductorDebyeRLGCLadderDocument(
+        [0.,1e-9,2e-9],[[0.,0.,0.],[1.,-.4,.2],[1.,-.4,.2]],
+        signals=3,R=np.diag([20.,23.,26.]),L=np.diag([450.,470.,490.])*1e-9,
+        G=np.diag([.002,.0022,.0024]),C_inf=np.diag([210.,220.,230.])*1e-12,
+        delta_C=np.array([np.diag([130.,140.,150.]),np.zeros((3,3))])*1e-12,
+        relaxation_hz=[8e7,7e8],length=.1,cells=4,
+        source_resistance=[25.]*3,load_resistance=[100.]*3))
     return base
 
 
