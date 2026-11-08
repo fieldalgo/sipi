@@ -94,6 +94,9 @@ scikit-rf2.2.0 ABCD에서 주기 PWL alias8192/16384/32768을 합산하고 참�
 
 field 추출·일반 분산/초기 에너지·실측 정확도·자동 시간 선택·새 의존성·앱/플랫폼
 연결을 추가하지 않습니다. [엄격한 typed 소스 저장](multiconductor_debye_mixed_startup_document.md)은
-이제 가능하며 파동 수락은 별개입니다. 이 저장 추가로 registry는89스키마·37template입니다.
+이제 가능하며 명시6·8단자 파동 변환도 지원합니다. 이 저장 추가로 registry는89스키마·37template입니다.
 기존 [2신호 상수 혼합 API](mixed_startup.md)의 경계 계약은 별개이며 그 API의
 이상적 전압/단락 옵션을 여기서 추론하지 않습니다.
+
+
+[다신호 혼합 소스 단자 파동](multiconductor_debye_mixed_startup_waves.md)은 단자 전류를 보존하고 소스 직렬·병렬 손실을 모두 제외합니다.

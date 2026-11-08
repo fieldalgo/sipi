@@ -84,7 +84,7 @@ installed artifacts; the actual new fixture retains exact registry equality
 (89 schemas/37 templates at this addition).
 
 This library schema does not change the physical engine or its failed/qualified
-PWL/horizon scopes. Existing native wave conversion and saved wave versions1–14
-do not admit this response/document kind. No measured accuracy, arbitrary
+PWL/horizon scopes. Explicit [native terminal waves](multiconductor_debye_mixed_startup_waves.md)
+now admit the response; saved wave versions1–14 still reject this document kind. No measured accuracy, arbitrary
 transient guarantee, new dependency, browser/desktop engine update or platform
 integration is added. See [common execution](execution.md).

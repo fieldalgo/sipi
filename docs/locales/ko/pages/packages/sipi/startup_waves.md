@@ -441,3 +441,6 @@ N3/4 × 결합/대각/무손실 × 램프/펄스, 독립 scalar 모드 파동 �
 
 
 [다신호 전류원 단자 파동](multiconductor_debye_norton_startup_waves.md)은 단자 전류를 보존하고 near 전력에서 소스 병렬 손실을 제외합니다.
+
+
+[다신호 혼합 소스 단자 파동](multiconductor_debye_mixed_startup_waves.md)은 단자 전류를 보존하고 소스 직렬·병렬 손실을 모두 제외합니다.

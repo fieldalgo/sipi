@@ -472,3 +472,6 @@ establish general TDR inversion, measured accuracy or app/platform support.
 
 
 [Current-source multiconductor port waves](multiconductor_debye_norton_startup_waves.md) preserve terminal current and exclude source shunt loss from near power.
+
+
+[Typed-source multiconductor port waves](multiconductor_debye_mixed_startup_waves.md) preserve terminal currents and exclude both source series and shunt losses.

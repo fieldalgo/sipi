@@ -101,7 +101,7 @@ def test_original_typed_values_and_small_current_shunts_are_preserved(signals,ti
   np.sum(r.voltage[:,:signals]*r.current[:,:signals],axis=1),rtol=1e-10,atol=1e-12)
  assert r.total_power_balance_relative_error<=1e-10 and r.power_balance_relative_error<=1e-10
  assert not np.any(r.source_series_resistor_loss<0) and not np.any(r.source_shunt_resistor_loss<0)
- with pytest.raises(ValueError,match='response must be'):startup_port_waves(r,z_ref=[50.]*(2*signals))
+ assert startup_port_waves(r,z_ref=[50.]*(2*signals)).incident.shape==(121,2*signals)
 
 
 @pytest.mark.parametrize('signals',[3,4])

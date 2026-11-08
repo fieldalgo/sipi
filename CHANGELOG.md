@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Admit explicit multiconductor Debye typed-source responses to six/eight-port power waves, keeping terminal current and both source loss partitions distinct.
+
 - Add strict versioned multiconductor Debye typed-source documents, preserving original V/A inputs, source loss partitions, exact state identity and actual sample budgets.
 
 - Add typed finite-series voltage/current mixtures for multiconductor PSD Debye circuits, preserving source units, separate series/shunt losses and the existing finite-circuit qualification limits.

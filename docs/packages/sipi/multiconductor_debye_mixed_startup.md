@@ -101,7 +101,10 @@ Prior low-loss PWL/short-horizon failures remain outside the accepted scope.
 No field extraction, arbitrary dispersion/initial energy, measured accuracy,
 automatic time selection, new dependency or application/platform integration is added.
 [Strict typed-source documents](multiconductor_debye_mixed_startup_document.md) are now
-available; wave admission remains separate. This saved addition brings the registry
+available; explicit six/eight-port terminal wave conversion is also supported. This saved addition brings the registry
 to89 schemas/37 templates.
 The earlier [two-signal constant mixed API](mixed_startup.md) has a separate boundary
 contract; its ideal voltage/short options are not inferred here.
+
+
+[Typed-source multiconductor port waves](multiconductor_debye_mixed_startup_waves.md) preserve terminal currents and exclude both source series and shunt losses.
