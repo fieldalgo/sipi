@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add typed finite-series voltage/current mixtures for multiconductor PSD Debye circuits, preserving source units, separate series/shunt losses and the existing finite-circuit qualification limits.
+
 - Add explicit saved wave version14 for multiconductor Debye current-source inputs, retaining versions1–13, source-shunt/terminal power distinctions and original sample budgets.
 
 - Admit explicit multiconductor Debye Norton responses to six/eight-port power-wave conversion, preserving terminal current, source shunt loss separation and existing wave formulas.

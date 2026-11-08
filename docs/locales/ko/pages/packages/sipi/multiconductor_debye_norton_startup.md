@@ -108,3 +108,6 @@ PWL RL 한계를 포함합니다. 소스/설치 회귀에서 기존 전체 상�
 
 
 [다신호 전류원 단자 파동](multiconductor_debye_norton_startup_waves.md)은 단자 전류를 보존하고 near 전력에서 소스 병렬 손실을 제외합니다.
+
+
+[명시 전압원·전류원 혼합](multiconductor_debye_mixed_startup.md)은 각 소스 단위와 직렬/병렬 손실을 구분하며 이 회로를 재사용합니다.

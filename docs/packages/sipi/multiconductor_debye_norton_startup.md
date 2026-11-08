@@ -119,3 +119,6 @@ platform integration or new runtime dependency is added.
 
 
 [Current-source multiconductor port waves](multiconductor_debye_norton_startup_waves.md) preserve terminal current and exclude source shunt loss from near power.
+
+
+[Typed voltage/current mixtures](multiconductor_debye_mixed_startup.md) reuse this circuit with separate source units and series/shunt loss partitions.
