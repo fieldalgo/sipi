@@ -59,6 +59,7 @@ from .grid_plate_document import GridPlateCapacitanceDocument
 from .strip_grid_document import StripGridCapacitanceDocument
 from .thick_grid_strip_document import ThickGridStripCapacitanceDocument
 from .volume_grid_strip_document import VolumeGridStripCapacitanceDocument
+from .volume_grid_pair_document import VolumeGridPairCapacitanceDocument
 from .coupled_boundary_startup_document import MixedBoundaryRLGCLadderDocument
 from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 
@@ -122,6 +123,7 @@ _REGISTRY = {
     'sipi.strip-grid-capacitance/1': StripGridCapacitanceDocument,
     'sipi.thick-grid-strip-capacitance/1': ThickGridStripCapacitanceDocument,
     'sipi.volume-grid-strip-capacitance/1': VolumeGridStripCapacitanceDocument,
+    'sipi.volume-grid-pair-capacitance/1': VolumeGridPairCapacitanceDocument,
     'sipi.coupled-rlgc-startup/2': MixedBoundaryRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/3': CapacitiveRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/4': ReactiveRLGCLadderDocument,
@@ -399,7 +401,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
     if isinstance(doc, (MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
-    elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument, ThickGridStripCapacitanceDocument, VolumeGridStripCapacitanceDocument)):
+    elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument, ThickGridStripCapacitanceDocument, VolumeGridStripCapacitanceDocument, VolumeGridPairCapacitanceDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, ConductivityProfileDocument):
         profile = doc.analyze(max_evaluations=budget)

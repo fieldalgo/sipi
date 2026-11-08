@@ -39,7 +39,7 @@ print(saved_schemas())
 impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
 aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–6,
 volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1, mixed-circuit/1, periodic-mixed-circuit/1, conductivity-profile/1, pair-impedance-design/1–2, sampled-impedance-design/1, lossless-startup/1, rlgc-startup/1, coupled-rlgc-startup/1–4, startup-port-waves/1–9, norton-rlgc-startup/1, mixed-rlgc-startup/1, debye-rlgc-startup/1, coupled-debye-rlgc-startup/1, psd-coupled-debye-rlgc-startup/1, debye-capacitive-startup/1, debye-reactive-startup/1, multiconductor-rlgc-startup/1, grid-plate-capacitance/1, strip-grid-capacitance/1, thick-grid-strip-capacitance/1, volume-grid-strip-capacitance/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
+circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1, mixed-circuit/1, periodic-mixed-circuit/1, conductivity-profile/1, pair-impedance-design/1–2, sampled-impedance-design/1, lossless-startup/1, rlgc-startup/1, coupled-rlgc-startup/1–4, startup-port-waves/1–9, norton-rlgc-startup/1, mixed-rlgc-startup/1, debye-rlgc-startup/1, coupled-debye-rlgc-startup/1, psd-coupled-debye-rlgc-startup/1, debye-capacitive-startup/1, debye-reactive-startup/1, multiconductor-rlgc-startup/1, grid-plate-capacitance/1, strip-grid-capacitance/1, thick-grid-strip-capacitance/1, volume-grid-strip-capacitance/1, volume-grid-pair-capacitance/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
 숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
 
 ## 결과 계약
@@ -150,3 +150,6 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 
 
 [유한 신호선·접지 체적 저장](volume_grid_strip_document.md)은 두 두께와 한 번의 장 풀이를 보존합니다.
+
+
+[쌍 신호선·접지 체적 저장](volume_grid_pair_document.md)은 명시한 신호선 간격과 두 전압 기저를 보존합니다.

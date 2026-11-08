@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save paired finite-volume traces with strict SI gap/width inputs, explicit electrode and volume identity and one field evaluation.
+
 - Add bounded paired finite-thickness traces over a ground-grid volume with explicit Maxwell capacitance, independent field comparisons and separate refinement checks.
 
 - Save finite trace and ground-grid volumes with strict SI inputs, pre-mesh checks, exact surface/volume/count identity and one field evaluation.

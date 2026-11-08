@@ -77,7 +77,7 @@ Result `include_fields=True` adds the N×2 basis potentials. The capacitance
 property returns a detached matrix. Direct dataclass construction does not
 replace factory validation. The existing raw1e-8 gates, exact names/shapes,
 positive-definite C/energy, Maxwell signs and prescribed potentials are checked.
-This API adds no versioned saved-input adapter.
+Versioned inputs use the separate [saved-input adapter](volume_grid_pair_document.md).
 
 Four independent scikit-fem12.0.2 P1 weak forms compare the complete C, energy,
 ground-charge and potential matrices within relative1e-10. Coordinate material
