@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit mixed ideal/resistive/open/short boundaries for two-signal startup, preserving mutual endpoint capacitance with mass-matrix state elimination and independent analytic/ODE/refinement checks.
+
 - Save strict two-signal RLGC startup matrices and drives, preserving actual sample budgets, full-state replay and common finite execution output.
 
 - Add two-signal passive finite RLGC startup with full constant matrices, positive resistive ends, energy diagnostics and independent modal, asymmetric ODE and scalar-limit checks.

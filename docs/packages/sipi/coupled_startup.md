@@ -1,5 +1,7 @@
 # Two-signal finite RLGC startup circuit
 
+[Mixed boundaries](coupled_boundary_startup.md) provide a separate API for per-conductor ideal/open/short ends.
+
 [Saved inputs](coupled_startup_document.md) preserve these matrices and connect to common execution.
 
 `coupled_rlgc_ladder_response` propagates a uniform **finite two-signal circuit**

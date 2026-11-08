@@ -45,8 +45,7 @@ def _passive_matrix(name, value):
     return m
 
 
-def _coupled_input(time, source_voltages, *, R, L, G, C, length, cells,
-                   source_resistance, load_resistance):
+def _coupled_core_input(time, source_voltages, *, R, L, G, C, length, cells):
     time = _times('time', time)
     if not 2 <= len(time) <= 10000 or time[0] != 0:
         raise ValueError('time needs 2..10000 samples starting at zero')
@@ -58,10 +57,17 @@ def _coupled_input(time, source_voltages, *, R, L, G, C, length, cells,
         raise ValueError('source_voltages needs shape (times,2) and a zero first row')
     r, l, g, c = [_passive_matrix(name, value) for name,value in [('R',R),('L',L),('G',G),('C',C)]]
     length = _scalar('length', length); cells = _integer(cells, 1, 128)
+    return time, drive, r, l, g, c, length, cells
+
+
+def _coupled_input(time, source_voltages, *, R, L, G, C, length, cells,
+                   source_resistance, load_resistance):
+    data = _coupled_core_input(time, source_voltages,
+        R=R, L=L, G=G, C=C, length=length, cells=cells)
     rs = _real('source_resistance', source_resistance); rl = _real('load_resistance', load_resistance)
     if rs.shape != (2,) or rl.shape != (2,) or np.any(rs <= 0) or np.any(rl <= 0):
         raise ValueError('source/load resistance each need two finite positive values')
-    return time, drive, r, l, g, c, length, cells, rs, rl
+    return (*data, rs, rl)
 
 
 def _quadratic(values, matrix):

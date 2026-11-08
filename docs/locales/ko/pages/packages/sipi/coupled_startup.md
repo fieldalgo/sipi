@@ -1,5 +1,7 @@
 # 두 신호 유한 RLGC 시작 응답 회로
 
+[혼합 경계](coupled_boundary_startup.md)는 도체별 이상/개방/단락을 위한 별도 API입니다.
+
 [입력 저장](coupled_startup_document.md)으로 행렬을 보존하고 공통 실행에 연결합니다.
 
 `coupled_rlgc_ladder_response`는 초기 저장 에너지가 없는 균일한 **두 신호 유한
