@@ -90,3 +90,5 @@ there is no new runtime dependency. No geometry/material extraction, general
 fitting, measured accuracy, browser or Windows integration is established.
 
 [한국어](../../locales/ko/pages/packages/sipi/psd_debye_startup.md)
+
+[Separate PSD saved inputs](psd_debye_startup_document.md) preserve singular matrices and original time samples; saved waves remain separate.

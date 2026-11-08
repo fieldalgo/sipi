@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit PSD Debye startup inputs with singular-strength preservation, time-row budgets and complete state replay guards.
+
 - Add a separate two-signal Debye startup API for singular PSD strengths using canonical voltage states, with charge-KCL, modal and convergence checks.
 
 - Add explicitly selected saved wave version5 for coupled Debye inputs while preserving prior nested registries and physical budgets.

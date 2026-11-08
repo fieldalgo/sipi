@@ -271,6 +271,12 @@ def documents():
         delta_C=np.array([[[150.,-25.],[-25.,150.]]])*1e-12,relaxation_hz=[1e9],
         length=.1,cells=8,source_resistance=[25.,25.],load_resistance=[100.,100.]))
     base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.],version=5))
+    from sipi import PSDCoupledDebyeRLGCLadderDocument
+    base.append(PSDCoupledDebyeRLGCLadderDocument([0.,1e-9,2e-9],[[0.,0.],[1.,0.],[1.,0.]],
+        R=[[20.,3.],[3.,20.]],L=np.array([[500.,100.],[100.,500.]])*1e-9,
+        G=[[.002,-.0003],[-.0003,.002]],C_inf=np.array([[220.,-40.],[-40.,220.]])*1e-12,
+        delta_C=np.array([[[150.,-150.],[-150.,150.]]])*1e-12,relaxation_hz=[1e9],
+        length=.1,cells=8,source_resistance=[25.,25.],load_resistance=[100.,100.]))
     return base
 
 
