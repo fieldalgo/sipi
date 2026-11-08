@@ -98,3 +98,6 @@ scikit-rf는 기존 BSD-3-Clause 고지를 유지한 시험 전용, SciPy는 기
 집중 회로이며 Maxwell FDTD/장 추출이 아닙니다. 일반 특이 PSD강도/R/G·이상적/
 개방/단락/전류원/리액티브 종단·임의 분산/피팅·실측 기판 정확도·앱/플랫폼 지원·
 자동 파동/저장 연결은 이 계약에 포함하지 않습니다.
+
+
+[별도3·4신호 PSD Debye 회로](psd_multiconductor_debye_startup.md)는 이 API를 바꾸지 않고 특이 강도와 수동 손실을 수락합니다.

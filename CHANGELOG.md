@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a separate three/four-signal PSD Debye finite-circuit API with canonical null-direction states, independent charge-KCL and modal refinement checks, retaining original strict-strength models.
+
 - Add explicit saved wave version10 for three/four-signal Debye inputs, preserving older version admissions, canonical replay and time-row budgets.
 
 - Admit explicit three/four-signal Debye responses to real-reference port waves, retaining terminal/polarization power, original formulas and legacy response outputs.

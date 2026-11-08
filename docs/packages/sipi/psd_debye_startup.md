@@ -94,3 +94,6 @@ fitting, measured accuracy, browser or Windows integration is established.
 [Separate PSD saved inputs](psd_debye_startup_document.md) preserve singular matrices and original time samples; saved waves remain separate.
 
 [External capacitive-load API](debye_capacitive_startup.md) separates internal polarization from external storage.
+
+
+[Separate three/four-signal PSD Debye circuits](psd_multiconductor_debye_startup.md) admit singular strengths and passive losses without changing this API.

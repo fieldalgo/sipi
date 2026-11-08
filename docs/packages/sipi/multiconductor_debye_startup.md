@@ -110,3 +110,6 @@ This is a lumped circuit, not Maxwell FDTD or a field extraction. General
 singular PSD strengths/R/G, ideal/open/short/current-source/reactive ends,
 arbitrary dispersion/fitting, measured-board accuracy, application/platform
 support and automatic wave/saved integration are outside this contract.
+
+
+[Separate three/four-signal PSD Debye circuits](psd_multiconductor_debye_startup.md) admit singular strengths and passive losses without changing this API.
