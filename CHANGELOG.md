@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit passive external capacitive loads to three/four-signal PSD Debye startup circuits, with separate storage/current and independent charge-KCL, RC and modal refinement checks.
+
 - Add explicit saved wave version11 for three/four-signal PSD Debye inputs, retaining versions1–10, null-direction power meaning and actual sample budgets.
 
 - Admit explicit three/four-signal PSD Debye terminal waves with six/eight real references, retaining null-direction power meaning and original conversion formulas.

@@ -192,13 +192,18 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
             charge[:, :, pole] = dx*weights[None, :, None]*(w[:, :, pole]@delta[pole].T)
             pcurrent[:, :, pole] = dx*weights[None, :, None]*(dw[:, :, pole]@delta[pole].T)
         if signals != 2:
-            if load_capacitance is not None or load_branch is not None:
-                raise ValueError('multiconductor Debye derivatives require resistive ends')
+            if load_branch is not None:
+                raise ValueError('multiconductor Debye derivatives do not support inductive branches')
             flow = np.zeros_like(v)
             flow[:, :-1] -= i; flow[:, 1:] += i
             flow[:, 0] += (drive-v[:, 0])/rs; flow[:, -1] -= v[:, -1]/rl
             forcing = (flow-pcurrent.sum(axis=2))/(dx*weights[None, :, None])-v@g.T
             dv = np.linalg.solve(c, forcing.reshape(-1, signals).T).T.reshape(v.shape)
+            if load_capacitance is not None:
+                far_mass = dx*weights[-1]*c+load_capacitance
+                far_flow = (flow[:, -1]-pcurrent[:, -1].sum(axis=1)
+                            -dx*weights[-1]*(v[:, -1]@g.T))
+                dv[:, -1] = np.linalg.solve(far_mass, far_flow.T).T
             forcing_i = (v[:, :-1]-v[:, 1:])/dx-i@r.T
             di = np.linalg.solve(l, forcing_i.reshape(-1, signals).T).T.reshape(i.shape)
             rhs[:, :nv] = dv.reshape(len(time), nv)

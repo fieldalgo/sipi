@@ -94,3 +94,6 @@ field extraction, fitted dispersion, arbitrary boundary, FFT/TDR, platform
 integration or measured accuracy. See the [two-signal PSD contract](psd_debye_startup.md).
 SciPy/scikit-rf remain existing dependencies/test references with existing
 notices; no new dependency is introduced.
+
+
+[Separate external capacitive loads](multiconductor_debye_capacitive_startup.md) add explicit terminal storage to three/four-signal circuits.

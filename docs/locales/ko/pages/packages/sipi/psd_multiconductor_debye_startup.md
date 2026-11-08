@@ -88,3 +88,6 @@ V1e-10/I1e-12로, 별도의 비가환 전하 상태 node KCL DOP853을 V1e-8/I1e
 연결·실측 정확도를 추가하지 않습니다. [2신호 PSD 계약](psd_debye_startup.md)을
 참고하세요. SciPy/scikit-rf는 기존 의존성/시험 기준과 고지를 유지하며 새
 의존성은 추가하지 않습니다.
+
+
+[별도 외부 커패시터 부하](multiconductor_debye_capacitive_startup.md)가3·4신호 회로에 명시한 단자 저장을 추가합니다.
