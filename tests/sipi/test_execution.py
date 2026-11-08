@@ -295,6 +295,7 @@ def documents():
         load_capacitance=np.array([[30.,-5.],[-5.,30.]])*1e-12,
         load_branch_resistance=[[150.,20.],[20.,150.]],
         load_branch_inductance=np.array([[200.,30.],[30.,200.]])*1e-9))
+    base.append(StartupPortWavesDocument(base[-1],z_ref=[35.,45.,55.,65.],version=8))
     return base
 
 

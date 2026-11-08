@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected saved wave version8 for external series-RL Debye inputs while preserving prior registries and physical power partitions.
+
 - Accept explicit reactive Debye terminal waves with separate internal line, capacitor and series-RL branch power partitions.
 
 - Save explicit Debye capacitive/series-RL load inputs with strict SI units, complete branch-state replay and actual time-row budgets.

@@ -355,3 +355,58 @@ strengths. Zero/rank-one/full matrices and pulse replays preserve capacitor
 current and signed charging/discharging power. Terminal power sums to internal
 line energy rate plus losses; total circuit energy additionally includes the
 external capacitor. No missing capacitance is inferred or defaulted.
+
+## Explicit version 8: external series RL Debye inputs
+
+`version=8` selects **sipi.startup-port-waves/8** and adds
+**sipi.debye-reactive-startup/1** to the twelve version-7 input kinds.
+Supply four positive real references in near_0,near_1,far_0,far_1 order.
+Singular and nearly singular PSD strengths, declared pole order/zeros/repeats,
+finite terminal resistances and original PWL times remain unchanged. There
+is no eigenvalue repair, rank clipping, resampling or implicit nested upgrade.
+The root retains exactly schema, startup and z_ref_ohm; underlying cell/pole
+limits and actual time-row budgets remain distinct. Default version1 and
+all versions1..7 retain their registries and reject external series RL Debye inputs.
+
+```python
+from sipi import DebyeReactiveLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+import numpy as np
+
+startup = DebyeReactiveLadderDocument([0., 1e-9, 2e-9],
+    [[0., 0.], [1., -.4], [1., -.4]], R=[[20., 3.], [3., 20.]],
+    L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.],
+    load_capacitance=np.array([[30., -5.], [-5., 30.]])*1e-12,
+    load_branch_resistance=[[150., 20.], [20., 150.]],
+    load_branch_inductance=np.array([[200., 30.], [30., 200.]])*1e-9)
+document = StartupPortWavesDocument(startup, z_ref=[35., 45., 55., 65.], version=8)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['result']['source_kind'] == 'DebyeReactiveLadderResponse'
+assert out['input']['startup'] == startup.to_dict()
+assert len(out['result']['incident_sqrt_w'][0]) == 4
+```
+
+Twenty-six ramp/pulse replays cover all thirteen kinds and each eligible prior
+version. Diagonal rank-one/exchange/noncommuting matrices, one/zero/repeated/
+reordered poles, near-singular and null-mode saved inputs are preserved.
+Strict units/recursion/copies/budgets/identity and original physical/wave
+failures are checked. All prior version tests remain unchanged; positive v8 has its own tests. This does not establish app/platform or measured accuracy.
+[External series RL saved inputs](debye_reactive_startup_document.md) define physical validity;
+[terminal waves](startup_waves.md) define reference and null-state meaning.
+
+External `load_capacitance_f` is in F, distinct from internal F/m material
+strengths. Zero/rank-one/full matrices and pulse replays preserve capacitor
+current and signed charging/discharging power. Terminal power sums to internal
+line energy rate plus losses; total circuit energy additionally includes the
+external capacitor. No missing capacitance is inferred or defaulted.
+
+External branch resistance/inductance are required ohm/H matrices; internal
+line matrices retain per-length units. Preserve PSD branch resistance,
+strict SPD inductance and original zero initial branch current. Far-port
+power includes parallel resistor loss, capacitor power, branch energy rate
+and branch resistor loss. Zero/rank-one/full branch resistance and pulse
+replays preserve the direct result. No branch default or topology inference.

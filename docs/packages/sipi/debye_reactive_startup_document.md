@@ -82,3 +82,5 @@ value, inferred branch or conversion of zero L to resistance is allowed.
 Branch current(times,2), energy/rate/resistor loss(times,) and internal/external
 power partitions are preserved and checked on replay. Existing capacitive-only
 saved inputs and wave versions1–7 reject this distinct kind.
+
+[Explicit saved version8](startup_waves_document.md) adds external series RL Debye inputs.

@@ -330,3 +330,55 @@ rank-one·교환대칭·비가환 행렬, 단일/강도0/중복/순서변경 극
 보존합니다. 단자 전력 합은 내부 선로 에너지 변화율과 손실의 합이고,
 전체 회로 에너지는 외부 커패시터도 포함합니다. 누락된 부하 C를 추측하거나
 기본값으로 채우지 않습니다.
+
+## 명시적 버전 8: 외부 직렬 RL Debye 입력
+
+`version=8`은 **sipi.startup-port-waves/8**을 선택하고 버전7의 12종에
+**sipi.debye-reactive-startup/1**을 추가합니다. near_0,near_1,far_0,
+far_1 순서의 네 양의 실수 기준 임피던스를 지정합니다. 특이·거의 특이한
+PSD 강도, 극점 순서·강도0·중복, 유한 종단 저항과 원래 PWL 시간을
+그대로 보존합니다. 고유값 보정·rank 클리핑·재표본화·중첩 버전 자동 승격은
+없습니다. root는 schema,startup,z_ref_ohm 세 키만 가지며 셀·극점 제한과
+실제 시간 행 예산을 구분합니다. 기본 버전1 및 기존 버전1..7의 등록
+목록은 유지하고 외부 직렬 RL Debye 입력을 거부합니다.
+
+```python
+from sipi import DebyeReactiveLadderDocument, StartupPortWavesDocument
+from sipi.execution import execute_saved
+import numpy as np
+
+startup = DebyeReactiveLadderDocument([0., 1e-9, 2e-9],
+    [[0., 0.], [1., -.4], [1., -.4]], R=[[20., 3.], [3., 20.]],
+    L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.],
+    load_capacitance=np.array([[30., -5.], [-5., 30.]])*1e-12,
+    load_branch_resistance=[[150., 20.], [20., 150.]],
+    load_branch_inductance=np.array([[200., 30.], [30., 200.]])*1e-9)
+document = StartupPortWavesDocument(startup, z_ref=[35., 45., 55., 65.], version=8)
+out = execute_saved(document.dumps(), max_evaluations=3)
+assert out['result']['source_kind'] == 'DebyeReactiveLadderResponse'
+assert out['input']['startup'] == startup.to_dict()
+assert len(out['result']['incident_sqrt_w'][0]) == 4
+```
+
+13종×ramp/pulse 26개와 지원되는 이전 버전의 출력을 비교합니다. 대각
+rank-one·교환대칭·비가환 행렬, 단일/강도0/중복/순서변경 극점과 거의
+특이한 행렬·null 방향 입력을 보존합니다. 엄격한 단위·재귀·복사·예산·
+결과 동일성 및 원래 물리·파동 실패를 검사합니다. 기존 버전별 시험은 변경하지 않고 양의 v8 경로를 별도로 검사합니다. 앱·플랫폼이나
+실측 정확도 수락은 아닙니다. 물리 조건은 [외부 직렬 RL 저장](debye_reactive_startup_document.md),
+기준 임피던스·null 상태 의미는 [단자 파동](startup_waves.md)을 따릅니다.
+
+외부 `load_capacitance_f`는 F이며 내부 재료 강도의 F/m와 구분합니다.
+0/rank-one/full 행렬과 pulse 재실행은 커패시터 전류와 충·방전 전력을
+보존합니다. 단자 전력 합은 내부 선로 에너지 변화율과 손실의 합이고,
+전체 회로 에너지는 외부 커패시터도 포함합니다. 누락된 부하 C를 추측하거나
+기본값으로 채우지 않습니다.
+
+외부 가지 저항·인덕턴스는 필수 Ω·H 행렬이며 내부 선로는 단위당 길이
+입력을 유지합니다. PSD 가지 저항, 엄격한 SPD 인덕턴스와 초기 가지
+전류0을 보존합니다. far 단자 전력에는 병렬 저항 손실·커패시터 전력·
+가지 에너지 변화율·가지 저항 손실이 포함됩니다. 0/rank-one/full 가지
+저항과 pulse 재실행이 직접 결과를 보존하며 가지 기본값·구조 추론은 없습니다.

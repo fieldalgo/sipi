@@ -404,3 +404,5 @@ energy rate plus branch resistor loss, separate from parallel load resistor
 loss. Zero/rank-one/full branch resistance and pulse energy release are
 checked. Neither branch current nor capacitor current alone is a line-port
 current. Whole-circuit energy includes both external C and L storage.
+
+[Explicit saved version8](startup_waves_document.md) adds external series RL Debye inputs.
