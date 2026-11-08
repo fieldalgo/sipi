@@ -73,6 +73,6 @@ with existing BSD-3-Clause notices.
 This adapter does not infer propagation modes, TDR inversion, b/a or V/I
 ratios, delay alignment, gating, FFT or frequency-dependent references.
 [Saved circuit input](multiconductor_debye_startup_document.md) is available,
-but saved startup-wave versions1–9 still reject this new document kind.
-No new saved schema, numerical solver, runtime dependency, application or
-platform support is added. See the [general wave contract](startup_waves.md).
+and [explicit saved wave version10](startup_waves_document_v10.md) now admits
+this kind; versions1–9 still reject it. Wave conversion adds no numerical
+solver, runtime dependency, application or platform support. See the [general wave contract](startup_waves.md).

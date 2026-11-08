@@ -170,3 +170,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Saved three/four-signal Debye inputs](multiconductor_debye_startup_document.md) preserve explicit poles, signal count and actual time-row budgets.
+
+
+[Explicit saved wave version10](startup_waves_document_v10.md) adds three/four-signal Debye inputs while preserving versions1–9.

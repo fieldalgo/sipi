@@ -462,3 +462,6 @@ version tests and the numerical wave/physical implementations stay unchanged.
 physical validity; [terminal waves](startup_waves.md) define port reference
 meaning. This storage contract does not establish app/platform integration,
 measured accuracy or a general transient field solver.
+
+
+[Explicit saved wave version10](startup_waves_document_v10.md) adds three/four-signal Debye inputs while preserving versions1–9.

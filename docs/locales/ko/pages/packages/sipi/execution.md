@@ -156,3 +156,6 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 
 
 [3·4신호 Debye 입력 저장](multiconductor_debye_startup_document.md)은 명시 pole·신호 수·실제 시간 행 예산을 보존합니다.
+
+
+[명시 저장 파동 버전10](startup_waves_document_v10.md)은 버전1–9를 유지하며3·4신호 Debye 입력을 추가합니다.

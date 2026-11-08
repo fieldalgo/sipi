@@ -431,3 +431,6 @@ assert len(out['result']['incident_sqrt_w'][0]) == 8
 [다신호 입력 저장](multiconductor_startup_document.md)은 물리 유효범위를,
 [단자 파동](startup_waves.md)은 기준 저항의 의미를 정의합니다. 저장 계약은
 앱·플랫폼 통합, 실측 정확도나 일반 과도 전자기장 솔버 완료를 뜻하지 않습니다.
+
+
+[명시 저장 파동 버전10](startup_waves_document_v10.md)은 버전1–9를 유지하며3·4신호 Debye 입력을 추가합니다.
