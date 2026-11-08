@@ -92,4 +92,7 @@ not implicitly accepted by saved or terminal-wave APIs. The registry remains
 support is added. See [development validation](../../development.md).
 
 
-[Explicit saved mixed-boundary inputs](multiconductor_boundary_startup_document.md) preserve ideal/open/short values without changing the numerical model; terminal-wave admission remains separate.
+[Explicit saved mixed-boundary inputs](multiconductor_boundary_startup_document.md) preserve ideal/open/short values without changing the numerical model; explicit terminal-wave conversion is also supported.
+
+
+[Explicit mixed-boundary port waves](multiconductor_boundary_startup_waves.md) preserve ideal/open/short terminal current and power.

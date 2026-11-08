@@ -475,3 +475,6 @@ establish general TDR inversion, measured accuracy or app/platform support.
 
 
 [Typed-source multiconductor port waves](multiconductor_debye_mixed_startup_waves.md) preserve terminal currents and exclude both source series and shunt losses.
+
+
+[Explicit mixed-boundary port waves](multiconductor_boundary_startup_waves.md) preserve ideal/open/short terminal current and power.

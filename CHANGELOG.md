@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Admit explicit multiconductor mixed-boundary terminal power waves, retaining ideal-source displacement current and open/short wave identities.
+
 - Add strict multiconductor mixed-boundary saved inputs, preserving ideal voltage/open/short entries, PSD losses, actual sample budgets and exact result identity.
 
 - Add a separate three/four-signal constant PSD RLGC circuit with ideal/resistive voltage sources and open/short/resistive loads, retaining mutual endpoint capacitance and explicit terminal power balances.

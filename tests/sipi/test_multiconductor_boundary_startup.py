@@ -154,7 +154,7 @@ def test_zero_detached_readonly_json_and_separate_wave_type(n):
  a['source_voltages'][1,0]=999;a['L'][:]=999;out=r.to_dict(include_states=True);out['input']['load_resistance_ohm'][0]=999
  assert json.dumps(r.to_dict(include_states=True),sort_keys=True,allow_nan=False)==before
  assert r.port_names==tuple(f'{end}_{j}' for end in ['near','far'] for j in range(n))
- with pytest.raises(ValueError,match='response must be'):startup_port_waves(r,z_ref=[50.]*(2*n))
+ assert startup_port_waves(r,z_ref=[50.]*(2*n)).incident.shape==(121,2*n)
  with pytest.raises(ValueError):r.to_dict(include_states=1)
  a=fixture(n);a['source_voltages'][:]=0;r=power(response(**a))
  for key in ['node_voltage','segment_current','voltage','current','energy','energy_rate','source_power']:assert not np.any(getattr(r,key))

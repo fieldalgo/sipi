@@ -69,7 +69,10 @@ schemas retain exact source/installed hashes. The actual new fixture keeps
 exact registry equality:91schemas/37templates at this addition.
 
 The numerical model and its independent KCL/analytical/qualified spatial
-limits are unchanged. Terminal-wave conversion and saved wave versions1–15
+limits are unchanged. Explicit terminal-wave conversion is supported; saved wave versions1–15
 still reject this separate kind. No field/measured accuracy, arbitrary
 transient guarantee, new dependency or app/platform update is added.
 See [common execution](execution.md).
+
+
+[Explicit mixed-boundary port waves](multiconductor_boundary_startup_waves.md) preserve ideal/open/short terminal current and power.

@@ -84,4 +84,7 @@ V.00646841224/A.000157794877입니다. 동일 PWL knot의601/1201/2401표본은 
 지원을 추가하지 않습니다. [개발 검증](../../../../../development.ko.md)을 참고하세요.
 
 
-[명시 혼합 종단 저장 입력](multiconductor_boundary_startup_document.md)은 수치 모델을 바꾸지 않고 이상/개방/단락 값을 보존합니다. 단자 파동 수락은 별도입니다.
+[명시 혼합 종단 저장 입력](multiconductor_boundary_startup_document.md)은 수치 모델을 바꾸지 않고 이상/개방/단락 값을 보존합니다. 명시 단자 파동 변환도 지원합니다.
+
+
+[명시 혼합 종단 단자 파동](multiconductor_boundary_startup_waves.md)은 이상/개방/단락의 단자 전류·전력을 보존합니다.
