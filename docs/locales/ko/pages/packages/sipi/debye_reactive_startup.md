@@ -80,3 +80,5 @@ scikit-rf 버전·고지를 재사용하며 새 의존성은 없습니다. 기�
 
 [부하 C API](debye_capacitive_startup.md) ·
 [English](../../../../../packages/sipi/debye_reactive_startup.md)
+
+[외부 RL 입력 저장](debye_reactive_startup_document.md)은 Ω·H·F와 선로의 단위당 길이 입력을 구분합니다.

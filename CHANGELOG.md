@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit Debye capacitive/series-RL load inputs with strict SI units, complete branch-state replay and actual time-row budgets.
+
 - Add a separate PSD Debye startup API with external capacitive and series RL loads, independent charge-KCL/modal convergence and distinct line/branch energy balances.
 
 - Add explicitly selected saved wave version7 for external capacitive Debye inputs with original nested versions and energy partitions preserved.

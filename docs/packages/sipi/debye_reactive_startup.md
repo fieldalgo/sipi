@@ -87,3 +87,5 @@ browser/Windows integration is established.
 
 [Capacitive API](debye_capacitive_startup.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/debye_reactive_startup.md)
+
+[Saved external RL inputs](debye_reactive_startup_document.md) distinguish external ohm/H/F from per-length line inputs.
