@@ -401,6 +401,12 @@ def documents():
         C=np.array([[210.,-20.,0.],[-20.,220.,-20.],[0.,-20.,230.]])*1e-12,
         length=.1,cells=2,source_resistance=[0.,25.,0.],load_resistance=[None,0.,75.]))
     base.append(StartupPortWavesDocument(base[-1], z_ref=[35.,45.,55.,65.,75.,85.], version=16))
+    from sipi import AsymmetricVolumeGridPairCapacitanceDocument
+    base.append(AsymmetricVolumeGridPairCapacitanceDocument(pitch=1e-3,grid_width=.5e-3,
+        left_trace_width=.5e-3,right_trace_width=1e-3,trace_gap=.5e-3,height=.5e-3,
+        top_clearance=1e-3,backside_depth=1e-3,eps_substrate=3.8,eps_above=1.,eps_below=1.,
+        transverse_periods=3,cells_per_pitch=4,cells_substrate=2,cells_above=4,cells_below=3,
+        ground_thickness=.25e-3,cells_grid=1,trace_thickness=.25e-3,cells_trace=1))
     return base
 
 

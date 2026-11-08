@@ -67,6 +67,7 @@ from .strip_grid_document import StripGridCapacitanceDocument
 from .thick_grid_strip_document import ThickGridStripCapacitanceDocument
 from .volume_grid_strip_document import VolumeGridStripCapacitanceDocument
 from .volume_grid_pair_document import VolumeGridPairCapacitanceDocument
+from .asymmetric_volume_grid_pair_document import AsymmetricVolumeGridPairCapacitanceDocument
 from .coupled_boundary_startup_document import MixedBoundaryRLGCLadderDocument
 from .coupled_capacitive_startup_document import CapacitiveRLGCLadderDocument
 
@@ -138,6 +139,7 @@ _REGISTRY = {
     'sipi.thick-grid-strip-capacitance/1': ThickGridStripCapacitanceDocument,
     'sipi.volume-grid-strip-capacitance/1': VolumeGridStripCapacitanceDocument,
     'sipi.volume-grid-pair-capacitance/1': VolumeGridPairCapacitanceDocument,
+    'sipi.asymmetric-volume-grid-pair-capacitance/1': AsymmetricVolumeGridPairCapacitanceDocument,
     'sipi.coupled-rlgc-startup/2': MixedBoundaryRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/3': CapacitiveRLGCLadderDocument,
     'sipi.coupled-rlgc-startup/4': ReactiveRLGCLadderDocument,
@@ -415,7 +417,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
     if isinstance(doc, (MixedBoundaryMulticonductorRLGCLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
-    elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument, ThickGridStripCapacitanceDocument, VolumeGridStripCapacitanceDocument, VolumeGridPairCapacitanceDocument)):
+    elif isinstance(doc, (GridPlateCapacitanceDocument, StripGridCapacitanceDocument, ThickGridStripCapacitanceDocument, VolumeGridStripCapacitanceDocument, VolumeGridPairCapacitanceDocument, AsymmetricVolumeGridPairCapacitanceDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
     elif isinstance(doc, ConductivityProfileDocument):
         profile = doc.analyze(max_evaluations=budget)

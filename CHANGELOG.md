@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save independent-width finite-volume pairs with strict21-key input, separate sidewall geometry checks, one field evaluation and exact result identity.
+
 - Add bounded unequal-width finite-volume trace pairs over a ground grid, preserving independent widths, explicit metal surfaces, Maxwell capacitance and qualified mesh/exterior checks.
 
 - Add explicit saved wave version16 for multiconductor mixed boundaries, preserving ideal/open/short entries, versions1–15, actual budgets and terminal power identities.

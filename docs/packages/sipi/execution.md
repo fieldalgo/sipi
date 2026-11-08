@@ -200,3 +200,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Explicit saved wave version16](startup_waves_document_v16.md) adds multiconductor mixed-boundary inputs, preserving versions1–15. At this addition the registry becomes92schemas/37templates.
+
+
+[Saved independent-width volume inputs](asymmetric_volume_grid_pair_document.md) preserve both widths, resource budgets and full geometry identity.

@@ -77,7 +77,7 @@ Result `include_fields=True` adds the N×2 basis potentials. The capacitance
 property returns a detached matrix. Direct dataclass construction does not
 replace factory validation. The existing raw1e-8 gates, exact names/shapes,
 positive-definite C/energy, Maxwell signs and prescribed potentials are checked.
-There is no saved-input adapter for this separate kind at this addition.
+A separate strict saved-input adapter is now available.
 
 Four independent scikit-fem12.0.2 P1 weak forms compare the complete C, energy,
 ground-charge and potential matrices within relative1e-10. Coordinate material
@@ -104,3 +104,6 @@ This is a bounded perfect-conductor electrostatic cell. No finite conductivity,
 roughness, return-current inductance, line impedance/RLGC, frequency validity,
 propagation, radiation or measured accuracy is inferred. Shared solvers and
 existing APIs/schemas are unchanged; no new dependency or app/platform support.
+
+
+[Saved independent-width volume inputs](asymmetric_volume_grid_pair_document.md) preserve both widths, resource budgets and full geometry identity.
