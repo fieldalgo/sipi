@@ -303,3 +303,5 @@ limits, nearly singular strengths, pole/conductor permutations, copies,
 strict references and internal-array rejection. Saved wave v1..5 still reject
 PSD saved inputs. This does not establish dispersive eigenmode/TDR inference,
 measured accuracy or browser/Windows integration.
+
+[Explicit saved version6](startup_waves_document.md) adds PSD Debye inputs.

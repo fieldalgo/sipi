@@ -64,3 +64,5 @@ general material extraction or measured-board accuracy.
 [한국어](../../locales/ko/pages/packages/sipi/psd_debye_startup_document.md)
 
 [Strict-SPD saved inputs](coupled_debye_startup_document.md) retain their original admissibility rules.
+
+[Explicit saved version6](startup_waves_document.md) adds PSD Debye inputs.

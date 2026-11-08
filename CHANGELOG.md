@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicitly selected saved wave version6 for PSD Debye inputs while preserving prior nested registries and physical budgets.
+
 - Accept explicit PSD Debye terminal waves with rank-one mode limits and null-direction energy checks.
 
 - Save explicit PSD Debye startup inputs with singular-strength preservation, time-row budgets and complete state replay guards.

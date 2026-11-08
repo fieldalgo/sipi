@@ -1,4 +1,4 @@
-# 결합 Debye 시작 응답 입력 저장
+# PSD 강도 Debye 시작 응답 입력 저장
 
 `PSDCoupledDebyeRLGCLadderDocument`는 명시적
 [두 신호 Debye 회로](psd_debye_startup.md)를
@@ -62,3 +62,5 @@ R/G의 정확대칭 PSD와 L/C_inf의 SPD 조건은 유지합니다. 1–2개 �
 [English](../../../../../packages/sipi/psd_debye_startup_document.md)
 
 [기존 SPD 저장](coupled_debye_startup_document.md)의 입력 조건은 그대로입니다.
+
+[명시적 저장 버전6](startup_waves_document.md)이 PSD Debye 입력을 추가합니다.
