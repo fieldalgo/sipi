@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a separate three/four-signal constant PSD RLGC circuit with ideal/resistive voltage sources and open/short/resistive loads, retaining mutual endpoint capacitance and explicit terminal power balances.
+
 - Add explicit saved wave version15 for multiconductor Debye typed sources, preserving original V/A objects, source loss partitions, versions1–14 and actual row budgets.
 
 - Admit explicit multiconductor Debye typed-source responses to six/eight-port power waves, keeping terminal current and both source loss partitions distinct.

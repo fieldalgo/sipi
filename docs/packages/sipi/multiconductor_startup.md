@@ -83,3 +83,6 @@ exact installed-artifact validation and reference-tool versions.
 
 
 [Three/four-signal positive-strength Debye API](multiconductor_debye_startup.md) uses a separate explicit result type and bounded circuit contract.
+
+
+[Separate mixed-boundary circuit](multiconductor_boundary_startup.md) adds explicit ideal voltage/open/short ends and PSD losses without changing this positive-resistance contract.

@@ -77,3 +77,6 @@ scikit-rf 2.2.0의 연속 scalar 모드 ABCD와 대조합니다. 고정 시험 �
 
 
 [3·4신호 양의 강도 Debye API](multiconductor_debye_startup.md)는 별도 결과형과 명시한 유한 회로 계약을 사용합니다.
+
+
+[별도 혼합 종단 회로](multiconductor_boundary_startup.md)는 이 양저항 계약을 유지하며 이상 전압/개방/단락과 PSD 손실을 추가합니다.
