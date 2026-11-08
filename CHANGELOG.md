@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Accept explicit capacitive Debye terminal waves with separate internal line and external capacitor power balances.
+
 - Save explicit external-capacitive Debye inputs with distinct F/F-per-m units, complete replay guards and actual time-row budgets.
 
 - Add a separate PSD Debye startup API with external capacitive loads and distinct line/full-circuit energy balances.

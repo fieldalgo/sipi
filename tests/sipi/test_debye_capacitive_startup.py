@@ -156,7 +156,7 @@ def test_linear_time_impedance_conductor_and_pole_invariants():
     np.testing.assert_allclose(permute.polarization_charge,a.polarization_charge[:,:,::-1],rtol=1e-10,atol=1e-22)
 
 
-def test_detached_readonly_lumped_charge_units_zero_and_no_implicit_wave_admission():
+def test_detached_readonly_lumped_charge_units_zero_and_explicit_wave_admission():
     delta=D.copy();poles=F.copy();t=np.linspace(0,12e-9,121);d=np.minimum(t/2e-9,1.)[:,None]*[1.,-.4]
     a=run(t,d,delta_C=delta,relaxation_hz=poles);delta[:]=0;poles[:]=1;t[:]=9;d[:]=9
     assert a.inputs['delta_C_f_per_m']==D.tolist() and a.inputs['relaxation_hz']==F.tolist() and a.time[0]==0
@@ -169,7 +169,7 @@ def test_detached_readonly_lumped_charge_units_zero_and_no_implicit_wave_admissi
     states=a.to_dict(include_states=True);assert np.array(states['polarization_charge_c']).shape==(121,17,2,2);json.dumps(states,allow_nan=False)
     states['input']['delta_C_f_per_m'][0][0][0]=9;assert a.inputs['delta_C_f_per_m']==D.tolist()
     with pytest.raises(ValueError):a.to_dict(include_states=1)
-    with pytest.raises(ValueError):startup_port_waves(a,z_ref=[50.]*4)
+    assert startup_port_waves(a,z_ref=[50.]*4).source_kind=='DebyeCapacitiveLadderResponse'
     z=run(drive=np.zeros((121,2)));assert not np.any(z.total_energy) and z.power_balance_relative_error==0 and z.total_power_balance_relative_error==0
     with pytest.raises(ValueError):replace(a,polarization_voltage=np.full((121,17,2,2),np.nan))
 

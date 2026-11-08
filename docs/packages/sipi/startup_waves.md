@@ -305,3 +305,47 @@ PSD saved inputs. This does not establish dispersive eigenmode/TDR inference,
 measured accuracy or browser/Windows integration.
 
 [Explicit saved version6](startup_waves_document.md) adds PSD Debye inputs.
+
+## Explicit four-terminal waves with external capacitive loads
+
+[External-load Debye responses](debye_capacitive_startup.md) are accepted
+explicitly as `DebyeCapacitiveLadderResponse`. Four terminal voltages and
+into-line currents use four positive real references. All numerical wave
+calculations and gates are unchanged. Source voltages, polarization currents
+and external capacitor currents cannot replace terminal currents.
+
+Near-pair power is source_power-source_resistor_loss; far-pair power is
+-load_resistor_loss-load_capacitor_power. Their sum is line_energy_rate+
+series_loss+shunt_loss+relaxation_loss, distinct from total_energy_rate that
+includes external storage. Capacitor power can change sign during charging
+and discharging; capacitor energy and resistor loss remain nonnegative.
+
+```python
+from sipi import psd_coupled_debye_capacitive_ladder_response, startup_port_waves
+import numpy as np
+
+time = np.linspace(0., 12e-9, 121)
+response = psd_coupled_debye_capacitive_ladder_response(time,
+    np.minimum(time/2e-9, 1.)[:, None]*[1., -.4],
+    R=[[20., 3.], [3., 20.]], L=np.array([[500., 100.], [100., 500.]])*1e-9,
+    G=[[.002, -.0003], [-.0003, .002]], C_inf=np.array([[220., -40.], [-40., 220.]])*1e-12,
+    delta_C=np.array([[[150., -150.], [-150., 150.]]])*1e-12,
+    relaxation_hz=[1e9], length=.1, cells=16,
+    source_resistance=[25., 25.], load_resistance=[100., 100.],
+    load_capacitance=np.array([[30., -5.], [-5., 30.]])*1e-12)
+waves = startup_port_waves(response, z_ref=[35., 45., 55., 65.])
+assert waves.source_kind == 'DebyeCapacitiveLadderResponse'
+np.testing.assert_allclose(waves.port_power.sum(axis=1),
+    response.line_energy_rate + response.series_loss + response.shunt_loss
+    + response.relaxation_loss, rtol=1e-10, atol=1e-12)
+np.testing.assert_allclose(waves.port_power[:, 2:].sum(axis=1),
+    -response.load_resistor_loss-response.load_capacitor_power, rtol=1e-10, atol=1e-12)
+```
+
+Checks cover independent scalar modes and original PSD waves at CL0,
+constant capacitive-line waves at zero strength, noncommuting ramp/pulse,
+zero/rank-one/full external capacitance, null/nearly singular strengths,
+permutations, reference power, copies and internal-array rejection. Saved
+wave v1–6 still reject [external capacitive saved inputs](debye_capacitive_startup_document.md).
+This does not establish dispersive eigenmode/TDR inference, measured accuracy
+or browser/Windows integration.
