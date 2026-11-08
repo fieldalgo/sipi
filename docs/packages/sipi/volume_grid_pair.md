@@ -102,3 +102,6 @@ This is a bounded perfect-conductor electrostatic cell. No finite conductivity,
 roughness, return-current inductance, line impedance/RLGC, frequency validity,
 propagation, radiation or measured accuracy is inferred. Shared solvers and
 existing APIs/schemas are unchanged; no new dependency or app/platform support.
+
+
+[Independent-width finite pair](asymmetric_volume_grid_pair.md) provides separate left/right widths without changing this equal-width contract.

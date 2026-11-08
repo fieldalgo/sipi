@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add bounded unequal-width finite-volume trace pairs over a ground grid, preserving independent widths, explicit metal surfaces, Maxwell capacitance and qualified mesh/exterior checks.
+
 - Add explicit saved wave version16 for multiconductor mixed boundaries, preserving ideal/open/short entries, versions1–15, actual budgets and terminal power identities.
 
 - Admit explicit multiconductor mixed-boundary terminal power waves, retaining ideal-source displacement current and open/short wave identities.
