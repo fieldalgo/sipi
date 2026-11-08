@@ -278,7 +278,7 @@ def test_invalid_summary_input_rejects(values):
     'conductor', 'skin', 'material', 'sampling'])
 def test_strict_input_rejects_before_mesh(monkeypatch, case):
     raw = document().to_dict()
-    if case == 'schema': raw['schema'] = 'sipi.line-quantity-study/3'
+    if case == 'schema': raw['schema'] = 'sipi.line-quantity-study/999'
     if case == 'missing': del raw['quantity']
     if case == 'extra': raw['extra'] = 1
     if case == 'quantity': raw['quantity'] = 'z0'

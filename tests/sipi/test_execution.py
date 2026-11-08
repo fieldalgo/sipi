@@ -416,6 +416,12 @@ def documents():
             variables=[dict(name='left_width',lower=.2e-3,upper=1e-3)])),
         conductor=dict(kind='perfect'),quantity='common_forward_impedance_real',
         target=40.,tolerance=.125,max_evaluations=24,schema='sipi.line-quantity-design/3'))
+    common_goal = next(item.to_dict() for item in base
+                       if item.to_dict()['schema'] == 'sipi.line-quantity-design/3')
+    common_source = common_goal['study']
+    common_source['sampling']['count'] = 3
+    base.append(LineQuantityStudyDocument(common_source, conductor=common_goal['conductor'],
+        quantity='common_forward_impedance_real', schema='sipi.line-quantity-study/3'))
     return base
 
 

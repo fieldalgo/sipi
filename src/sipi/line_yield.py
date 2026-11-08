@@ -82,6 +82,8 @@ def assess_line_yield(study, *, minimum=None, maximum=None, confidence=.95, mini
     if not isinstance(study, LineQuantityStudy):
         raise ValueError('yield assessment requires a LineQuantityStudy')
     source = LineQuantityStudyDocument.loads(study.input_json); data = source.to_dict()
+    if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
+        raise ValueError('yield assessment requires line-quantity-study/1 or /2')
     sampling = data['study']['sampling']
     if sampling['kind'] not in ('uniform', 'normal'):
         raise ValueError('yield assessment requires iid uniform or normal samples, not sweep/corners')
@@ -123,6 +125,8 @@ class LineQuantityYieldDocument:
         if data['schema'] != 'sipi.line-quantity-yield/1':
             raise ValueError('unsupported line-quantity-yield schema')
         study = LineQuantityStudyDocument.from_dict(data['study']).to_dict()
+        if study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
+            raise ValueError('saved yield requires line-quantity-study/1 or /2')
         if study['study']['sampling']['kind'] not in ('uniform', 'normal'):
             raise ValueError('yield assessment requires iid uniform or normal samples')
         low, high, level, target = _criteria(data['minimum'], data['maximum'], data['confidence'],

@@ -113,6 +113,7 @@ _REGISTRY = {
     'sipi.line-quantity-design/3': LineQuantityDesignDocument,
     'sipi.line-quantity-study/1': LineQuantityStudyDocument,
     'sipi.line-quantity-study/2': LineQuantityStudyDocument,
+    'sipi.line-quantity-study/3': LineQuantityStudyDocument,
     'sipi.line-quantity-yield/1': LineQuantityYieldDocument,
     'sipi.periodic-network/1': PeriodicNetworkDocument,
     'sipi.periodic-circuit/1': PeriodicCircuitDocument,

@@ -206,7 +206,7 @@ def test_shared_complete_report_roundtrip_and_budget_before_fields(monkeypatch):
 def test_strict_pair_contract_before_mesh(monkeypatch, case):
     raw = document().to_dict()
     if case == 'v1': raw['schema'] = 'sipi.line-quantity-study/1'
-    if case == 'schema': raw['schema'] = 'sipi.line-quantity-study/3'
+    if case == 'schema': raw['schema'] = 'sipi.line-quantity-study/999'
     if case == 'modal_source':
         raw['study'] = ImpedanceStudyDocument('coupled_stripline', dict(width=.3e-3, gap=.2e-3,
             plane_spacing=1e-3, eps_r=4.), quantity='z_diff', frequency=1e9, materials={}, mesh=MESH,

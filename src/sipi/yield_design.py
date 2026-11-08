@@ -133,6 +133,8 @@ class YieldDesignDocument:
             names.add(name)
             cost = _scalar('candidate cost', entry['cost'], zero=True)
             study = (LineQuantityStudyDocument if lossy else ImpedanceStudyDocument).from_dict(entry['study']).to_dict()
+            if lossy and study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
+                raise ValueError('yield candidates require line-quantity-study/1 or /2')
             source = study['study'] if lossy else study
             if source['sampling']['kind'] not in ('uniform', 'normal'):
                 raise ValueError('yield candidates require iid uniform or normal sampling')

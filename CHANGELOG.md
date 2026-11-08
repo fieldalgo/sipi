@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit version3 common-current forward-impedance sampling, preserving all failed rows and prior yield-consumer study-version boundaries.
+
 - Add explicit version3 saved common-current forward-impedance goals with unchanged prior quantity admission, source constraints and execution budgets.
 
 - Add explicit common-current forward Re(Zcc) goals for lossy asymmetric pairs, retaining coupling, actual attempt budgets, frozen refinement and prior saved-schema admission.

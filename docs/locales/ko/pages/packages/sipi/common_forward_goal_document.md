@@ -1,5 +1,7 @@
 # 공통 전류 순방향 임피던스 목표 저장
 
+[명시적 study /3](common_forward_line_study.md)는 공통 전류 물리량의 기술적 표본 분석을 제공합니다.
+
 [English](../../../../../packages/sipi/common_forward_goal_document.md) | **한국어**
 
 명시적 `sipi.line-quantity-design/3`는 `common_forward_impedance_real`을 추가하고

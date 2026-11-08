@@ -91,7 +91,7 @@ class LineQuantityStudy:
 
 
 class LineQuantityStudyDocument:
-    """Sample full-loss line quantities with explicit saved versions 1 and 2.
+    """Sample full-loss line quantities with explicit saved versions 1 through 3.
 
     The nested study/3 or /4 supplies scalar template inputs, fixed positive
     frequency, sampling and geometry/material constraints. Its z0 selects the
@@ -102,6 +102,11 @@ class LineQuantityStudyDocument:
     version 2 also accepts a z_diff_forward pair source and the quantity
     differential_forward_impedance_real. It targets Re(Zdd) with launch Ic=0,
     retaining asymmetric coupling rather than asserting an independent mode.
+
+    Explicit version 3 also admits common_forward_impedance_real: Re(Zcc)
+    with launch Id=0, retaining differential voltage coupling. Its nested
+    z_diff_forward label selects paired inputs only; no source study runs.
+    Versions 1 and 2 retain their previous accepted quantities.
 
     Every generated sample is attempted in order, including after failures.
     Failed rows retain their sample values and all representable intermediate
@@ -119,14 +124,18 @@ class LineQuantityStudyDocument:
     def _assign(self, data):
         data = _copy(data)
         _keys(data, ('schema', 'study', 'conductor', 'quantity'), where='line quantity study')
-        if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
+        if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2',
+                                  'sipi.line-quantity-study/3'):
             raise ValueError('unsupported line-quantity-study schema')
         allowed = ('impedance_real', 'attenuation')
-        if data['schema'] == 'sipi.line-quantity-study/2':
+        if data['schema'] in ('sipi.line-quantity-study/2', 'sipi.line-quantity-study/3'):
             allowed += ('differential_forward_impedance_real',)
+        if data['schema'] == 'sipi.line-quantity-study/3':
+            allowed += ('common_forward_impedance_real',)
         if not isinstance(data['quantity'], str) or data['quantity'] not in allowed:
             raise ValueError('quantity must be '+' or '.join(allowed))
-        study = _source_study(data['study'], paired=data['quantity'] == 'differential_forward_impedance_real')
+        study = _source_study(data['study'], paired=data['quantity'] in
+                              ('differential_forward_impedance_real', 'common_forward_impedance_real'))
         nominal = _line_from_values(study, data['conductor'])
         self._data = dict(schema=data['schema'], study=study,
             conductor=nominal.to_dict()['conductor'], quantity=data['quantity'])
@@ -172,12 +181,13 @@ class LineQuantityStudyDocument:
                 if tuple(line.names) != names or tuple(line.frequency) != (evaluation['frequency_hz'],):
                     raise ValueError('extraction changed signal names or frequency')
                 phase = 'diagnostic'
-                if data['quantity'] == 'differential_forward_impedance_real':
+                if data['quantity'] in ('differential_forward_impedance_real', 'common_forward_impedance_real'):
                     characteristic = line.characteristic()
                     if (characteristic.basis != 'single-ended' or tuple(characteristic.names) != names
                             or tuple(characteristic.frequency) != tuple(line.frequency)):
                         raise ValueError('characteristic changed signal coordinates or frequency')
-                    value = float(characteristic.mixed_mode().z_characteristic[0, 0, 0].real)
+                    coordinate = 1 if data['quantity'] == 'common_forward_impedance_real' else 0
+                    value = float(characteristic.mixed_mode().z_characteristic[0, coordinate, coordinate].real)
                 else:
                     propagation = line.propagation()
                     if propagation.modes != ('single',) or tuple(propagation.frequency) != tuple(line.frequency):

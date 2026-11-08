@@ -1,5 +1,7 @@
 # Saved common-current forward-impedance goals
 
+[Explicit study /3](common_forward_line_study.md) adds descriptive common-current sampling.
+
 **English** | [한국어](../../locales/ko/pages/packages/sipi/common_forward_goal_document.md)
 
 Explicit `sipi.line-quantity-design/3` adds `common_forward_impedance_real`.
