@@ -61,7 +61,7 @@ metal/dielectric volumes in m³. `include_mesh=True` adds arrays; result
 `include_fields=True` also adds the1V potential. Direct dataclass construction
 does not replace factory validation. Result identity, shapes, finite positive
 C/energy, negative ground charge and prescribed potentials are checked alongside
-the unchanged raw field gates1e-8. No versioned saved-input adapter is added here.
+the unchanged raw field gates1e-8. Versioned inputs use the separate [saved-input adapter](thick_grid_strip_document.md).
 
 Tests cover three solid/full-trace analytic limits C=eps0*eps_substrate*p²M/h
 within1e-11; width monotonicity; length and all-eps scaling1e-10; disconnected

@@ -59,7 +59,7 @@ assert len(expanded['potential_v_at_one_volt']) == len(result.cell.nodes)
 `include_mesh=True`는 배열을, 결과의 `include_fields=True`는1V 전위까지 포함합니다.
 데이터클래스 직접 생성은 팩토리 검증을 대신하지 않습니다. 결과 식별·형태·유한한
 양의 C/에너지·음의 접지 전하·지정 전위와 기존1e-8 원시 장 기준을 유지합니다.
-이번 단위에는 버전 있는 입력 저장 어댑터를 추가하지 않습니다.
+버전 있는 입력은 [별도 저장 어댑터](thick_grid_strip_document.md)를 사용합니다.
 
 시험은 완전 접지판·전폭 트레이스의 해석해 C=eps0*eps_substrate*p²M/h 세 조건1e-11,
 폭 증가 단조, 전체 길이·유전율 배율1e-10, 분리된 접지 성분, 표면 라벨·체적·재료·

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save finite-thickness ground-grid inputs with pre-mesh validation, exact volume/count/electrode identity and one physical field evaluation.
+
 - Add finite-thickness ground-grid cells with explicit PEC-volume removal, grounded component checks and qualified common-mesh thickness comparisons.
 
 - Save bounded thin trace/grid inputs with strict SI geometry, three explicit dielectric regions, pre-mesh checks and exact geometry/material/field replay guards.
