@@ -1,5 +1,7 @@
 # Mixed boundaries for two-signal startup
 
+[Explicit capacitive loads](coupled_capacitive_startup.md) use a separate API with internal/external energy accounting.
+
 [Explicit saved v2](coupled_boundary_startup_document.md) connects mixed ends to strict JSON and common execution.
 
 `coupled_boundary_ladder_response` solves the finite passive two-signal RLGC

@@ -49,6 +49,14 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
     endpoint C*dV/dt+G*V. This is a finite circuit with input-specific spatial,
     source and time convergence requirements, not an exact continuous line.
     """
+    return _coupled_boundary_response(time, source_voltages, R=R, L=L, G=G, C=C,
+        length=length, cells=cells, source_resistance=source_resistance,
+        load_resistance=load_resistance)
+
+
+def _coupled_boundary_response(time, source_voltages, *, R, L, G, C,
+                               length, cells, source_resistance, load_resistance,
+                               load_capacitance=None):
     time, drive, r, l, g, c, length, n, rs, rl = _boundary_input(time, source_voltages,
         R=R, L=L, G=G, C=C, length=length, cells=cells,
         source_resistance=source_resistance, load_resistance=load_resistance)
@@ -83,6 +91,9 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
             mass[s, s] = l*dx; stiffness[s, s] = -r*dx
             stiffness[s, 2*node:2*node+2] = np.eye(2)
             stiffness[s, 2*node+2:2*node+4] = -np.eye(2)
+    if load_capacitance is not None:
+        with np.errstate(over='ignore', invalid='ignore'):
+            mass[2*n:2*n+2, 2*n:2*n+2] += load_capacitance
     if not all(np.all(np.isfinite(x)) for x in (mass, stiffness, b)):
         raise ValueError('circuit coefficients exceed finite scales')
     free = np.array([i for i in range(size) if i not in fixed]); fixed = np.array(fixed, dtype=int)
@@ -116,6 +127,11 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
         for j in range(2):
             current[:, j] = near[:, j] if rs[j] == 0 else (drive[:, j]-v[:, 0, j])/rs[j]
             current[:, 2+j] = far[:, j] if rl[j] == 0 else 0. if rl[j] is None else -v[:, -1, j]/rl[j]
+        if load_capacitance is not None:
+            cap_current = dv[:, -1]@load_capacitance.T
+            for j in range(2):
+                if rl[j] != 0:
+                    current[:, 2+j] -= cap_current[:, j]
         energy = .5*dx*(np.sum(_quadratic(v, c)*weights, axis=1)+np.sum(_quadratic(i, l), axis=1))
         rate = dx*(np.sum(np.einsum('tni,ij,tnj->tn', v, c, dv)*weights, axis=1)
                    +np.sum(np.einsum('tni,ij,tnj->tn', i, l, di), axis=1))
@@ -126,7 +142,10 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
         source_loss = np.sum(rs*current[:, :2]**2, axis=1)
         load_loss = np.zeros(len(time))
         for j in range(2):
-            if rl[j] is not None: load_loss += rl[j]*current[:, 2+j]**2
+            if load_capacitance is None:
+                if rl[j] is not None: load_loss += rl[j]*current[:, 2+j]**2
+            elif rl[j] is not None and rl[j] > 0:
+                load_loss += v[:, -1, j]**2/rl[j]
         residual = rate-line_power+series+shunt
     if (not np.all(np.isfinite(np.r_[energy, rate, line_power, series, shunt, residual]))
             or np.any(energy < 0) or np.any(series < 0) or np.any(shunt < 0)):
@@ -138,6 +157,24 @@ def coupled_boundary_ladder_response(time, source_voltages, *, R, L, G, C,
     data = dict(time_s=time.tolist(), source_voltages_v=drive.tolist(), R_ohm_per_m=r.tolist(),
         L_h_per_m=l.tolist(), G_s_per_m=g.tolist(), C_f_per_m=c.tolist(), length_m=length,
         cells=n, source_resistance_ohm=rs.tolist(), load_resistance_ohm=list(rl))
-    return MixedBoundaryRLGCLadderResponse(json.dumps(data, sort_keys=True, allow_nan=False),
+    if load_capacitance is not None:
+        data['load_capacitance_f'] = load_capacitance.tolist()
+    response = MixedBoundaryRLGCLadderResponse(json.dumps(data, sort_keys=True, allow_nan=False),
         time, drive, v, i, voltage, current, energy, rate, series, shunt, line_power,
         source_power, source_loss, load_loss, error)
+    if load_capacitance is None:
+        return response
+    with np.errstate(over='ignore', invalid='ignore'):
+        cap_energy = .5*_quadratic(v[:, -1], load_capacitance)
+        cap_power = np.sum(v[:, -1]*cap_current, axis=1)
+        total_rate = rate+cap_power
+        total_loss = source_loss+load_loss+series+shunt
+        total_residual = total_rate-source_power+total_loss
+    if (not np.all(np.isfinite(np.r_[cap_energy, cap_power, total_rate, total_loss, total_residual]))
+            or np.any(cap_energy < 0)):
+        raise ValueError('load capacitor diagnostics exceed finite scales')
+    total_scale = max(np.max(abs(total_rate)), np.max(abs(source_power)), np.max(abs(total_loss)))
+    total_error = float(np.max(abs(total_residual))/total_scale) if total_scale > 0 else 0.
+    if not np.isfinite(total_error) or total_error > 1e-10:
+        raise ValueError('line plus load capacitor power balance exceeds relative 1e-10')
+    return response, cap_current, cap_energy, cap_power, total_error
