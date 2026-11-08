@@ -185,3 +185,6 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Explicit saved wave version12](startup_waves_document_v12.md) adds multiconductor Debye capacitive inputs while preserving versions1–11.
+
+
+[Saved multiconductor series RL inputs](multiconductor_debye_reactive_startup_document.md) preserve explicit branch state semantics and actual time-row budgets.

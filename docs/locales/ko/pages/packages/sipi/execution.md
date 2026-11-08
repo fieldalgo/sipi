@@ -171,3 +171,6 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 
 
 [명시 저장 파동 버전12](startup_waves_document_v12.md)은 버전1–11을 유지하며 다신호 Debye 외부 커패시터 입력을 추가합니다.
+
+
+[다신호 직렬 RL 입력 저장](multiconductor_debye_reactive_startup_document.md)은 명시 branch 상태 의미와 실제 시간 행 예산을 보존합니다.

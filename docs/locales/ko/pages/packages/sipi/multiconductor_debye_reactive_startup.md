@@ -89,7 +89,7 @@ scikit-rf2.2.0 독립 modal ABCD는 `Yload=1/R+jωCload+1/(Rbranch+jωLbranch)`�
 
 0/rank-one/근영 외부 행렬·저장/전류 분리·선형/시간/임피던스/신호/pole 불변식·
 선언한0 강도·엄격 입력·읽기 전용 복사·원래 실패를 검사합니다. 기존 전체 상태
-출력96개는 소스/설치본에서 정확한 해시를 유지합니다. 별도 결과형은 아직 저장/
-파동 API에 연결하지 않습니다. 일반 RLC 토폴로지·장 추출·재료 피팅·FFT/TDR·
+출력96개는 소스/설치본에서 정확한 해시를 유지합니다. [명시 입력 저장](multiconductor_debye_reactive_startup_document.md)이 이 모델을 보존합니다.
+별도 결과형은 아직 파동 API에 연결하지 않습니다. 일반 RLC 토폴로지·장 추출·재료 피팅·FFT/TDR·
 플랫폼 연결·새 의존성은 추가하지 않습니다.
 [2신호 reactive 계약](debye_reactive_startup.md)을 참고하세요.
