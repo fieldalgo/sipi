@@ -1,5 +1,7 @@
 # Frozen saved execution requests
 
+[Saved result records](execution_record.md) retain original text, receipts and host artifact declarations.
+
 [한국어](../../locales/ko/pages/packages/sipi/execution_request.md) · [Saved execution](execution.md)
 
 `sipi.execution_request.SavedExecutionRequest` freezes saved JSON text and the

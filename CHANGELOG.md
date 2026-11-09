@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add immutable saved execution records binding original requests, receipts and host-declared artifact identities without executing on reopen.
+
 - Add strict saved tensor fitting requests with shared execution budgets, original residuals and separate sampled-error acceptance.
 
 - Add fixed-pole, fixed-orientation passive tensor fitting with original samples, Frobenius residuals and explicit sampled acceptance.

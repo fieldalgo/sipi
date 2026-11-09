@@ -1,5 +1,7 @@
 # 저장 입력과 옵션을 고정하는 실행 요청
 
+[실행 결과 기록](execution_record.md)은 원문·영수증·호스트 산출물 선언을 보관합니다.
+
 [English](../../../../../packages/sipi/execution_request.md) · [저장 실행](execution.md)
 
 `sipi.execution_request.SavedExecutionRequest`는 저장 JSON 원문과 공통 옵션
