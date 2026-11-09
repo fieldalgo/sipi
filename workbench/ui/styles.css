@@ -119,8 +119,11 @@ footer a{color:inherit;text-underline-offset:3px}
 
 .network .target-fields{margin-bottom:16px}.network-scroll{max-height:260px;overflow:auto;margin:12px 0}.network table{width:100%;border-collapse:collapse;font-size:12px}.network th,.network td{text-align:right;padding:8px;border-bottom:1px solid #e4eceb}.network th{white-space:normal}.network svg{width:100%;height:auto;margin-top:12px}#network-description{overflow-wrap:anywhere}
 /* Input project controls share the existing workbench layout. */
-.project-panel { margin-bottom: 24px; }
+.project-panel { margin-bottom: 24px; padding: 24px 25px; }
+.project-panel .panel-heading { gap: 12px; }
+.project-panel .tag { max-width: 60%; overflow-wrap: anywhere; }
 .project-fields { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
-.project-fields label { flex: 1 1 170px; }
-.project-fields input, .project-fields select { width: 100%; box-sizing: border-box; }
+.project-fields label { flex: 1 1 170px; min-width: 0; }
+.project-fields input, .project-fields select { width: 100%; box-sizing: border-box; margin-top: 8px; height: 36px; padding: 8px 10px; border: 1px solid #dfe6e9; border-radius: 5px; font: inherit; color: #263f4d; background: #fcfdfd; }
 .project-fields button { flex: 0 1 auto; }
+@media(max-width: 700px) { .project-panel { padding: 20px; } }
