@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Compare fixed paired manufacturing candidates on one shared finite frequency grid with simultaneous joint-acceptance bounds and retained unresolved samples.
+
 - Assess one fixed joint iid acceptance event across both paired impedances and every supplied frequency, retaining original specimens and unresolved bounds.
 
 - Preserve each paired manufacturing sample across a finite frequency grid, with atomic failed rows and per-frequency descriptive summaries.

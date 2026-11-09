@@ -1,5 +1,7 @@
 # Joint iid acceptance across finite frequencies
 
+[Fixed finite-frequency candidates](sampled_panel_pair_selection.md) adds simultaneous bounds across a predeclared candidate family.
+
 [한국어](../../locales/ko/pages/packages/sipi/sampled_panel_pair_yield.md) ·
 [Finite-frequency samples](sampled_panel_pair_study.md) · [Single-frequency joint acceptance](panel_pair_yield.md)
 

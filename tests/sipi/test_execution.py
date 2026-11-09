@@ -480,6 +480,12 @@ def documents():
         SampledPanelForwardPairStudyDocument.from_dict(sampled_iid),
         acceptance={q: dict(minimum=[0., 0.], maximum=[1000., 1000.]) for q in pair_quantities},
         confidence=.95, minimum_yield=.9))
+    from sipi.sampled_panel_pair_selection import SampledPanelForwardPairSelectionDocument
+    family_source = base[-1].to_dict()
+    base.append(SampledPanelForwardPairSelectionDocument(
+        [dict(name='nominal', cost=1., study=family_source['study'])],
+        cost_unit='relative-cost', acceptance=family_source['acceptance'],
+        confidence=.95, minimum_yield=.3))
     return base
 
 

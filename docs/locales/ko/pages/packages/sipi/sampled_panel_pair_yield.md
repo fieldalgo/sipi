@@ -1,5 +1,7 @@
 # 유한 주파수 전체의 공동 iid 판정
 
+[유한주파수 고정 후보](sampled_panel_pair_selection.md)는 사전 고정 후보군의 동시 신뢰구간을 제공합니다.
+
 [English](../../../../../packages/sipi/sampled_panel_pair_yield.md) ·
 [다주파수 제조 표본](sampled_panel_pair_study.md) · [단일 주파수 공동 판정](panel_pair_yield.md)
 
