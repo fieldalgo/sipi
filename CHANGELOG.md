@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Give saved-analysis project fields and history selectors consistent spacing and 44-pixel minimum control height on desktop and mobile screens.
+
 - Connect Saved analysis to project variants and recorded-run history: preserve raw project files and stored execution controls, duplicate or switch inputs, inspect historical runs and explicitly select matching results. Keep the previous project on failed transformations or excessive growth, preserve standalone record export, and reject stale file/attachment completion.
 
 - Add read-only project record lookup that preserves raw record digests and distinguishes existing selection from current-input matching. Permit viewing historical requests without rerunning, selecting or fabricating environment manifests.

@@ -4,7 +4,8 @@
 .saved-project .tag { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
 .saved-project-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 16px; }
 .saved-project-fields label, .saved-history label { min-width: 0; }
-.saved-project-fields select, .saved-project-fields input, .saved-history select { width: 100%; min-width: 0; }
+.saved-project-fields select, .saved-project-fields input, .saved-history select { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; margin-top: 8px; padding: 10px 12px; border: 1px solid #dfe6e9; border-radius: 5px; font: inherit; color: #263f4d; background: #fcfdfd; }
+.saved-project-fields select:disabled, .saved-project-fields input:disabled, .saved-history select:disabled { color: #92a2aa; background: #f3f6f5; }
 .saved-history { margin-top: 20px; }
 .saved-input, .saved-output { padding: 24px; min-width: 0; }
 .saved-input textarea { box-sizing: border-box; width: 100%; min-height: 360px; padding: 14px; border: 1px solid #c9d1d9; border-radius: 8px; font: 13px/1.6 ui-monospace, monospace; resize: vertical; }
