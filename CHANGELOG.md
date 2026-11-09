@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Validate the pinned shared 0.0.2 development baseline and retain exact dependency artifact requirements without changing existing calculation methods.
+
 - Add strict saved two-variable forward impedance goals with geometry/material inputs and transport-independent failure histories.
 
 - Add bounded two-parameter goals for full-loss differential/common forward impedances, with frozen-input mesh refinement and retained failure histories.

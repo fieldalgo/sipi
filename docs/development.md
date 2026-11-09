@@ -47,3 +47,10 @@ a failed launch/audit leaves a failed JSON report, not an old passing XML. A fai
 numerical test keeps its fresh failing JUnit report. These checks verify artifact
 identity, not the physical accuracy or upstream provenance of an arbitrary wheel;
 the existing numerical/reference tests and pinned build remain required.
+
+The current coordinated baseline uses galerkin and meshine 0.0.2 development
+wheels. The declared range also retains the earlier 0.1 development line;
+neither range nor version proves that an unreleased API is present. Build from
+the exact dependency commit and retain wheel hashes. The boundary-panel API
+is a shared galerkin capability; changing this pin alone does not select it
+for existing SIPI calculations.
