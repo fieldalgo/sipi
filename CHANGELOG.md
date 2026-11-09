@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit local project reads and cooperative atomic saves with no-clobber creation, raw-byte conflict detection and distinct post-publication failure reports.
+
 - Add immutable A/B project snapshots with original inputs, retained execution history and explicit result selection invalidated by semantic edits.
 
 - Add immutable saved execution records binding original requests, receipts and host-declared artifact identities without executing on reopen.
