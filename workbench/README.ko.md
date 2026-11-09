@@ -6,7 +6,7 @@
 결과 이력 화면은 후속 작업이다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
 [설치 파일 helper](ARTIFACTS.ko.md)는 호스트 출처용 실제 배포물 파일을 수집한다.
-[Native 계산 기록](RECORDING.ko.md)은 원문 결과 기록을 생성하며 현재 UI 연결은 별도다.
+[계산 기록](RECORDING.ko.md)은 설치 wheel 또는 staged 브라우저의 **Saved analysis → Run and keep record**에서 원문 결과 기록과 실행환경 목록을 내보낸다.
 [브라우저 기록](BROWSER_RECORDING.ko.md)은 같은 기록 전달에 검사된 staged 배포 원본을 사용한다.
 
 독립 설치한 SIPI 엔진을 기본 브라우저의 로컬 화면 또는 브라우저 Worker에서

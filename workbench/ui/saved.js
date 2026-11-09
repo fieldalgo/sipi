@@ -10,6 +10,7 @@ const example = {
   placement: 'series', reference_ohms: [50, 50], port_names: ['near', 'far'],
 };
 let generation = 0, activeRun = null, busy = false, closed = false, checked = null, report = null;
+let recorded = null;
 const bytes = value => new TextEncoder().encode(value).length;
 
 function state(message, error = false) {
@@ -17,13 +18,15 @@ function state(message, error = false) {
   $('status').classList.toggle('error', error);
 }
 function controls() {
-  for (const id of ['open', 'example', 'check', 'run']) $(id).disabled = busy || closed;
+  for (const id of ['open', 'example', 'check', 'run', 'record']) $(id).disabled = busy || closed;
   $('save-input').disabled = busy || closed || checked === null;
   $('save-result').disabled = busy || closed || report === null;
+  for (const id of ['save-record', 'save-environment']) $(id).disabled = busy || closed || recorded === null;
   $('cancel').disabled = closed;
 }
 function invalidate() {
-  ++generation; checked = report = null;
+  ++generation; checked = report = recorded = null;
+  $('record-status').hidden = true;
   $('output').hidden = true; $('output').textContent = '';
   $('diagnostic-status').hidden = true;
   state(busy ? 'Inputs changed. Cancel the current calculation to run these settings.' : 'Inputs changed. Check or run the updated analysis.');
@@ -35,6 +38,8 @@ function request(action) {
   if (bytes(text) > 200 * 1024) throw new Error('Input exceeds 200 KiB.');
   const input = {action, text};
   if (action === 'saved-analyze') input.diagnostics = ['characteristic', 'modes'].filter(id => $(id).checked);
+  if (action === 'saved-record') input.controls = {max_input_bytes: 200*1024, max_evaluations: 128,
+    diagnostics: ['characteristic', 'modes'].filter(id => $(id).checked)};
   if (bytes(JSON.stringify(input)) > 256 * 1024) throw new Error('Encoded input exceeds the 256 KiB request limit.');
   return input;
 }
@@ -44,7 +49,8 @@ async function run(action) {
   try { input = request(action); } catch (error) { state(error.message, true); return; }
   const current = ++generation;
   activeRun = current;
-  busy = true; checked = report = null;
+  busy = true; checked = report = recorded = null;
+  $('record-status').hidden = true;
   $('output').hidden = true; $('output').textContent = ''; $('diagnostic-status').hidden = true;
   state(action === 'saved-normalize' ? 'Checking input…' : 'Calculating…'); controls();
   try {
@@ -54,9 +60,16 @@ async function run(action) {
       checked = result.document_text; $('input-text').value = checked;
       state('Input checked. Its schema and resolved settings are preserved.');
     } else {
-      report = result;
-      const out = result.execution;
-      checked = JSON.stringify(out.input, null, 2);
+      const record = action === 'saved-record' ? JSON.parse(result.record_text) : null;
+      const out = record ? record.receipt.execution : result.execution;
+      report = record ? {engine: result.engine, execution: out} : result;
+      checked = record ? record.source_text : JSON.stringify(out.input, null, 2);
+      if (record) {
+        // Reserializing parsed numbers can change the record's content digest.
+        recorded = {text: result.record_text, environment: result.runtime_manifest_text};
+        $('record-status').textContent = `Execution record ready (${record.run_id}). Save the record and environment files together to keep this run.`;
+        $('record-status').hidden = false;
+      }
       $('output').textContent = JSON.stringify(out, null, 2); $('output').hidden = false;
       if (out.status === 'failed') state('Target not met: ' + out.error.message, true);
       else if (out.status === 'incomplete') state(`${out.result.failed} sample(s) failed. All rows are retained; no summary was calculated.`, true);
@@ -97,17 +110,22 @@ $('example').onclick = () => {
 };
 $('check').onclick = () => run('saved-normalize');
 $('run').onclick = () => run('saved-analyze');
+$('record').onclick = () => run('saved-record');
 $('save-input').onclick = () => { if (!busy && checked !== null) download('sipi-input.json', checked); };
 $('save-result').onclick = () => { if (!busy && report !== null) download('sipi-result.json', JSON.stringify(report, null, 2)); };
+$('save-record').onclick = () => { if (!busy && !closed && recorded !== null) download('sipi-execution-record.json', recorded.text); };
+$('save-environment').onclick = () => { if (!busy && !closed && recorded !== null) download('sipi-runtime-manifest.json', recorded.environment); };
 $('cancel').onclick = async () => {
   const current = ++generation; activeRun = current; busy = true;
-  checked = report = null; $('output').hidden = true; $('diagnostic-status').hidden = true; controls();
+  checked = report = recorded = null; $('output').hidden = true; $('diagnostic-status').hidden = true;
+  $('record-status').hidden = true; controls();
   try { await transport.cancel(); if (current === generation) state('Calculation cancelled. You can run another input.'); }
   catch (error) { if (current === generation) state(error.message, true); }
   finally { if (activeRun === current) { activeRun = null; busy = false; controls(); } }
 };
 $('exit').textContent = browser ? 'Close workspace' : 'Exit';
 $('exit').onclick = async () => {
+  recorded = null; $('record-status').hidden = true;
   closed = true; ++generation; activeRun = null; busy = false; controls();
   try { await transport.close(); state(browser ? 'Workspace closed. You can close this tab.' : 'Application stopped. You can close this tab.'); }
   catch (error) { state(error.message, true); closed = false; controls(); }

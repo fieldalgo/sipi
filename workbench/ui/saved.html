@@ -21,12 +21,15 @@
         <p id="input-help" class="fine">Maximum input: 200 KiB. Studies and goals: up to 128 evaluations. A calculation can run for up to five minutes. Mesh refinement and model validity still need separate checks.</p>
         <div class="saved-actions"><button id="example">Load RLC example</button><button id="check">Check and format</button><button id="save-input" disabled>Save checked input ↓</button></div>
         <fieldset><legend>Optional line diagnostics</legend><label><input id="characteristic" type="checkbox"> Forward-wave matrices</label><label><input id="modes" type="checkbox"> Tracked modes and power losses</label><p class="fine">For top-level transmission or volume line inputs. An unresolved diagnostic keeps the base line results.</p></fieldset>
-        <div class="saved-actions"><button id="run" class="primary">Run analysis →</button><button id="cancel">Cancel calculation</button></div>
+        <div class="saved-actions"><button id="run" class="primary">Run analysis →</button><button id="record">Run and keep record</button><button id="cancel">Cancel calculation</button></div>
+        <p class="fine">A record keeps the input, execution settings, result and environment identifiers. It does not certify accuracy. Save both record files to retain them after closing.</p>
       </section>
       <section class="panel saved-output">
         <div class="panel-heading"><h2>Results</h2><button id="save-result" disabled>Save result ↓</button></div>
         <p id="status" role="status" aria-live="polite">Open an input or load the example to begin.</p>
         <p id="diagnostic-status" hidden></p>
+        <p id="record-status" class="fine" hidden></p>
+        <div class="saved-actions"><button id="save-record" disabled>Save execution record ↓</button><button id="save-environment" disabled>Save environment ↓</button></div>
         <pre id="output" tabindex="0" hidden></pre>
         <p class="fine">Failed samples and target-check history stay in the result. A completed calculation does not certify physical accuracy. Results are cleared when inputs change.</p>
       </section>

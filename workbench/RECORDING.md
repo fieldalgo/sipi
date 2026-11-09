@@ -30,6 +30,32 @@ The browser uses a separate [source-artifact path](BROWSER_RECORDING.md), while
 frozen-executable provenance remains separate work. Existing calculations remain
 available; automatic result-history UI is not added by these transport actions.
 
+## Keep a run from the saved-analysis screen
+
+Open **Saved analysis**, load an input and choose any applicable line diagnostics.
+**Run and keep record** executes those settings once. It displays the same result
+as **Run analysis** and enables **Save execution record** and **Save environment**.
+Download both files before editing inputs or closing: there is no automatic disk
+or cloud save. The record preserves original input text, complete execution
+controls and failed/incomplete histories. The environment file identifies the
+host-declared installed payload or browser source artifacts described above.
+
+These two downloads preserve the original returned strings, including numeric
+spellings used by the record digest. **Save result** remains an ordinary result
+export; it is not a substitute for the execution record. Repeating a recorded
+run creates another run ID even when inputs and results are identical.
+Changing input or diagnostic settings, starting another operation, cancelling,
+or closing clears record export. Late completions cannot restore it.
+
+Recording is supported in the inspectable installed wheel and the reviewed
+staged browser runtime. A source-only launcher or frozen executable without an
+inventory provider cannot record; ordinary **Run analysis** remains available.
+Record-file import, a project history selector and comparison are separate work.
+
+Actual screen/download acceptance: run `node workbench/tests/record-ui-browser.mjs OUTPUT`
+with `SIPI_PYTHON` set to the built-wheel environment. Add a staged web directory
+as the second argument for Worker acceptance.
+
 Run this built-wheel example outside the checkout:
 
 ```python
