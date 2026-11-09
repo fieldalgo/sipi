@@ -4,4 +4,5 @@ recursive-include tests/sipi/reference_data/template_section *.json
 include setup.py
 include workbench/PYTHON_NOTICES.md
 include workbench/desktop/main.py workbench/desktop/engine.py workbench/desktop/artifacts.py
+include workbench/desktop/recording.py
 recursive-include workbench/ui *.html *.js *.css

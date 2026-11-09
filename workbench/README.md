@@ -6,6 +6,7 @@ The [project transport contract](PROJECTS.md) connects immutable input variants
 to the five-form workspace. The result-history screen remains separate work.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
 The [installed artifact helper](ARTIFACTS.md) captures actual distribution files for host provenance.
+[Recorded native execution](RECORDING.md) produces raw result records; the current UI integration is separate.
 
 This source candidate runs the independently installed SIPI engine through a
 local default-browser UI or a browser Worker. It is not a released application.

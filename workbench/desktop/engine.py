@@ -242,7 +242,7 @@ def execute(request):
     if not isinstance(request, dict):
         raise ValueError('Request must be a JSON object.')
     action = request.get('action')
-    if action == 'saved-receipt':
+    if action in ('saved-receipt', 'saved-record'):
         from sipi.execution_request import SavedExecutionRequest
         if not {'action', 'text'} <= request.keys() or not request.keys() <= {'action', 'text', 'controls'}:
             raise ValueError('Receipt execution needs text and optional complete controls.')
@@ -259,6 +259,15 @@ def execute(request):
         prepared = SavedExecutionRequest(text, **controls)
         if prepared.max_evaluations > 128:
             raise ValueError('This workbench accepts at most 128 evaluations per request.')
+        if action == 'saved-record':
+            try:
+                if __package__:
+                    from .recording import run_recorded
+                else:
+                    from recording import run_recorded
+            except ImportError as error:
+                raise ValueError('Recorded execution requires an inspectable native wheel installation.') from error
+            return {'engine': engine_info(), **run_recorded(prepared)}
         return {'engine': engine_info(), 'receipt': prepared.run()}
     if action in ('project-create', 'project-open', 'project-duplicate', 'project-update',
                   'project-attach', 'project-select', 'project-remove-record'):
