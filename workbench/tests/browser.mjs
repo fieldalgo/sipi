@@ -94,6 +94,13 @@ try {
   await cdp.evaluate('document.querySelector("#save").click()');
   const saved=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-cross-section.json'),'utf8'));}catch{return null;}},'saved design download');
   assert.equal(saved.schema,'sipi.cross-section/1');
+  await cdp.evaluate('document.querySelector("#save-editable").click()');
+  const goalEditable=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-editable-design.json'),'utf8'));}catch{}},'editable goal download');
+  assert.equal(goalEditable.schema,'sipi.template-section/1');
+  assert.deepEqual(goalEditable.cross_section,saved,'Goal export must retain the actual returned geometry and mesh.');
+  assert.equal(goalEditable.parameters.width,saved.traces[0].width);
+  await until(()=>cdp.evaluate('!document.querySelector("#open").disabled'),'save finished');
+
   await writeFile(join(output,'designed.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await cdp.evaluate('document.querySelector("#width").value="0.6";document.querySelector("#width").dispatchEvent(new Event("input"))');
   assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
@@ -103,6 +110,7 @@ try {
   await until(()=>cdp.evaluate('!document.querySelector("#import-note").hidden'),'import');
   assert.equal(await cdp.evaluate('document.querySelector("#inputs").hidden'),true,'Imported geometry must not show stale template dimensions.');
   assert.equal(await cdp.evaluate('document.querySelector("#design").disabled'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#save-editable").disabled'),true);
   await cdp.evaluate('document.querySelector("#calculate").click()');
   await until(()=>cdp.evaluate('!document.querySelector("#result").hidden'),'imported solve');
   assert.ok(Math.abs(await cdp.evaluate('Number(document.querySelector("#z-value").textContent)')-50)<.1);
@@ -129,7 +137,9 @@ try {
   assert.ok(touchstone.includes('[Version] 2.0') && touchstone.includes('[Number of Frequencies] 41'));
   await cdp.evaluate('document.querySelector("#line-length").value="50";document.querySelector("#line-length").dispatchEvent(new Event("input"))');
   assert.equal(await cdp.evaluate('document.querySelector("#network-result").hidden'),true,'Frequency input changes clear the response');
-  await cdp.evaluate('document.querySelector("[data-template=coupled_microstrip]").click();document.querySelector("#network-calculate").click()');
+  await cdp.evaluate('document.querySelector("[data-template=coupled_microstrip]").click()');
+  assert.equal(await cdp.evaluate('document.querySelector("#save-editable").disabled'),false,'Choosing a template restores editable saving after a geometric import.');
+  await cdp.evaluate('document.querySelector("#network-calculate").click()');
   await until(()=>cdp.evaluate('!document.querySelector("#network-result").hidden || document.querySelector("#status").classList.contains("error")'),'coupled response',180000);
   assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
   assert.ok(await cdp.evaluate('document.querySelector("#network-description").textContent.includes("Sdd21")'));
@@ -211,6 +221,66 @@ try {
   assert.equal(studySaved.settings.variables[0].parameter,'width');
   const csv=await until(async()=>{try{return await readFile(join(downloads,'sipi-parameter-study.csv'),'utf8');}catch{return null;}},'study CSV download');
   assert.ok(csv.includes('width_m'));assert.equal(csv.trim().split('\n').length,4);
+  // Editable inputs preserve exact physical values, hidden arguments and mesh.
+  const editableData=spawnSync(process.env.SIPI_PYTHON || 'python',['workbench/tests/editable_cases.py'],{encoding:'utf8',env:{...process.env,OPENBLAS_NUM_THREADS:'1'}});
+  assert.equal(editableData.status,0,editableData.stderr);
+  const editableCases=JSON.parse(editableData.stdout);
+  async function openEditable(value, name='한글 editable.json') {
+    const path=join(profile,name);await writeFile(path,typeof value==='string'?value:JSON.stringify(value));
+    await cdp.call('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[path]});
+    await until(()=>cdp.evaluate('!document.querySelector("#open").disabled'),'editable validation',180000);
+  }
+  async function downloadEditable() {
+    await rm(join(downloads,'sipi-editable-design.json'),{force:true});
+    await cdp.evaluate('document.querySelector("#save-editable").click()');
+    const value=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-editable-design.json'),'utf8'));}catch{}},'editable download');
+    await until(()=>cdp.evaluate('!document.querySelector("#open").disabled'),'editable save finished');return value;
+  }
+  for(const sample of editableCases.cases) {
+    await openEditable(sample);
+    assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
+    assert.equal(await cdp.evaluate('document.querySelector("#inputs").hidden'),false);
+    assert.equal(await cdp.evaluate('document.querySelector("#design").disabled'),false);
+    assert.equal(await cdp.evaluate('document.querySelector("#study-calculate").disabled'),false);
+    assert.equal(await cdp.evaluate('document.querySelector("[data-template].selected").dataset.template'),sample.template);
+    await cdp.evaluate('for(const unit of ["mil","mm","mil","mm"]) {document.querySelector("#unit").value=unit;document.querySelector("#unit").dispatchEvent(new Event("change"));}');
+    assert.deepEqual(await downloadEditable(),sample,'Untouched display and unit toggles must preserve exact inputs.');
+  }
+  const beforeInvalid=await downloadEditable();
+  const corrupt=structuredClone(beforeInvalid);corrupt.parameters.width*=2;
+  for(const invalid of [corrupt,editableCases.unsupported,JSON.stringify(beforeInvalid).replace('"schema":','"schema":"duplicate","schema":')]) {
+    await openEditable(invalid);
+    assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),true);
+    assert.deepEqual(await downloadEditable(),beforeInvalid,'Failed imports must preserve the previous editable input.');
+  }
+  // Cancel while File.text is pending, then deliver the late bytes.
+  await cdp.evaluate('window.originalFileText=File.prototype.text;File.prototype.text=function(){const file=this;return new Promise(resolve=>{window.releaseFile=()=>window.originalFileText.call(file).then(resolve)});};');
+  const latePath=join(profile,'late.json');await writeFile(latePath,JSON.stringify(goalEditable));
+  await cdp.call('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[latePath]});
+  await until(()=>cdp.evaluate('typeof window.releaseFile==="function"'),'pending file read');
+  await cdp.evaluate('document.querySelector("#cancel").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#open").disabled'),'cancel file read');
+  await cdp.evaluate('File.prototype.text=window.originalFileText;window.releaseFile()');
+  assert.deepEqual(await downloadEditable(),beforeInvalid,'Late file bytes must not replace the current input.');
+  await openEditable(goalEditable);
+  await cdp.evaluate('document.querySelector("#unit").value="mm";document.querySelector("#unit").dispatchEvent(new Event("change"));for(const [id,value] of [["target","50"],["lower",".4"],["upper",".6"],["tolerance",".1"]]) {const element=document.getElementById(id);element.value=value;element.dispatchEvent(new Event("input"));}document.querySelector("#design").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#refinement").hidden || document.querySelector("#status").classList.contains("error")'),'reopened target',300000);
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
+  const reopenedGoal=await downloadEditable();
+  assert.equal(reopenedGoal.parameters.width,reopenedGoal.cross_section.traces[0].width);
+  await cdp.evaluate('document.querySelector("#width").value=".55";document.querySelector("#width").dispatchEvent(new Event("input"))');
+  assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
+  const edited=await downloadEditable();
+  assert.equal(edited.parameters.width,.00055);assert.deepEqual(edited.cross_section.mesh,reopenedGoal.cross_section.mesh);
+  assert.deepEqual({...edited.parameters,width:reopenedGoal.parameters.width},reopenedGoal.parameters);
+  await cdp.evaluate('document.querySelector("#calculate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#result").hidden || document.querySelector("#status").classList.contains("error")'),'edited solve',180000);
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false);
+  await cdp.evaluate('for(const [id,value] of [["study-mode","sweep"],["study-variable-1","width"],["study-low-1",".54"],["study-high-1",".56"],["study-points","2"]]) {const element=document.getElementById(id);element.value=value;element.dispatchEvent(new Event("input"));}document.querySelector("#study-calculate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#study-result").hidden || document.querySelector("#status").classList.contains("error")'),'reopened study',300000);
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
+  await writeFile(join(output,'editable-design.json'),JSON.stringify(edited,null,2));
+  await writeFile(join(output,'editable.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await writeFile(join(output,'study.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await cdp.evaluate('document.documentElement.scrollWidth <= innerWidth'),true,'mobile horizontal overflow');
@@ -266,7 +336,7 @@ try {
   }
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   if(webRoot) assert.ok(workerTargets.length>=4,'Observe failed, retried, restarted and parity Worker network contexts.');
-  await writeFile(join(output,'report.json'),JSON.stringify({status:parityFailures.length?'failed':'passed',mode:webRoot?'browser-worker':'local-native',stripline_z0:z,externalRequests:remoteRequests,apiRequests:apiRequests.length,workerTargets,errors,parity,parityFailures,checks:['asymmetric imported pair matrices/network without even-odd claim','single-ended NEXT/FEXT port mapping','sweep/corners/Monte Carlo','study CSV/JSON download and unit conversion','tapered geometry and v2 save/import','planar coating','invalid taper refusal','frequency sweep','2/4-port Touchstone download','network stale results','render','solve','unit conversion','target width/refinement','stale results','JSON save/import','cancel and restart','mobile','shutdown','page and Worker network observation',...(webRoot?['missing asset error and retry']:[])]},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:parityFailures.length?'failed':'passed',mode:webRoot?'browser-worker':'local-native',stripline_z0:z,externalRequests:remoteRequests,apiRequests:apiRequests.length,workerTargets,errors,parity,parityFailures,checks:['five editable form exact save/reopen and unit invariance','editable mismatch/duplicate/unsupported refusal','late file read cancellation','reopened goal/edit/analyze/study','asymmetric imported pair matrices/network without even-odd claim','single-ended NEXT/FEXT port mapping','sweep/corners/Monte Carlo','study CSV/JSON download and unit conversion','tapered geometry and v2 save/import','planar coating','invalid taper refusal','frequency sweep','2/4-port Touchstone download','network stale results','render','solve','unit conversion','target width/refinement','stale results','JSON save/import','cancel and restart','mobile','shutdown','page and Worker network observation',...(webRoot?['missing asset error and retry']:[])]},null,2));
   assert.deepEqual(parityFailures,[],'Browser/native parity must meet the preregistered relative 1e-6 threshold.');
   console.log('Browser acceptance passed: solve, target, JSON save/import, cancel, mobile, shutdown; no external HTTP requests.');
 } catch(error) {

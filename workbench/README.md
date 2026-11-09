@@ -9,9 +9,9 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers five cross-section forms, mesh controls, impedance
-targeting, tolerance samples, saved section JSON and line/circuit results.
-**Saved analysis** opens raw JSON for all 21 versioned contracts registered by
+The basic workspace offers five cross-section forms, impedance targeting,
+tolerance samples, saved mesh settings and line/circuit results.
+**Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
 canonical inputs, runs calculations and exports finite complex-valued results.
 Failed study rows and target-search histories remain visible and downloadable;
@@ -22,6 +22,37 @@ every saved contract are not implemented. Explicit-mesh bounded static 3D
 capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
+
+## Save a design and keep editing
+
+Choose a template, enter its dimensions and materials, then use **Save editable
+design**. **Open design** restores those fields from the downloaded JSON, so you
+can edit, calculate, search a target width or run a study. This uses
+[`sipi.template-section/1`](../docs/packages/sipi/template_document.md): original
+template arguments, their resolved geometry and all mesh settings stay together.
+Opening checks that the current engine reproduces the saved geometry exactly.
+A mismatched or unsupported file leaves your current design intact.
+
+The five forms are microstrip, stripline, coupled microstrip, grounded coplanar
+and planar coated microstrip. Other engine templates can use **Saved analysis**;
+this page does not infer a form from arbitrary geometry. **Export geometry**
+keeps the existing cross-section JSON download. Opening that geometric file
+preserves its geometry and mesh but does not enable dimension editing.
+
+Changing display units does not round the stored SI inputs. Unedited parameters
+and inputs without a visible field (such as air height or box width) retain their
+saved values. An explicit field edit invalidates displayed results. A successful
+target search saves the returned width and mesh. Reopened designs retain that
+mesh during subsequent edits; check mesh and outer-domain convergence again for
+the changed geometry. Choosing another template starts fresh default settings.
+An editable design file contains inputs, not calculation results, target bounds,
+study settings or A/B project history.
+
+The engine pin includes 109 registered saved schemas. Registration/normalization
+does not establish that every possible calculation is suitable for the browser,
+within its job limits, or independently validated. The editable path shares the
+native/Worker adapter; current-platform acceptance must use the exact staged
+engine and assets. Advancing the pin alone is not a Windows or Worker pass.
 
 ## Run from source
 

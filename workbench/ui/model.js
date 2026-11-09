@@ -2,6 +2,37 @@ export const scales = {mm: 1e-3, mil: 25.4e-6};
 export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_width', 'coating_height', 'lower', 'upper'];
 export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', grounded_coplanar: 'Grounded coplanar', coated_microstrip: 'Planar coated microstrip'};
 
+export function parameterFields(template) {
+  return {width: 'width', top_width: 'top_width', thickness: 'thickness',
+    height: template === 'stripline' ? 'plane_spacing' : 'substrate_height',
+    gap: 'gap', ground_width: 'ground_width', coating_height: 'coating_height',
+    eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
+    coating_tan_delta: 'coating_tan_delta'};
+}
+
+// Display rounding and unit changes must not become physical input edits.
+// Original parameters also retain inputs which have no field in this form.
+export function editableParameters(template, values, unit, original, changed, lengthSI) {
+  const entered = parameters(template, values, unit);
+  const fields = parameterFields(template);
+  for (const id of lengthFields) {
+    const key = fields[id];
+    if (key in entered && Object.hasOwn(lengthSI, id)) {
+      const value = lengthSI[id];
+      if (!Number.isFinite(value) || (id === 'thickness' ? value < 0 : value <= 0)) throw new Error(`${id} must be a valid length.`);
+      entered[key] = value;
+    }
+  }
+  if (!original) return entered;
+  const out = {...original};
+  for (const id of changed) {
+    const key = fields[id];
+    if (Object.hasOwn(entered, key)) out[key] = entered[key];
+  }
+  if (changed.has('profile')) out.top_width = entered.top_width ?? null;
+  return out;
+}
+
 export function parameters(template, values, unit) {
   if (!(template in labels) || !(unit in scales)) throw new Error('Unknown template or unit.');
   const positive = (key, allowZero = false) => {
@@ -38,7 +69,7 @@ export function convert(value, from, to) {
 export function studyFields(template, p) {
   const fields = {width: 'Bottom width', eps_r: 'Substrate permittivity',
     [template === 'stripline' ? 'plane_spacing' : 'substrate_height']: template === 'stripline' ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
-  if ('top_width' in p) fields.top_width = 'Top width';
+  if (p.top_width != null) fields.top_width = 'Top width';
   if ('gap' in p) fields.gap = 'Bottom gap';
   if ('coating_height' in p) { fields.coating_height = 'Coating height'; fields.coating_eps_r = 'Coating permittivity'; }
   return fields;

@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, parameters, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -9,6 +9,8 @@ if (inBrowser) document.querySelector('.local').lastChild.textContent = ' Browse
 let template = 'microstrip', unit = 'mm', imported = null, latest = null, busy = false;
 let cancelling = false, closed = false, latestNetwork = null, latestStudy = null;
 let runSequence = 0;
+let originalParameters = null, savedMesh = null;
+const changedFields = new Set();
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
 const allFields = [...lengthFields, 'profile', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
@@ -27,6 +29,7 @@ function setBusy(value) {
   $('exit').disabled = false;
   if (imported) for (const element of $('inputs').elements) element.disabled = true;
   $('design').disabled = value || !!imported;
+  $('save-editable').disabled = value || !!imported;
   geometryFields(); studyControls();
 }
 
@@ -41,6 +44,7 @@ function clearResult() {
 }
 
 function values() { return Object.fromEntries(allFields.map(id => [id, $(id).value])); }
+function currentParameters() { return editableParameters(template, values(), unit, originalParameters, changedFields, lengthSI); }
 function request(action) {
   const network = {};
   if (action === 'network') {
@@ -49,7 +53,7 @@ function request(action) {
   }
   if (imported) return {action, document_text: imported, ...network};
   if (!$('inputs').reportValidity()) throw new Error('Check the highlighted input.');
-  const input = {action, template, parameters: parameters(template, values(), unit), ...network};
+  const input = {action, template, parameters: currentParameters(), ...(savedMesh ? {mesh: {...savedMesh}} : {}), ...network};
   if (action === 'study') {
     const mode = $('study-mode').value;
     const count = mode === 'sweep' ? 1 : Number($('study-count').value);
@@ -115,7 +119,7 @@ function draw(model) {
 function preview() {
   $('drawing-unit').textContent = unit;
   try {
-    const model = imported ? JSON.parse(imported) : schematic(template, parameters(template, values(), unit));
+    const model = imported ? JSON.parse(imported) : schematic(template, currentParameters());
     draw(model);
   } catch { $('cross-section').replaceChildren(); }
 }
@@ -169,6 +173,8 @@ function render(result) {
   if (result.design) {
     const d = result.design;
     lengthSI.width = d.width;
+    changedFields.add('width');
+    savedMesh = {...result.document.mesh};
     $('width').value = String(Number((d.width / scales[unit]).toPrecision(10)));
     $('refinement').textContent = `Width ${format(d.width / scales[unit], 6)} ${unit} · initial ${format(d.impedance, 5)} Ω · refined ${format(d.refined_impedance, 5)} Ω · mesh change ${format(d.mesh_change, 5)} Ω. Both meet the requested target tolerance.`;
     history(d.history);
@@ -196,7 +202,7 @@ function studyControls() {
 
 function resetStudyBounds(i) {
   try {
-    const p=parameters(template,values(),unit), key=$(`study-variable-${i}`).value;
+    const p=currentParameters(), key=$(`study-variable-${i}`).value;
     const value=p[key]/studyScale(key,unit);
     $(`study-low-${i}`).value=String(['eps_r','coating_eps_r'].includes(key) ? Math.max(1,value*.9) : value*.9);
     $(`study-high-${i}`).value=String(value === 0 ? .05*scales.mm/scales[unit] : value*1.1);
@@ -204,7 +210,7 @@ function resetStudyBounds(i) {
 }
 
 function refreshStudyOptions(reset=false) {
-  let p; try {p=parameters(template,values(),unit);} catch {return;}
+  let p; try {p=currentParameters();} catch {return;}
   const choices=studyFields(template,p);
   for (let i=1;i<=2;i++) {
     const select=$(`study-variable-${i}`), previous=select.value;
@@ -281,38 +287,46 @@ async function run(action) {
   const sequence = ++runSequence;
   try {
     const input = request(action);
-    if (action !== 'document') clearResult();
+    if (!['document', 'template-document'].includes(action)) clearResult();
     setBusy(true);
     status(action === 'study' ? 'Calculating every sampled cross-section…' : action === 'network' ? 'Calculating the cross-section and frequency response…' : action === 'design' ? 'Searching the width range, then checking a finer mesh…' : action === 'analyze' ? (inBrowser ? 'Preparing the browser engine and calculating… The first load can take longer.' : 'Meshing the cross-section and solving locally…') : 'Validating the design file…');
     const result = await transport.run(input);
     if (sequence !== runSequence || closed) return;
-    if (action === 'document') { download(result.document); status('Design saved with its resolved mesh settings.'); }
+    if (action === 'template-document') {
+      downloadText(result.document_text, 'sipi-editable-design.json', 'application/json');
+      status('Editable design saved with its parameters and resolved mesh.');
+    }
+    else if (action === 'document') { download(result.document); status('Design saved with its resolved mesh settings.'); }
     else { render(result); if (result.study?.failed) status('Study incomplete: failed samples are retained; summary statistics are withheld.', true); else status('Calculation complete. Check mesh and domain convergence before using these values.'); }
   } catch (error) {
     if (sequence === runSequence && !closed && !cancelling) { status(error.message, error.name !== 'AbortError'); history(error.history); }
   } finally { if (sequence === runSequence && !closed && !cancelling) setBusy(false); }
 }
 
-for (const button of document.querySelectorAll('[data-template]')) {
-  button.addEventListener('click', () => {
-    template = button.dataset.template; imported = null;
+function chooseTemplate(name) {
+    template = name; imported = null;
+    originalParameters = null; savedMesh = null; changedFields.clear();
     $('import-note').hidden = true;
     $('inputs').hidden = false;
     for (const element of $('inputs').elements) element.disabled = false;
     for (const b of document.querySelectorAll('[data-template]')) {
-      b.classList.toggle('selected', b === button); b.setAttribute('aria-pressed', String(b === button));
+      b.classList.toggle('selected', b.dataset.template === name); b.setAttribute('aria-pressed', String(b.dataset.template === name));
     }
     $('height-label').textContent = template === 'stripline' ? 'Plane spacing' : 'Substrate height';
     $('gap-field').hidden = !['coupled_microstrip', 'grounded_coplanar'].includes(template);
     $('ground-field').hidden = template !== 'grounded_coplanar';
     $('target-label').firstChild.textContent = template === 'coupled_microstrip' ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
+    $('save-editable').disabled = busy;
     geometryFields(); refreshStudyOptions(true); studyControls(); clearResult(); preview();
-  });
+}
+for (const button of document.querySelectorAll('[data-template]')) {
+  button.addEventListener('click', () => chooseTemplate(button.dataset.template));
 }
 $('inputs').addEventListener('submit', event => event.preventDefault());
 for (const id of allFields) $(id).addEventListener('input', () => {
   if (lengthFields.includes(id)) lengthSI[id] = Number($(id).value) * scales[unit];
+  changedFields.add(id);
   geometryFields(); refreshStudyOptions(); studyControls(); clearResult(); preview();
 });
 $('unit').addEventListener('change', () => {
@@ -337,22 +351,47 @@ for (const id of ['study-mode','study-points','study-seed','study-count','study-
 });
 $('design').addEventListener('click', () => run('design'));
 $('save').addEventListener('click', () => latest ? download(latest.document) : run('document'));
+$('save-editable').addEventListener('click', () => run('template-document'));
 $('open').addEventListener('click', () => $('file').click());
 $('file').addEventListener('change', async () => {
   const file = $('file').files[0];
   $('file').value = '';
-  if (!file) return;
+  if (!file || busy || closed) return;
+  const sequence = ++runSequence;
+  setBusy(true);
   try {
     if (file.size > 200 * 1024) throw new Error('Design files must be smaller than 200 KiB.');
     const text = await file.text(); const value = JSON.parse(text);
+    if (sequence !== runSequence || closed) return;
+    if (value?.schema === 'sipi.template-section/1') {
+      status('Validating the editable design…');
+      const restored = await transport.run({action: 'template-open', text});
+      if (sequence !== runSequence || closed) return;
+      if (!Object.hasOwn(labels, restored.template)) throw new Error('No editable form is available for this template.');
+      chooseTemplate(restored.template);
+      originalParameters = {...restored.parameters};
+      savedMesh = {...restored.document.mesh};
+      for (const [id, key] of Object.entries(parameterFields(template))) {
+        const v = originalParameters[key];
+        if (v == null) continue;
+        if (lengthFields.includes(id)) { lengthSI[id] = v; $(id).value = String(Number((v / scales[unit]).toPrecision(10))); }
+        else $(id).value = String(v);
+      }
+      $('profile').value = originalParameters.top_width == null ? 'rectangular' : 'tapered';
+      geometryFields(); refreshStudyOptions(true); studyControls(); preview();
+      status(`Loaded ${file.name}. Edit the dimensions, calculate, or run a target search or study. Saved mesh settings are retained.`);
+      return;
+    }
     if (!['sipi.cross-section/1', 'sipi.cross-section/2'].includes(value?.schema)) throw new Error('Choose a sipi.cross-section/1 or /2 JSON design.');
     imported = text;
-    clearResult(); preview(); setBusy(false);
+    originalParameters = null; savedMesh = null; changedFields.clear();
+    clearResult(); preview();
     $('import-note').hidden = false;
     $('inputs').hidden = true;
     for (const b of document.querySelectorAll('[data-template]')) { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); }
     status(`Loaded ${file.name}. Calculate to validate and solve the imported design.`);
-  } catch (error) { status(error.message, true); }
+  } catch (error) { if (sequence === runSequence && !closed && !cancelling) status(error.message, true); }
+  finally { if (sequence === runSequence && !closed && !cancelling) setBusy(false); }
 });
 $('cancel').addEventListener('click', async () => {
   const sequence = ++runSequence;

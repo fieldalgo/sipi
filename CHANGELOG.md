@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve editable template inputs in the five-form workbench: save/reopen exact parameters and mesh, retain hidden arguments through unit changes, and keep geometry export compatible. Validate files before changing the form and discard cancelled reads. Advance the engine pin to the validated template-input contract; Windows and Worker acceptance remain separate.
+
 - Preserve editable template names and resolved arguments together with exact cross-section geometry and mesh in a strict shared calculation input.
 
 - Add explicit local project reads and cooperative atomic saves with no-clobber creation, raw-byte conflict detection and distinct post-publication failure reports.

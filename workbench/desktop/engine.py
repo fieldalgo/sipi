@@ -189,6 +189,26 @@ def execute(request):
     if not isinstance(request, dict):
         raise ValueError('Request must be a JSON object.')
     action = request.get('action')
+    if action in ('template-document', 'template-open'):
+        from sipi.template_document import TemplateSectionDocument
+        if action == 'template-open':
+            if set(request) != {'action', 'text'}:
+                raise ValueError('Opening an editable design needs only raw text.')
+            text = request['text']
+            if not isinstance(text, str) or len(text.encode('utf-8')) > 200*1024:
+                raise ValueError('Editable designs must be UTF-8 text up to 200 KiB.')
+            editable = TemplateSectionDocument.loads(text)
+        else:
+            required = {'action', 'template', 'parameters'}
+            if not required <= request.keys() or not request.keys() <= required | {'mesh'}:
+                raise ValueError('Saving an editable design needs template, parameters and optional mesh.')
+            editable = TemplateSectionDocument(request['template'], request['parameters'],
+                                               mesh=request.get('mesh'))
+        if editable.template not in TEMPLATES:
+            raise ValueError('This workspace has no editable form for that template; use Saved analysis.')
+        return {'engine': engine_info(), 'document_text': editable.dumps(),
+                'template': editable.template, 'parameters': editable.parameters,
+                'document': editable.cross_section.to_dict()}
     if action in ('saved-normalize', 'saved-analyze'):
         from sipi.execution import normalize_saved, execute_saved
         required = {'action', 'text'}
