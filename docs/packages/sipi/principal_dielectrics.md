@@ -1,5 +1,7 @@
 # Principal-axis dispersive dielectrics
 
+[Independently oriented Debye residues](tensor_debye.md) provide a separate model with different axes per relaxation term.
+
 `sipi.dielectric.PrincipalAxisDielectric(axis1, axis2, angle_rad=0)` combines two
 existing scalar material models on fixed orthogonal transverse axes:
 

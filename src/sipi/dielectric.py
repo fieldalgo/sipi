@@ -12,6 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from types import MappingProxyType
+import math
 
 import numpy as np
 from .constants import epsilon_0, mu_0
@@ -20,7 +21,7 @@ from .network import _frequencies, _real, _scalar, rlgc_network
 from .quasistatic import capacitance_matrix, _permittivity
 
 __all__ = ['ConstantDielectric', 'DebyeDielectric', 'WidebandDielectric',
-           'TabulatedDielectric', 'PrincipalAxisDielectric', 'dielectric_to_dict', 'dielectric_from_dict',
+           'TabulatedDielectric', 'PrincipalAxisDielectric', 'TensorDebyeDielectric', 'dielectric_to_dict', 'dielectric_from_dict',
            'DielectricSweep', 'dispersive_line']
 
 
@@ -168,6 +169,73 @@ class TabulatedDielectric:
                 - 1j*np.interp(x, xp, np.asarray(self.eps_r)*self.tan_delta))
 
 
+def _rotated_debye_diagonal(values, angle):
+    c, s = np.cos(angle), np.sin(angle)
+    a, b = np.array([c, s]), np.array([-s, c])
+    return values[0]*np.outer(a, a) + values[1]*np.outer(b, b)
+
+
+@dataclass(frozen=True)
+class TensorDebyeDielectric:
+    """Finite passive reciprocal Debye tensor with separately oriented residues.
+
+    eps_inf gives two relative high-frequency principal permittivities >=1,
+    oriented by eps_inf_angle_rad. Each strengths pair gives two nonnegative
+    principal residue values, oriented by its angles_rad entry, with a positive
+    relaxation_hz. All angles are counterclockwise from global transverse x.
+    One through 64 terms are accepted, with a finite sum of principal bounds.
+
+    The convention is exp(+j omega t). Different residue directions can make
+    real and loss principal directions frequency dependent and noncoincident;
+    no one rotating common frame or eigenvector tracking is assumed. This
+    causal finite relaxation family does not establish measured validity,
+    longitudinal/magnetic response or full-wave accuracy.
+    """
+    eps_inf: tuple[float, float]
+    strengths: tuple[tuple[float, float], ...]
+    relaxation_hz: tuple[float, ...]
+    angles_rad: tuple[float, ...]
+    eps_inf_angle_rad: float = 0.0
+
+    def __post_init__(self):
+        high = _real('eps_inf', self.eps_inf)
+        if high.shape != (2,) or np.any(high < 1):
+            raise ValueError('eps_inf needs two principal permittivities >= 1')
+        strength = _real('strengths', self.strengths)
+        if (strength.ndim != 2 or strength.shape[1] != 2
+                or not 1 <= len(strength) <= 64 or np.any(strength < 0)):
+            raise ValueError('strengths needs 1..64 pairs of nonnegative principal values')
+        poles = _vector('relaxation_hz', self.relaxation_hz)
+        angles = _real('angles_rad', self.angles_rad)
+        if len(poles) != len(strength) or angles.shape != (len(strength),):
+            raise ValueError('strengths, relaxation_hz and angles_rad need equal lengths')
+        high_angle = _real('eps_inf_angle_rad', self.eps_inf_angle_rad)
+        if high_angle.ndim != 0:
+            raise ValueError('eps_inf_angle_rad must be a finite real scalar')
+        try:
+            bound = math.fsum([float(max(high)), *map(float, strength.max(axis=1))])
+        except OverflowError as exc:
+            raise ValueError('static principal-permittivity bound must be finite') from exc
+        if not np.isfinite(bound):
+            raise ValueError('static principal-permittivity bound must be finite')
+        object.__setattr__(self, 'eps_inf', tuple(map(float, high)))
+        object.__setattr__(self, 'strengths', tuple(tuple(map(float, row)) for row in strength))
+        object.__setattr__(self, 'relaxation_hz', poles)
+        object.__setattr__(self, 'angles_rad', tuple(map(float, angles)))
+        object.__setattr__(self, 'eps_inf_angle_rad', float(high_angle))
+
+    def permittivity(self, frequency):
+        f = _samples(frequency)
+        high = _rotated_debye_diagonal(self.eps_inf, self.eps_inf_angle_rad)
+        result = np.broadcast_to(high, (*f.shape, 2, 2)).astype(complex).copy()
+        for values, pole, angle in zip(self.strengths, self.relaxation_hz, self.angles_rad):
+            scale = np.maximum(pole, f)
+            a, b = pole/scale, f/scale
+            response = (a*a-1j*a*b)/(a*a+b*b)
+            result += response[..., None, None]*_rotated_debye_diagonal(values, angle)
+        return result
+
+
 _MODELS = {'constant': ConstantDielectric, 'debye': DebyeDielectric,
            'wideband': WidebandDielectric, 'table': TabulatedDielectric}
 
@@ -204,6 +272,11 @@ class PrincipalAxisDielectric:
 
 def dielectric_to_dict(model):
     """Versioned, JSON-safe model input; no code paths or implicit units."""
+    if type(model) is TensorDebyeDielectric:
+        return dict(schema='sipi.dielectric/3', kind='tensor-debye', parameters=dict(
+            eps_inf=list(model.eps_inf), strengths=[list(x) for x in model.strengths],
+            relaxation_hz=list(model.relaxation_hz), angles_rad=list(model.angles_rad),
+            eps_inf_angle_rad=model.eps_inf_angle_rad))
     if type(model) is PrincipalAxisDielectric:
         return dict(schema='sipi.dielectric/2', kind='principal-axes', parameters=dict(
             axis1=dielectric_to_dict(model.axis1), axis2=dielectric_to_dict(model.axis2),
@@ -220,6 +293,11 @@ def dielectric_from_dict(value):
     if not isinstance(value, dict) or set(value) != {'schema', 'kind', 'parameters'}:
         raise ValueError('dielectric document needs exactly schema, kind and parameters')
     kind = value['kind']
+    if value['schema'] == 'sipi.dielectric/3' and kind == 'tensor-debye':
+        parameters = value['parameters']
+        if not isinstance(parameters, dict) or set(parameters) != set(TensorDebyeDielectric.__dataclass_fields__):
+            raise ValueError('tensor Debye parameters need every declared field and no extras')
+        return TensorDebyeDielectric(**parameters)
     if value['schema'] == 'sipi.dielectric/2' and kind == 'principal-axes':
         parameters = value['parameters']
         if not isinstance(parameters, dict) or set(parameters) != {'axis1', 'axis2', 'angle_rad'}:

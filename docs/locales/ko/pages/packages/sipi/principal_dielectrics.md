@@ -1,5 +1,7 @@
 # 주축 방향별 분산 유전체
 
+[독립 방향 Debye 잔차](tensor_debye.md)는 항마다 다른 축을 허용하는 별도 재료 모델입니다.
+
 `sipi.dielectric.PrincipalAxisDielectric(axis1, axis2, angle_rad=0)`는 기존 스칼라
 재료 모델 두 개를 고정된 직교 횡방향 축에 배치합니다.
 
