@@ -147,7 +147,7 @@ def test_strict_saved_input_and_detached_snapshots():
     data = doc.to_dict(); data['candidates'][0]['study']['parameters']['width'] = 99
     assert doc.dumps() == restored.dumps() == normalize_saved(doc.dumps())
     bad = []
-    for field, value in [('schema', 'sipi.yield-design/3'), ('extra', 1), ('confidence', True),
+    for field, value in [('schema', 'sipi.yield-design/999'), ('extra', 1), ('confidence', True),
             ('confidence', math.nextafter(1., 0.)), ('minimum_yield', None), ('minimum_yield', 1.1),
             ('cost_unit', ''), ('cost_unit', 'money\n'), ('cost_unit', 'x'*129),
             ('candidates', []), ('candidates', {}), ('candidates', doc.to_dict()['candidates']*11)]:

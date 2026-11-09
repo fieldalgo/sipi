@@ -1,5 +1,7 @@
 # Common-current iid acceptance bounds
 
+[Explicit fixed-candidate selection /3](common_forward_yield_design.md) adds simultaneous bounds for predeclared common-current candidates.
+
 **English** | [한국어](../../locales/ko/pages/packages/sipi/common_forward_line_yield.md)
 
 Explicit `sipi.line-quantity-yield/2` accepts a fixed random

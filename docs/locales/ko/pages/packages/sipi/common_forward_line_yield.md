@@ -1,5 +1,7 @@
 # 공통 전류 물리량의 iid 합격 확률 구간
 
+[명시적 고정 후보 선택 /3](common_forward_yield_design.md)는 미리 정한 공통 전류 후보의 동시 신뢰구간을 제공합니다.
+
 [English](../../../../../packages/sipi/common_forward_line_yield.md) | **한국어**
 
 명시적 `sipi.line-quantity-yield/2`는 고정된 확률 표본 요청인

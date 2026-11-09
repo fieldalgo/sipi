@@ -89,13 +89,13 @@ class YieldDesignResult:
             quantity=self.candidates[0].assessment.study.quantity,
             evaluations=sum(len(c.assessment.study.rows) for c in self.candidates),
             unresolved=self.unresolved, candidates=[c.to_dict() for c in self.candidates])
-        if data['schema'] == 'sipi.yield-design/2':
+        if data['schema'] in ('sipi.yield-design/2', 'sipi.yield-design/3'):
             out['unit'] = self.candidates[0].assessment.study.unit
         return out
 
 
 class YieldDesignDocument:
-    """Enumerate a fixed candidate set before any field work, versions 1 and 2.
+    """Enumerate a fixed candidate set before any field work, versions 1 through 3.
 
     Each candidate is exactly {name, cost, study}, where study is a saved random
     impedance-study dictionary. Cost is supplied by the caller in one explicit
@@ -103,6 +103,9 @@ class YieldDesignDocument:
     Version 1 is the constructor default. Explicit version 2 instead takes
     line-quantity-study/1 or /2 dictionaries and requires an identical lossy
     quantity and positive frequency for all candidates. Units remain explicit.
+    Explicit version 3 also admits line-quantity-study/3, including common-current
+    forward Re(Zcc), while version 2 retains its previous study/1 and /2 boundary.
+    Candidates are fixed before sampling; no adaptive or continuous optimization runs.
     """
     def __init__(self, candidates, *, cost_unit, minimum_yield, minimum=None, maximum=None, confidence=.95,
                  schema='sipi.yield-design/1'):
@@ -112,9 +115,9 @@ class YieldDesignDocument:
     def _assign(self, data):
         _keys(data, ('schema', 'candidates', 'cost_unit', 'minimum', 'maximum', 'minimum_yield', 'confidence'),
               where='yield design')
-        if data['schema'] not in ('sipi.yield-design/1', 'sipi.yield-design/2'):
+        if data['schema'] not in ('sipi.yield-design/1', 'sipi.yield-design/2', 'sipi.yield-design/3'):
             raise ValueError('unsupported yield-design schema')
-        lossy = data['schema'] == 'sipi.yield-design/2'
+        lossy = data['schema'] in ('sipi.yield-design/2', 'sipi.yield-design/3')
         low, high, confidence, target = _criteria(data['minimum'], data['maximum'],
             data['confidence'], data['minimum_yield'], quantity_name='line quantity' if lossy else 'impedance')
         if target is None:
@@ -133,7 +136,8 @@ class YieldDesignDocument:
             names.add(name)
             cost = _scalar('candidate cost', entry['cost'], zero=True)
             study = (LineQuantityStudyDocument if lossy else ImpedanceStudyDocument).from_dict(entry['study']).to_dict()
-            if lossy and study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
+            if (data['schema'] == 'sipi.yield-design/2' and
+                    study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2')):
                 raise ValueError('yield candidates require line-quantity-study/1 or /2')
             source = study['study'] if lossy else study
             if source['sampling']['kind'] not in ('uniform', 'normal'):
@@ -171,7 +175,7 @@ class YieldDesignDocument:
     def analyze(self, *, max_evaluations=128):
         budget = _integer(max_evaluations, 2, 10000)
         data = self._data
-        lossy = data['schema'] == 'sipi.yield-design/2'
+        lossy = data['schema'] in ('sipi.yield-design/2', 'sipi.yield-design/3')
         total = sum((c['study']['study'] if lossy else c['study'])['sampling']['count']
                     for c in data['candidates'])
         if total > budget:

@@ -107,6 +107,7 @@ _REGISTRY = {
     'sipi.impedance-yield/1': ImpedanceYieldDocument,
     'sipi.yield-design/1': YieldDesignDocument,
     'sipi.yield-design/2': YieldDesignDocument,
+    'sipi.yield-design/3': YieldDesignDocument,
     'sipi.dielectric-fit/1': DebyeFitDocument,
     'sipi.line-quantity-design/1': LineQuantityDesignDocument,
     'sipi.line-quantity-design/2': LineQuantityDesignDocument,

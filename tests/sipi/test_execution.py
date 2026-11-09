@@ -427,6 +427,12 @@ def documents():
     common_source['study']['sampling'].update(kind='uniform', count=3, seed=17)
     base.append(LineQuantityYieldDocument(LineQuantityStudyDocument.from_dict(common_source),
         schema='sipi.line-quantity-yield/2', minimum=1., maximum=1000., minimum_yield=.5))
+    common_yield_source = next(item.to_dict()['study'] for item in base
+                               if item.to_dict()['schema'] == 'sipi.line-quantity-yield/2')
+    common_yield_source['study']['sampling']['count'] = 2
+    base.append(YieldDesignDocument([dict(name='common-current', cost=1., study=common_yield_source)],
+        cost_unit='relative cost', minimum=1., maximum=1000., minimum_yield=.1,
+        schema='sipi.yield-design/3'))
     return base
 
 

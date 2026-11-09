@@ -147,7 +147,7 @@ def test_total_candidate_budget_and_normalization_before_first_field(monkeypatch
 def test_strict_lossy_candidates_and_common_frequency_before_fields(monkeypatch, case):
     raw = design((1., 2.), count=2).to_dict()
     if case == 'v1': raw['schema'] = 'sipi.yield-design/1'
-    if case == 'schema': raw['schema'] = 'sipi.yield-design/3'
+    if case == 'schema': raw['schema'] = 'sipi.yield-design/999'
     if case == 'missing': del raw['cost_unit']
     if case == 'extra': raw['optimizer'] = 'adaptive'
     if case == 'quantity': raw['candidates'][1]['study'] = random_study('attenuation', 2).to_dict()
