@@ -1,5 +1,7 @@
 # Shared execution of saved inputs
 
+[Frozen execution requests](execution_request.md) associate canonical inputs and controls with unchanged execution results.
+
 [Saved two-parameter impedance goals](pair_design_document.md) retain two targets and full failure context.
 
 [Saved conductivity profiles](conductivity_profile_document.md) retain the exterior port plane and check frequency budgets before integration.

@@ -1,5 +1,7 @@
 # 저장 입력의 공통 실행
 
+[불변 실행 요청](execution_request.md)은 정규화 입력·옵션과 기존 실행 결과를 연결합니다.
+
 [두 변수 임피던스 목표 저장](pair_design_document.md)은 두 목표와 전체 실패 문맥을 보존합니다.
 
 [전도율 프로파일 저장](conductivity_profile_document.md)은 외측 포트면을 보존하고 적분 전에 주파수 예산을 확인합니다.

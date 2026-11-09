@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Freeze saved inputs and execution controls in an immutable request with semantic hashes and receipts that retain the existing execution result.
+
 - Compare fixed paired manufacturing candidates on one shared finite frequency grid with simultaneous joint-acceptance bounds and retained unresolved samples.
 
 - Assess one fixed joint iid acceptance event across both paired impedances and every supplied frequency, retaining original specimens and unresolved bounds.
