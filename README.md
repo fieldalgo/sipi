@@ -4,6 +4,11 @@
 
 [Suite documentation](https://github.com/fieldalgo/openphysics/blob/main/docs/README.md)
 
+[Saved-input commands](docs/packages/sipi/cli.md) ([한국어](docs/locales/ko/pages/packages/sipi/cli.md)):
+the development wheel provides `sipi validate` and `sipi run`, with the same
+versioned engine inputs and execution receipts. This is not a published release
+or the default UI launcher.
+
 Per-unit-length parameters of printed-circuit-board transmission lines from
 their cross-section: layered/local dielectrics, rectangular, tapered or polygonal traces, quasi-static
 (quasi-TEM) analysis on the galerkin finite-element engine with meshes from

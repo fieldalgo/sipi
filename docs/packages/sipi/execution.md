@@ -1,5 +1,7 @@
 # Shared execution of saved inputs
 
+[Installed commands](cli.md) validate and run the same inputs without a GUI.
+
 [Frozen execution requests](execution_request.md) associate canonical inputs and controls with unchanged execution results.
 
 [Saved two-parameter impedance goals](pair_design_document.md) retain two targets and full failure context.

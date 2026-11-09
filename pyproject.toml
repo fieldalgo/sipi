@@ -34,6 +34,9 @@ Homepage = "https://github.com/fieldalgo/sipi"
 Repository = "https://github.com/fieldalgo/sipi"
 Issues = "https://github.com/fieldalgo/sipi/issues"
 
+[project.scripts]
+sipi = "sipi.cli:main"
+
 [project.optional-dependencies]
 test = ["pytest", "scikit-rf==2.2.0", "scikit-fem==12.0.2"]
 
