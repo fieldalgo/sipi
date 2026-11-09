@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an unequal pair between finite coplanar grounds under a normal-thickness film, with explicit ground thickness and fixed-pitch material studies and goals.
+
 - Add an unequal microstrip pair with a normal-thickness mitered dielectric film, independent signal dimensions and fixed-pitch material studies and goals.
 
 - Add an unequal planar-coated microstrip pair with independent signal widths, thicknesses and tapers, including fixed-pitch studies and bounded impedance goals.

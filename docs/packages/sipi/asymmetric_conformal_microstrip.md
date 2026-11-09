@@ -1,5 +1,7 @@
 # Unequal pair with a normal-thickness coating
 
+[Finite coplanar grounds](asymmetric_conformal_coplanar.md) add explicit lateral grounds under the same normal-thickness film.
+
 [한국어](../../locales/ko/pages/packages/sipi/asymmetric_conformal_microstrip.md) ·
 [Planar coating](asymmetric_coated_microstrip.md) · [Equal conformal pair](conformal_coating.md)
 

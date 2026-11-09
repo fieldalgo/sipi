@@ -1,5 +1,7 @@
 # 법선 두께 코팅을 갖는 비대칭 쌍
 
+[유한 coplanar 접지](asymmetric_conformal_coplanar.md)는 같은 법선 두께 필름 아래 명시적 측면 접지를 추가합니다.
+
 [English](../../../../../packages/sipi/asymmetric_conformal_microstrip.md) ·
 [평면 코팅](asymmetric_coated_microstrip.md) · [동일폭 conformal 쌍](conformal_coating.md)
 
