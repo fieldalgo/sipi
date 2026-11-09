@@ -11,6 +11,18 @@
   <header class="topbar"><div class="brand">FieldAlgo <span>/</span> <strong>SIPI</strong></div><div class="top-actions"><a href="./saved.html">Saved analysis</a><span class="local"><i></i> Offline workspace</span><button id="exit" class="quiet">Exit</button></div></header>
   <main>
     <div class="heading"><div><p class="eyebrow">TRANSMISSION LINE DESIGN</p><h1>Start with the cross-section.</h1><p class="intro">Explore impedance, refine a dimension, keep the design.</p></div><div class="file-actions"><button id="open">Open design</button><button id="save-editable">Save editable design ↓</button><button id="save">Export geometry ↓</button><input id="file" type="file" accept=".json,application/json" hidden></div></div>
+    <section class="panel project-panel" aria-label="Design variants">
+      <div class="panel-heading"><h2>Design variants</h2><span id="project-title" class="tag">Input project</span></div>
+      <div class="project-fields">
+        <label>Current design<select id="project-design" disabled><option value="">Design A</option></select></label>
+        <label>Design name<input id="project-label" value="Design A" maxlength="256" required></label>
+        <button id="project-duplicate">Duplicate design</button>
+        <button id="project-save">Save input project ↓</button>
+        <button id="project-open">Open project</button>
+        <input id="project-file" type="file" accept=".json,application/json" hidden>
+      </div>
+      <p class="fine" id="project-note">Variants keep cross-section inputs and mesh. Save this file to resume later. Target, study, frequency-response settings and new results are not stored.</p>
+    </section>
     <div class="workspace">
       <aside class="inputs panel">
         <div class="panel-heading"><h2>Cross-section</h2><span class="step">01</span></div>

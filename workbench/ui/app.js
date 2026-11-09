@@ -10,6 +10,7 @@ let template = 'microstrip', unit = 'mm', imported = null, latest = null, busy =
 let cancelling = false, closed = false, latestNetwork = null, latestStudy = null;
 let runSequence = 0;
 let originalParameters = null, savedMesh = null;
+let projectText = null, activeDesign = null;
 const changedFields = new Set();
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
 const allFields = [...lengthFields, 'profile', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
@@ -31,6 +32,94 @@ function setBusy(value) {
   $('design').disabled = value || !!imported;
   $('save-editable').disabled = value || !!imported;
   geometryFields(); studyControls();
+  projectControls();
+}
+
+function projectControls() {
+  for (const id of ['project-duplicate', 'project-save']) $(id).disabled = busy || closed || !!imported;
+  $('project-design').disabled = busy || closed || !projectText;
+  $('project-label').disabled = busy || closed || !!imported;
+  $('project-open').disabled = busy || closed;
+}
+
+function showProject() {
+  if (!projectText) return;
+  const project = JSON.parse(projectText);
+  $('project-title').textContent = project.title;
+  $('project-design').replaceChildren(...project.designs.map(design => {
+    const option = document.createElement('option'); option.value = design.design_id;
+    option.textContent = design.label; return option;
+  }));
+  $('project-design').value = activeDesign;
+  const current = project.designs.find(design => design.design_id === activeDesign);
+  $('project-label').value = current.label;
+  const count = project.designs.reduce((sum, design) => sum + design.records.length, 0);
+  $('project-note').textContent = 'Variants keep cross-section inputs and mesh. Save this file to resume later. Target, study, frequency-response settings and new results are not stored.' +
+    (count ? ` ${count} existing saved record(s) are retained.` : '');
+  projectControls();
+}
+
+function supportedProject(text) {
+  const project = JSON.parse(text);
+  for (const design of project.designs) {
+    const input = JSON.parse(design.source_text);
+    if (input?.schema !== 'sipi.template-section/1' || !Object.hasOwn(labels, input.template))
+      throw new Error(`No editable form for design “${design.label}”. This workspace opens projects using its five editable templates; the current project is unchanged.`);
+  }
+  return project;
+}
+
+async function projectCall(input, sequence) {
+  if (new TextEncoder().encode(JSON.stringify(input)).length > 256*1024)
+    throw new Error('Encoded project request exceeds 256 KiB. The current project is unchanged.');
+  const result = await transport.run(input);
+  if (sequence !== runSequence || closed) throw new DOMException('Project operation cancelled.', 'AbortError');
+  return result;
+}
+
+async function snapshotProject(sequence) {
+  const label = $('project-label').value;
+  if (!label.trim()) throw new Error('Enter a design name before saving or switching.');
+  const editable = await projectCall(request('template-document'), sequence);
+  const id = activeDesign || crypto.randomUUID();
+  const input = projectText ? {action:'project-update', project_text:projectText,
+    design_id:id, text:editable.document_text, label} : {action:'project-create',
+    text:editable.document_text, project_id:crypto.randomUUID(), design_id:id,
+    title:'Cross-section designs', label};
+  const result = await projectCall(input, sequence);
+  return {text:result.project_text, id, editable};
+}
+
+async function changeProject(operation, target) {
+  if (busy || closed || imported) return;
+  if (projectText) $('project-design').value = activeDesign;
+  const sequence = ++runSequence;
+  setBusy(true);
+  try {
+    let snapshot = await snapshotProject(sequence);
+    let restored = null;
+    if (operation === 'duplicate') {
+      const id = crypto.randomUUID();
+      const result = await projectCall({action:'project-duplicate', project_text:snapshot.text,
+        source_id:snapshot.id, design_id:id,
+        label:`Design ${JSON.parse(snapshot.text).designs.length + 1}`}, sequence);
+      snapshot = {...snapshot, text:result.project_text, id};
+      restored = snapshot.editable;
+    } else if (operation === 'switch') {
+      const design = supportedProject(snapshot.text).designs.find(design => design.design_id === target);
+      if (!design) throw new Error('The requested design is unavailable.');
+      restored = await projectCall({action:'template-open', text:design.source_text}, sequence);
+      snapshot.id = target;
+    }
+    if (restored) restoreEditable(restored);
+    projectText = snapshot.text; activeDesign = snapshot.id; showProject();
+    if (operation === 'save') {
+      downloadText(projectText, 'sipi-project.json', 'application/json');
+      status('Input project saved. Inputs and existing records are retained; new calculation results are not added.');
+    } else status('Design ready. Edit its inputs or calculate; save the project file to keep your variants.');
+  } catch (error) {
+    if (sequence === runSequence && !closed && !cancelling) status(error.message, error.name !== 'AbortError');
+  } finally { if (sequence === runSequence && !closed && !cancelling) setBusy(false); }
 }
 
 function clearResult() {
@@ -318,7 +407,22 @@ function chooseTemplate(name) {
     $('target-label').firstChild.textContent = template === 'coupled_microstrip' ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
     $('save-editable').disabled = busy;
-    geometryFields(); refreshStudyOptions(true); studyControls(); clearResult(); preview();
+    geometryFields(); refreshStudyOptions(true); studyControls(); clearResult(); preview(); projectControls();
+}
+
+function restoreEditable(restored) {
+  if (!Object.hasOwn(labels, restored.template)) throw new Error('No editable form is available for this template.');
+  chooseTemplate(restored.template);
+  originalParameters = {...restored.parameters};
+  savedMesh = {...restored.document.mesh};
+  for (const [id, key] of Object.entries(parameterFields(template))) {
+    const v = originalParameters[key];
+    if (v == null) continue;
+    if (lengthFields.includes(id)) { lengthSI[id] = v; $(id).value = String(Number((v / scales[unit]).toPrecision(10))); }
+    else $(id).value = String(v);
+  }
+  $('profile').value = originalParameters.top_width == null ? 'rectangular' : 'tapered';
+  geometryFields(); refreshStudyOptions(true); studyControls(); preview();
 }
 for (const button of document.querySelectorAll('[data-template]')) {
   button.addEventListener('click', () => chooseTemplate(button.dataset.template));
@@ -367,22 +471,12 @@ $('file').addEventListener('change', async () => {
       status('Validating the editable design…');
       const restored = await transport.run({action: 'template-open', text});
       if (sequence !== runSequence || closed) return;
-      if (!Object.hasOwn(labels, restored.template)) throw new Error('No editable form is available for this template.');
-      chooseTemplate(restored.template);
-      originalParameters = {...restored.parameters};
-      savedMesh = {...restored.document.mesh};
-      for (const [id, key] of Object.entries(parameterFields(template))) {
-        const v = originalParameters[key];
-        if (v == null) continue;
-        if (lengthFields.includes(id)) { lengthSI[id] = v; $(id).value = String(Number((v / scales[unit]).toPrecision(10))); }
-        else $(id).value = String(v);
-      }
-      $('profile').value = originalParameters.top_width == null ? 'rectangular' : 'tapered';
-      geometryFields(); refreshStudyOptions(true); studyControls(); preview();
+      restoreEditable(restored);
       status(`Loaded ${file.name}. Edit the dimensions, calculate, or run a target search or study. Saved mesh settings are retained.`);
       return;
     }
     if (!['sipi.cross-section/1', 'sipi.cross-section/2'].includes(value?.schema)) throw new Error('Choose a sipi.cross-section/1 or /2 JSON design.');
+    if (projectText) throw new Error('A geometry-only import cannot replace an editable project design. Open an editable design, or use a separate workspace.');
     imported = text;
     originalParameters = null; savedMesh = null; changedFields.clear();
     clearResult(); preview();
@@ -393,6 +487,28 @@ $('file').addEventListener('change', async () => {
   } catch (error) { if (sequence === runSequence && !closed && !cancelling) status(error.message, true); }
   finally { if (sequence === runSequence && !closed && !cancelling) setBusy(false); }
 });
+$('project-duplicate').onclick = () => changeProject('duplicate');
+$('project-save').onclick = () => changeProject('save');
+$('project-design').onchange = () => changeProject('switch', $('project-design').value);
+$('project-open').onclick = () => $('project-file').click();
+$('project-file').onchange = async () => {
+  const file = $('project-file').files[0]; $('project-file').value = '';
+  if (!file || busy || closed) return;
+  const sequence = ++runSequence; setBusy(true);
+  try {
+    if (file.size > 200*1024) throw new Error('Project files must be at most 200 KiB.');
+    const text = await file.text();
+    if (sequence !== runSequence || closed) return;
+    const opened = await projectCall({action:'project-open', project_text:text}, sequence);
+    const project = supportedProject(opened.project_text), first = project.designs[0];
+    const restored = await projectCall({action:'template-open', text:first.source_text}, sequence);
+    restoreEditable(restored);
+    projectText = opened.project_text; activeDesign = first.design_id; showProject();
+    status(`Opened ${file.name}. The first design is selected. Inputs and existing records are retained.`);
+  } catch (error) {
+    if (sequence === runSequence && !closed && !cancelling) status(error.message, error.name !== 'AbortError');
+  } finally { if (sequence === runSequence && !closed && !cancelling) setBusy(false); }
+};
 $('cancel').addEventListener('click', async () => {
   const sequence = ++runSequence;
   cancelling = true;
@@ -407,4 +523,4 @@ $('exit').addEventListener('click', async () => {
   try { await transport.close(); status('Application closed. You can close this browser tab.'); for (const element of document.querySelectorAll('button,input,select')) element.disabled = true; }
   catch (error) { closed = false; status(error.message, true); setBusy(false); }
 });
-geometryFields(); refreshStudyOptions(true); studyControls(); preview();
+geometryFields(); refreshStudyOptions(true); studyControls(); preview(); projectControls();

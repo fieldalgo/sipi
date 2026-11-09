@@ -1,6 +1,9 @@
 """Fixed editable inputs for the real browser save/reopen acceptance."""
 import json
 from sipi.template_document import TemplateSectionDocument
+from sipi.execution_request import SavedExecutionRequest
+from sipi.execution_record import SavedExecutionRecord
+from sipi.project import SavedProject
 
 cases = []
 for name in ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip'):
@@ -15,4 +18,16 @@ for name in ('microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar
     doc = TemplateSectionDocument(name, p, mesh=dict(edge_size=8e-6, far_size=.00025, grade=.3))
     cases.append(doc.to_dict())
 unsupported = TemplateSectionDocument('coupled_stripline', dict(width=.0005, gap=.0002, plane_spacing=.001, eps_r=4))
-print(json.dumps(dict(cases=cases, unsupported=unsupported.to_dict()), allow_nan=False))
+unsupported_project = SavedProject(SavedExecutionRequest(unsupported.dumps()),
+    project_id='unsupported', design_id='a', title='Unsupported form', label='A')
+base = TemplateSectionDocument('stripline',dict(width=.0005,plane_spacing=.001,eps_r=4),
+    mesh=dict(edge_size=16e-6,far_size=.0005,grade=.3))
+request = SavedExecutionRequest(base.dumps())
+# Synthetic artifact declaration for a browser fixture, not runtime provenance.
+record = SavedExecutionRecord(request, request.run(), run_id='fixture:run', artifacts=[
+    dict(component='sipi',version='fixture-only',kind='wheel',sha256='1'*64)])
+recorded = SavedProject(request, project_id='recorded',design_id='a',title='Recorded input',label='A')
+recorded = recorded.attach_record('a',record,select=True)
+print(json.dumps(dict(cases=cases, unsupported=unsupported.to_dict(),
+    unsupported_project=unsupported_project.to_dict(), recorded_project=recorded.to_dict(),
+    recorded_project_text=recorded.dumps()),allow_nan=False))

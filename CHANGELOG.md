@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add input-project controls to the existing five-form workbench: duplicate, rename, switch, save and reopen cross-section variants while preserving exact parameters, resolved mesh and existing records. Reject unsupported or late imports without replacing current state; new calculation-result history remains separate.
+
 - Connect bounded project create/open/duplicate/update operations to the existing immutable project contract. Preserve original inputs, controls and history, reject oversized or invalid edits, and keep calculations, file publication and A/B UI separate.
 
 - Include the canonical local workbench host and UI in the pure development wheel. Open it with `sipi` or `sipi gui`, retain headless commands and the direct source launcher, and reuse the existing loopback/cancellation lifecycle without bundling a browser or third-party runtime.

@@ -282,6 +282,82 @@ try {
   await writeFile(join(output,'editable-design.json'),JSON.stringify(edited,null,2));
   await writeFile(join(output,'editable.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await writeFile(join(output,'study.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+  // Input projects preserve exact variants and pre-existing records.
+  const projectFile=await cdp.call('DOM.querySelector',{nodeId:root.root.nodeId,selector:'#project-file'});
+  async function openProject(value, name='입력 프로젝트.json') {
+    const path=join(profile,name);await writeFile(path,typeof value==='string'?value:JSON.stringify(value));
+    await cdp.call('DOM.setFileInputFiles',{nodeId:projectFile.nodeId,files:[path]});
+    await until(()=>cdp.evaluate('!document.querySelector("#project-open").disabled'),'project open',180000);
+  }
+  async function saveProject() {
+    await rm(join(downloads,'sipi-project.json'),{force:true});
+    await cdp.evaluate('document.querySelector("#project-save").click()');
+    const result=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-project.json'),'utf8'));}catch{}},'project download',180000);
+    await until(()=>cdp.evaluate('!document.querySelector("#project-save").disabled'),'project save finished');return result;
+  }
+  async function selectDesign(id) {
+    await cdp.evaluate(`document.querySelector('#project-design').value=${JSON.stringify(id)};document.querySelector('#project-design').dispatchEvent(new Event('change'));`);
+    await until(()=>cdp.evaluate('!document.querySelector("#project-open").disabled'),'project switch',180000);
+    assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
+  }
+  await cdp.evaluate('document.querySelector("#project-duplicate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#project-duplicate").disabled'),'initial duplicate',180000);
+  assert.equal(await cdp.evaluate('document.querySelector("#project-design").options.length'),2);
+  const firstProject=await saveProject();
+  const [a,b]=firstProject.designs.map(d=>d.design_id);
+  assert.deepEqual(JSON.parse(firstProject.designs[0].source_text),edited);
+  assert.equal(firstProject.designs[0].source_text,firstProject.designs[1].source_text);
+  await cdp.evaluate('document.querySelector("#width").value=".6";document.querySelector("#width").dispatchEvent(new Event("input"))');
+  await selectDesign(a);
+  assert.equal(await cdp.evaluate('Number(document.querySelector("#width").value)'),.55);
+  await selectDesign(b);
+  assert.equal(await cdp.evaluate('Number(document.querySelector("#width").value)'),.6);
+  const variants=await saveProject();
+  assert.equal(JSON.parse(variants.designs[0].source_text).parameters.width,.00055);
+  assert.equal(JSON.parse(variants.designs[1].source_text).parameters.width,.0006);
+  for(const d of variants.designs) {assert.deepEqual(JSON.parse(d.source_text).cross_section.mesh,edited.cross_section.mesh);assert.deepEqual(d.records,[]);}
+  await openProject(variants);
+  assert.equal(await cdp.evaluate('document.querySelector("#project-design").value'),a);
+  await selectDesign(b);
+  const corruptProject=structuredClone(variants);corruptProject.title='digest mismatch';
+  for(const invalid of [corruptProject,editableCases.unsupported_project,JSON.stringify(variants).replace('"schema":','"schema":"duplicate","schema":')]) {
+    await openProject(invalid);
+    assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),true);
+    assert.equal(await cdp.evaluate('document.querySelector("#project-design").value'),b);
+    assert.deepEqual(await saveProject(),variants,'Rejected projects must retain all variants.');
+  }
+  await cdp.evaluate('window.releaseFile=null;window.originalFileText=File.prototype.text;File.prototype.text=function(){const file=this;return new Promise(resolve=>{window.releaseFile=()=>window.originalFileText.call(file).then(resolve)});};');
+  const lateProject=join(profile,'late project.json');await writeFile(lateProject,editableCases.recorded_project_text);
+  await cdp.call('DOM.setFileInputFiles',{nodeId:projectFile.nodeId,files:[lateProject]});
+  await until(()=>cdp.evaluate('typeof window.releaseFile==="function"'),'pending project read');
+  await cdp.evaluate('document.querySelector("#cancel").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#project-open").disabled'),'cancel project read');
+  await cdp.evaluate('File.prototype.text=window.originalFileText;window.releaseFile()');
+  assert.deepEqual(await saveProject(),variants,'Late project bytes must not replace current variants.');
+  await openProject(editableCases.recorded_project_text);
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false);
+  assert.deepEqual(await saveProject(),editableCases.recorded_project,'Existing exact records and selection survive reopening.');
+  assert.equal(await readFile(join(downloads,'sipi-project.json'),'utf8'),editableCases.recorded_project_text,
+    'Raw canonical project text preserves numeric representation inside existing records.');
+  await openProject(editableCases.recorded_project); // Deliberate JS numeric reserialization.
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),true);
+  await saveProject();
+  assert.equal(await readFile(join(downloads,'sipi-project.json'),'utf8'),editableCases.recorded_project_text,
+    'A digest-changing reserialization must be rejected without replacing the raw project.');
+  await cdp.evaluate('document.querySelector("#width").value=".6";document.querySelector("#width").dispatchEvent(new Event("input"));document.querySelector("#project-label").value="변형 B";');
+  const updatedRecord=await saveProject();
+  assert.equal(updatedRecord.designs[0].selected_run_id,null);
+  assert.deepEqual(updatedRecord.designs[0].records,editableCases.recorded_project.designs[0].records);
+  await cdp.evaluate('document.querySelector("#calculate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#result").hidden || document.querySelector("#status").classList.contains("error")'),'project solve',180000);
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false);
+  assert.deepEqual(await saveProject(),updatedRecord,'New workbench results must not fabricate saved records.');
+  await cdp.evaluate('document.querySelector("#project-duplicate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#project-duplicate").disabled'),'recorded duplicate',180000);
+  const copiedRecord=await saveProject();assert.deepEqual(copiedRecord.designs[1].records,[]);
+  assert.deepEqual(copiedRecord.designs[0].records,editableCases.recorded_project.designs[0].records);
+  await writeFile(join(output,'project.json'),JSON.stringify(copiedRecord,null,2));
+  await writeFile(join(output,'project.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await cdp.evaluate('document.documentElement.scrollWidth <= innerWidth'),true,'mobile horizontal overflow');
   await writeFile(join(output,'mobile.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));

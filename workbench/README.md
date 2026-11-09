@@ -2,8 +2,8 @@
 
 [한국어](README.ko.md)
 
-The [project transport contract](PROJECTS.md) connects existing immutable A/B
-snapshots; its screen controls and result-history flow remain separate work.
+The [project transport contract](PROJECTS.md) connects immutable input variants
+to the five-form workspace. The result-history screen remains separate work.
 
 This source candidate runs the independently installed SIPI engine through a
 local default-browser UI or a browser Worker. It is not a released application.
@@ -56,6 +56,34 @@ does not establish that every possible calculation is suitable for the browser,
 within its job limits, or independently validated. The editable path shares the
 native/Worker adapter; current-platform acceptance must use the exact staged
 engine and assets. Advancing the pin alone is not a Windows or Worker pass.
+
+## Keep A/B cross-section inputs in a project
+
+Use **Duplicate design** to keep the current cross-section as one variant and
+edit a copy. **Current design** switches between variants, keeping changes to
+the design you leave. **Design name** changes its label. Template selection and
+opening an editable design replace the active variant's cross-section.
+
+**Save input project** downloads `sipi-project.json`; **Open project** restores
+its first design, then the selector opens the other variants. These actions
+validate inputs without automatically calculating. Exact SI inputs, hidden
+template settings and resolved mesh survive display-unit changes. A calculation
+or target search must still satisfy its own model and convergence checks.
+
+This file stores cross-section geometry, materials and mesh. Target bounds,
+study options, frequency-response settings and new workbench results are not
+added. Existing validated records in an opened project are preserved; an input
+change clears their current selection and a duplicate starts without records.
+The screen does not display old records as a newly calculated result.
+
+All project designs must use the five supported editable templates. Other
+inputs, invalid/damaged projects and files over 200 KiB are rejected without
+replacing the current project. The encoded request limit is 256 KiB; oversized
+updates are rejected without truncation. A geometry-only import cannot replace
+an active editable project design; use an editable design or a separate workspace.
+Cancel also discards pending or late file reads. Projects live in this tab until
+you download them: no automatic disk save, recovery or cloud storage is provided.
+After a failed operation, correct the input and retry or reopen a saved file.
 
 ## Run from source
 

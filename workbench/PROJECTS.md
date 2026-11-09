@@ -4,7 +4,8 @@
 
 The private desktop/Worker adapter transforms the existing
 [SavedProject](../docs/packages/sipi/project.md) format without calculations or
-file writes. A/B controls and result-history screens are not connected yet.
+file writes. The [input-project UI](README.md#keep-ab-cross-section-inputs-in-a-project)
+uses these operations; the result-history screen remains separate.
 An accepted engine input does not imply an editable form exists for it.
 
 | Action | Required keys besides `action` | Optional keys |
@@ -64,5 +65,5 @@ assert opened['project_text'] == updated['project_text']
 assert len(json.loads(opened['project_text'])['designs']) == 2
 ```
 
-Native source/installed adapter and spawned HTTP checks do not establish new
-Worker or Windows acceptance. The UI assets are unchanged in this unit.
+Adapter/HTTP acceptance and actual browser/platform acceptance are separate
+checks; see the [workbench guide](README.md) for the current user flow and limits.

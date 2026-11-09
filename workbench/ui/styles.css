@@ -118,3 +118,9 @@ main{padding:26px 16px}
 footer a{color:inherit;text-underline-offset:3px}
 
 .network .target-fields{margin-bottom:16px}.network-scroll{max-height:260px;overflow:auto;margin:12px 0}.network table{width:100%;border-collapse:collapse;font-size:12px}.network th,.network td{text-align:right;padding:8px;border-bottom:1px solid #e4eceb}.network th{white-space:normal}.network svg{width:100%;height:auto;margin-top:12px}#network-description{overflow-wrap:anywhere}
+/* Input project controls share the existing workbench layout. */
+.project-panel { margin-bottom: 24px; }
+.project-fields { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.project-fields label { flex: 1 1 170px; }
+.project-fields input, .project-fields select { width: 100%; box-sizing: border-box; }
+.project-fields button { flex: 0 1 auto; }

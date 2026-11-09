@@ -4,8 +4,9 @@
 
 desktop/Worker의 내부 adapter는 기존
 [SavedProject](../docs/locales/ko/pages/packages/sipi/project.md) 형식을 이용한다.
-계산이나 파일 쓰기는 실행하지 않는다. A/B 조작 및 결과 이력 화면은 아직 연결되지
-않았다. 엔진 입력을 열 수 있다는 사실이 해당 편집 폼 지원을 뜻하지 않는다.
+계산이나 파일 쓰기는 실행하지 않는다. [입력 프로젝트 화면](README.ko.md)이 이
+동작을 이용하며 결과 이력 화면은 후속 작업이다. 엔진 입력을 열 수 있다는 사실이
+해당 편집 폼 지원을 뜻하지 않는다.
 
 | action | `action` 외 필수 키 | 선택 키 |
 |---|---|---|
@@ -58,5 +59,5 @@ assert opened['project_text'] == updated['project_text']
 assert len(json.loads(opened['project_text'])['designs']) == 2
 ```
 
-native 소스/설치 adapter 및 실제 HTTP 프로세스 검사는 새 Worker·Windows 수락
-결과가 아니다. 이번 단위에서 화면 자산은 바뀌지 않는다.
+adapter/HTTP 검사와 실제 브라우저·플랫폼 검사는 별개다.
+현재 사용 흐름과 범위는 [workbench 안내](README.ko.md)를 참고한다.

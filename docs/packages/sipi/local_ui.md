@@ -30,8 +30,9 @@ template inputs and resolved mesh; **Open design** restores those fields.
 **Export geometry** retains the existing geometric JSON behavior. **Saved analysis**
 uses the common versioned input engine for calculations without dedicated forms.
 See the [workbench guide](../../../workbench/README.md) for model limits, failed
-rows, cancellation, stale-result behavior and exports. A/B project/result-history
-UI is not included in this unit. Reopened inputs are not a claim of convergence.
+rows, cancellation, stale-result behavior and exports. Input projects let you
+duplicate/switch cross-section variants and reopen their saved inputs. New result
+history is not stored by this screen. Reopened inputs are not a claim of convergence.
 
 The wheel contains the canonical first-party host, adapter and UI assets copied
 at build time, with SIPI's license/notice and a dependency-use notice. It does
