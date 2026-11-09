@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve editable template names and resolved arguments together with exact cross-section geometry and mesh in a strict shared calculation input.
+
 - Add explicit local project reads and cooperative atomic saves with no-clobber creation, raw-byte conflict detection and distinct post-publication failure reports.
 
 - Add immutable A/B project snapshots with original inputs, retained execution history and explicit result selection invalidated by semantic edits.

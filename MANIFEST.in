@@ -1,2 +1,3 @@
 recursive-include tests/sipi/reference_data/tensor_debye *.json *.py
 recursive-include tests/sipi/reference_data/tensor_fit *.json
+recursive-include tests/sipi/reference_data/template_section *.json

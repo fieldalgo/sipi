@@ -1,6 +1,6 @@
 # Saved A/B projects
 
-[한국어](../../locales/ko/pages/packages/sipi/project.md) · [Execution records](execution_record.md) · [Requests](execution_request.md) · [Local files](project_io.md)
+[한국어](../../locales/ko/pages/packages/sipi/project.md) · [Execution records](execution_record.md) · [Requests](execution_request.md) · [Local files](project_io.md) · [Editable templates](template_document.md)
 
 `SavedProject` keeps multiple current designs and their execution histories in
 one immutable JSON snapshot. It supplies the data contract for local A/B work

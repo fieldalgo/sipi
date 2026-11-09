@@ -38,12 +38,13 @@ print(saved_schemas())
 `normalize_saved` returns the document's canonical JSON with its original
 schema version and resolved settings. It does not mesh or solve fields; some
 network validators perform small algebraic calculations. `saved_schemas()`
-lists the closed registry: cross-section/1–3, impedance-study/1–4,
-impedance-design/1–3, circular-aperture/1, aperture-section/1,
-aperture-study/1, aperture-design/1, transmission-line/1–6, volume-line/1,
-lumped-network/1, network-assembly/1, network-transforms/1–2, circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1, mixed-circuit/1, periodic-mixed-circuit/1, conductivity-profile/1, pair-impedance-design/1–2, sampled-impedance-design/1, lossless-startup/1, rlgc-startup/1, coupled-rlgc-startup/1–4, startup-port-waves/1–9, norton-rlgc-startup/1, mixed-rlgc-startup/1, debye-rlgc-startup/1, coupled-debye-rlgc-startup/1, psd-coupled-debye-rlgc-startup/1, debye-capacitive-startup/1, debye-reactive-startup/1, multiconductor-rlgc-startup/1, multiconductor-debye-rlgc-startup/1, grid-plate-capacitance/1, strip-grid-capacitance/1, thick-grid-strip-capacitance/1, volume-grid-strip-capacitance/1, volume-grid-pair-capacitance/1.
-Each name has the `sipi.` prefix. Unknown versions, duplicate keys, nonfinite
-numbers (including exponent overflow) and non-text inputs are rejected.
+enumerates the exact registered input versions of the installed engine. Use this
+list for input admission rather than a separately maintained schema count. It
+includes geometric cross-sections and [editable template sections](template_document.md),
+studies/goals, lines, networks, circuits, material fitting and other documented
+calculation inputs. Each name has the `sipi.` prefix. Project and execution-record
+output envelopes are not calculation inputs. Unknown versions, duplicate keys,
+nonfinite numbers (including exponent overflow) and non-text inputs are rejected.
 
 ## Result contract
 
@@ -57,7 +58,7 @@ must separately record the exact engine commit and wheel/runtime hashes.
 
 | Input | Selected output |
 |---|---|
-| Cross section | ordered names, C/C0/C_loss in F/m, L in H/m; scalar z0 (ohm), effective permittivity and delay (s/m) for one signal |
+| Cross section / editable template | ordered names, C/C0/C_loss in F/m, L in H/m; scalar z0 (ohm), effective permittivity and delay (s/m) for one signal |
 | Circular/elliptical aperture | ordered names and complex capacitance in F/m; scalar for circular, matrix for elliptical |
 | Study | quantity, unit, every row's index/parameters/document/value/error, failed count and summary |
 | Impedance yield | all rows and P/F/U counts, inclusive limits, observed-fraction bounds, exact binomial unresolved envelope and optional target status; see [contract](yield.md) |

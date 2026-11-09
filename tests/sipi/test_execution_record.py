@@ -103,7 +103,7 @@ def test_load_prepare_never_execute_optimize_or_mesh(monkeypatch):
 
 def test_all_registered_inputs_prepare_from_structural_records_without_fields(monkeypatch):
     from test_execution import documents
-    docs=documents();assert len(docs)==len(saved_schemas())==108
+    docs=documents();assert len(docs)==len(saved_schemas())==109
     def forbidden(*a,**k):pytest.fail('structural record preparation reached fields')
     monkeypatch.setattr(CrossSection,'mesh',forbidden)
     monkeypatch.setattr(SavedExecutionRequest,'run',forbidden)

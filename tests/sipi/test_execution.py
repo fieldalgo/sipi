@@ -491,6 +491,9 @@ def documents():
         eps_real=[[[3., 0.], [0., 4.]], [[2., 0.], [0., 3.]]],
         eps_loss=[[[.2, 0.], [0., .3]], [[.3, 0.], [0., .4]]],
         relaxation_hz=[1e6], angles_rad=[0.], max_error=.01))
+    from sipi.template_document import TemplateSectionDocument
+    base.append(TemplateSectionDocument('stripline',
+        dict(width=.5e-3, plane_spacing=1e-3, eps_r=4)))
     return base
 
 

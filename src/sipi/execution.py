@@ -14,6 +14,7 @@ import math
 import numpy as np
 
 from .document import CrossSectionDocument, _unique_object
+from .template_document import TemplateSectionDocument
 from .study import ImpedanceStudyDocument
 from .design_document import ImpedanceDesignDocument
 from .design import GoalSeekError
@@ -109,6 +110,7 @@ _REGISTRY = {
     'sipi.sampled-panel-forward-pair-selection/1': SampledPanelForwardPairSelectionDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
+    'sipi.template-section/1': TemplateSectionDocument,
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
     **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2, 3)},
     'sipi.circular-aperture/1': ApertureDocument,
@@ -575,7 +577,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         result = doc.analyze()
         if isinstance(result, BandAssessment):
             out['result'] = result.to_dict()
-        elif isinstance(doc, CrossSectionDocument):
+        elif isinstance(doc, (CrossSectionDocument, TemplateSectionDocument)):
             out['result'] = dict(names=list(result.names), C_f_per_m=_array(result.C),
                 C0_f_per_m=_array(result.C0), C_loss_f_per_m=_array(result.C_loss),
                 L_h_per_m=_array(result.L))

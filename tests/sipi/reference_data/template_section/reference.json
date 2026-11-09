@@ -1,0 +1,4451 @@
+{
+  "basis": "Existing factory geometry snapshots, not an independent physical accuracy reference.",
+  "cases": [
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.00706
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "39d6a1ab3df876078ade71fb46372d11929104fb260c1b5c416104b5fcb71e66",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_coated_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.00706
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "8df751ae75e499e5e337237626db12b7c504199b6095d91e1e5f1a0749e7d5b4",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_coated_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.00706
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0006233333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0077
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "66f65b45cb58908846a05f17bcf00a42f8cff2534f5c124261fbc0ba83eee660",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_air_height": null,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_coated_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.00074
+              ],
+              [
+                -0.0014850000000000002,
+                0.00074
+              ],
+              [
+                -0.0014850000000000002,
+                0.00079
+              ],
+              [
+                -0.000705,
+                0.00079
+              ],
+              [
+                -0.000705,
+                0.00074
+              ],
+              [
+                -0.00046339739689881654,
+                0.00074
+              ],
+              [
+                -0.00043339739689881657,
+                0.000775
+              ],
+              [
+                -0.0001766026031011835,
+                0.000775
+              ],
+              [
+                -0.00014660260310118354,
+                0.00074
+              ],
+              [
+                5.3768943743823376e-05,
+                0.00074
+              ],
+              [
+                6.876894374382338e-05,
+                0.0008
+              ],
+              [
+                0.00046123105625617657,
+                0.0008
+              ],
+              [
+                0.00047623105625617656,
+                0.00074
+              ],
+              [
+                0.000705,
+                0.00074
+              ],
+              [
+                0.000705,
+                0.00079
+              ],
+              [
+                0.0014850000000000002,
+                0.00079
+              ],
+              [
+                0.0014850000000000002,
+                0.00074
+              ],
+              [
+                0.007,
+                0.00074
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0071600000000000006
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 4e-07,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "94848b44c1b6e2ae51ea0348de12021211af594db176d8b520bac5db1fb9f79b",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_conformal_coated_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.00074
+              ],
+              [
+                0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.00074
+              ],
+              [
+                -0.00046339739689881654,
+                0.00074
+              ],
+              [
+                -0.00043339739689881657,
+                0.000775
+              ],
+              [
+                -0.0001766026031011835,
+                0.000775
+              ],
+              [
+                -0.00014660260310118354,
+                0.00074
+              ],
+              [
+                5.3768943743823376e-05,
+                0.00074
+              ],
+              [
+                6.876894374382338e-05,
+                0.0008
+              ],
+              [
+                0.00046123105625617657,
+                0.0008
+              ],
+              [
+                0.00047623105625617656,
+                0.00074
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0071600000000000006
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 4e-07,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "c9b9dfbe5c220c43ca5a8d2824bfbdd41bae5dc4124184c62564074f19d8da5a",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_conformal_coated_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.0077
+              ],
+              [
+                -0.007,
+                0.0077
+              ],
+              [
+                -0.007,
+                0.00774
+              ],
+              [
+                -0.0014850000000000002,
+                0.00774
+              ],
+              [
+                -0.0014850000000000002,
+                0.00779
+              ],
+              [
+                -0.000705,
+                0.00779
+              ],
+              [
+                -0.000705,
+                0.00774
+              ],
+              [
+                -0.00046339739689881654,
+                0.00774
+              ],
+              [
+                -0.00043339739689881657,
+                0.007775
+              ],
+              [
+                -0.0001766026031011835,
+                0.007775
+              ],
+              [
+                -0.00014660260310118354,
+                0.00774
+              ],
+              [
+                5.3768943743823376e-05,
+                0.00774
+              ],
+              [
+                6.876894374382338e-05,
+                0.0078000000000000005
+              ],
+              [
+                0.00046123105625617657,
+                0.0078000000000000005
+              ],
+              [
+                0.00047623105625617656,
+                0.00774
+              ],
+              [
+                0.000705,
+                0.00774
+              ],
+              [
+                0.000705,
+                0.00779
+              ],
+              [
+                0.0014850000000000002,
+                0.00779
+              ],
+              [
+                0.0014850000000000002,
+                0.00774
+              ],
+              [
+                0.007,
+                0.00774
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0071600000000000006
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 4.0000000000000104e-07,
+          "far_size": 0.0006191666666666666,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0077
+          },
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "79cc8c785db886c4985baa0a490805faeb4bb79b7830b74e101bdefc80fe37a4",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_air_height": null,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_conformal_coated_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0006
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0006
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0006
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0006
+          }
+        ]
+      },
+      "cross_section_sha256": "84c0d7ffa3fcca70316ade23f491d331d64f8877b748dc9730707abc7ee042ec",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "plane_spacing": 0.0014,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "tan_delta": 0.015,
+        "trace_height": 0.0006
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "plane_spacing": 0.0014,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "tan_delta": 0.015,
+        "trace_height": 0.0006
+      },
+      "template": "asymmetric_coupled_coplanar_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.00706
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "25c38a49e1d498a5a8d0dec755b44c51bb907523fae3786b0210dc1ce1e5102e",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.014400000000000001
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.0005
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.0007
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.0006000000000000001,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0005
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0005
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0005
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0005
+          }
+        ]
+      },
+      "cross_section_sha256": "7deca213248880aed70a9d4675a1d5b49732a596a6c6c686b13fe06fd02a39d6",
+      "resolved_parameters": {
+        "box_width": null,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0
+      },
+      "supplied_parameters": {
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007
+      },
+      "template": "asymmetric_coupled_layered_coplanar_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.014400000000000001
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.0005
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.0007
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.0006000000000000001,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0005
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0005
+          }
+        ]
+      },
+      "cross_section_sha256": "16f3808894ef2277d8c5944e7480ce0e0273896427dba4689daa421ca52b6d1a",
+      "resolved_parameters": {
+        "box_width": null,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0
+      },
+      "supplied_parameters": {
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007
+      },
+      "template": "asymmetric_coupled_layered_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.00706
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "3798c1a1fc984e564f8674c2b5e01b1f5771755c73b2f2c480b210690be56123",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0006825
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.00067
+          }
+        ]
+      },
+      "cross_section_sha256": "5ab57b56bdfedd859a773e4a42b14177e95da65ed0cb2d272f53706464a3b730",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "plane_spacing": 0.0014,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "plane_spacing": 0.0014,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.00706
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.2e-06,
+          "far_size": 0.000615,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00022,
+            "width": 0.00028,
+            "x": -0.00030500000000000004,
+            "y": 0.0077
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 6e-05,
+            "top_width": 0.00033,
+            "width": 0.00036,
+            "x": 0.000265,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001095,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001095,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "ee326bc808b0e96a317705d3112bf6dbf8aae9fef8b0dc0a18198ac28e6f432b",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "lower_air_height": null,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_thickness": 5e-05,
+        "ground_width": 0.0007,
+        "left_thickness": 3.5e-05,
+        "left_top_width": 0.00022,
+        "left_width": 0.00028,
+        "right_thickness": 6e-05,
+        "right_top_width": 0.00033,
+        "right_width": 0.00036,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015
+      },
+      "template": "asymmetric_coupled_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.5e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "width": 0.0003,
+            "x": -0.0,
+            "y": 0.00054
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.000825
+          }
+        ]
+      },
+      "cross_section_sha256": "bf6599f222107b1c4f2f9aac2c5bd863d1ebdca72703ae2d05b440f541d34752",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "offset": 0.0,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "width": 0.0003
+      },
+      "template": "broadside_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "1a3e817335b6586601854e1ad15871b718ed2b25f0a9eda6bfad41acc3f78313",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coated_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "fde73a52198bb1a2926c3e0383a5ef9d54e092395dfb7117085d4504e93350df",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coated_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0006222916666666667,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "0bb68cee195ebaf5ec93888b60e80c2e6f6f4007fdc6bf014ff16ac179ef2840",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "lower_air_height": null,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coated_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.00074
+              ],
+              [
+                -0.00114,
+                0.00074
+              ],
+              [
+                -0.00114,
+                0.000775
+              ],
+              [
+                -0.00036,
+                0.000775
+              ],
+              [
+                -0.00036,
+                0.00074
+              ],
+              [
+                -0.0001683973968988165,
+                0.00074
+              ],
+              [
+                -0.0001383973968988165,
+                0.000775
+              ],
+              [
+                0.0001383973968988165,
+                0.000775
+              ],
+              [
+                0.0001683973968988165,
+                0.00074
+              ],
+              [
+                0.00036,
+                0.00074
+              ],
+              [
+                0.00036,
+                0.000775
+              ],
+              [
+                0.00114,
+                0.000775
+              ],
+              [
+                0.00114,
+                0.00074
+              ],
+              [
+                0.007,
+                0.00074
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.007110000000000001
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 3.499999999999998e-07,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "17c1cb029f36ef5d1f3d036432b11cbecc5d3bd082128690ad10dc111271d6f5",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "conformal_coated_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.00074
+              ],
+              [
+                0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.00074
+              ],
+              [
+                -0.0001683973968988165,
+                0.00074
+              ],
+              [
+                -0.0001383973968988165,
+                0.000775
+              ],
+              [
+                0.0001383973968988165,
+                0.000775
+              ],
+              [
+                0.0001683973968988165,
+                0.00074
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.007110000000000001
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 4e-07,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "9511af427c3f8a1e247a2a22fa36aa089374814e2f34f14d212978fccfc9dabb",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "conformal_coated_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.0077
+              ],
+              [
+                -0.007,
+                0.0077
+              ],
+              [
+                -0.007,
+                0.00774
+              ],
+              [
+                -0.00114,
+                0.00774
+              ],
+              [
+                -0.00114,
+                0.007775
+              ],
+              [
+                -0.00036,
+                0.007775
+              ],
+              [
+                -0.00036,
+                0.00774
+              ],
+              [
+                -0.0001683973968988165,
+                0.00774
+              ],
+              [
+                -0.0001383973968988165,
+                0.007775
+              ],
+              [
+                0.0001383973968988165,
+                0.007775
+              ],
+              [
+                0.0001683973968988165,
+                0.00774
+              ],
+              [
+                0.00036,
+                0.00774
+              ],
+              [
+                0.00036,
+                0.007775
+              ],
+              [
+                0.00114,
+                0.007775
+              ],
+              [
+                0.00114,
+                0.00774
+              ],
+              [
+                0.007,
+                0.00774
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.007110000000000001
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 3.499999999999944e-07,
+          "far_size": 0.0006170833333333333,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "c029aa26699a83d099108fd8d7690ab2045b7ebf10b9843c12e0bf87a40204ab",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "lower_air_height": null,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "conformal_coated_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0006
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0006
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0006
+          }
+        ]
+      },
+      "cross_section_sha256": "5efbced3be0cfe1c365eb04801262787c031216eb68d96a9a6e29afe19a68826",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": 0.0006,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": 0.0006,
+        "width": 0.0003
+      },
+      "template": "coplanar_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "2691bdbe17d3d4c3275ecec44eaf80778754856f2435277f4160917b82a5690a",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_coated_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "0c69fd6e1045e30b7be8dcd56235c298c37b17d30cdba85621b80ad52f2582c5",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_coated_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "thickness": 0.0002
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2e-06,
+          "far_size": 0.0006222916666666667,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0077
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "f3fffa1377a21923b629721c1efc5bc53f4bbdc3cf68e6cef310698c2d18578e",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "coating_tan_delta": 0.0,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "lower_air_height": null,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_height": 0.0002,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_coated_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.00074
+              ],
+              [
+                -0.0014650000000000002,
+                0.00074
+              ],
+              [
+                -0.0014650000000000002,
+                0.000775
+              ],
+              [
+                -0.000685,
+                0.000775
+              ],
+              [
+                -0.000685,
+                0.00074
+              ],
+              [
+                -0.00044339739689881644,
+                0.00074
+              ],
+              [
+                -0.00041339739689881647,
+                0.000775
+              ],
+              [
+                -0.00013660260310118346,
+                0.000775
+              ],
+              [
+                -0.00010660260310118346,
+                0.00074
+              ],
+              [
+                0.00010660260310118346,
+                0.00074
+              ],
+              [
+                0.00013660260310118346,
+                0.000775
+              ],
+              [
+                0.00041339739689881647,
+                0.000775
+              ],
+              [
+                0.00044339739689881644,
+                0.00074
+              ],
+              [
+                0.000685,
+                0.00074
+              ],
+              [
+                0.000685,
+                0.000775
+              ],
+              [
+                0.0014650000000000002,
+                0.000775
+              ],
+              [
+                0.0014650000000000002,
+                0.00074
+              ],
+              [
+                0.007,
+                0.00074
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.007110000000000001
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 3.499999999999998e-07,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "240e1a728edfcc6cc1186bb47ba84f7251e3b40bebf8720d4d3886bcf434255a",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_conformal_coated_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.00074
+              ],
+              [
+                0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.0007
+              ],
+              [
+                -0.007,
+                0.00074
+              ],
+              [
+                -0.00044339739689881644,
+                0.00074
+              ],
+              [
+                -0.00041339739689881647,
+                0.000775
+              ],
+              [
+                -0.00013660260310118346,
+                0.000775
+              ],
+              [
+                -0.00010660260310118346,
+                0.00074
+              ],
+              [
+                0.00010660260310118346,
+                0.00074
+              ],
+              [
+                0.00013660260310118346,
+                0.000775
+              ],
+              [
+                0.00041339739689881647,
+                0.000775
+              ],
+              [
+                0.00044339739689881644,
+                0.00074
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.007110000000000001
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 4e-07,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "e3cc9dacd471c8495e08631d8e15b27366d982c894509cd6544c633be5a420a5",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_conformal_coated_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "dielectric_regions": [
+          {
+            "eps_r": 3.0,
+            "name": "coating",
+            "tan_delta": 0.0,
+            "vertices": [
+              [
+                0.007,
+                0.0077
+              ],
+              [
+                -0.007,
+                0.0077
+              ],
+              [
+                -0.007,
+                0.00774
+              ],
+              [
+                -0.0014650000000000002,
+                0.00774
+              ],
+              [
+                -0.0014650000000000002,
+                0.007775
+              ],
+              [
+                -0.000685,
+                0.007775
+              ],
+              [
+                -0.000685,
+                0.00774
+              ],
+              [
+                -0.00044339739689881644,
+                0.00774
+              ],
+              [
+                -0.00041339739689881647,
+                0.007775
+              ],
+              [
+                -0.00013660260310118346,
+                0.007775
+              ],
+              [
+                -0.00010660260310118346,
+                0.00774
+              ],
+              [
+                0.00010660260310118346,
+                0.00774
+              ],
+              [
+                0.00013660260310118346,
+                0.007775
+              ],
+              [
+                0.00041339739689881647,
+                0.007775
+              ],
+              [
+                0.00044339739689881644,
+                0.00774
+              ],
+              [
+                0.000685,
+                0.00774
+              ],
+              [
+                0.000685,
+                0.007775
+              ],
+              [
+                0.0014650000000000002,
+                0.007775
+              ],
+              [
+                0.0014650000000000002,
+                0.00774
+              ],
+              [
+                0.007,
+                0.00774
+              ]
+            ]
+          }
+        ],
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.007110000000000001
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 3.499999999999944e-07,
+          "far_size": 0.0006170833333333333,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/3",
+        "traces": [
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0077
+          },
+          {
+            "ground": false,
+            "kind": "trapezoid",
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "kind": "trapezoid",
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "5787610a2d32b96d055bb4d929954e99e8b7a6fc929134cf578a3b4474dc39cb",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "coating_eps_r": 3.0,
+        "coating_tan_delta": 0.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "lower_air_height": null,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "coating_eps_r": 3.0,
+        "coating_thickness": 4e-05,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_conformal_coated_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0006
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0006
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0006
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0006
+          }
+        ]
+      },
+      "cross_section_sha256": "d1a4f978fcf004e6907a43b1b45d0ad4db90b63bb812ad75a6aaaa77729f0a34",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": 0.0006,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": 0.0006,
+        "width": 0.0003
+      },
+      "template": "coupled_coplanar_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "60f30d7fbcc6271277b49cd5ee6f8b61a31fefa43e23d4ee2ef5249fcc6b9ea2",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.014400000000000001
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.0005
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.0007
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0006000000000000001,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0005
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0005
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0005
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0005
+          }
+        ]
+      },
+      "cross_section_sha256": "e6b5b8558ec35f420b56ca1314a627687fe9a10db5facb3dff19e0eb2dbb50fd",
+      "resolved_parameters": {
+        "box_width": null,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "width": 0.0003
+      },
+      "template": "coupled_layered_coplanar_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.014400000000000001
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.0005
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.0007
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0006000000000000001,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0005
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0005
+          }
+        ]
+      },
+      "cross_section_sha256": "01112d29de68e6380147a337b79f2b33e0b1508bc0849975b015d4c712786748",
+      "resolved_parameters": {
+        "box_width": null,
+        "gap": 0.00025,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "gap": 0.00025,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "width": 0.0003
+      },
+      "template": "coupled_layered_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0007
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "7aea50f5b02bbebdd66ec91f2a84652858ac03fe81415476dd1b03ea0f9f1c93",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0006825
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0006825
+          }
+        ]
+      },
+      "cross_section_sha256": "26937cccfdeadb65c13f4176633c0e720df19605e7e9bdd1e1107de30a9ace33",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": null,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0006139583333333333,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": -0.00027499999999999996,
+            "y": 0.0077
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.00027499999999999996,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.001075,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.001075,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "d135ff341d1bb1030cee926060b4dc522fd35be0dee0ce963409034f6e2f6199",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "lower_air_height": null,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_gap": 0.0003,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "coupled_unbacked_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0007
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "1785579a68f10edf7765c339478d42c1ece8f9d7fa364160beb29c308e6f59ec",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "grounded_coplanar"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.01824
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.000535
+          },
+          {
+            "eps_r": 3.0,
+            "name": "gap",
+            "tan_delta": 0.0,
+            "thickness": 0.00025
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.000735
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.5e-06,
+          "far_size": 0.0007599999999999999,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "width": 0.0003,
+            "x": -0.0,
+            "y": 0.0005
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.000785
+          }
+        ]
+      },
+      "cross_section_sha256": "6fb102ac5021cd226e42182d309fa0508c8430a4c1dd4a61b75c586f665420a3",
+      "resolved_parameters": {
+        "box_width": null,
+        "gap": 0.00025,
+        "gap_eps_r": 3.0,
+        "gap_tan_delta": 0.0,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "offset": 0.0,
+        "thickness": 3.5e-05,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "gap": 0.00025,
+        "gap_eps_r": 3.0,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "thickness": 3.5e-05,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "width": 0.0003
+      },
+      "template": "layered_broadside_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.014400000000000001
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.0005
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.0007
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0006000000000000001,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0005
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0005
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0005
+          }
+        ]
+      },
+      "cross_section_sha256": "a3a5c22d4967c882b3e3de14bdcbb17082322bb63735ce6ab9bfa33f864129a0",
+      "resolved_parameters": {
+        "box_width": null,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "width": 0.0003
+      },
+      "template": "layered_coplanar_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.014400000000000001
+        },
+        "layers": [
+          {
+            "eps_r": 3.5,
+            "name": "lower",
+            "tan_delta": 0.0,
+            "thickness": 0.0005
+          },
+          {
+            "eps_r": 4.2,
+            "name": "upper",
+            "tan_delta": 0.0,
+            "thickness": 0.0007
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0006000000000000001,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0005
+          }
+        ]
+      },
+      "cross_section_sha256": "88bf69c3c1662bb03405d1aa1f296eabf0d7f8181cf382fec5baa82dc4994072",
+      "resolved_parameters": {
+        "box_width": null,
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "lower_tan_delta": 0.0,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.0,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "lower_eps_r": 3.5,
+        "lower_height": 0.0005,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "upper_eps_r": 4.2,
+        "upper_height": 0.0007,
+        "width": 0.0003
+      },
+      "template": "layered_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0005833333333333334,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0007
+          }
+        ]
+      },
+      "cross_section_sha256": "15791b0db06334bebe191ee0ab5f7c6efbb0876e929b24d0bb609fbe2da7bd98",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "microstrip"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0006
+          }
+        ]
+      },
+      "cross_section_sha256": "9675375f9fa2f572cf39e4a8b54318179d9ca12c613de00b15b44180263b737f",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": 0.0006,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "trace_height": 0.0006,
+        "width": 0.0003
+      },
+      "template": "offset_stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "ground",
+          "width": 0.0168
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "dielectric",
+            "tan_delta": 0.015,
+            "thickness": 0.0014
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0007,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0006825
+          }
+        ]
+      },
+      "cross_section_sha256": "d6a658851f89182583fb0f0b8e073988d452159949dea88f797f9de67fbfbfba",
+      "resolved_parameters": {
+        "box_width": null,
+        "eps_r": 4.0,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "plane_spacing": 0.0014,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "stripline"
+    },
+    {
+      "cross_section": {
+        "box": {
+          "bottom": "open",
+          "sides": "open",
+          "top": "open",
+          "width": 0.014
+        },
+        "layers": [
+          {
+            "eps_r": 1.0,
+            "name": "lower_air",
+            "tan_delta": 0.0,
+            "thickness": 0.007
+          },
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.015,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.0070350000000000005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 2.4e-06,
+          "far_size": 0.0006139583333333333,
+          "grade": 0.15,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/2",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "top_width": 0.00024,
+            "width": 0.0003,
+            "x": 0.0,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_left",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": -0.00075,
+            "y": 0.0077
+          },
+          {
+            "ground": true,
+            "name": "ground_right",
+            "thickness": 3.5e-05,
+            "top_width": 0.0007,
+            "width": 0.0007,
+            "x": 0.00075,
+            "y": 0.0077
+          }
+        ]
+      },
+      "cross_section_sha256": "b20173d1db4e297c89a38382e530e4e6f87656427ea92fc9b302ee6ddc679b2d",
+      "resolved_parameters": {
+        "air_height": null,
+        "box_width": null,
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "lower_air_height": null,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "supplied_parameters": {
+        "eps_r": 4.0,
+        "gap": 0.00025,
+        "ground_width": 0.0007,
+        "substrate_height": 0.0007,
+        "tan_delta": 0.015,
+        "thickness": 3.5e-05,
+        "top_width": 0.00024,
+        "width": 0.0003
+      },
+      "template": "unbacked_coplanar"
+    }
+  ],
+  "engine_commit": "4445d5ce3a0e9e186e33fb8d12354a2339f6e0df",
+  "engine_wheel_sha256": "eff1deb019060fc0fd8af83c5e345a53803d7af2a21406a731e1db686da6289a"
+}

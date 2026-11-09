@@ -37,12 +37,13 @@ print(saved_schemas())
 
 `normalize_saved`는 원래 스키마 버전과 확정 설정을 유지한 정규 JSON을 반환합니다.
 메시나 필드 계산은 하지 않지만 일부 네트워크 검증기는 작은 대수 계산을 합니다.
-`saved_schemas()`는 닫힌 목록을 반환합니다: cross-section/1–3,
-impedance-study/1–4, impedance-design/1–3, circular-aperture/1,
-aperture-section/1, aperture-study/1, aperture-design/1, transmission-line/1–6,
-volume-line/1, lumped-network/1, network-assembly/1, network-transforms/1–2,
-circuit/1, capacitance-3d/1, network-band/1, line-length-design/1–2, tem-ports-3d/1, impedance-yield/1, yield-design/1–2, dielectric-fit/1, line-quantity-design/1–2 and line-quantity-study/1–2 and line-quantity-yield/1, periodic-network/1, periodic-circuit/1, norton-circuit/1, periodic-norton-circuit/1, mixed-circuit/1, periodic-mixed-circuit/1, conductivity-profile/1, pair-impedance-design/1–2, sampled-impedance-design/1, lossless-startup/1, rlgc-startup/1, coupled-rlgc-startup/1–4, startup-port-waves/1–9, norton-rlgc-startup/1, mixed-rlgc-startup/1, debye-rlgc-startup/1, coupled-debye-rlgc-startup/1, psd-coupled-debye-rlgc-startup/1, debye-capacitive-startup/1, debye-reactive-startup/1, multiconductor-rlgc-startup/1, multiconductor-debye-rlgc-startup/1, grid-plate-capacitance/1, strip-grid-capacitance/1, thick-grid-strip-capacitance/1, volume-grid-strip-capacitance/1, volume-grid-pair-capacitance/1. 각 이름에는 `sipi.` 접두사가 붙습니다. 미지원 버전·중복 키·비유한
-숫자(지수 overflow 포함)·텍스트가 아닌 입력은 거부합니다.
+`saved_schemas()`는 설치된 엔진의 정확한 지원 입력 버전을 열거합니다.
+별도 수기 목록이나 개수 대신 이 목록으로 입력 지원 여부를 확인합니다.
+기하 단면과 [편집 가능한 템플릿 단면](template_document.md), 공차·역산·선로·
+네트워크·회로·재료 피팅 등 문서화된 계산 입력을 포함합니다. 각 이름에는
+`sipi.` 접두사가 붙습니다. 프로젝트·실행 기록의 출력 envelope는 계산 입력이
+아닙니다. 미지원 버전·중복 키·비유한 숫자(지수 overflow 포함)·텍스트가 아닌
+입력은 거부합니다.
 
 ## 결과 계약
 
@@ -55,7 +56,7 @@ wheel/런타임 해시를 별도로 기록해야 합니다.
 
 | 입력 | 선택 출력 |
 |---|---|
-| 단면 | 순서 있는 이름, C/C0/C_loss(F/m), L(H/m); 단일 신호의 z0(ohm), 유효 유전율, 지연(s/m) |
+| 단면 / 편집 가능한 템플릿 | 순서 있는 이름, C/C0/C_loss(F/m), L(H/m); 단일 신호의 z0(ohm), 유효 유전율, 지연(s/m) |
 | 원형/타원 개구 | 이름과 복소 C(F/m); 원형은 스칼라, 타원은 행렬 |
 | 공차 | quantity/unit, 모든 행의 index/parameters/document/value/error, 실패 개수와 summary |
 | 목표 역산 | quantity/unit, parameter, 목표/결과/세분 결과, 두 잔차, 완료 이력과 결과 기하; 임피던스 재료 평가 보존 |

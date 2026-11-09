@@ -151,10 +151,10 @@ def test_load_edit_and_prepare_do_not_execute_mesh_optimize_or_access_files(monk
     assert restored.dumps() == text
 
 
-def test_all108_inputs_are_projects_without_execution(monkeypatch):
+def test_all_registered_inputs_are_projects_without_execution(monkeypatch):
     from test_execution import documents
     docs = documents()
-    assert len(docs) == len(saved_schemas()) == 108
+    assert len(docs) == len(saved_schemas()) == 109
     def forbidden(*args, **kwargs):
         pytest.fail('project preparation executed fields')
     monkeypatch.setattr(SavedExecutionRequest, 'run', forbidden)

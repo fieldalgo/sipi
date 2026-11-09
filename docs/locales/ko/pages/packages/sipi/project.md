@@ -1,6 +1,6 @@
 # A/B 프로젝트 저장
 
-[English](../../../../../packages/sipi/project.md) · [실행 결과 기록](execution_record.md) · [실행 요청](execution_request.md) · [로컬 파일](project_io.md)
+[English](../../../../../packages/sipi/project.md) · [실행 결과 기록](execution_record.md) · [실행 요청](execution_request.md) · [로컬 파일](project_io.md) · [편집 가능한 템플릿](template_document.md)
 
 `SavedProject`는 여러 설계의 현재 입력과 실행 이력을 하나의 불변 JSON
 스냅샷에 보관합니다. 로컬 A/B 비교와 다시 열기에 사용할 데이터 계약입니다.
