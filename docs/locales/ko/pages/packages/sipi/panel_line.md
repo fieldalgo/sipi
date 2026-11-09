@@ -1,5 +1,7 @@
 # 패널 전류를 명시하는 저장 선로
 
+[명시적 두 매개변수 역산](panel_pair_goal.md)은 체적·패널·동시 세분을 각각 검증합니다.
+
 `PanelTransmissionLineDocument`는 공유 경계 패널 진공 전류와 기존 유전체
 장 추출을 명시적으로 조합합니다. `sipi.panel-transmission-line/1` 입력은
 정확히 `schema`, `line`, `panel`을 갖습니다. `line`은 정규화된 기존

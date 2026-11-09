@@ -1,5 +1,7 @@
 # Saved lines with explicit panel currents
 
+[Explicit two-parameter forward goals](panel_pair_goal.md) add independent volume, panel and joint refinement checks.
+
 `PanelTransmissionLineDocument` describes an explicit combination of shared
 boundary-panel vacuum currents and the existing dielectric field extraction.
 Its `sipi.panel-transmission-line/1` input contains exactly `schema`, `line`

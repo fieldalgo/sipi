@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit panel-current two-parameter forward goals with frozen volume, panel and joint refinement, original target tolerances and retained failure histories.
+
 - Add explicit saved panel-current lines with matching dielectric extraction, retained current diagnostics and frequency-bounded common execution.
 
 - Add explicit shared boundary-panel current factors and per-boundary metal loss with grounded traces, capability checks and unchanged existing calculation defaults.
