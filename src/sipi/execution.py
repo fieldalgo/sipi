@@ -49,6 +49,8 @@ from .periodic_norton_circuit import PeriodicNortonCircuitDocument
 from .conductivity_profile_document import ConductivityProfileDocument
 from .pair_design_document import PairImpedanceDesignDocument
 from .pair_design import PairImpedanceGoalError
+from .pair_line_goal_document import ForwardPairDesignDocument
+from .pair_line_goal import ForwardPairGoalError
 from .sampled_design_document import SampledImpedanceDesignDocument
 from .sampled_design import SampledImpedanceGoalError
 from .startup_document import LosslessStartupDocument
@@ -126,6 +128,7 @@ _REGISTRY = {
     'sipi.conductivity-profile/1': ConductivityProfileDocument,
     'sipi.pair-impedance-design/1': PairImpedanceDesignDocument,
     'sipi.pair-impedance-design/2': PairImpedanceDesignDocument,
+    'sipi.forward-pair-design/1': ForwardPairDesignDocument,
     'sipi.sampled-impedance-design/1': SampledImpedanceDesignDocument,
     'sipi.lossless-startup/1': LosslessStartupDocument,
     'sipi.rlgc-startup/1': RLGCLadderDocument,
@@ -479,6 +482,18 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 input=None if exc.input_json is None else json.loads(exc.input_json),
                 material_evaluation=(None if exc.material_evaluation_json is None
                                      else json.loads(exc.material_evaluation_json)),
+                history=[row.to_dict() for row in exc.history]))
+    elif isinstance(doc, ForwardPairDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except ForwardPairGoalError as exc:
+            out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
+                quantities=['differential_forward_impedance_real', 'common_forward_impedance_real'],
+                unit='ohm', attempts=exc.attempts, stage=exc.stage,
+                failed_parameters=exc.failed_parameters, cause_type=exc.cause_type,
+                input=None if exc.input_json is None else json.loads(exc.input_json),
                 history=[row.to_dict() for row in exc.history]))
     elif isinstance(doc, LineQuantityDesignDocument):
         if data['max_evaluations'] > budget:

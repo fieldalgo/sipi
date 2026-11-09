@@ -1,5 +1,7 @@
 # Two-variable forward impedance targets
 
+[Saved two-variable goals](pair_line_goal_document.md) preserve named geometry/material inputs and execution failures.
+
 [한국어](../../locales/ko/pages/packages/sipi/pair_line_goal.md) ·
 [One-variable common-current goals](common_forward_line_goal.md) ·
 [Transmission lines](line_model.md)

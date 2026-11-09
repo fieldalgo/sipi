@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict saved two-variable forward impedance goals with geometry/material inputs and transport-independent failure histories.
+
 - Add bounded two-parameter goals for full-loss differential/common forward impedances, with frozen-input mesh refinement and retained failure histories.
 
 - Add explicit fixed common-current candidate selection with simultaneous acceptance bounds and retained unknown rows.

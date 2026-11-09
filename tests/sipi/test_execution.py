@@ -433,6 +433,18 @@ def documents():
     base.append(YieldDesignDocument([dict(name='common-current', cost=1., study=common_yield_source)],
         cost_unit='relative cost', minimum=1., maximum=1000., minimum_yield=.1,
         schema='sipi.yield-design/3'))
+    from sipi.pair_line_goal_document import ForwardPairDesignDocument
+    pair_source = next(item.to_dict()['study'] for item in base
+                       if item.to_dict()['schema'] == 'sipi.line-quantity-design/3')
+    pair_source['fixed_pitch_m'] = None
+    pair_source['sampling'] = dict(kind='corners', variables=[
+        dict(name='left_width', lower=.4e-3, upper=.9e-3),
+        dict(name='gap', lower=.2e-3, upper=.6e-3)])
+    pair_quantities = ('differential_forward_impedance_real', 'common_forward_impedance_real')
+    base.append(ForwardPairDesignDocument(pair_source, conductor=dict(kind='perfect'),
+        targets=dict(zip(pair_quantities, [110., 40.])),
+        tolerances=dict(zip(pair_quantities, [.25, .125])),
+        initial=[.7e-3, .35e-3], max_evaluations=64))
     return base
 
 

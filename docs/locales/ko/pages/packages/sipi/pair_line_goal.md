@@ -1,5 +1,7 @@
 # 두 변수 전방 임피던스 목표
 
+[두 변수 목표 저장](pair_line_goal_document.md)은 이름 있는 기하/재료 입력과 실행 실패를 보존합니다.
+
 [English](../../../../../packages/sipi/pair_line_goal.md) ·
 [한 변수 공통 전류 목표](common_forward_line_goal.md) ·
 [전송선](line_model.md)
