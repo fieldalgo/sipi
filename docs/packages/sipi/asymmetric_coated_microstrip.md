@@ -1,5 +1,7 @@
 # Unequal planar-coated microstrip pair
 
+[Normal-thickness coating](asymmetric_conformal_microstrip.md) uses an explicit mitered film over the substrate and each signal.
+
 [한국어](../../locales/ko/pages/packages/sipi/asymmetric_coated_microstrip.md) · [Equal coated pair](coated_pair.md)
 
 `asymmetric_coupled_coated_microstrip` places two independently dimensioned

@@ -18,6 +18,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_coated_grounded_coplanar',
            'asymmetric_coupled_coated_unbacked_coplanar',
            'asymmetric_coupled_coated_microstrip',
+           'asymmetric_coupled_conformal_coated_microstrip',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_layered_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
@@ -420,6 +421,27 @@ def asymmetric_coupled_coated_microstrip(*, left_width, right_width, gap,
         tan_delta=tan_delta, air_height=None, box_width=box_width,
         left_top_width=left_top_width, right_top_width=right_top_width)
     return _coated_coplanar(base, coating_height, coating_eps_r, coating_tan_delta, air_height)
+
+
+def asymmetric_coupled_conformal_coated_microstrip(*, left_width, right_width,
+        gap, substrate_height, eps_r, coating_thickness, coating_eps_r,
+        left_thickness=0.0, right_thickness=0.0, tan_delta=0.0,
+        coating_tan_delta=0.0, air_height=None, box_width=None,
+        left_top_width=None, right_top_width=None):
+    """Unequal surface signals with a normal-thickness mitered dielectric film.
+
+    Positive is left and negative is right; gap uses bottom edges. Metal widths,
+    thicknesses and narrowing top widths are independent. The same normal film
+    coats both signals and substrate; upper air starts above the highest film.
+    Meeting envelopes unite, without clipping or enclosed air pockets. This
+    is not a meniscus, rounded corner or measured deposition model.
+    """
+    base = asymmetric_coupled_microstrip(left_width=left_width,
+        right_width=right_width, gap=gap, substrate_height=substrate_height,
+        eps_r=eps_r, left_thickness=left_thickness, right_thickness=right_thickness,
+        tan_delta=tan_delta, air_height=None, box_width=box_width,
+        left_top_width=left_top_width, right_top_width=right_top_width)
+    return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
 
 
 def _check_conformal_resolution(section):

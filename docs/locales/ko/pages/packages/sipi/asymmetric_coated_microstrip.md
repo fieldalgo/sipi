@@ -1,5 +1,7 @@
 # 비대칭 평면 코팅 microstrip 쌍
 
+[법선 두께 코팅](asymmetric_conformal_microstrip.md)은 기판과 각 신호를 덮는 명시적 mitered 필름을 사용합니다.
+
 [English](../../../../../packages/sipi/asymmetric_coated_microstrip.md) · [동일폭 코팅 쌍](coated_pair.md)
 
 `asymmetric_coupled_coated_microstrip`는 하부 접지면 위 기판에 독립 치수의
