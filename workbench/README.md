@@ -2,8 +2,9 @@
 
 [한국어](README.ko.md)
 
-The [project transport contract](PROJECTS.md) connects immutable input variants
-to the five-form workspace. The result-history screen remains separate work.
+The [project workflow](PROJECTS.md) keeps input variants in the five-form workspace
+and adds saved-run history to **Saved analysis**. Project files and separate
+environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
 The [installed artifact helper](ARTIFACTS.md) captures actual distribution files for host provenance.
 [Recorded execution](RECORDING.md) can export raw result records and environment manifests from **Saved analysis → Run and keep record** in an installed wheel or staged browser workspace.

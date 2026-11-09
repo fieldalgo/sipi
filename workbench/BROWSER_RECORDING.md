@@ -3,7 +3,8 @@
 The Worker supports the same `saved-record` request and raw record/project
 transport as [native recording](RECORDING.md). Its provenance describes checked
 source artifacts loaded into Pyodide, rather than an installed filesystem snapshot.
-Automatic result-history UI remains separate from this transport contract.
+[Saved-analysis project history](PROJECTS.md) uses this transport contract for
+recorded runs; the provenance limitations below still apply.
 
 Initialization validates relative source paths, declared sizes and SHA-256 for
 every staged manifest file before loading the calculation runtime. Limits are
@@ -49,7 +50,7 @@ For the first command, `SIPI_PYTHON` must select the current built-wheel install
 the host starts outside the checkout. Integrity-negative acceptance can add
 `--expect-integrity-error` with a separately copied stage whose helper/runtime
 bytes or source path was deliberately corrupted. Preserve the good stage.
-These checks exercise actual browser transport; they do not claim that a new
-result-history screen exists.
+These checks exercise actual browser transport. The project-history guide
+describes the separate actual-screen acceptance.
 
 [한국어](BROWSER_RECORDING.ko.md)

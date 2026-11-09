@@ -5,7 +5,8 @@
 The private desktop/Worker adapter transforms the existing
 [SavedProject](../docs/packages/sipi/project.md) format without calculations or
 file writes. The [input-project UI](README.md#keep-ab-cross-section-inputs-in-a-project)
-uses input operations; record operations and the result-history screen are separate.
+uses input operations. **Saved analysis** uses the same contract for project inputs,
+recorded runs and explicit history selection, as described below.
 An accepted engine input does not imply an editable form exists for it.
 
 | Action | Required keys besides `action` | Optional keys |
@@ -70,8 +71,57 @@ Pass original serialized record text across JavaScript. Parsing and reserializin
 numbers can change their content digest. Artifact declarations remain
 `host-declared`; attaching a record does not audit or authenticate its provenance.
 Invocation IDs, stale-response handling, execution, actual artifact evidence and
-file publication remain host work. The input-project screen does not yet attach
-newly recorded results automatically.
+file publication remain host work. The five-form input-project screen does not
+attach newly recorded results; use **Saved analysis** for that workflow.
+
+## Keep analysis variants and recorded runs
+
+In **Saved analysis**, load a saved input and choose **Start project from input**.
+Name the design, edit its raw JSON or optional diagnostics, and use **Duplicate
+current input** to make another variant. Duplication copies current input and
+controls with empty history. Switching designs first validates and stores the
+current edit, then restores the other input and diagnostics. Invalid input keeps
+the current project and design. **Save project** downloads the complete raw
+`sipi-analysis-project.json`; **Open project** validates a file before replacing
+the current workspace. Neither operation uploads or automatically writes files.
+
+**Run and keep record** in an active project executes the current input and
+controls once, then attaches and explicitly selects that run for the design.
+Failed targets and incomplete studies remain records with their original status.
+If the combined project would exceed a limit, the old project is retained and
+the new standalone execution record remains downloadable with a clear error.
+Ordinary **Run analysis** does not create history. In a project it uses the same
+stored byte/evaluation controls and selected diagnostics as recorded execution.
+Imported controls are preserved: a budget above the workbench's 128-evaluation
+limit can be opened and saved but execution is refused, not silently clamped.
+
+Choose a run in **Project history**, then **View saved run**. This reads its raw
+record without recalculating, selecting or replacing the editable input. The
+screen distinguishes selected, matching-but-unselected and historical requests;
+unsaved edits are explicitly marked. **Select as current** requires the record
+to match the current validated input and controls. **Clear selection** retains
+all history; **Remove from project** removes the chosen run and clears selection
+when needed. Save the project file to retain any such change.
+
+Input/control edits retain historical records and clear an incompatible
+selection on the next validated project update. Formatting alone does not change
+semantic matching. Project text and record text are transported and downloaded
+without JavaScript reserialization of their digest-bearing numbers. A viewed
+record can be exported, but its separate runtime manifest is not inside the
+project: **Save environment** is unavailable for a history-only view. Save the
+environment file immediately after a newly recorded run if you need it later.
+Ordinary result export is disabled while viewing history; export the raw record.
+
+Cancelled operations, late file reads and late attachment replies cannot replace
+the current project or append a stale run. UI edits commit only after all required
+project transformations succeed. Project limits remain 200 KiB and 256 KiB for
+the encoded request; there is no truncation or automatic deletion of old runs.
+Individual record-file import, automatic numerical comparison and an environment
+manifest archive are not part of this screen.
+
+Actual browser acceptance is `node workbench/tests/project-history-browser.mjs OUTPUT`
+with `SIPI_PYTHON` pointing to the built-wheel environment. A staged browser
+directory as the second argument exercises the Worker path.
 
 This built development-wheel example creates an A/B snapshot without fields:
 

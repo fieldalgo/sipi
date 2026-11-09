@@ -12,6 +12,12 @@
   <header class="topbar"><div class="brand">FieldAlgo <span>/</span> <strong>SIPI</strong></div><div class="top-actions"><a href="./">Cross-section workspace</a><button id="exit" class="quiet">Exit</button></div></header>
   <main>
     <div class="heading"><div><p class="eyebrow">SAVED ANALYSIS</p><h1>Continue from your analysis file.</h1><p class="intro">Open a SIPI JSON input, check its settings and run it on this device.</p></div></div>
+    <section class="panel saved-project" aria-label="Analysis project">
+      <div class="panel-heading"><h2>Analysis project</h2><span id="project-title" class="tag">No project open</span></div>
+      <div class="saved-actions"><button id="project-start">Start project from input</button><button id="project-open">Open project</button><button id="project-save">Save project ↓</button><input id="project-file" type="file" accept=".json,application/json" hidden></div>
+      <div class="saved-project-fields"><label>Current design<select id="project-design" disabled><option value="">Design A</option></select></label><label>Design name<input id="project-label" value="Design A" maxlength="256" required></label><button id="project-duplicate">Duplicate current input</button></div>
+      <p id="project-note" class="fine">Start a project to keep input variants and recorded runs in one file. Save it to this device to resume later.</p>
+    </section>
     <div class="saved-layout">
       <section class="panel saved-input">
         <div class="panel-heading"><h2>Analysis input</h2><button id="open">Open JSON</button><input id="file" type="file" accept=".json,application/json" hidden></div>
@@ -28,6 +34,11 @@
         <div class="panel-heading"><h2>Results</h2><button id="save-result" disabled>Save result ↓</button></div>
         <p id="status" role="status" aria-live="polite">Open an input or load the example to begin.</p>
         <p id="diagnostic-status" hidden></p>
+        <div class="saved-history">
+          <label>Project history<select id="project-record" disabled><option value="">Choose a saved run</option></select></label>
+          <div class="saved-actions"><button id="project-view" disabled>View saved run</button><button id="project-select" disabled>Select as current</button><button id="project-clear" disabled>Clear selection</button><button id="project-remove" disabled>Remove from project</button></div>
+          <p class="fine">Viewing a run does not recalculate or select it. Only records matching the current input and execution settings can be selected. Input edits retain older history.</p>
+        </div>
         <p id="record-status" class="fine" hidden></p>
         <div class="saved-actions"><button id="save-record" disabled>Save execution record ↓</button><button id="save-environment" disabled>Save environment ↓</button></div>
         <pre id="output" tabindex="0" hidden></pre>

@@ -28,7 +28,8 @@ checks. No files are written and the action does not select a project result.
 
 The browser uses a separate [source-artifact path](BROWSER_RECORDING.md), while
 frozen-executable provenance remains separate work. Existing calculations remain
-available; automatic result-history UI is not added by these transport actions.
+available. [Project history](PROJECTS.md) connects these transport actions in the
+saved-analysis screen.
 
 ## Keep a run from the saved-analysis screen
 
@@ -50,7 +51,8 @@ or closing clears record export. Late completions cannot restore it.
 Recording is supported in the inspectable installed wheel and the reviewed
 staged browser runtime. A source-only launcher or frozen executable without an
 inventory provider cannot record; ordinary **Run analysis** remains available.
-Record-file import, a project history selector and comparison are separate work.
+The saved-analysis [project workflow](PROJECTS.md) can retain and select recorded
+runs. Individual record-file import and automatic numerical comparison remain separate.
 
 Actual screen/download acceptance: run `node workbench/tests/record-ui-browser.mjs OUTPUT`
 with `SIPI_PYTHON` set to the built-wheel environment. Add a staged web directory

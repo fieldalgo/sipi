@@ -2,8 +2,9 @@
 
 [English](README.md)
 
-[프로젝트 전달 계약](PROJECTS.ko.md)은 불변 입력 변형을 기존 폼 5종에 연결한다.
-결과 이력 화면은 후속 작업이다.
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 5종의 입력 변형과 **Saved analysis**의
+저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
+자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
 [설치 파일 helper](ARTIFACTS.ko.md)는 호스트 출처용 실제 배포물 파일을 수집한다.
 [계산 기록](RECORDING.ko.md)은 설치 wheel 또는 staged 브라우저의 **Saved analysis → Run and keep record**에서 원문 결과 기록과 실행환경 목록을 내보낸다.

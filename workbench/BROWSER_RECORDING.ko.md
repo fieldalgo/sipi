@@ -2,7 +2,8 @@
 
 Worker는 [native 기록](RECORDING.ko.md)과 같은 `saved-record` 요청 및 원문
 기록/프로젝트 전달을 지원한다. 출처는 설치 파일 snapshot 대신 Pyodide에 불러온
-검사된 배포 원본을 설명한다. 자동 결과 이력 UI는 이 전달 계약과 별도다.
+검사된 배포 원본을 설명한다. [저장 분석 프로젝트 이력](PROJECTS.ko.md)이 이 전달
+계약을 사용하며 아래 출처 한계는 그대로 적용된다.
 
 초기화 시 계산 runtime을 불러오기 전에 staged manifest의 모든 파일에 대해
 상대 경로·크기·SHA-256을 확인한다. 최대 128개 파일, 파일당 64 MiB,
@@ -42,6 +43,6 @@ node workbench/tests/record-browser.mjs .validation/record-worker .validation/we
 첫 명령의 `SIPI_PYTHON`은 현재 빌드 wheel 설치본을 가리켜야 하며 호스트는 저장소
 밖에서 시작한다. 정상 stage는 보존하고 별도 복사본의 helper/runtime byte나
 경로를 의도적으로 바꾼 뒤 `--expect-integrity-error`를 추가하면 무결성 거부를
-검사한다. 실제 브라우저 전달 검사이며 새 결과 이력 화면이 있다는 의미는 아니다.
+검사한다. 이는 실제 브라우저 전달 검사이며 별도 화면 검사는 프로젝트 이력 안내를 따른다.
 
 [English](BROWSER_RECORDING.md)

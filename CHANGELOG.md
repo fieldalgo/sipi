@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Connect Saved analysis to project variants and recorded-run history: preserve raw project files and stored execution controls, duplicate or switch inputs, inspect historical runs and explicitly select matching results. Keep the previous project on failed transformations or excessive growth, preserve standalone record export, and reject stale file/attachment completion.
+
 - Add read-only project record lookup that preserves raw record digests and distinguishes existing selection from current-input matching. Permit viewing historical requests without rerunning, selecting or fabricating environment manifests.
 
 - Keep saved-analysis navigation and Exit within the header on narrow screens by allowing its height and rows to grow with the controls.
