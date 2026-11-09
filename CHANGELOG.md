@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save explicit panel-current pair goals with field-free preflight, fixed refinement budgets and complete common-execution failure histories.
+
 - Add explicit panel-current two-parameter forward goals with frozen volume, panel and joint refinement, original target tolerances and retained failure histories.
 
 - Add explicit saved panel-current lines with matching dielectric extraction, retained current diagnostics and frequency-bounded common execution.

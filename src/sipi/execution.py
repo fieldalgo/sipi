@@ -51,6 +51,7 @@ from .conductivity_profile_document import ConductivityProfileDocument
 from .pair_design_document import PairImpedanceDesignDocument
 from .pair_design import PairImpedanceGoalError
 from .pair_line_goal_document import ForwardPairDesignDocument
+from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .pair_line_goal import ForwardPairGoalError
 from .sampled_design_document import SampledImpedanceDesignDocument
 from .sampled_design import SampledImpedanceGoalError
@@ -89,6 +90,7 @@ from .debye_reactive_startup_document import DebyeReactiveLadderDocument
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
 _REGISTRY = {
+    'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
@@ -488,8 +490,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 material_evaluation=(None if exc.material_evaluation_json is None
                                      else json.loads(exc.material_evaluation_json)),
                 history=[row.to_dict() for row in exc.history]))
-    elif isinstance(doc, ForwardPairDesignDocument):
-        if data['max_evaluations'] > budget:
+    elif isinstance(doc, (ForwardPairDesignDocument, PanelForwardPairDesignDocument)):
+        goal_data = data['design'] if isinstance(doc, PanelForwardPairDesignDocument) else data
+        if goal_data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')
         try:
             out['result'] = doc.solve().to_dict()

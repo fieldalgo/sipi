@@ -1,5 +1,7 @@
 # 명시 패널 전류를 사용하는 두 임피던스 목표
 
+[저장형 패널 역산](panel_pair_goal_document.md)은 명시 설정과 공통 실행 실패를 보존합니다.
+
 [English](../../../../../packages/sipi/panel_pair_goal.md) · [패널 선로](panel_line.md) · [기존 선로 목표](pair_line_goal.md)
 
 `seek_panel_forward_pair_impedances`는 `PanelTransmissionLineDocument`를 반환하는

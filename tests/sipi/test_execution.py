@@ -447,6 +447,9 @@ def documents():
         initial=[.7e-3, .35e-3], max_evaluations=64))
     from sipi.panel_line import PanelTransmissionLineDocument
     base.append(PanelTransmissionLineDocument(line()))
+    from sipi.panel_pair_goal_document import PanelForwardPairDesignDocument
+    base.append(PanelForwardPairDesignDocument(next(
+        item for item in base if isinstance(item, ForwardPairDesignDocument))))
     return base
 
 
