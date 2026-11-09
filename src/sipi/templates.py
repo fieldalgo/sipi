@@ -17,6 +17,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_unbacked_coplanar',
            'asymmetric_coupled_coated_grounded_coplanar',
            'asymmetric_coupled_coated_unbacked_coplanar',
+           'asymmetric_coupled_coated_microstrip',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_layered_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
@@ -399,6 +400,26 @@ def asymmetric_coupled_coated_unbacked_coplanar(*, left_width, right_width, gap,
         tan_delta=tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height,
         box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width)
     return _unbacked_coplanar(base, lower_air_height)
+
+
+def asymmetric_coupled_coated_microstrip(*, left_width, right_width, gap,
+        substrate_height, eps_r, coating_height, coating_eps_r,
+        left_thickness=0.0, right_thickness=0.0, tan_delta=0.0,
+        coating_tan_delta=0.0, air_height=None, box_width=None,
+        left_top_width=None, right_top_width=None):
+    """Independent signal dimensions under a flat coating over a backing plane.
+
+    Coating height starts at the substrate and exceeds both metal thicknesses.
+    Upper air starts above the film and can be any positive height. The bottom
+    signal span is centered, positive left and negative right; gap uses bottom
+    edges. No lateral grounds, conformal film or exchange symmetry is assumed.
+    """
+    base = asymmetric_coupled_microstrip(left_width=left_width,
+        right_width=right_width, gap=gap, substrate_height=substrate_height,
+        eps_r=eps_r, left_thickness=left_thickness, right_thickness=right_thickness,
+        tan_delta=tan_delta, air_height=None, box_width=box_width,
+        left_top_width=left_top_width, right_top_width=right_top_width)
+    return _coated_coplanar(base, coating_height, coating_eps_r, coating_tan_delta, air_height)
 
 
 def _check_conformal_resolution(section):

@@ -1,5 +1,7 @@
 # 평탄 코팅 안의 edge-coupled 차동선
 
+[비대칭 코팅 microstrip 쌍](asymmetric_coated_microstrip.md)은 좌우 신호 폭·두께·taper를 독립 지정합니다.
+
 `coupled_coated_microstrip`는 기판 표면의 동일 폭 `positive`/`negative` 신호와
 전체 폭의 평탄 코팅, 위쪽 공기를 기존 `CrossSection`으로 만듭니다. 지정한
 평탄 단면이며 conformal mask·meniscus나 실제 제조 형상 예측은 아닙니다.

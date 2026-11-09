@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an unequal planar-coated microstrip pair with independent signal widths, thicknesses and tapers, including fixed-pitch studies and bounded impedance goals.
+
 - Add an unequal planar-coated coplanar pair with finite grounds, explicit lower air and no backing plane, including fixed-pitch geometry/material studies and bounded impedance goals.
 
 - Freeze saved inputs and execution controls in an immutable request with semantic hashes and receipts that retain the existing execution result.

@@ -1,5 +1,7 @@
 # Edge-coupled traces in a planar coating
 
+[Unequal coated microstrip pair](asymmetric_coated_microstrip.md) permits independent signal widths, thicknesses and tapers.
+
 `coupled_coated_microstrip` returns an existing `CrossSection`: equal-width
 `positive`/`negative` traces at the substrate surface, a flat full-width coating
 and air above. This is a prescribed planar profile, not a conformal mask,
