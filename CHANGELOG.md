@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Package an installed-runtime inventory helper that fingerprints actual distribution files and rejects missing, shadowed, unlisted or changing module payloads. Keep runtime fingerprints distinct from original wheel hashes and leave automatic result recording and browser/executable provenance separate.
+
 - Connect immutable project record attachment, explicit selection and removal to the workbench adapter. Preserve raw records and historical inputs; reject duplicate run IDs, mismatched current selections, tampering and combined size growth without changing the original project.
 
 - Add bounded saved-receipt transport with immutable input/control identity and unchanged execution results, including failed goals and incomplete studies. Preserve existing saved-analyze responses; project result attachment remains separate.
