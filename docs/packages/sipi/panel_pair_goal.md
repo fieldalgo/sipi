@@ -1,5 +1,7 @@
 # Explicit panel-current pair impedance goals
 
+[Finite-frequency pair goals](sampled_panel_pair_goal.md) check both targets at every supplied frequency.
+
 [Saved panel goals](panel_pair_goal_document.md) preserve explicit controls and common-execution failures.
 
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_goal.md) · [Panel lines](panel_line.md) · [Existing forward goals](pair_line_goal.md)
