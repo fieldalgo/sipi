@@ -1,6 +1,6 @@
 # 실행 결과 저장
 
-[English](../../../../../packages/sipi/execution_record.md) · [불변 요청](execution_request.md) · [공통 실행](execution.md)
+[English](../../../../../packages/sipi/execution_record.md) · [불변 요청](execution_request.md) · [공통 실행](execution.md) · [A/B 프로젝트](project.md)
 
 `SavedExecutionRecord`는 실행 영수증 하나를 정확한 원입력 문자열, 호스트 실행
 식별자, 선언된 빌드 산출물 정보와 함께 보관합니다. 읽거나 준비할 때 계산을 실행하지

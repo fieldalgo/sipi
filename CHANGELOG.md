@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add immutable A/B project snapshots with original inputs, retained execution history and explicit result selection invalidated by semantic edits.
+
 - Add immutable saved execution records binding original requests, receipts and host-declared artifact identities without executing on reopen.
 
 - Add strict saved tensor fitting requests with shared execution budgets, original residuals and separate sampled-error acceptance.
