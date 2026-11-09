@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Sample paired forward impedances from one explicit panel-current extraction per row, with strict saved inputs, retained failures and all-or-none descriptive summaries.
+
 - Save explicit panel-current pair goals with field-free preflight, fixed refinement budgets and complete common-execution failure histories.
 
 - Add explicit panel-current two-parameter forward goals with frozen volume, panel and joint refinement, original target tolerances and retained failure histories.

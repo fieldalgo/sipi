@@ -450,6 +450,8 @@ def documents():
     from sipi.panel_pair_goal_document import PanelForwardPairDesignDocument
     base.append(PanelForwardPairDesignDocument(next(
         item for item in base if isinstance(item, ForwardPairDesignDocument))))
+    from sipi.panel_pair_study import PanelForwardPairStudyDocument
+    base.append(PanelForwardPairStudyDocument(pair_source, conductor=dict(kind='perfect')))
     return base
 
 

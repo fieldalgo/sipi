@@ -1,7 +1,8 @@
 # Saved explicit panel-current pair goals
 
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_goal_document.md) ·
-[Direct panel goals](panel_pair_goal.md) · [Panel lines](panel_line.md)
+[Direct panel goals](panel_pair_goal.md) · [Panel lines](panel_line.md) ·
+[Paired sampling](panel_pair_study.md)
 
 `PanelForwardPairDesignDocument` saves an explicit panel-current goal as
 `sipi.panel-forward-pair-design/1`. The three root keys are `schema`, `design`

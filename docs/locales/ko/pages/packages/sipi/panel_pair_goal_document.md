@@ -1,7 +1,8 @@
 # 명시 패널 전류를 사용하는 저장형 두 목표 역산
 
 [English](../../../../../packages/sipi/panel_pair_goal_document.md) ·
-[직접 패널 역산](panel_pair_goal.md) · [패널 선로](panel_line.md)
+[직접 패널 역산](panel_pair_goal.md) · [패널 선로](panel_line.md) ·
+[두 양의 공차 평가](panel_pair_study.md)
 
 `PanelForwardPairDesignDocument`는 명시 패널 전류 역산을
 `sipi.panel-forward-pair-design/1`로 저장합니다. 최상위 키는 `schema`, `design`, `panel`
