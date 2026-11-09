@@ -53,6 +53,7 @@ from .pair_design import PairImpedanceGoalError
 from .pair_line_goal_document import ForwardPairDesignDocument
 from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .panel_pair_study import PanelForwardPairStudyDocument
+from .panel_pair_yield import PanelForwardPairYieldDocument
 from .pair_line_goal import ForwardPairGoalError
 from .sampled_design_document import SampledImpedanceDesignDocument
 from .sampled_design import SampledImpedanceGoalError
@@ -93,6 +94,7 @@ __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 _REGISTRY = {
     'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-study/1': PanelForwardPairStudyDocument,
+    'sipi.panel-forward-pair-yield/1': PanelForwardPairYieldDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
@@ -457,7 +459,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = _mixed_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, NortonCircuitDocument):
         out['result'] = _norton_circuit(doc.analyze(max_evaluations=budget))
-    elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument)):
+    elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument,
+                          PanelForwardPairYieldDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

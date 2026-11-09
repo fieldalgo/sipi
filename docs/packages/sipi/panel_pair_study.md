@@ -1,7 +1,8 @@
 # Paired forward-impedance sampling with explicit panel currents
 
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_study.md) ·
-[Panel lines](panel_line.md) · [Saved pair goals](panel_pair_goal_document.md)
+[Panel lines](panel_line.md) · [Saved pair goals](panel_pair_goal_document.md) ·
+[Joint acceptance](panel_pair_yield.md)
 
 `PanelForwardPairStudyDocument` calculates two quantities from **one extraction
 per sample**: `differential_forward_impedance_real` and

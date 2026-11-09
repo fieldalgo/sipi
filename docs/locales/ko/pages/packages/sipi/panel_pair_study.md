@@ -1,7 +1,8 @@
 # 명시 패널 전류를 사용하는 두 순방향 임피던스 공차 평가
 
 [English](../../../../../packages/sipi/panel_pair_study.md) ·
-[패널 선로](panel_line.md) · [두 목표 저장](panel_pair_goal_document.md)
+[패널 선로](panel_line.md) · [두 목표 저장](panel_pair_goal_document.md) ·
+[동시 조건 수율](panel_pair_yield.md)
 
 `PanelForwardPairStudyDocument`는 **표본마다 한 번 추출**하여
 `differential_forward_impedance_real`, `common_forward_impedance_real`을

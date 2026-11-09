@@ -452,6 +452,12 @@ def documents():
         item for item in base if isinstance(item, ForwardPairDesignDocument))))
     from sipi.panel_pair_study import PanelForwardPairStudyDocument
     base.append(PanelForwardPairStudyDocument(pair_source, conductor=dict(kind='perfect')))
+    from sipi.panel_pair_yield import PanelForwardPairYieldDocument
+    panel_iid = base[-1].to_dict()
+    panel_iid['study']['sampling'].update(kind='uniform', count=4, seed=123)
+    base.append(PanelForwardPairYieldDocument(PanelForwardPairStudyDocument.from_dict(panel_iid),
+        acceptance={q: dict(minimum=0., maximum=1000.) for q in pair_quantities},
+        confidence=.95, minimum_yield=.9))
     return base
 
 
