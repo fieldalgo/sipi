@@ -37,7 +37,8 @@ def test_editable_roundtrip_preserves_direct_geometry_and_hidden_arguments(name,
     assert execute(dict(action='document', template=name, parameters=opened['parameters'], mesh=opened['document']['mesh']))['document'] == saved['document']
 
 
-@pytest.mark.parametrize('bad', [None, 1, True, '{}', '{"schema":1,"schema":2}', '{"a":NaN}', ' '*204801])
+@pytest.mark.parametrize('bad', [None, 1, True, '{}', '{"schema":1,"schema":2}', '{"a":NaN}', ' '*204801],
+                         ids=['null', 'number', 'boolean', 'empty-object', 'duplicate-key', 'nonfinite', 'oversized'])
 def test_open_rejects_bad_or_oversized_text(bad):
     with pytest.raises((ValueError, TypeError)):
         execute(dict(action='template-open', text=bad))

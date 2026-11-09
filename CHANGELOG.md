@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Give oversized-input workbench tests short explicit case names so Windows can set pytest's current-test environment variable; preserve the original input sizes and rejection checks.
+
 - Add installed `sipi run`/`validate` and `python -m sipi` commands with bounded UTF-8 inputs, existing request receipts, retained failure histories and exclusive atomic output publication. Keep pipeline failure exit codes stable; UI packaging and other-platform filesystem acceptance remain separate.
 
 - Preserve editable template inputs in the five-form workbench: save/reopen exact parameters and mesh, retain hidden arguments through unit changes, and keep geometry export compatible. Validate files before changing the form and discard cancelled reads. Advance the engine pin to the validated template-input contract; Windows and Worker acceptance remain separate.

@@ -54,3 +54,7 @@ neither range nor version proves that an unreleased API is present. Build from
 the exact dependency commit and retain wheel hashes. The boundary-panel API
 is a shared galerkin capability; changing this pin alone does not select it
 for existing SIPI calculations.
+
+Give large parametrized test inputs short explicit `ids`. Pytest puts the node
+ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
+32767 characters. Keep the actual large input and its rejection criterion intact.
