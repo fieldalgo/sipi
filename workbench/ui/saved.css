@@ -8,4 +8,9 @@
 .saved-output pre { max-height: 650px; overflow: auto; padding: 16px; background: #f3f6f5; border-radius: 8px; font: 12px/1.6 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 #record-status { overflow-wrap: anywhere; }
 .top-actions a { color: inherit; }
-@media (max-width: 900px) { .saved-layout { grid-template-columns: 1fr; } .top-actions { flex-wrap: wrap; } }
+@media (max-width: 900px) {
+  .saved-layout { grid-template-columns: 1fr; }
+  .topbar { height: auto; min-height: 68px; padding-top: 12px; padding-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+  .topbar .brand { flex-shrink: 0; }
+  .top-actions { flex-wrap: wrap; gap: 12px; min-width: 0; }
+}

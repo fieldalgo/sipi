@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Keep saved-analysis navigation and Exit within the header on narrow screens by allowing its height and rows to grow with the controls.
+
 - Add an explicit recorded-run action to Saved analysis, with raw execution-record and environment downloads. Preserve ordinary result exports, optional diagnostics and failed/incomplete results; clear record export on edits, cancellation and stale completions. Project history selection remains separate.
 
 - Connect Worker result recording to checked staged wheel/runtime sources through a host-owned provider. Validate all declared asset hashes and reviewed versions, retain raw records/manifests, and preserve native recording and existing calculation behavior. Keep automatic history UI and frozen-executable provenance separate.
