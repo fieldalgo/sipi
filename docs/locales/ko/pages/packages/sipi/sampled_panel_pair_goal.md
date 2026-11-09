@@ -1,5 +1,7 @@
 # 유한 주파수 표본의 두 임피던스 목표
 
+[저장 요청](sampled_panel_pair_goal_document.md)은 기하·재료 입력과 공통 실행 실패를 보존합니다.
+
 [English](../../../../../packages/sipi/sampled_panel_pair_goal.md) ·
 [단일 주파수 패널 역산](panel_pair_goal.md) · [패널 선로 계약](panel_line.md)
 

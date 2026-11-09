@@ -55,6 +55,8 @@ from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .panel_pair_study import PanelForwardPairStudyDocument
 from .panel_pair_yield import PanelForwardPairYieldDocument
 from .panel_pair_selection import PanelForwardPairSelectionDocument
+from .sampled_panel_pair_goal_document import SampledPanelForwardPairDesignDocument
+from .sampled_panel_pair_goal import SampledPanelForwardPairGoalError
 from .pair_line_goal import ForwardPairGoalError
 from .sampled_design_document import SampledImpedanceDesignDocument
 from .sampled_design import SampledImpedanceGoalError
@@ -93,6 +95,7 @@ from .debye_reactive_startup_document import DebyeReactiveLadderDocument
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
 _REGISTRY = {
+    'sipi.sampled-panel-forward-pair-design/1': SampledPanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-study/1': PanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-yield/1': PanelForwardPairYieldDocument,
@@ -496,6 +499,18 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 input=None if exc.input_json is None else json.loads(exc.input_json),
                 material_evaluation=(None if exc.material_evaluation_json is None
                                      else json.loads(exc.material_evaluation_json)),
+                history=[row.to_dict() for row in exc.history]))
+    elif isinstance(doc, SampledPanelForwardPairDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved goal batch budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except SampledPanelForwardPairGoalError as exc:
+            out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
+                quantities=['differential_forward_impedance_real', 'common_forward_impedance_real'],
+                unit='ohm', frequencies_hz=list(exc.frequencies), attempts=exc.attempts,
+                stage=exc.stage, failed_parameters=exc.failed_parameters, cause_type=exc.cause_type,
+                input=None if exc.input_json is None else json.loads(exc.input_json),
                 history=[row.to_dict() for row in exc.history]))
     elif isinstance(doc, (ForwardPairDesignDocument, PanelForwardPairDesignDocument)):
         goal_data = data['design'] if isinstance(doc, PanelForwardPairDesignDocument) else data

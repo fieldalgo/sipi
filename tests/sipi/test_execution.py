@@ -464,6 +464,12 @@ def documents():
         dict(name='second', cost=.8, study=panel_iid)], cost_unit='relative-cost',
         acceptance={q: dict(minimum=0., maximum=1000.) for q in pair_quantities},
         confidence=.95, minimum_yield=.9))
+    from sipi.sampled_panel_pair_goal_document import SampledPanelForwardPairDesignDocument
+    base.append(SampledPanelForwardPairDesignDocument(pair_source,
+        conductor=dict(kind='perfect'), frequencies=[1e9, 2e9],
+        targets={q: [v, v] for q, v in zip(pair_quantities, [110., 40.])},
+        tolerances={q: [v, v] for q, v in zip(pair_quantities, [.5, .25])},
+        initial=[.7e-3, .35e-3], max_evaluations=64))
     return base
 
 

@@ -1,5 +1,7 @@
 # Paired goals at finite frequency samples
 
+[Saved requests](sampled_panel_pair_goal_document.md) preserve geometry/material inputs and common-execution failures.
+
 [한국어](../../locales/ko/pages/packages/sipi/sampled_panel_pair_goal.md) ·
 [Single-frequency panel goals](panel_pair_goal.md) · [Panel line contract](panel_line.md)
 

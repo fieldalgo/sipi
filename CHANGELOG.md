@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Save finite-frequency paired panel goals with full-grid preflight, named target arrays and preserved common-execution failures.
+
 - Seek paired forward impedance targets at explicit finite frequency samples, with frozen volume/panel/joint verification and atomic failed-batch histories.
 
 - Select the lowest-cost certified member of a fixed paired-impedance candidate set using simultaneous joint-yield bounds, whole-family preflight and retained unresolved rows.
