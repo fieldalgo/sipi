@@ -1,5 +1,7 @@
 # 법선 두께 코팅을 갖는 비대칭 coplanar 쌍
 
+[하부 접지면 없는 구조](asymmetric_conformal_unbacked.md)는 유한 측면 접지·법선 필름을 유지하고 독립 아래 공기를 추가합니다.
+
 [English](../../../../../packages/sipi/asymmetric_conformal_coplanar.md) ·
 [측면 접지 없는 쌍](asymmetric_conformal_microstrip.md) · [동일폭 코팅 coplanar](conformal_coplanar.md)
 

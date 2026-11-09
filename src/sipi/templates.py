@@ -20,6 +20,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_coated_microstrip',
            'asymmetric_coupled_conformal_coated_microstrip',
            'asymmetric_coupled_conformal_coated_grounded_coplanar',
+           'asymmetric_coupled_conformal_coated_unbacked_coplanar',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_layered_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
@@ -467,6 +468,33 @@ def asymmetric_coupled_conformal_coated_grounded_coplanar(*, left_width,
         ground_thickness=ground_thickness, tan_delta=tan_delta, air_height=None,
         box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width)
     return _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta, air_height)
+
+
+def asymmetric_coupled_conformal_coated_unbacked_coplanar(*, left_width,
+        right_width, gap, ground_gap, ground_width, substrate_height, eps_r,
+        coating_thickness, coating_eps_r, left_thickness=0.0,
+        right_thickness=0.0, ground_thickness=0.0, tan_delta=0.0,
+        coating_tan_delta=0.0, air_height=None, lower_air_height=None,
+        box_width=None, left_top_width=None, right_top_width=None):
+    """Unequal coated signals and finite grounds without a backing plane.
+
+    Normal-thickness mitered film covers the substrate and all four traces.
+    Signal dimensions are independent; rectangular grounds share explicit
+    dimensions and their thickness is never inferred from a signal. All outer
+    boundaries are insulated and only finite grounds set the reference. Lower
+    air translates metal and local coating together; upper air begins above
+    the highest coated metal. No central ground, overhang or air pocket.
+    """
+    base = asymmetric_coupled_conformal_coated_grounded_coplanar(
+        left_width=left_width, right_width=right_width, gap=gap,
+        ground_gap=ground_gap, ground_width=ground_width,
+        substrate_height=substrate_height, eps_r=eps_r,
+        coating_thickness=coating_thickness, coating_eps_r=coating_eps_r,
+        left_thickness=left_thickness, right_thickness=right_thickness,
+        ground_thickness=ground_thickness, tan_delta=tan_delta,
+        coating_tan_delta=coating_tan_delta, air_height=air_height,
+        box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width)
+    return _unbacked_coplanar(base, lower_air_height)
 
 
 def _check_conformal_resolution(section):
