@@ -126,3 +126,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 ```
 
 [공유 메시의 주파수 선로 입력](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/line_model.md)은 이 추출과 재료/도체 모델을 연결하고 전체 입력을 JSON으로 저장합니다.
+
+[명시적 경계 패널 전류와 금속별 손실](panel_conductor.md)은 고정 전위 접지 도체를 다루는 선택적 공유 커널 경로이며 패널·외곽 수렴을 별도로 검증합니다.

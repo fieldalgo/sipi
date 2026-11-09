@@ -153,3 +153,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 
 [Shared-mesh frequency-line input](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/line_model.md) combines this extraction with
 the other material/conductor components and saves the complete input as JSON.
+
+[Explicit boundary-panel currents and per-boundary loss](panel_conductor.md) provide an optional shared-kernel path with fixed grounded traces and separate panel/domain convergence checks.

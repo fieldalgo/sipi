@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit shared boundary-panel current factors and per-boundary metal loss with grounded traces, capability checks and unchanged existing calculation defaults.
+
 - Validate the pinned shared 0.0.2 development baseline and retain exact dependency artifact requirements without changing existing calculation methods.
 
 - Add strict saved two-variable forward impedance goals with geometry/material inputs and transport-independent failure histories.
