@@ -1,5 +1,7 @@
 # 극점과 방향을 고정한 텐서 피팅
 
+[저장 피팅 요청](tensor_dielectric_fit_document.md)은 엄격한 JSON과 공통 실행을 연결합니다.
+
 [English](../../../../../packages/sipi/tensor_dielectric_fit.md) · [텐서 재료](tensor_debye.md) · [스칼라 피팅](dielectric_fit.md)
 
 `fit_tensor_debye`는 `exp(+j omega t)` 규약의 명시적 상대 유전율 텐서 표본에

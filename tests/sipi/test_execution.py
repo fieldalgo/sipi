@@ -18,6 +18,7 @@ from sipi.volume_line import VolumeLineDocument
 from sipi.circuit_document import CircuitDocument
 from sipi.dielectric import ConstantDielectric
 from sipi.dielectric_fit import DebyeFitDocument
+from sipi.tensor_dielectric_fit_document import TensorDebyeFitDocument
 from sipi.line_goal_document import LineQuantityDesignDocument
 from sipi.line_study import LineQuantityStudyDocument
 
@@ -486,6 +487,10 @@ def documents():
         [dict(name='nominal', cost=1., study=family_source['study'])],
         cost_unit='relative-cost', acceptance=family_source['acceptance'],
         confidence=.95, minimum_yield=.3))
+    base.append(TensorDebyeFitDocument([1e5, 1e7],
+        eps_real=[[[3., 0.], [0., 4.]], [[2., 0.], [0., 3.]]],
+        eps_loss=[[[.2, 0.], [0., .3]], [[.3, 0.], [0., .4]]],
+        relaxation_hz=[1e6], angles_rad=[0.], max_error=.01))
     return base
 
 

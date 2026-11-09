@@ -1,5 +1,7 @@
 # Tensor fitting with fixed poles and directions
 
+[Saved fitting requests](tensor_dielectric_fit_document.md) add strict JSON and shared execution.
+
 [한국어](../../locales/ko/pages/packages/sipi/tensor_dielectric_fit.md) · [Tensor material](tensor_debye.md) · [Scalar fitting](dielectric_fit.md)
 
 `fit_tensor_debye` fits a finite [TensorDebyeDielectric](tensor_debye.md) to

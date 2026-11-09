@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add strict saved tensor fitting requests with shared execution budgets, original residuals and separate sampled-error acceptance.
+
 - Add fixed-pole, fixed-orientation passive tensor fitting with original samples, Frobenius residuals and explicit sampled acceptance.
 
 - Add passive transverse Debye tensors with independently oriented residues, strict nested material inputs and saved material studies/goals.
