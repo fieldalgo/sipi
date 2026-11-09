@@ -1,5 +1,7 @@
 # 명시 패널 전류를 사용하는 두 순방향 임피던스 공차 평가
 
+[유한 주파수 두 양 표본](sampled_panel_pair_study.md)은 같은 제조 표본을 요청 주파수 전체에 적용합니다.
+
 [English](../../../../../packages/sipi/panel_pair_study.md) ·
 [패널 선로](panel_line.md) · [두 목표 저장](panel_pair_goal_document.md) ·
 [동시 조건 수율](panel_pair_yield.md)

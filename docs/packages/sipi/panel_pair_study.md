@@ -1,5 +1,7 @@
 # Paired forward-impedance sampling with explicit panel currents
 
+[Finite-frequency paired sampling](sampled_panel_pair_study.md) keeps each manufactured sample fixed across the requested grid.
+
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_study.md) ·
 [Panel lines](panel_line.md) · [Saved pair goals](panel_pair_goal_document.md) ·
 [Joint acceptance](panel_pair_yield.md)
