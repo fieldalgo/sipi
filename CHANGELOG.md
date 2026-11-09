@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add read-only project record lookup that preserves raw record digests and distinguishes existing selection from current-input matching. Permit viewing historical requests without rerunning, selecting or fabricating environment manifests.
+
 - Keep saved-analysis navigation and Exit within the header on narrow screens by allowing its height and rows to grow with the controls.
 
 - Add an explicit recorded-run action to Saved analysis, with raw execution-record and environment downloads. Preserve ordinary result exports, optional diagnostics and failed/incomplete results; clear record export on edits, cancellation and stale completions. Project history selection remains separate.

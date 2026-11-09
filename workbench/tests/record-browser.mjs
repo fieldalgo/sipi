@@ -99,12 +99,18 @@ try {
     let created=await run({action:'project-create',text:texts['10'],project_id:'p',design_id:'a',title:'Recorded',label:'A'});
     let attached=await run({action:'project-attach',project_text:created.project_text,design_id:'a',record_text:first.record_text,select:true});
     assert.equal(JSON.parse(attached.project_text).designs[0].selected_run_id,record.run_id);
+    const lookup=await run({action:'project-record',project_text:attached.project_text,design_id:'a',run_id:record.run_id});
+    assert.equal(lookup.record_text,first.record_text);assert.equal(lookup.selected,true);assert.equal(lookup.matches_current,true);
     const damaged=await rejected({action:'project-attach',project_text:created.project_text,design_id:'a',record_text:JSON.stringify(record),select:true});
     assert.equal(damaged.accepted,false);assert.match(damaged.message,/digest/);
     const both=await run({action:'project-attach',project_text:attached.project_text,design_id:'a',record_text:second.record_text,select:false});
     assert.equal(JSON.parse(both.project_text).designs[0].selected_run_id,record.run_id);
     const edited=await run({action:'project-update',project_text:both.project_text,design_id:'a',text:texts['20']});
     assert.equal(JSON.parse(edited.project_text).designs[0].selected_run_id,null);
+    const past=await run({action:'project-record',project_text:edited.project_text,design_id:'a',run_id:record.run_id});
+    assert.equal(past.record_text,first.record_text);assert.equal(past.selected,false);assert.equal(past.matches_current,false);
+    const missing=await rejected({action:'project-record',project_text:edited.project_text,design_id:'a',run_id:'absent'});
+    assert.equal(missing.accepted,false);assert.match(missing.message,/not in this design/);
     const stale=await rejected({action:'project-select',project_text:edited.project_text,design_id:'a',run_id:record.run_id});
     assert.equal(stale.accepted,false);assert.match(stale.message,/current design request/);
     const forged=await rejected({...input,artifacts:[]});assert.equal(forged.accepted,false);
@@ -118,6 +124,8 @@ try {
       const checked=await run({action:'project-create',text:cases[name],project_id:'p:'+name,design_id:'a',title:name,label:'A'});
       const restored=await run({action:'project-attach',project_text:checked.project_text,design_id:'a',record_text:recordedOutput.record_text,select:true});
       const stored=JSON.parse(restored.project_text).designs[0].records[0];
+      const lookup=await run({action:'project-record',project_text:restored.project_text,design_id:'a',run_id:saved.run_id});
+      assert.equal(lookup.record_text,recordedOutput.record_text);assert.equal(lookup.selected,true);assert.equal(lookup.matches_current,true);
       assert.deepEqual(stored,saved);
       if(name==='study') assert.ok(saved.receipt.execution.result.failed>0);
       else assert.equal(saved.receipt.execution.error.history.at(-1).stage,'refinement');
@@ -131,7 +139,8 @@ try {
     await writeFile(join(output,'project.json'),both.project_text);
     checks=['real recorded calculation','same semantic receipt with unique run IDs','exact old saved execution',
       'raw project attachment','numeric reserialization rejected','history retained on edit','stale selection rejected',
-      'caller provenance rejected','incomplete-study record/project history','failed refined-goal record/project history','pending cancellation and restart'];
+      'caller provenance rejected','incomplete-study record/project history','failed refined-goal record/project history',
+      'raw current and historical project lookup','missing record rejected','pending cancellation and restart'];
   }
   await cdp.evaluate('window.recordTransport.close()');
   if(!webRoot) await until(()=>server.exitCode===0,'installed host exit');

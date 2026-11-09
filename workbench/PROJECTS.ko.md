@@ -17,11 +17,14 @@ desktop/Worker의 내부 adapter는 기존
 | `project-attach` | `project_text`, `design_id`, `record_text`, `select` | 없음 |
 | `project-select` | `project_text`, `design_id`, `run_id` | 없음 |
 | `project-remove-record` | `project_text`, `design_id`, `run_id` | 없음 |
+| `project-record` | `project_text`, `design_id`, `run_id` | 없음 |
 
 `text`는 원본 엔진 입력 JSON, `project_text`와 `record_text`는 프로젝트와 실행 기록 원문 JSON이다.
 누락·알 수 없는 옵션, 원본 JSON의 중복 키, 미지원 버전, 잘못된 값 및 프로젝트
 digest 불일치를 거부한다. 응답은 기존 버전/빌드 정보인 `engine`과 정규
 `project_text`를 담는다. 새 아티팩트 인증이나 생성한 결과 기록이 아니다.
+읽기 전용 `project-record` 응답은 대신 `engine`, 원문 `record_text`, boolean인
+`selected`, `matches_current`를 반환하며 프로젝트 대체본을 반환하지 않는다.
 
 UTF-8 요청은 256 KiB, 새 입력·들어오는 프로젝트/기록 원문·정규 프로젝트 출력은 각각
 200 KiB까지다. adapter는 compact JSON과 원문 Unicode로 크기를 확인하고 native
@@ -47,11 +50,18 @@ HTTP 호스트는 공백·이스케이프를 포함한 실제 본문도 제한�
 snapshot을 바꾸지 않고 거부한다. 최신 결과를 자동 선택하거나 활성 실행의 응답임을
 인증하지 않는다.
 
+`project-record`는 계산·선택·변경 없이 지정한 기존 실행을 읽는다. 입력 프로젝트
+전체를 먼저 검증하고 Python으로 직렬화한 원래 기록의 숫자 표기와 digest를 보존한다.
+과거 입력·controls의 기록도 읽을 수 있으나 `matches_current=false`이면 현재 설계의
+결과가 아닌 과거 이력이다. 서식만 바뀐 입력은 의미상 일치를 유지한다. `selected`는
+기존 명시적 선택 여부이며 일치한다고 자동 선택하지 않는다. 기록의 host-declared
+배포물 metadata에서 runtime manifest를 새로 만들거나 복원했다고 주장하지 않는다.
+
 JavaScript를 거칠 때 기록의 직렬화 원문을 전달해야 한다. 숫자를 파싱 후 다시
 직렬화하면 content digest가 달라질 수 있다. 출처 선언은 `host-declared` 그대로이며
 기록을 붙인다고 배포물의 출처를 감사하거나 인증하지 않는다. 실행 ID·늦은 응답
-처리·실행·실제 배포물 근거·파일 게시는 호스트의 작업이다. UI는 아직 새 결과를
-생성해 붙이지 않는다.
+처리·실행·실제 배포물 근거·파일 게시는 호스트의 작업이다. 입력 프로젝트 화면은
+새로 생성한 기록을 아직 자동으로 붙이지 않는다.
 
 빌드한 개발 wheel에서 전계 계산 없이 A/B 입력을 만들고 수정하는 예제:
 
@@ -80,3 +90,23 @@ assert cleared['project_text'] == opened['project_text']
 
 adapter/HTTP 검사와 실제 브라우저·플랫폼 검사는 별개다.
 현재 사용 흐름과 범위는 [workbench 안내](README.ko.md)를 참고한다.
+
+숫자를 파싱한 객체를 다시 보내지 않고 실제 설치 기록 원문을 읽는 예제:
+
+```python
+from sipi import LumpedNetworkDocument
+from sipi._workbench.engine import execute
+
+text = LumpedNetworkDocument([0, 1e9], resistance=10).dumps()
+created = execute(dict(action='project-create', text=text, project_id='records',
+    design_id='a', title='Recorded analysis', label='A'))
+recorded = execute(dict(action='saved-record', text=text))
+import json
+run_id = json.loads(recorded['record_text'])['run_id']
+attached = execute(dict(action='project-attach', project_text=created['project_text'],
+    design_id='a', record_text=recorded['record_text'], select=True))
+read = execute(dict(action='project-record', project_text=attached['project_text'],
+    design_id='a', run_id=run_id))
+assert read['record_text'] == recorded['record_text']
+assert read['selected'] and read['matches_current']
+```

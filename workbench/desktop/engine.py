@@ -198,6 +198,7 @@ def edit_project(request):
         'project-attach': ({'action', 'project_text', 'design_id', 'record_text', 'select'}, set()),
         'project-select': ({'action', 'project_text', 'design_id', 'run_id'}, set()),
         'project-remove-record': ({'action', 'project_text', 'design_id', 'run_id'}, set()),
+        'project-record': ({'action', 'project_text', 'design_id', 'run_id'}, set()),
     }
     required, optional = keys[action]
     if not required <= request.keys() or not request.keys() <= required | optional:
@@ -209,6 +210,19 @@ def edit_project(request):
         raise ValueError('Design label must be text.')
     if action != 'project-create':
         project = SavedProject.loads(request['project_text'], max_project_bytes=200*1024)
+    if action == 'project-record':
+        from sipi.execution_record import SavedExecutionRecord
+        design = project.design(request['design_id'])
+        run_id = request['run_id']
+        if not isinstance(run_id, str):
+            raise ValueError('run_id must identify a record in this design.')
+        raw = next((item for item in design['records'] if item['run_id'] == run_id), None)
+        if raw is None:
+            raise ValueError('run_id is not in this design.')
+        record = SavedExecutionRecord.from_dict(raw, max_record_bytes=200*1024)
+        return {'engine': engine_info(), 'record_text': record.dumps(),
+                'selected': design['selected_run_id'] == run_id,
+                'matches_current': record.prepare().request_id == project.prepare(request['design_id']).request_id}
     if action in ('project-create', 'project-update'):
         text = request['text']
         if not isinstance(text, str) or len(text.encode('utf-8')) > 200*1024:
@@ -274,7 +288,7 @@ def execute(request, *, record_provider=None):
             return {'engine': engine_info(), **run_recorded(prepared)}
         return {'engine': engine_info(), 'receipt': prepared.run()}
     if action in ('project-create', 'project-open', 'project-duplicate', 'project-update',
-                  'project-attach', 'project-select', 'project-remove-record'):
+                  'project-attach', 'project-select', 'project-remove-record', 'project-record'):
         return edit_project(request)
     if action in ('template-document', 'template-open'):
         from sipi.template_document import TemplateSectionDocument

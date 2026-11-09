@@ -42,6 +42,76 @@ def transformed(payload):
     return result
 
 
+def lookup(p, run_id='run:1', design_id='a'):
+    return dict(action='project-record', project_text=p.dumps(), design_id=design_id, run_id=run_id)
+
+
+def test_lookup_preserves_raw_record_without_selecting_or_executing(monkeypatch):
+    request = prepared()
+    first, second = record(request), record(request, 'run:2')
+    p = project(request).attach_record('a', first, select=True).attach_record('a', second)
+    before = p.dumps()
+    monkeypatch.setattr(SavedExecutionRequest, 'run', lambda *a: pytest.fail('lookup executed'))
+    out = execute(lookup(p))
+    assert set(out) == {'engine', 'record_text', 'selected', 'matches_current'}
+    assert out['record_text'] == first.dumps() and out['selected'] is True and out['matches_current'] is True
+    other = execute(lookup(p, 'run:2'))
+    assert other['record_text'] == second.dumps() and other['selected'] is False and other['matches_current'] is True
+    cleared = p.select_record('a', None)
+    assert execute(lookup(cleared))['selected'] is False
+    assert p.dumps() == before and p.current_record('a').run_id == first.run_id
+
+
+@pytest.mark.parametrize('change', ['input', 'controls', 'format'])
+def test_lookup_distinguishes_historical_and_current_request(change, monkeypatch):
+    old = prepared()
+    current = (prepared(20) if change == 'input' else
+               SavedExecutionRequest(old.source_text, max_input_bytes=200*1024, max_evaluations=72)
+               if change == 'controls' else SavedExecutionRequest(old.source_text+'\n ', max_input_bytes=200*1024))
+    saved = record(old)
+    p = project(old).attach_record('a', saved, select=True).update_design('a', current)
+    monkeypatch.setattr(SavedExecutionRequest, 'run', lambda *a: pytest.fail('lookup executed'))
+    out = execute(lookup(p))
+    assert out['record_text'] == saved.dumps()
+    assert out['matches_current'] is (change == 'format')
+    assert out['selected'] is (change == 'format')
+
+
+@pytest.mark.parametrize('problem', ['missing-run', 'other-design', 'missing-design', 'null-run',
+    'array-run', 'extra-key', 'missing-key', 'tamper', 'oversized-project'])
+def test_lookup_rejects_invalid_or_unavailable_history(problem, monkeypatch):
+    request = prepared();saved = record(request)
+    p = project(request).attach_record('a', saved).duplicate_design('a', 'b', 'B')
+    payload = lookup(p)
+    if problem == 'missing-run': payload['run_id'] = 'run:absent'
+    elif problem == 'other-design': payload['design_id'] = 'b'
+    elif problem == 'missing-design': payload['design_id'] = 'absent'
+    elif problem == 'null-run': payload['run_id'] = None
+    elif problem == 'array-run': payload['run_id'] = ['run:1']
+    elif problem == 'extra-key': payload['select'] = True
+    elif problem == 'missing-key': del payload['run_id']
+    elif problem == 'tamper': payload['project_text'] = payload['project_text'].replace('"run:1"', '"run:x"')
+    elif problem == 'oversized-project': payload['project_text'] += ' '*(200*1024)
+    monkeypatch.setattr(SavedExecutionRequest, 'run', lambda *a: pytest.fail('lookup executed'))
+    with pytest.raises(ValueError): execute(payload)
+
+
+def test_actual_spawned_raw_record_lookup(server):
+    old = prepared();saved = record(old)
+    p = project(old).attach_record('a', saved, select=True)
+    status, started = call(server, 'POST', '/api/job', lookup(p))
+    assert status == 202
+    result = finish(server)
+    assert result['status'] == 'complete'
+    out = result['result']
+    assert out['record_text'] == saved.dumps() and out['selected'] and out['matches_current']
+    changed = p.update_design('a', prepared(20))
+    status, started = call(server, 'POST', '/api/job', lookup(changed))
+    assert status == 202
+    out = finish(server)['result']
+    assert out['record_text'] == saved.dumps() and not out['selected'] and not out['matches_current']
+
+
 def test_attach_select_clear_remove_preserve_exact_record_without_running(monkeypatch):
     request = prepared()
     p = project(request)

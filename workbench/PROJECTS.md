@@ -17,13 +17,16 @@ An accepted engine input does not imply an editable form exists for it.
 | `project-attach` | `project_text`, `design_id`, `record_text`, `select` | none |
 | `project-select` | `project_text`, `design_id`, `run_id` | none |
 | `project-remove-record` | `project_text`, `design_id`, `run_id` | none |
+| `project-record` | `project_text`, `design_id`, `run_id` | none |
 
 `text` is raw engine-input JSON; `project_text` and `record_text` are raw project
 and execution-record JSON. Missing or
 unknown options, duplicate keys in those texts, unsupported versions, invalid
 values and mismatched project digests are rejected. Replies contain `engine`
 (existing version/build information) and canonical `project_text`. This adds
-neither artifact attestation nor fabricated result records.
+neither artifact attestation nor fabricated result records. The read-only
+`project-record` reply instead contains `engine`, raw `record_text`, `selected`
+and `matches_current` booleans; it does not return a replacement project.
 
 The encoded UTF-8 request is limited to 256 KiB. New input text, incoming project
 text, incoming record text and canonical output projects are each limited to 200 KiB. The adapter uses
@@ -54,11 +57,21 @@ Missing designs/runs, stale selections, tampering and excessive combined growth
 are errors; the original snapshot is unchanged. No operation chooses the latest
 result automatically or certifies that a response belongs to the active invocation.
 
+`project-record` reads a specified existing run without executing, selecting or
+changing anything. It validates the whole incoming project first, then returns
+the Python-serialized record text with its numeric spellings and digest intact.
+Historical inputs/controls may be read: `matches_current=false` marks them as
+history, not results for the current design. A formatting-only input change
+does not change semantic matching. `selected` reports the existing explicit
+selection; matching alone never selects a run. No runtime manifest is invented
+or reconstructed from the record's host-declared artifact metadata.
+
 Pass original serialized record text across JavaScript. Parsing and reserializing
 numbers can change their content digest. Artifact declarations remain
 `host-declared`; attaching a record does not audit or authenticate its provenance.
 Invocation IDs, stale-response handling, execution, actual artifact evidence and
-file publication remain host work. The UI does not yet generate/attach new results.
+file publication remain host work. The input-project screen does not yet attach
+newly recorded results automatically.
 
 This built development-wheel example creates an A/B snapshot without fields:
 
@@ -87,3 +100,23 @@ assert cleared['project_text'] == opened['project_text']
 
 Adapter/HTTP acceptance and actual browser/platform acceptance are separate
 checks; see the [workbench guide](README.md) for the current user flow and limits.
+
+Read a real installed record without resending its parsed numeric values:
+
+```python
+from sipi import LumpedNetworkDocument
+from sipi._workbench.engine import execute
+
+text = LumpedNetworkDocument([0, 1e9], resistance=10).dumps()
+created = execute(dict(action='project-create', text=text, project_id='records',
+    design_id='a', title='Recorded analysis', label='A'))
+recorded = execute(dict(action='saved-record', text=text))
+import json
+run_id = json.loads(recorded['record_text'])['run_id']
+attached = execute(dict(action='project-attach', project_text=created['project_text'],
+    design_id='a', record_text=recorded['record_text'], select=True))
+read = execute(dict(action='project-record', project_text=attached['project_text'],
+    design_id='a', run_id=run_id))
+assert read['record_text'] == recorded['record_text']
+assert read['selected'] and read['matches_current']
+```
