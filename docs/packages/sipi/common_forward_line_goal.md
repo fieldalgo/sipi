@@ -1,5 +1,7 @@
 # Lossy common-current forward-impedance goal
 
+[Two-variable forward targets](pair_line_goal.md) jointly match differential and common real impedances.
+
 [Saved goal /3](common_forward_goal_document.md) connects supported geometry/material sources to this API.
 
 **English** | [한국어](../../locales/ko/pages/packages/sipi/common_forward_line_goal.md)

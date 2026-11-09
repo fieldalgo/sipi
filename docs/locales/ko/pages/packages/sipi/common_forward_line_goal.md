@@ -1,5 +1,7 @@
 # 유손실 공통 전류 순방향 임피던스 목표
 
+[두 변수 전방 목표](pair_line_goal.md)는 차동·공통 실수부 임피던스를 함께 맞춥니다.
+
 [저장 목표 /3](common_forward_goal_document.md)은 지원 기하·재료 입력을 이 API에 연결합니다.
 
 [English](../../../../../packages/sipi/common_forward_line_goal.md) | **한국어**

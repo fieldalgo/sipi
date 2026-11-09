@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add bounded two-parameter goals for full-loss differential/common forward impedances, with frozen-input mesh refinement and retained failure histories.
+
 - Add explicit fixed common-current candidate selection with simultaneous acceptance bounds and retained unknown rows.
 
 - Add explicit saved common-current iid acceptance bounds, preserving unresolved rows and previous saved-version admission.
