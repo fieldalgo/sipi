@@ -231,6 +231,24 @@ def execute(request):
     if not isinstance(request, dict):
         raise ValueError('Request must be a JSON object.')
     action = request.get('action')
+    if action == 'saved-receipt':
+        from sipi.execution_request import SavedExecutionRequest
+        if not {'action', 'text'} <= request.keys() or not request.keys() <= {'action', 'text', 'controls'}:
+            raise ValueError('Receipt execution needs text and optional complete controls.')
+        encoded = json.dumps(request, ensure_ascii=False, allow_nan=False, separators=(',', ':'))
+        if len(encoded.encode('utf-8')) > 256*1024:
+            raise ValueError('Encoded receipt request exceeds 256 KiB.')
+        text = request['text']
+        if not isinstance(text, str) or len(text.encode('utf-8')) > 200*1024:
+            raise ValueError('Saved input must be UTF-8 text up to 200 KiB.')
+        controls = request.get('controls', dict(max_input_bytes=200*1024,
+                                               max_evaluations=128, diagnostics=[]))
+        if not isinstance(controls, dict) or set(controls) != {'max_input_bytes', 'max_evaluations', 'diagnostics'}:
+            raise ValueError('Receipt controls need exactly byte limit, evaluation limit and diagnostics.')
+        prepared = SavedExecutionRequest(text, **controls)
+        if prepared.max_evaluations > 128:
+            raise ValueError('This workbench accepts at most 128 evaluations per request.')
+        return {'engine': engine_info(), 'receipt': prepared.run()}
     if action in ('project-create', 'project-open', 'project-duplicate', 'project-update'):
         return edit_project(request)
     if action in ('template-document', 'template-open'):
