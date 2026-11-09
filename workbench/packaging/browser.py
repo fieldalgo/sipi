@@ -141,7 +141,8 @@ def main():
     notices.extend(extra_notices)
     manifest['supplemental_components'] = components
     manifest['redistribution_review'] = 'incomplete; internal validation only'
-    put('engine.py', (ROOT / 'workbench/desktop/engine.py').read_bytes(), 'first-party adapter')
+    for name in ('engine.py', 'artifacts.py', 'recording.py', 'browser_recording.py'):
+        put(name, (ROOT / 'workbench/desktop'/name).read_bytes(), 'first-party adapter')
     put('notices.txt', '\n'.join(notices).encode('utf-8'), 'collected upstream notices')
     manifest['staged_bytes'] = sum(path.stat().st_size for path in output.rglob('*') if path.is_file())
     (output / 'runtime-manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')

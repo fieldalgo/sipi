@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Connect Worker result recording to checked staged wheel/runtime sources through a host-owned provider. Validate all declared asset hashes and reviewed versions, retain raw records/manifests, and preserve native recording and existing calculation behavior. Keep automatic history UI and frozen-executable provenance separate.
+
 - Add recorded execution for inspectable native wheel installations: compare actual installed file snapshots around one saved calculation, assign a fresh run ID and return raw record/provenance text. Preserve failed/incomplete histories and reject changed artifacts or excessive record growth; automatic UI and other hosts remain separate.
 
 - Package an installed-runtime inventory helper that fingerprints actual distribution files and rejects missing, shadowed, unlisted or changing module payloads. Keep runtime fingerprints distinct from original wheel hashes and leave automatic result recording and browser/executable provenance separate.

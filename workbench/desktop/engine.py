@@ -238,7 +238,7 @@ def edit_project(request):
     return {'engine': engine_info(), 'project_text': project.dumps()}
 
 
-def execute(request):
+def execute(request, *, record_provider=None):
     if not isinstance(request, dict):
         raise ValueError('Request must be a JSON object.')
     action = request.get('action')
@@ -260,6 +260,10 @@ def execute(request):
         if prepared.max_evaluations > 128:
             raise ValueError('This workbench accepts at most 128 evaluations per request.')
         if action == 'saved-record':
+            if record_provider is not None:
+                if not callable(record_provider):
+                    raise ValueError('The host record provider must be callable.')
+                return {'engine': engine_info(), **record_provider(prepared)}
             try:
                 if __package__:
                     from .recording import run_recorded

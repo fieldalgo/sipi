@@ -13,6 +13,19 @@ else:
     from artifacts import capture_installed_artifacts
 
 
+def _admit(request):
+    if not isinstance(request, SavedExecutionRequest):
+        raise ValueError('Recorded execution needs a prepared saved request.')
+    if len(request.source_text.encode('utf-8')) > 200*1024 or request.max_evaluations > 128:
+        raise ValueError('Recorded workbench execution accepts at most 200 KiB and 128 evaluations.')
+
+
+def _record_result(request, receipt, artifacts, manifest_text):
+    record = SavedExecutionRecord(request, receipt, run_id='run:'+uuid.uuid4().hex,
+                                  artifacts=artifacts, max_record_bytes=200*1024)
+    return dict(record_text=record.dumps(), runtime_manifest_text=manifest_text)
+
+
 def run_recorded(request):
     """Execute once between two matching installed-file snapshots.
 
@@ -20,10 +33,7 @@ def run_recorded(request):
     File snapshots do not attest loaded memory or make the execution atomic.
     Return raw record/manifest text so JavaScript need not reserialize numbers.
     """
-    if not isinstance(request, SavedExecutionRequest):
-        raise ValueError('Recorded execution needs a prepared saved request.')
-    if len(request.source_text.encode('utf-8')) > 200*1024 or request.max_evaluations > 128:
-        raise ValueError('Recorded workbench execution accepts at most 200 KiB and 128 evaluations.')
+    _admit(request)
     before = capture_installed_artifacts()
     components = json.loads(before['manifest_text'])['components']
     own_files = next(item['files'] for item in components if item['component'] == 'sipi')
@@ -35,6 +45,4 @@ def run_recorded(request):
     after = capture_installed_artifacts()
     if before != after:
         raise RuntimeError('Installed artifact snapshot changed during execution; no record was created.')
-    record = SavedExecutionRecord(request, receipt, run_id='run:'+uuid.uuid4().hex,
-                                  artifacts=before['artifacts'], max_record_bytes=200*1024)
-    return dict(record_text=record.dumps(), runtime_manifest_text=before['manifest_text'])
+    return _record_result(request, receipt, before['artifacts'], before['manifest_text'])

@@ -26,9 +26,9 @@ original-wheel identification or physical-accuracy claim. Declarations remain
 `host-declared`. Unique run IDs do not replace cancellation or stale-response
 checks. No files are written and the action does not select a project result.
 
-The current browser runtime and frozen executable do not use this installed-file
-provenance path. Existing calculations remain available. Automatic result-history
-UI and those hosts' provenance capture are separate integration work.
+The browser uses a separate [source-artifact path](BROWSER_RECORDING.md), while
+frozen-executable provenance remains separate work. Existing calculations remain
+available; automatic result-history UI is not added by these transport actions.
 
 Run this built-wheel example outside the checkout:
 
