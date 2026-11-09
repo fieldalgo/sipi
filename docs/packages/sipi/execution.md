@@ -203,3 +203,15 @@ replace the numerical reference and convergence tests of each engine.
 
 
 [Saved independent-width volume inputs](asymmetric_volume_grid_pair_document.md) preserve both widths, resource budgets and full geometry identity.
+
+## Explicit panel-current lines
+
+`sipi.panel-transmission-line/1` uses the same finite RLGC/network result contract
+and optional characteristic/mode diagnostics as the existing line types. It
+also returns `current_solver`: explicit panel settings, grounded-trace names,
+vacuum capacitance, surface-current factors/integrals and solve diagnostics.
+Per-boundary metal data remains present for surface-boundaries inputs.
+The nested frequency count must not exceed `max_evaluations`; this check occurs
+before either panel or volume field work. The count is not a memory or time
+bound. Existing line document versions retain their original behavior.
+See [saved panel lines](panel_line.md).

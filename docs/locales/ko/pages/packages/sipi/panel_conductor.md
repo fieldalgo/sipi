@@ -100,3 +100,5 @@ loss = panel_conductor_loss_by_boundary(
 assert loss.R.shape == (2, 2, 2)
 assert loss.factors.current_error <= 1e-10
 ```
+
+[저장 패널 선로](panel_line.md)는 명시적 전류 설정을 보존하고 일치하는 유전체 추출과 연결합니다.

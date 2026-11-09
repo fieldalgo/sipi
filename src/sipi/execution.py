@@ -21,6 +21,7 @@ from .aperture import ApertureDocument
 from .aperture_section import ApertureSectionDocument
 from .aperture_study import ApertureStudyDocument, ApertureDesignDocument, CapacitanceGoalError
 from .line_model import TransmissionLineDocument
+from .panel_line import PanelTransmissionLineDocument
 from .volume_line import VolumeLineDocument
 from .lumped import LumpedNetworkDocument
 from .assembly_document import NetworkAssemblyDocument
@@ -88,6 +89,7 @@ from .debye_reactive_startup_document import DebyeReactiveLadderDocument
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
 _REGISTRY = {
+    'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
     **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2, 3)},
@@ -397,6 +399,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     Sampled impedance goals count parameter batches, not internal frequency solves;
     their separate frequency count is capped at 64 by the saved input contract.
     Bounded TEM-port 3D counts one evaluation per frequency before field work.
+    Panel lines count frequencies before any panel or volume field solve.
     Conductivity profiles count frequencies before constitutive integration.
     Lossless startup counts required forward delay terms before waveforms,
     separately from its saved hard cap and output sample count.
@@ -405,7 +408,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     Dielectric fitting counts input frequencies before matrix/optimizer work;
     completed execution keeps the fit's accepted flag as a separate decision.
     diagnostics may contain 'characteristic' and/or 'modes', only for top-level
-    transmission/volume lines. A failed diagnostic preserves the base output.
+    transmission/volume/panel lines. A failed diagnostic preserves the base output.
     Failed goals return status='failed' with completed history; malformed input
     and other solver failures raise their original exceptions. Study failures
     remain rows with status='incomplete', without a partial summary.
@@ -419,8 +422,10 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     data = doc.to_dict()
     if isinstance(doc, TEMPorts3DDocument) and len(data['frequency_hz']) > budget:
         raise ValueError('saved 3D frequency count exceeds max_evaluations before any field solve')
-    if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
-        raise ValueError('diagnostics require a top-level transmission-line or volume-line')
+    if isinstance(doc, PanelTransmissionLineDocument) and len(data['line']['frequency_hz']) > budget:
+        raise ValueError('saved panel-line frequency count exceeds max_evaluations before any field solve')
+    if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument)):
+        raise ValueError('diagnostics require a top-level transmission-line, volume-line or panel-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
     if isinstance(doc, (MixedBoundaryMulticonductorRLGCLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
         out['result'] = doc.analyze(max_evaluations=budget).to_dict()
@@ -561,12 +566,12 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 consistency={key: _array(getattr(result, key)) for key in
                     ('linear_residual', 'power_balance', 'reciprocity',
                      'projected_unitarity', 'unprojected_port_power')})
-        elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument)):
+        elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument)):
             out['result'] = dict(names=list(result.names), frequency_hz=_array(result.frequency),
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),
                 G_s_per_m=_array(result.G), C_f_per_m=_array(result.C),
                 network=_network(result.network), diagnostics=_diagnostics(result, diagnostics))
-            if isinstance(doc, TransmissionLineDocument) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss)):
+            if isinstance(doc, (TransmissionLineDocument, PanelTransmissionLineDocument)) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss)):
                 loss = result.conductor
                 out['result']['conductor_boundaries'] = dict(labels=list(loss.boundary_labels),
                     skin_depth_m=_array(loss.skin_depth), roughness_factor=_array(loss.roughness_factor),
@@ -578,6 +583,15 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                         current_integrals=_array(loss.factors.current_integrals),
                         whole_boundary_current_integrals=_array(loss.factors.base.current_integrals),
                         current_flux_error=loss.factors.current_error)
+            if isinstance(doc, PanelTransmissionLineDocument):
+                factors = result.current_factors
+                out['result']['current_solver'] = dict(
+                    kind='grounded-rectangle-panels', settings=dict(result.panel_settings),
+                    ground_trace_names=list(factors.ground_trace_names),
+                    vacuum_capacitance_f_per_m=_array(factors.C0),
+                    surface_current_factors_per_m=_array(factors.parts),
+                    current_integrals=_array(factors.current_integrals),
+                    diagnostics=dict(factors.diagnostics))
         elif isinstance(doc, CircuitDocument):
             out['result'] = _circuit(result)
         elif isinstance(doc, LumpedNetworkDocument):

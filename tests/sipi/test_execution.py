@@ -445,6 +445,8 @@ def documents():
         targets=dict(zip(pair_quantities, [110., 40.])),
         tolerances=dict(zip(pair_quantities, [.25, .125])),
         initial=[.7e-3, .35e-3], max_evaluations=64))
+    from sipi.panel_line import PanelTransmissionLineDocument
+    base.append(PanelTransmissionLineDocument(line()))
     return base
 
 

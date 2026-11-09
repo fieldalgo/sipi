@@ -189,3 +189,13 @@ complete/failed가 있어 DC 거부·모드 불확정이 기본 RLGC/S를 지우
 
 
 [독립 폭 체적 입력 저장](asymmetric_volume_grid_pair_document.md)은 양쪽 폭·자원 예산·전체 기하 identity를 보존합니다.
+
+## 패널 전류를 명시하는 선로
+
+`sipi.panel-transmission-line/1`은 기존 선로와 같은 유한 RLGC/회로 결과 및
+선택적 특성·모드 진단 계약을 사용합니다. 추가 `current_solver`에는 명시적
+패널 설정, 접지 도체 이름, 진공 정전용량, 표면 전류 계수·적분과 계산
+진단이 들어갑니다. surface-boundaries 입력의 금속별 데이터도 유지합니다.
+중첩 주파수 개수는 `max_evaluations` 이하여야 하며, 패널과 체적 장 계산
+전에 검사합니다. 이 개수가 메모리·시간 한도는 아닙니다. 기존 선로 문서의
+동작은 그대로 유지합니다. [저장 패널 선로](panel_line.md)를 참고하세요.

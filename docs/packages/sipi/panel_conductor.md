@@ -105,3 +105,5 @@ loss = panel_conductor_loss_by_boundary(
 assert loss.R.shape == (2, 2, 2)
 assert loss.factors.current_error <= 1e-10
 ```
+
+[Saved panel lines](panel_line.md) retain explicit current controls and combine them with matching dielectric extraction.
