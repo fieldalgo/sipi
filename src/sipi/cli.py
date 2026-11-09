@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Explicit saved-input execution; importing this module starts no host."""
+"""Explicit UI or saved-input execution; importing this module starts no host."""
 import argparse
 import json
 import os
@@ -72,9 +72,12 @@ def _write_output(path, text):
 
 def _parser():
     from . import __version__
-    parser = argparse.ArgumentParser(prog='sipi', description='Validate or run saved SIPI calculation inputs.')
+    parser = argparse.ArgumentParser(prog='sipi', description='Open the local SIPI UI, or validate/run saved calculation inputs.')
     parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
-    subcommands = parser.add_subparsers(dest='command', required=True)
+    subcommands = parser.add_subparsers(dest='command')
+    gui = subcommands.add_parser('gui', help='Open the installed local UI (the default without a subcommand).')
+    gui.add_argument('--no-browser', action='store_true', help='Print the local URL without opening a browser.')
+    gui.add_argument('--port', type=_port, default=0, help='Loopback port, 0 selects an available port.')
     for name, help_text in [('run', 'Run an input and write an execution receipt.'),
                             ('validate', 'Validate and write canonical input without a field solve.')]:
         command = subcommands.add_parser(name, help=help_text)
@@ -87,10 +90,38 @@ def _parser():
     return parser
 
 
+def _port(value):
+    number = int(value)
+    if not 0 <= number <= 65535:
+        raise argparse.ArgumentTypeError('port must be 0..65535')
+    return number
+
+
+def _launch_gui(args):
+    try:
+        from ._workbench.main import main as host_main
+    except ModuleNotFoundError as exc:
+        if exc.name != 'sipi._workbench.main':
+            raise
+        print('sipi: UI assets are unavailable. Install a built SIPI wheel; a source checkout can use workbench/desktop/main.py.', file=sys.stderr)
+        return 1
+    options = [] if args.command is None else ['--port', str(args.port)]
+    if args.command == 'gui' and args.no_browser:
+        options.append('--no-browser')
+    try:
+        host_main(options)
+    except (OSError, ValueError) as exc:
+        print('sipi: UI: ' + str(exc), file=sys.stderr)
+        return 1
+    return 0
+
+
 def main(argv=None):
     """Return a documented exit code; argparse handles usage and help exits."""
     args = _parser().parse_args(argv)
     try:
+        if args.command in (None, 'gui'):
+            return _launch_gui(args)
         if args.output != '-' and os.path.lexists(args.output):
             print('sipi: output already exists; choose a new path.', file=sys.stderr)
             return 3

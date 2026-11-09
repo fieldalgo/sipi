@@ -4,10 +4,11 @@
 
 [Suite documentation](https://github.com/fieldalgo/openphysics/blob/main/docs/README.md)
 
-[Saved-input commands](docs/packages/sipi/cli.md) ([한국어](docs/locales/ko/pages/packages/sipi/cli.md)):
-the development wheel provides `sipi validate` and `sipi run`, with the same
-versioned engine inputs and execution receipts. This is not a published release
-or the default UI launcher.
+[Local UI](docs/packages/sipi/local_ui.md) ([한국어](docs/locales/ko/pages/packages/sipi/local_ui.md)):
+the development wheel opens the existing workbench with `sipi` or `sipi gui`.
+[Saved-input commands](docs/packages/sipi/cli.md) provide `sipi validate` and
+`sipi run` without a GUI, using the same versioned inputs and execution receipts.
+These are development-wheel capabilities, not a published release announcement.
 
 Per-unit-length parameters of printed-circuit-board transmission lines from
 their cross-section: layered/local dielectrics, rectangular, tapered or polygonal traces, quasi-static

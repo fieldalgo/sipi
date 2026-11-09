@@ -49,6 +49,12 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 
 ## 소스 실행
 
+설치한 개발 SIPI wheel에도 이 로컬 UI와 어댑터가 들어갑니다. `sipi` 또는
+`sipi gui`로 실행하고, URL만 표시하려면 `sipi gui --no-browser`를 사용합니다.
+[설치 UI 안내](../docs/locales/ko/pages/packages/sipi/local_ui.md)를 참고합니다.
+wheel 빌드가 같은 원본을 복사하며 브라우저·외부 런타임을 번들하지 않습니다.
+소스·editable 체크아웃은 아래 직접 실행기를 계속 사용할 수 있습니다.
+
 `packaging/engine-ref.txt`의 SIPI와 해당 엔진 `dependencies.json`에 고정한
 galerkin·meshine을 설치하고 `packaging/requirements-windows.txt`의 수치 패키지를
 사용합니다. 다른 editable 소스 경로가 설치본을 가리지 않도록 합니다.

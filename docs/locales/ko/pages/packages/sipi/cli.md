@@ -4,9 +4,9 @@
 
 개발 wheel은 `sipi run`, `sipi validate`를 설치하며 `python -m sipi`도 같은 명령을
 제공합니다. [개발 안내](../../../../../development.ko.md)의 정확히 검증한 wheel과
-대응 의존성을 사용합니다. PyPI 출시 안내는 아닙니다. 명령은 브라우저·서버를
-시작하지 않습니다. UI 자산과 기본 UI 실행기는 별도 작업이며 현재 하위 명령 없는
-`sipi`는 사용법을 표시하고 종료 코드 2를 반환합니다.
+대응 의존성을 사용합니다. PyPI 출시 안내는 아닙니다. `run`과 `validate`는 브라우저·서버를
+시작하지 않습니다. 하위 명령 없는 `sipi`는 [설치된 로컬 UI](local_ui.md)를 엽니다.
+브라우저를 열지 않고 URL만 표시하려면 `sipi gui --no-browser`를 사용합니다.
 
 기존 API로 입력을 만듭니다.
 
@@ -51,6 +51,8 @@ assert receipt["execution"]["input"]["schema"] == "sipi.lumped-network/1"
 줄이지 않습니다. 지원하는 최상위 선로에서 `--diagnostic characteristic`,
 `--diagnostic modes`를 사용할 수 있고 중복 지정은 거부합니다. 이 설정은 실행 시간이나
 메모리 한도가 아닙니다.
+
+다음 종료 코드는 저장 입력 명령에 적용합니다.
 
 | 종료 | 의미 |
 |---|---|

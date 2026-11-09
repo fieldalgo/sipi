@@ -1,3 +1,7 @@
 recursive-include tests/sipi/reference_data/tensor_debye *.json *.py
 recursive-include tests/sipi/reference_data/tensor_fit *.json
 recursive-include tests/sipi/reference_data/template_section *.json
+include setup.py
+include workbench/PYTHON_NOTICES.md
+include workbench/desktop/main.py workbench/desktop/engine.py
+recursive-include workbench/ui *.html *.js *.css

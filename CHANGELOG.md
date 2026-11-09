@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Include the canonical local workbench host and UI in the pure development wheel. Open it with `sipi` or `sipi gui`, retain headless commands and the direct source launcher, and reuse the existing loopback/cancellation lifecycle without bundling a browser or third-party runtime.
+
 - Give oversized-input workbench tests short explicit case names so Windows can set pytest's current-test environment variable; preserve the original input sizes and rejection checks.
 
 - Add installed `sipi run`/`validate` and `python -m sipi` commands with bounded UTF-8 inputs, existing request receipts, retained failure histories and exclusive atomic output publication. Keep pipeline failure exit codes stable; UI packaging and other-platform filesystem acceptance remain separate.

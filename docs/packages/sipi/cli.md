@@ -5,9 +5,9 @@
 The development wheel installs `sipi run` and `sipi validate`; `python -m sipi`
 provides the same commands. Use an exactly validated wheel and matching
 dependencies from [development](../../development.md). This is not a PyPI
-release announcement. Commands do not start a browser or server. Bundled UI
-assets and the default UI launcher remain separate work: `sipi` without a
-subcommand currently prints usage and exits with code 2.
+release announcement. The `run` and `validate` commands do not start a browser
+or server. Without a subcommand, `sipi` opens the [installed local UI](local_ui.md).
+Use `sipi gui --no-browser` to print its URL without opening a browser.
 
 Prepare an input using the existing API:
 
@@ -55,6 +55,8 @@ range and per-model admission. Saved budgets are never silently clamped.
 `--diagnostic characteristic` and/or `--diagnostic modes` apply only to supported
 top-level line inputs; duplicate selections are invalid. These controls do not
 limit elapsed time or memory.
+
+The following exit codes apply to saved-input commands:
 
 | Exit | Meaning |
 |---|---|

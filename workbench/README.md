@@ -56,6 +56,12 @@ engine and assets. Advancing the pin alone is not a Windows or Worker pass.
 
 ## Run from source
 
+An installed development SIPI wheel also contains this local UI and adapter:
+run `sipi` or `sipi gui`. Use `sipi gui --no-browser` for an explicit local URL.
+See [installed UI](../docs/packages/sipi/local_ui.md). The wheel build copies
+these canonical sources; it does not bundle a browser or third-party runtime.
+Source/editable checkouts can continue using the launcher below.
+
 Use an environment containing SIPI at `packaging/engine-ref.txt`, galerkin and
 meshine at that engine's `dependencies.json` pin, and the numerical packages in
 [`packaging/requirements-windows.txt`](packaging/requirements-windows.txt).

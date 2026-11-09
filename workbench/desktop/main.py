@@ -12,7 +12,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 import webbrowser
 
-from engine import worker
+if __package__:
+    from .engine import worker
+else:
+    from engine import worker
 
 MAX_BODY = 256 * 1024
 MAX_SECONDS = 300
@@ -201,11 +204,11 @@ class Handler(BaseHTTPRequestHandler):
             self.respond({'message': 'Not found.'}, 404)
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description='SIPI offline workbench')
     parser.add_argument('--no-browser', action='store_true')
     parser.add_argument('--port', type=int, default=0)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     ui = Path(__file__).resolve().parent / 'ui'
     if not ui.is_dir():
         ui = Path(__file__).resolve().parent.parent / 'ui'
