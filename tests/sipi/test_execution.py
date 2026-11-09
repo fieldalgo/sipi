@@ -422,6 +422,11 @@ def documents():
     common_source['sampling']['count'] = 3
     base.append(LineQuantityStudyDocument(common_source, conductor=common_goal['conductor'],
         quantity='common_forward_impedance_real', schema='sipi.line-quantity-study/3'))
+    common_source = next(item.to_dict() for item in base
+                         if item.to_dict()['schema'] == 'sipi.line-quantity-study/3')
+    common_source['study']['sampling'].update(kind='uniform', count=3, seed=17)
+    base.append(LineQuantityYieldDocument(LineQuantityStudyDocument.from_dict(common_source),
+        schema='sipi.line-quantity-yield/2', minimum=1., maximum=1000., minimum_yield=.5))
     return base
 
 

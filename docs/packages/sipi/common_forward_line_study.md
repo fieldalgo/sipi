@@ -77,8 +77,9 @@ Statistics are descriptive: mean, sample standard deviation (ddof1), and
 linear-interpolated5th/95th percentiles. They are neither confidence intervals
 nor measured production yield. Within-row normal correlation is retained,
 while iid distribution assumptions are not inferred from manufacturing data.
-The existing yield assessment API, saved yield/1 and fixed selection/2 admit
-study/1 or/2 only; they explicitly reject this new study/3 source.
+The direct yield assessment API and explicit [saved yield /2](common_forward_line_yield.md)
+also admit study /3 under a separate iid inference contract. Saved yield /1
+and fixed selection /2 still accept study /1 or /2 only.
 
 Validation replays widths.6/.7/.8mm against direct lines and independent
 balanced2N telegrapher eigenspaces within1e-10, and independent statistics

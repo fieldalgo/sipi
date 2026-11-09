@@ -218,7 +218,7 @@ def test_roundtrip_registry_and_budget_before_fields(monkeypatch):
 @pytest.mark.parametrize('case', ['schema', 'extra', 'missing', 'legacy_study'])
 def test_strict_saved_fields(case):
     raw = LineQuantityYieldDocument(random_study(), minimum=95.).to_dict()
-    if case == 'schema': raw['schema'] = 'sipi.line-quantity-yield/2'
+    if case == 'schema': raw['schema'] = 'sipi.line-quantity-yield/999'
     if case == 'extra': raw['extra'] = 0
     if case == 'missing': del raw['confidence']
     if case == 'legacy_study': raw['study'] = raw['study']['study']

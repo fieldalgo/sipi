@@ -71,7 +71,7 @@ class LineYieldAssessment:
 def assess_line_yield(study, *, minimum=None, maximum=None, confidence=.95, minimum_yield=None):
     """Inclusive quantity limits on every original iid uniform/normal sample.
 
-    Limits use the study quantity's unit: ohm for Re(Zc)/forward Re(Zdd), Np/m
+    Limits use the study quantity's unit: ohm for Re(Zc)/forward Re(Zdd) or Re(Zcc), Np/m
     for scalar attenuation. A completed attenuation may be zero. Correlation
     between variables within a normal row is allowed. Sweep/corners reject.
     Counts, order and exact regenerated sample vectors are checked. These
@@ -82,8 +82,9 @@ def assess_line_yield(study, *, minimum=None, maximum=None, confidence=.95, mini
     if not isinstance(study, LineQuantityStudy):
         raise ValueError('yield assessment requires a LineQuantityStudy')
     source = LineQuantityStudyDocument.loads(study.input_json); data = source.to_dict()
-    if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
-        raise ValueError('yield assessment requires line-quantity-study/1 or /2')
+    if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2',
+                              'sipi.line-quantity-study/3'):
+        raise ValueError('yield assessment requires line-quantity-study/1, /2 or /3')
     sampling = data['study']['sampling']
     if sampling['kind'] not in ('uniform', 'normal'):
         raise ValueError('yield assessment requires iid uniform or normal samples, not sweep/corners')
@@ -112,20 +113,27 @@ def assess_line_yield(study, *, minimum=None, maximum=None, confidence=.95, mini
 
 
 class LineQuantityYieldDocument:
-    """Strict line-quantity-yield/1 for one fixed random line-quantity study."""
-    def __init__(self, study, *, minimum=None, maximum=None, confidence=.95, minimum_yield=None):
+    """One fixed iid line study, with explicit saved versions 1 and 2.
+
+    Version 1 remains the default and admits study/1 or /2 only. Explicit
+    version 2 also admits study/3, including common-current forward Re(Zcc).
+    Both preserve every original sample and unresolved-label interval bounds.
+    """
+    def __init__(self, study, *, minimum=None, maximum=None, confidence=.95, minimum_yield=None,
+                 schema='sipi.line-quantity-yield/1'):
         if not isinstance(study, LineQuantityStudyDocument):
             raise ValueError('study must be a LineQuantityStudyDocument')
-        self._assign(dict(schema='sipi.line-quantity-yield/1', study=study.to_dict(),
+        self._assign(dict(schema=schema, study=study.to_dict(),
             minimum=minimum, maximum=maximum, confidence=confidence, minimum_yield=minimum_yield))
 
     def _assign(self, data):
         data = _copy(data)
         _keys(data, ('schema', 'study', 'minimum', 'maximum', 'confidence', 'minimum_yield'), where='line quantity yield')
-        if data['schema'] != 'sipi.line-quantity-yield/1':
+        if data['schema'] not in ('sipi.line-quantity-yield/1', 'sipi.line-quantity-yield/2'):
             raise ValueError('unsupported line-quantity-yield schema')
         study = LineQuantityStudyDocument.from_dict(data['study']).to_dict()
-        if study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2'):
+        if (data['schema'] == 'sipi.line-quantity-yield/1' and
+                study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2')):
             raise ValueError('saved yield requires line-quantity-study/1 or /2')
         if study['study']['sampling']['kind'] not in ('uniform', 'normal'):
             raise ValueError('yield assessment requires iid uniform or normal samples')

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved common-current iid acceptance bounds, preserving unresolved rows and previous saved-version admission.
+
 - Add explicit version3 common-current forward-impedance sampling, preserving all failed rows and prior yield-consumer study-version boundaries.
 
 - Add explicit version3 saved common-current forward-impedance goals with unchanged prior quantity admission, source constraints and execution budgets.

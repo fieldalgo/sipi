@@ -71,8 +71,9 @@ json.dumps(report, allow_nan=False)
 
 통계는 기술 통계로 평균·표본 표준편차(ddof1)·선형 보간5/95백분위입니다. 신뢰구간이나
 실측 제조 수율이 아닙니다. normal의 행 내부 상관을 유지하며 제조 데이터로부터
-분포 가정을 자동 추정하지 않습니다. 기존 수율 평가 API·저장 yield/1·고정 후보
-selection/2는 study/1 또는/2만 수락하고 새 study/3 입력을 명시적으로 거부합니다.
+분포 가정을 자동 추정하지 않습니다. 직접 수율 평가 API와 명시적 [저장 yield /2](common_forward_line_yield.md)는
+별도 iid 추론 계약으로 study /3도 지원합니다. 저장 yield /1과 고정 후보
+선택 /2는 study /1·/2만 받습니다.
 
 폭.6/.7/.8mm 각각 직접 선로 재생·독립 balanced2N 전신방정식 고유공간을1e-10 안에서,
 독립 통계를1e-12 안에서 비교합니다. 각 표본의 edge/far/grade를 모두 절반으로 줄여

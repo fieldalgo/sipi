@@ -265,7 +265,7 @@ def test_explicit_v3_differential_study_preserves_v2_exactly(monkeypatch):
 
 @pytest.mark.parametrize('quantity',['impedance_real','differential_forward_impedance_real',QUANTITY])
 @pytest.mark.parametrize('consumer',['assessment','saved-yield','saved-selection'])
-def test_previous_yield_consumers_do_not_implicitly_admit_new_study_version(monkeypatch,quantity,consumer):
+def test_yield_consumers_follow_explicit_study_version_contracts(monkeypatch,quantity,consumer):
     from sipi.line_yield import assess_line_yield,LineQuantityYieldDocument
     from sipi.yield_design import YieldDesignDocument
     if quantity=='impedance_real':
@@ -282,7 +282,13 @@ def test_previous_yield_consumers_do_not_implicitly_admit_new_study_version(monk
     def forbidden(*args,**kwargs):pytest.fail('yield rejection reached fields')
     monkeypatch.setattr(TransmissionLineDocument,'analyze',forbidden)
     monkeypatch.setattr(CrossSection,'mesh',forbidden)
-    with pytest.raises(ValueError,match='study/1 or /2'):
-        if consumer=='assessment':assess_line_yield(result,minimum=1.)
-        elif consumer=='saved-yield':LineQuantityYieldDocument(doc,minimum=1.)
-        else:YieldDesignDocument([dict(name='candidate',cost=1.,study=doc.to_dict())],cost_unit='relative',minimum=1.,minimum_yield=.8,schema='sipi.yield-design/2')
+    if consumer == 'assessment':
+        assessment = assess_line_yield(result, minimum=1.)
+        assert assessment.study is result and assessment.unresolved == 0
+        assert len(assessment.classifications) == 4
+        assert [row['index'] for row in assessment.to_dict()['rows']] == list(range(4))
+    else:
+        with pytest.raises(ValueError, match='study/1 or /2'):
+            if consumer == 'saved-yield': LineQuantityYieldDocument(doc, minimum=1.)
+            else: YieldDesignDocument([dict(name='candidate', cost=1., study=doc.to_dict())],
+                cost_unit='relative', minimum=1., minimum_yield=.8, schema='sipi.yield-design/2')

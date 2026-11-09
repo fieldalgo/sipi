@@ -115,6 +115,7 @@ _REGISTRY = {
     'sipi.line-quantity-study/2': LineQuantityStudyDocument,
     'sipi.line-quantity-study/3': LineQuantityStudyDocument,
     'sipi.line-quantity-yield/1': LineQuantityYieldDocument,
+    'sipi.line-quantity-yield/2': LineQuantityYieldDocument,
     'sipi.periodic-network/1': PeriodicNetworkDocument,
     'sipi.periodic-circuit/1': PeriodicCircuitDocument,
     'sipi.norton-circuit/1': NortonCircuitDocument,
