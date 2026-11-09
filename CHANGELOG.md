@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Select the lowest-cost certified member of a fixed paired-impedance candidate set using simultaneous joint-yield bounds, whole-family preflight and retained unresolved rows.
+
 - Assess joint iid acceptance of paired panel-current impedances with fixed named limits, unresolved-row confidence envelopes and retained common-execution results.
 
 - Sample paired forward impedances from one explicit panel-current extraction per row, with strict saved inputs, retained failures and all-or-none descriptive summaries.

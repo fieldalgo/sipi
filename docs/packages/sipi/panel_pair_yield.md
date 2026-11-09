@@ -1,7 +1,7 @@
 # Joint acceptance of paired forward impedances
 
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_yield.md) ·
-[Paired sampling](panel_pair_study.md)
+[Paired sampling](panel_pair_study.md) · [Fixed candidates](panel_pair_selection.md)
 
 `PanelForwardPairYieldDocument` assesses **both impedance limits on the same
 sample**. A completed row passes only if its real differential and common

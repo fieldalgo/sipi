@@ -1,7 +1,7 @@
 # 두 순방향 임피던스의 동시 조건 수율 평가
 
 [English](../../../../../packages/sipi/panel_pair_yield.md) ·
-[두 양의 공차 평가](panel_pair_study.md)
+[두 양의 공차 평가](panel_pair_study.md) · [고정 후보 선택](panel_pair_selection.md)
 
 `PanelForwardPairYieldDocument`는 **같은 표본에서 두 임피던스 조건을 함께**
 평가합니다. 완료된 행의 실수 차동·공통 순방향 임피던스가 모두 포함 한계를 만족해야

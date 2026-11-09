@@ -458,6 +458,12 @@ def documents():
     base.append(PanelForwardPairYieldDocument(PanelForwardPairStudyDocument.from_dict(panel_iid),
         acceptance={q: dict(minimum=0., maximum=1000.) for q in pair_quantities},
         confidence=.95, minimum_yield=.9))
+    from sipi.panel_pair_selection import PanelForwardPairSelectionDocument
+    base.append(PanelForwardPairSelectionDocument([
+        dict(name='first', cost=1., study=panel_iid),
+        dict(name='second', cost=.8, study=panel_iid)], cost_unit='relative-cost',
+        acceptance={q: dict(minimum=0., maximum=1000.) for q in pair_quantities},
+        confidence=.95, minimum_yield=.9))
     return base
 
 
