@@ -473,6 +473,13 @@ def documents():
     from sipi.sampled_panel_pair_study import SampledPanelForwardPairStudyDocument
     base.append(SampledPanelForwardPairStudyDocument(pair_source,
         conductor=dict(kind='perfect'), frequencies=[1e9, 2e9]))
+    from sipi.sampled_panel_pair_yield import SampledPanelForwardPairYieldDocument
+    sampled_iid = base[-1].to_dict()
+    sampled_iid['study']['sampling'].update(kind='uniform', count=4, seed=123)
+    base.append(SampledPanelForwardPairYieldDocument(
+        SampledPanelForwardPairStudyDocument.from_dict(sampled_iid),
+        acceptance={q: dict(minimum=[0., 0.], maximum=[1000., 1000.]) for q in pair_quantities},
+        confidence=.95, minimum_yield=.9))
     return base
 
 

@@ -55,6 +55,7 @@ from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .panel_pair_study import PanelForwardPairStudyDocument
 from .sampled_panel_pair_study import SampledPanelForwardPairStudyDocument
 from .panel_pair_yield import PanelForwardPairYieldDocument
+from .sampled_panel_pair_yield import SampledPanelForwardPairYieldDocument
 from .panel_pair_selection import PanelForwardPairSelectionDocument
 from .sampled_panel_pair_goal_document import SampledPanelForwardPairDesignDocument
 from .sampled_panel_pair_goal import SampledPanelForwardPairGoalError
@@ -96,6 +97,7 @@ from .debye_reactive_startup_document import DebyeReactiveLadderDocument
 __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
 _REGISTRY = {
+    'sipi.sampled-panel-forward-pair-yield/1': SampledPanelForwardPairYieldDocument,
     'sipi.sampled-panel-forward-pair-study/1': SampledPanelForwardPairStudyDocument,
     'sipi.sampled-panel-forward-pair-design/1': SampledPanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,
@@ -467,7 +469,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     elif isinstance(doc, NortonCircuitDocument):
         out['result'] = _norton_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument,
-                          PanelForwardPairYieldDocument, PanelForwardPairSelectionDocument)):
+                          PanelForwardPairYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Assess one fixed joint iid acceptance event across both paired impedances and every supplied frequency, retaining original specimens and unresolved bounds.
+
 - Preserve each paired manufacturing sample across a finite frequency grid, with atomic failed rows and per-frequency descriptive summaries.
 
 - Save finite-frequency paired panel goals with full-grid preflight, named target arrays and preserved common-execution failures.

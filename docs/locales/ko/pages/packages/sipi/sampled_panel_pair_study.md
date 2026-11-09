@@ -1,5 +1,7 @@
 # 유한 주파수 전체에 적용하는 두 임피던스 제조 표본
 
+[전주파수 공동 판정](sampled_panel_pair_yield.md)은 제조 표본 하나를 하나의 공동 사건으로 평가합니다.
+
 [English](../../../../../packages/sipi/sampled_panel_pair_study.md) ·
 [단일 주파수 두 양 표본](panel_pair_study.md) · [다주파수 목표](sampled_panel_pair_goal_document.md)
 

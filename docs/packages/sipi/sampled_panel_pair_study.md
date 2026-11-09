@@ -1,5 +1,7 @@
 # Paired manufacturing samples across finite frequencies
 
+[Joint finite-frequency acceptance](sampled_panel_pair_yield.md) treats every manufactured row as one joint event.
+
 [한국어](../../locales/ko/pages/packages/sipi/sampled_panel_pair_study.md) ·
 [Single-frequency paired sampling](panel_pair_study.md) · [Finite-frequency goals](sampled_panel_pair_goal_document.md)
 
