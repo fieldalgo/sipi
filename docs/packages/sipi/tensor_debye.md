@@ -1,5 +1,7 @@
 # Independently oriented Debye tensors
 
+[Fixed-pole/orientation fitting](tensor_dielectric_fit.md) estimates nonnegative coefficients for this model.
+
 [한국어](../../locales/ko/pages/packages/sipi/tensor_debye.md) · [Fixed principal axes](principal_dielectrics.md) · [Material studies](material_variables.md) · [Material goals](material_goals.md)
 
 `TensorDebyeDielectric` describes a reciprocal transverse relative permittivity

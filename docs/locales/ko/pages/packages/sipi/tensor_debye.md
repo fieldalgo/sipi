@@ -1,5 +1,7 @@
 # 항마다 독립 방향을 갖는 Debye 텐서
 
+[고정 극점·방향 피팅](tensor_dielectric_fit.md)으로 이 모델의 비음수 계수를 구할 수 있습니다.
+
 [English](../../../../../packages/sipi/tensor_debye.md) · [고정 주축](principal_dielectrics.md) · [재료 공차](material_variables.md) · [재료 역산](material_goals.md)
 
 `TensorDebyeDielectric`는 고주파 텐서와 각 양의 준정부호 Debye 잔차가 서로

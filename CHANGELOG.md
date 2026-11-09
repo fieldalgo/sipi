@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add fixed-pole, fixed-orientation passive tensor fitting with original samples, Frobenius residuals and explicit sampled acceptance.
+
 - Add passive transverse Debye tensors with independently oriented residues, strict nested material inputs and saved material studies/goals.
 
 - Add an unequal normal-film coplanar pair without a backing plane, with independent lower air, explicit ground thickness and fixed-pitch studies and goals.
