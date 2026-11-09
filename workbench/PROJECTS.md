@@ -5,7 +5,7 @@
 The private desktop/Worker adapter transforms the existing
 [SavedProject](../docs/packages/sipi/project.md) format without calculations or
 file writes. The [input-project UI](README.md#keep-ab-cross-section-inputs-in-a-project)
-uses these operations; the result-history screen remains separate.
+uses input operations; record operations and the result-history screen are separate.
 An accepted engine input does not imply an editable form exists for it.
 
 | Action | Required keys besides `action` | Optional keys |
@@ -14,15 +14,19 @@ An accepted engine input does not imply an editable form exists for it.
 | `project-open` | `project_text` | none |
 | `project-duplicate` | `project_text`, `source_id`, `design_id`, `label` | none |
 | `project-update` | `project_text`, `design_id`, `text` | `controls`, `label` |
+| `project-attach` | `project_text`, `design_id`, `record_text`, `select` | none |
+| `project-select` | `project_text`, `design_id`, `run_id` | none |
+| `project-remove-record` | `project_text`, `design_id`, `run_id` | none |
 
-`text` is raw engine-input JSON; `project_text` is raw project JSON. Missing or
+`text` is raw engine-input JSON; `project_text` and `record_text` are raw project
+and execution-record JSON. Missing or
 unknown options, duplicate keys in those texts, unsupported versions, invalid
 values and mismatched project digests are rejected. Replies contain `engine`
 (existing version/build information) and canonical `project_text`. This adds
 neither artifact attestation nor fabricated result records.
 
 The encoded UTF-8 request is limited to 256 KiB. New input text, incoming project
-text and canonical output projects are each limited to 200 KiB. The adapter uses
+text, incoming record text and canonical output projects are each limited to 200 KiB. The adapter uses
 compact, non-ASCII-escaped JSON for its size check; the native HTTP host also
 bounds the actual received body, including extra escaping/whitespace. Growth
 beyond the bound is rejected without truncation or automatic record removal.
@@ -38,10 +42,23 @@ budget or certify convergence.
 Duplication copies current input/controls into a new ID with empty history;
 other designs are retained. Semantic input/control updates clear selection but
 keep all history. Formatting-only updates retain selection and the new exact
-original text. Open preserves validated records and explicit selection. These
-actions neither attach records nor choose a latest result. Invocation IDs,
-stale-response handling, execution, artifact declarations and file publication
-remain host work.
+original text. Open preserves validated records and explicit selection.
+
+`project-attach` accepts an existing record with a required boolean `select`.
+Run IDs must be unique across the project. `select=true` requires the record's
+input and controls to match the current design; `false` may retain an older
+request as history, without replacing the current selection. `project-select`
+selects an existing matching run, or clears selection with `run_id=null`.
+`project-remove-record` removes an existing run and clears selection if needed.
+Missing designs/runs, stale selections, tampering and excessive combined growth
+are errors; the original snapshot is unchanged. No operation chooses the latest
+result automatically or certifies that a response belongs to the active invocation.
+
+Pass original serialized record text across JavaScript. Parsing and reserializing
+numbers can change their content digest. Artifact declarations remain
+`host-declared`; attaching a record does not audit or authenticate its provenance.
+Invocation IDs, stale-response handling, execution, actual artifact evidence and
+file publication remain host work. The UI does not yet generate/attach new results.
 
 This built development-wheel example creates an A/B snapshot without fields:
 
@@ -63,6 +80,9 @@ updated = execute(dict(action='project-update', project_text=copied['project_tex
 opened = execute(dict(action='project-open', project_text=updated['project_text']))
 assert opened['project_text'] == updated['project_text']
 assert len(json.loads(opened['project_text'])['designs']) == 2
+cleared = execute(dict(action='project-select', project_text=opened['project_text'],
+    design_id='a', run_id=None))
+assert cleared['project_text'] == opened['project_text']
 ```
 
 Adapter/HTTP acceptance and actual browser/platform acceptance are separate

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Connect immutable project record attachment, explicit selection and removal to the workbench adapter. Preserve raw records and historical inputs; reject duplicate run IDs, mismatched current selections, tampering and combined size growth without changing the original project.
+
 - Add bounded saved-receipt transport with immutable input/control identity and unchanged execution results, including failed goals and incomplete studies. Preserve existing saved-analyze responses; project result attachment remains separate.
 
 - Align input-project panel spacing and controls with the workbench, and wrap long project titles without horizontal page overflow on small screens.
