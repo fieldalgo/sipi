@@ -2,6 +2,9 @@
 
 [한국어](README.ko.md)
 
+The [project transport contract](PROJECTS.md) connects existing immutable A/B
+snapshots; its screen controls and result-history flow remain separate work.
+
 This source candidate runs the independently installed SIPI engine through a
 local default-browser UI or a browser Worker. It is not a released application.
 The native packaging target is one installation-free Windows x64 EXE. It embeds

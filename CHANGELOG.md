@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Connect bounded project create/open/duplicate/update operations to the existing immutable project contract. Preserve original inputs, controls and history, reject oversized or invalid edits, and keep calculations, file publication and A/B UI separate.
+
 - Include the canonical local workbench host and UI in the pure development wheel. Open it with `sipi` or `sipi gui`, retain headless commands and the direct source launcher, and reuse the existing loopback/cancellation lifecycle without bundling a browser or third-party runtime.
 
 - Give oversized-input workbench tests short explicit case names so Windows can set pytest's current-test environment variable; preserve the original input sizes and rejection checks.

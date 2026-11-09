@@ -185,10 +185,54 @@ def execute_study(request, nominal):
                 mesh_policy='fixed resolved nominal mesh; no per-sample refinement check')
 
 
+def edit_project(request):
+    """Transform a bounded project snapshot without running or saving it."""
+    from sipi.project import SavedProject
+    from sipi.execution_request import SavedExecutionRequest
+    action = request['action']
+    keys = {
+        'project-create': ({'action', 'text', 'project_id', 'design_id', 'title', 'label'}, {'controls'}),
+        'project-open': ({'action', 'project_text'}, set()),
+        'project-duplicate': ({'action', 'project_text', 'source_id', 'design_id', 'label'}, set()),
+        'project-update': ({'action', 'project_text', 'design_id', 'text'}, {'controls', 'label'}),
+    }
+    required, optional = keys[action]
+    if not required <= request.keys() or not request.keys() <= required | optional:
+        raise ValueError('Project operation has missing or unsupported options.')
+    encoded = json.dumps(request, ensure_ascii=False, allow_nan=False, separators=(',', ':'))
+    if len(encoded.encode('utf-8')) > 256*1024:
+        raise ValueError('Encoded project request exceeds 256 KiB.')
+    if 'label' in request and not isinstance(request['label'], str):
+        raise ValueError('Design label must be text.')
+    if action != 'project-create':
+        project = SavedProject.loads(request['project_text'], max_project_bytes=200*1024)
+    if action in ('project-create', 'project-update'):
+        text = request['text']
+        if not isinstance(text, str) or len(text.encode('utf-8')) > 200*1024:
+            raise ValueError('Design input must be UTF-8 text up to 200 KiB.')
+        defaults = (project.prepare(request['design_id']).controls if action == 'project-update'
+                    else dict(max_input_bytes=200*1024, max_evaluations=128, diagnostics=[]))
+        controls = request.get('controls', defaults)
+        if not isinstance(controls, dict) or set(controls) != {'max_input_bytes', 'max_evaluations', 'diagnostics'}:
+            raise ValueError('Project controls need exactly byte limit, evaluation limit and diagnostics.')
+        prepared = SavedExecutionRequest(text, **controls)
+        if action == 'project-create':
+            project = SavedProject(prepared, project_id=request['project_id'],
+                design_id=request['design_id'], title=request['title'], label=request['label'],
+                max_project_bytes=200*1024)
+        else:
+            project = project.update_design(request['design_id'], prepared, label=request.get('label'))
+    elif action == 'project-duplicate':
+        project = project.duplicate_design(request['source_id'], request['design_id'], request['label'])
+    return {'engine': engine_info(), 'project_text': project.dumps()}
+
+
 def execute(request):
     if not isinstance(request, dict):
         raise ValueError('Request must be a JSON object.')
     action = request.get('action')
+    if action in ('project-create', 'project-open', 'project-duplicate', 'project-update'):
+        return edit_project(request)
     if action in ('template-document', 'template-open'):
         from sipi.template_document import TemplateSectionDocument
         if action == 'template-open':
