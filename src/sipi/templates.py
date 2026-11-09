@@ -16,6 +16,7 @@ __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar',
            'asymmetric_coupled_grounded_coplanar',
            'asymmetric_coupled_unbacked_coplanar',
            'asymmetric_coupled_coated_grounded_coplanar',
+           'asymmetric_coupled_coated_unbacked_coplanar',
            'coplanar_stripline', 'coupled_coplanar_stripline',
            'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_layered_coplanar_stripline',
            'offset_stripline', 'coupled_stripline', 'broadside_stripline',
@@ -372,6 +373,31 @@ def coupled_coated_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
         coating_height=coating_height, coating_eps_r=coating_eps_r,
         thickness=thickness, tan_delta=tan_delta, coating_tan_delta=coating_tan_delta,
         air_height=air_height, box_width=box_width, top_width=top_width)
+    return _unbacked_coplanar(base, lower_air_height)
+
+
+def asymmetric_coupled_coated_unbacked_coplanar(*, left_width, right_width, gap,
+        ground_gap, ground_width, substrate_height, eps_r, coating_height, coating_eps_r,
+        left_thickness=0.0, right_thickness=0.0, ground_thickness=0.0,
+        tan_delta=0.0, coating_tan_delta=0.0, air_height=None, lower_air_height=None,
+        box_width=None, left_top_width=None, right_top_width=None):
+    """Unequal coated surface pair and finite grounds without a backing plane.
+
+    A finite substrate separates lower air from the full-width planar coating.
+    The film includes all copper and exceeds each signal/ground thickness;
+    air_height begins above the film. Independent signal tapers use bottom-edge
+    clearances; ground thickness is explicit and defaults to zero. Only finite
+    ground traces set the reference, with all outer boundaries insulated.
+    Lower air defaults to ten substrate heights and requires truncation checks.
+    No exchange symmetry, conformal film, central or backing ground is assumed.
+    """
+    base = asymmetric_coupled_coated_grounded_coplanar(left_width=left_width,
+        right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width,
+        substrate_height=substrate_height, eps_r=eps_r, coating_height=coating_height,
+        coating_eps_r=coating_eps_r, left_thickness=left_thickness,
+        right_thickness=right_thickness, ground_thickness=ground_thickness,
+        tan_delta=tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height,
+        box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width)
     return _unbacked_coplanar(base, lower_air_height)
 
 

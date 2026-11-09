@@ -1,5 +1,7 @@
 # Unequal unbacked coplanar pair
 
+[Planar-coated unequal pair](asymmetric_coated_unbacked_coplanar.md) adds an explicit full-width film above the substrate.
+
 `asymmetric_coupled_unbacked_coplanar` places two unequal signal traces between
 finite coplanar ground traces on a finite substrate. There is **no backing
 ground plane**. Lower and upper air separate the substrate from insulated

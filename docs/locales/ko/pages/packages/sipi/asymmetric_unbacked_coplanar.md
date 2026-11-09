@@ -1,5 +1,7 @@
 # 뒷면 접지판이 없는 비대칭 coplanar 쌍
 
+[평면 코팅 비대칭 쌍](asymmetric_coated_unbacked_coplanar.md)은 기판 위에 명시적인 전체 폭 코팅을 추가합니다.
+
 `asymmetric_coupled_unbacked_coplanar`는 유한 기판 위의 유한 coplanar 접지 사이에
 서로 다른 두 신호를 둡니다. **뒷면 접지판이 없습니다.** 아래·위 공기층과 절연 외곽을
 사용하며 두 접지 trace만 공통 기준을 정의합니다. 균일 2D 단면이고 중앙 접지나
