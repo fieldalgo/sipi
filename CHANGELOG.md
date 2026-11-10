@@ -1,5 +1,9 @@
 # Changelog
 
+- Connect normal-film unbacked single/pair forms with separate lower-air bounds,
+  finite coated grounds, exact projects, coating studies and refined width targets.
+  법선 코팅 unbacked 단일·차동 폼에 하부 공기, 유한 접지, 저장·공차·역산을 연결합니다.
+
 - Connect normal-thickness grounded coplanar single/pair forms with finite coated
   side grounds, separate pair gaps, saved projects, studies and refined width targets.
   법선 코팅 grounded coplanar 단일·차동 폼에 유한 측면 접지, 간격, 저장·공차·역산을 연결합니다.

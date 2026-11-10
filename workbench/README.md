@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the nineteen-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the twenty-one-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers nineteen cross-section forms, impedance targeting,
+The basic workspace offers twenty-one cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -139,7 +139,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The nineteen forms include normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The twenty-one forms include normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -389,7 +389,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the nineteen supported editable templates. Other
+All project designs must use the twenty-one supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
@@ -828,8 +828,7 @@ size, retaining growth and minimum angle. The separate refined-mesh acceptance
 and all evaluation, point and time limits remain unchanged. Film thickness is
 not planar height; side grounds are not inferred as infinite. Inspect the engine
 polygon, check mesh and outer boundaries separately, and keep thin-film/finite
-point and time limits in view. Normal-film unbacked coplanar remains available
-through Saved analysis, without a basic editable form.
+point and time limits in view.
 
 Checks: `workbench/tests/test_normal_coplanar_forms.py` and
 `tests/sipi/test_conformal_coplanar.py` retain independent image-charge panels,
@@ -837,3 +836,31 @@ complex P1 assembly, mesh/domain convergence, exact film geometry and lossless
 network invariants. `node workbench/tests/normal-coplanar.test.mjs` checks unit
 and gap transport. `workbench/tests/normal-coplanar-browser.mjs` exercises the
 native and Worker UI (`SIPI_NORMAL_COPLANAR_PAIR=1` selects the pair).
+
+## Normal-film unbacked coplanar forms
+
+**Normal-film unbacked coplanar** and **Normal-film unbacked pair** have finite
+coated side grounds and no bottom reference plane. The bottom, top and side
+outer boundaries are open. Upper air is clearance above the coated trace;
+`lower_air_height` is a separate clearance below the substrate. Changing lower
+air translates the substrate, conductors and coating together without changing
+their relative geometry. Only signal conductors may taper. The pair retains
+separate signal `gap` and outer `ground_gap`; no central ground is inferred.
+
+Inspect the actual engine polygons, save/reopen the precise editable JSON or an
+input project, and use coating-thickness/material sweeps and tolerance samples.
+Width targets preserve both air bounds, ground widths and gaps. Automatic
+targeting starts at ten times the factory edge size and one quarter of its far
+size, followed by mandatory refined-mesh acceptance. Explicit meshes and factory
+forward calculations retain their original settings. The 32-evaluation,
+300,000-point and five-minute limits still apply. A refined failure is not a
+successful target; tighter targets and arbitrary inputs are not guaranteed.
+
+Check fine mesh separately from enlarging upper air, lower air and box width.
+These are quasi-static idealized mitered coatings, not measured deposition or
+manufacturing certification. Checks in `workbench/tests/test_normal_unbacked_forms.py`
+and `tests/sipi/test_conformal_coplanar.py` include free-space finite-ground
+panels, independent complex P1 assembly, lossless-network invariants and exact
+lower-air/film transport. `node workbench/tests/normal-unbacked.test.mjs` checks
+unit and domain handling. `workbench/tests/normal-unbacked-browser.mjs` exercises
+native/Worker editing (`SIPI_NORMAL_UNBACKED_PAIR=1` selects the pair).

@@ -166,7 +166,7 @@ try {
   await cdp.evaluate('document.querySelector("#calculate").click();document.querySelector("#cancel").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("cancelled")'),'cancel');
   await click('calculate');assert.deepEqual(await save('save','sipi-cross-section.json'),original);
   // All supported editable choices still draw, with layer labels separated.
-  const names=await cdp.evaluate('[...document.querySelectorAll("[data-template]")].map(b=>b.dataset.template)');assert.equal(names.length,19);
+  const names=await cdp.evaluate('[...document.querySelectorAll("[data-template]")].map(b=>b.dataset.template)');assert.equal(names.length,21);
   await cdp.evaluate(`document.querySelector('#unit').value='mm';document.querySelector('#unit').dispatchEvent(new Event('change'))`);
   for(const name of names){await choose(name);await set('profile','rectangular');await set('thickness','0');await set('width','.5');await set('height','1');await set('coating_height','.2');if(name.includes('conformal_'))await click('geometry-inspect');
     const labels=await cdp.evaluate('[...document.querySelectorAll("#cross-section [data-geometry-label]")].map(p=>{const b=p.getBBox();return {x:b.x,y:b.y,w:b.width,h:b.height}})');assert.ok(labels.length>=2,name);

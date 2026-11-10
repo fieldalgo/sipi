@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 19종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 21종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 19종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 21종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -124,7 +124,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair) 19종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair) 21종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -335,7 +335,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 19종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 21종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는
@@ -720,7 +720,6 @@ JSON 경로를 유지합니다. 기하·재료 모델/pole·
 유지합니다. 별도 세분 메시의 수락 기준과 평가 횟수·점 수·시간 제한은 그대로입니다.
 법선 두께를 평면 코팅 높이로 바꾸거나 측면 접지를 무한 폭으로 추정하지 않습니다.
 메시·외곽을 별도로 점검하며 얇은 코팅의 점 수·시간 제한은 그대로 적용됩니다.
-법선 코팅 unbacked coplanar는 아직 기본 편집 폼 없이 Saved analysis로 이용합니다.
 
 검사: `workbench/tests/test_normal_coplanar_forms.py`,
 `tests/sipi/test_conformal_coplanar.py`의 독립 영상 전하 패널·복소 P1 조립,
@@ -728,3 +727,28 @@ JSON 경로를 유지합니다. 기하·재료 모델/pole·
 `node workbench/tests/normal-coplanar.test.mjs`는 단위와 간격 전달을 확인하고,
 `workbench/tests/normal-coplanar-browser.mjs`는 native/Worker 실제 화면을
 검사합니다(`SIPI_NORMAL_COPLANAR_PAIR=1`은 차동).
+
+## 법선 코팅 unbacked coplanar 폼
+
+**Normal-film unbacked coplanar**와 **Normal-film unbacked pair**는 코팅된
+유한 측면 접지를 사용하며 바닥 기준 접지면이 없습니다. 바닥·상부·측면 외곽은
+열린 경계입니다. 상부 공기는 코팅 표면 위의 여유 높이, `lower_air_height`는
+기판 아래의 별도 여유 높이입니다. 하부 공기를 바꾸면 기판·도체·코팅이 함께
+이동하며 상대 기하는 유지됩니다. 신호선만 테이퍼를 지원하고 차동의 신호 간
+`gap`과 바깥 접지 간 `ground_gap`은 별개입니다. 중앙 접지를 추정하지 않습니다.
+
+엔진 다각형 확인, 정확한 편집 JSON·입력 프로젝트 저장/재열기, 코팅 두께·재료
+스윕과 공차를 지원합니다. 폭 역산은 상하부 공기, 접지 폭과 간격을 보존합니다.
+자동 역산은 기본 가장자리 크기의 10배·원거리 크기의 1/4로 시작한 뒤 필수 세분
+메시 검증을 거칩니다. 명시 메시와 기본 전방 계산은 원래 설정을 유지합니다.
+32회 평가·30만 점·5분 제한은 그대로이며 세분 실패는 목표 달성이 아닙니다.
+더 엄격한 목표와 임의 입력의 성공을 보장하지 않습니다.
+
+세밀한 메시 검사와 상부·하부 공기 및 외곽 폭 확대 검사를 분리하세요. 준정적
+직선 마이터 코팅 모델이며 실측 증착 형상이나 제조 적합성 인증이 아닙니다.
+`workbench/tests/test_normal_unbacked_forms.py`와
+`tests/sipi/test_conformal_coplanar.py`에서 자유 공간 유한 접지 패널, 독립 복소
+P1 조립, 무손실 회로 불변식, 정확한 하부 공기·코팅 전달을 확인합니다.
+`node workbench/tests/normal-unbacked.test.mjs`는 단위·영역 처리를,
+`workbench/tests/normal-unbacked-browser.mjs`는 native/Worker 편집 흐름을
+검사합니다(`SIPI_NORMAL_UNBACKED_PAIR=1`은 차동).
