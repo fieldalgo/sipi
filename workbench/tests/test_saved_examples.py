@@ -81,3 +81,22 @@ def test_edited_material_sweep_checks_corners_without_meshing(kind, monkeypatch)
     invalid['sampling']['variables'][0]['lower'] = -.5
     with pytest.raises(ValueError, match='relative permittivity'):
         normalize_saved(json.dumps(invalid))
+
+
+def test_edited_pair_settings_validate_without_meshing(monkeypatch):
+    original = pair_material_goal().to_dict()
+    def forbidden(*args, **kwargs):
+        raise AssertionError('editing paired targets must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    edited = json.loads(json.dumps(original))
+    edited['targets_ohm']['z_diff'] = 101.
+    edited['variables'][0]['bounds'] = edited['variables'][1]['bounds'] = [2.2, 5.8]
+    edited['initial'] = [3.2, 3.5]
+    edited['material_evaluation']['frequency_hz'] = 2e8
+    assert json.loads(normalize_saved(json.dumps(edited))) == edited
+    edited['initial'][1] = 6.
+    with pytest.raises(ValueError, match='initial'):
+        normalize_saved(json.dumps(edited))
+    edited.update(initial=original['initial'], variables=original['variables'], targets_ohm=original['targets_ohm'])
+    edited['material_evaluation']['frequency_hz'] = original['material_evaluation']['frequency_hz']
+    assert edited == original

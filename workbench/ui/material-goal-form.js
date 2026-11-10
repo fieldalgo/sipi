@@ -7,6 +7,14 @@ const fields = [
   ['frequency', 'Evaluation frequency (Hz)'], ['budget', 'Maximum evaluations (3–128)'],
 ];
 const sweepFields = [fields[2],fields[3],fields[4],['count','Sample count (2–128)']];
+const pairFields = [
+  ['targetDiff','Differential target (Ω)'], ['toleranceDiff','Differential allowed error (Ω)'],
+  ['targetCommon','Common-mode target (Ω)'], ['toleranceCommon','Common-mode allowed error (Ω)'],
+  ['lowerFirst','Variable 1 lower bound (dimensionless)'], ['upperFirst','Variable 1 upper bound (dimensionless)'],
+  ['initialFirst','Variable 1 initial value (dimensionless)'],
+  ['lowerSecond','Variable 2 lower bound (dimensionless)'], ['upperSecond','Variable 2 upper bound (dimensionless)'],
+  ['initialSecond','Variable 2 initial value (dimensionless)'], fields[4], ['pairBudget','Maximum evaluations (2–128)'],
+];
 
 function bindingDescription(doc, alias) {
   if (typeof alias !== 'string' || !doc.material_variables || Object.keys(doc.material_variables).length !== 1 ||
@@ -43,6 +51,35 @@ export function materialSweepSettings(doc) {
   const values = {lower:variable.lower, upper:variable.upper, frequency:doc.material_evaluation.frequency_hz, count:doc.sampling.count};
   if (!Object.values(values).every(finite)) return null;
   return {kind:'sweep', values, description:`${names[doc.quantity]} sweep · ${description}`};
+}
+
+export function materialPairSettings(doc) {
+  if (doc?.schema !== 'sipi.pair-impedance-design/2' || !Array.isArray(doc.variables) || doc.variables.length !== 2 ||
+      !Array.isArray(doc.initial) || doc.initial.length !== 2 || !doc.material_variables ||
+      Object.keys(doc.material_variables).length !== 2) return null;
+  const descriptions=[], regions=[], axes=[], aliases=[];
+  for (const variable of doc.variables) {
+    if (typeof variable?.name !== 'string' || !Object.hasOwn(doc.material_variables,variable.name) ||
+        !Array.isArray(variable.bounds) || variable.bounds.length !== 2) return null;
+    const binding=doc.material_variables[variable.name], path=binding?.path;
+    if (typeof binding?.region !== 'string' || !Array.isArray(path) || path.length !== 3 ||
+        !['axis1','axis2'].includes(path[0]) || path[1] !== 'parameters' || path[2] !== 'eps_r') return null;
+    const model=doc.material_evaluation?.materials?.[binding.region], axis=model?.parameters?.[path[0]];
+    if (model?.schema !== 'sipi.dielectric/2' || model.kind !== 'principal-axes' ||
+        axis?.schema !== 'sipi.dielectric/1' || axis.kind !== 'constant' || !finite(axis.parameters?.eps_r)) return null;
+    aliases.push(variable.name);regions.push(binding.region);axes.push(path[0]);
+    descriptions.push(`${variable.name}: ${path[0]} relative permittivity`);
+  }
+  if (aliases[0]===aliases[1] || axes[0]===axes[1] || regions[0]!==regions[1]) return null;
+  for (const mapping of [doc.targets_ohm,doc.tolerances_ohm])
+    if (!mapping || Object.keys(mapping).length!==2 || !Object.hasOwn(mapping,'z_diff') || !Object.hasOwn(mapping,'z_common')) return null;
+  const values={targetDiff:doc.targets_ohm.z_diff,toleranceDiff:doc.tolerances_ohm.z_diff,
+    targetCommon:doc.targets_ohm.z_common,toleranceCommon:doc.tolerances_ohm.z_common,
+    lowerFirst:doc.variables[0].bounds[0],upperFirst:doc.variables[0].bounds[1],initialFirst:doc.initial[0],
+    lowerSecond:doc.variables[1].bounds[0],upperSecond:doc.variables[1].bounds[1],initialSecond:doc.initial[1],
+    frequency:doc.material_evaluation.frequency_hz,pairBudget:doc.max_evaluations};
+  if (!Object.values(values).every(finite)) return null;
+  return {kind:'pair',values,description:`Two targets · variable 1 ${descriptions[0]} · variable 2 ${descriptions[1]} · region ${regions[0]}`};
 }
 
 function numericDrafts(drafts, selectedFields) {
@@ -82,7 +119,30 @@ export function applyMaterialSweepSettings(doc, drafts) {
   return result;
 }
 
+export function applyMaterialPairSettings(doc,drafts) {
+  if (!materialPairSettings(doc)) throw new Error('This input has no supported paired material target form.');
+  const values=numericDrafts(drafts,pairFields);
+  if (['targetDiff','targetCommon','toleranceDiff','toleranceCommon'].some(key=>values[key]<=0))
+    throw new Error('Both targets and allowed errors must be positive.');
+  for (const suffix of ['First','Second']) {
+    const lower=values['lower'+suffix], upper=values['upper'+suffix], initial=values['initial'+suffix];
+    if (lower<=0 || lower>=upper) throw new Error('Both search bounds must be positive, with lower below upper.');
+    if (initial<lower || initial>upper) throw new Error('Each initial value must be inside its search bounds.');
+  }
+  if (values.frequency<0) throw new Error('Evaluation frequency must be zero or positive.');
+  if (!Number.isInteger(values.pairBudget) || values.pairBudget<2 || values.pairBudget>128)
+    throw new Error('Maximum evaluations must be an integer from 2 to 128.');
+  const result=structuredClone(doc);
+  result.targets_ohm.z_diff=values.targetDiff;result.targets_ohm.z_common=values.targetCommon;
+  result.tolerances_ohm.z_diff=values.toleranceDiff;result.tolerances_ohm.z_common=values.toleranceCommon;
+  result.variables[0].bounds=[values.lowerFirst,values.upperFirst];result.variables[1].bounds=[values.lowerSecond,values.upperSecond];
+  result.initial=[values.initialFirst,values.initialSecond];result.max_evaluations=values.pairBudget;
+  result.material_evaluation.frequency_hz=values.frequency;
+  return result;
+}
+
 export function applyMaterialSettings(doc,drafts) {
+  if (doc?.schema === 'sipi.pair-impedance-design/2') return applyMaterialPairSettings(doc,drafts);
   return doc?.schema === 'sipi.impedance-study/4' ? applyMaterialSweepSettings(doc,drafts) : applyMaterialGoalSettings(doc,drafts);
 }
 
@@ -91,8 +151,8 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
   const node = (tag,text) => {const value=document.createElement(tag); if(text!==undefined)value.textContent=text; return value;};
   const heading=node('h3','Material target settings'), description=node('p'), grid=node('div');grid.className='material-goal-fields';
   const inputs={},labels={};
-  for(const [name,text] of [...fields,sweepFields[3]]){
-    const label=node('label',text), input=node('input');input.type='number';input.step=['budget','count'].includes(name)?'1':'any';
+  for(const [name,text] of [...fields,sweepFields[3],...pairFields.filter(([name])=>name!=='frequency')]){
+    const label=node('label',text), input=node('input');input.type='number';input.step=['budget','count','pairBudget'].includes(name)?'1':'any';
     input.id='material-goal-'+name;input.setAttribute('aria-describedby','material-goal-note');label.htmlFor=input.id;
     label.append(input);grid.append(label);inputs[name]=input;labels[name]=label;
   }
@@ -106,10 +166,12 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
     apply.disabled=reset.disabled=blocked||!dirty;
     note.textContent=dirty?'Unapplied settings. Apply or reset before running or saving the current input.':
       'Edit these settings, then apply them to the input. Geometry, material poles and mesh stay in the JSON. Applying checks the input without calculating.' +
-      (settings?.kind==='sweep'?' Bounds and materials are checked before running. Failed calculation rows are retained without aggregate statistics. Sampled values do not guarantee manufacturing limits.':'');
+      (settings?.kind==='sweep'?' Bounds and materials are checked before running. Failed calculation rows are retained without aggregate statistics. Sampled values do not guarantee manufacturing limits.':
+       settings?.kind==='pair'?' Both targets must pass on the requested and refined meshes. The search is local; an evaluation budget does not guarantee a solution or limit elapsed time. Failed runs remain in the raw record.':'');
   }
   function restore(){
     for(const [name,input] of Object.entries(inputs)){labels[name].hidden=!Object.hasOwn(settings.values,name);input.value=labels[name].hidden?'':String(settings.values[name]);}
+    for(const [name] of settings.kind==='pair'?pairFields:settings.kind==='sweep'?sweepFields:fields)grid.append(labels[name]);
     for(const name of ['lower','upper'])labels[name].firstChild.textContent=`${name==='lower'?'Lower':'Upper'} ${settings.kind==='sweep'?'sample':'search'} bound (dimensionless)`;
     dirty=false;update();
   }
@@ -126,9 +188,9 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
       blocked=disabled;
       if(text!==source){
         source=text;dirty=false;settings=null;
-        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialSweepSettings(doc);}catch{}
+        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialSweepSettings(doc)||materialPairSettings(doc);}catch{}
         container.hidden=settings===null;
-        if(settings){heading.textContent=settings.kind==='sweep'?'Material sweep settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
+        if(settings){heading.textContent=settings.kind==='sweep'?'Material sweep settings':settings.kind==='pair'?'Paired material target settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
       }
       update();
     },

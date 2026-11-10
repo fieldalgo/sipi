@@ -523,3 +523,29 @@ unchanged. Normal, correlated and multi-variable sampling have no dedicated
 form here and keep their JSON input. Their existing failed rows and withheld
 aggregate summary remain intact. A completed finite sweep is a set of sampled
 values, not a guarantee of manufacturing bounds or continuous-range coverage.
+
+## Edit two material targets
+
+Load **100 Ω differential / 34 Ω common targets** to show **Paired material target settings**.
+Set differential and common-mode targets and allowed errors in ohms, positive
+ordered bounds for each variable, an initial value inside each interval,
+evaluation frequency in Hz and an integer evaluation budget from 2 to 128.
+Variable 1 and 2 follow the saved variable order; the description names each
+alias and its principal material axis. Both targets must pass on the requested
+and refined meshes. This is a local search, and the evaluation budget guarantees
+neither a solution nor an elapsed-time limit.
+
+The form supports `pair-impedance-design/2` with two distinct constant
+principal-axis permittivity bindings in one material, explicit initial values,
+and differential/common-mode targets. Other bindings or implicit initial values
+retain their JSON workflow. **Apply settings** validates the original and
+candidate documents before replacing the input. Geometry, variable order,
+material angle/loss, mesh and all unedited values remain unchanged.
+
+Drafts block execution and current-input saving until applied or reset. Input
+restoration and switching between pair, scalar and sweep settings discard old
+drafts; hidden fields cannot affect another input. A failed pair search keeps
+its original error and completed history in the raw execution record. Increasing
+the budget is a new explicit input, not a reinterpretation of that failure.
+Project history retains the failed and successful runs separately, while
+viewing an old run leaves the current form unchanged.

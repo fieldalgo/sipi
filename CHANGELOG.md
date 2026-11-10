@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Edit two principal-axis permittivities against differential and common-mode targets in saved analysis. Apply explicit targets, tolerances, bounds, initial values, frequency and evaluation budget through the existing validator; preserve failed runs, project records and scalar/sweep settings.
+
 - Add explicit settings for single constant-permittivity and Debye-strength material sweeps. Edit bounds, sample count and frequency through the existing validator; keep scalar target drafts, project history and unsupported sampling inputs separate. Invalid sweep corners are rejected before applying.
 
 - Show failed scalar impedance targets with their completed search/refinement history and a separate stopped mesh attempt when available. Preserve failure status, all original records and raw JSON without selecting a solution from the history.
