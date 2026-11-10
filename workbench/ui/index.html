@@ -32,6 +32,7 @@
           <button data-template="offset_stripline" aria-pressed="false"><span class="mini">═</span>Offset stripline</button>
           <button data-template="coupled_microstrip" aria-pressed="false"><span class="mini">━ ━</span>Coupled pair</button>
           <button data-template="coupled_stripline" aria-pressed="false"><span class="mini">═ ═</span>Coupled stripline</button>
+          <button data-template="unbacked_coplanar" aria-pressed="false"><span class="mini">▰ ━ ▰</span>Unbacked coplanar</button>
           <button data-template="grounded_coplanar" aria-pressed="false"><span class="mini">▰ ━ ▰</span>Grounded coplanar</button>
           <button data-template="coupled_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ━ ━ ▰</span>Coupled coplanar</button>
           <button data-template="coated_microstrip" aria-pressed="false"><span class="mini">▱</span>Planar coated</button>
@@ -78,6 +79,11 @@
             <div id="air-domain-fields">
               <label>Air layer height<select id="air_mode"><option value="auto">Automatic</option><option value="fixed">Set height</option></select></label>
               <label id="air-height-field" hidden>Air height<div class="number"><input id="air_height" type="number" value="10" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
+            </div>
+            <div id="lower-air-domain-fields" hidden>
+              <label>Lower air layer<select id="lower_air_mode"><option value="auto">Automatic (10 × substrate height)</option><option value="fixed">Set height</option></select></label>
+              <label id="lower-air-height-field" hidden>Lower air height<div class="number"><input id="lower_air_height" type="number" value="10" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
+              <p class="fine">No backplane. Only the two finite side conductors are grounded; the outer calculation edges are open. Check lower air, upper air and width convergence separately from mesh convergence.</p>
             </div>
           </div>
           <p id="domain-mode" class="fine">Bounds not inspected</p>

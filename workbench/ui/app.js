@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -15,7 +15,7 @@ const changedFields = new Set();
 // Display changes never become physical edits to target or study bounds.
 const studySI = {};
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
-const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
+const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
 
 function status(text, error = false) {
@@ -55,6 +55,9 @@ function meshControls() {
 function domainControls() {
   $('domain-inputs').hidden = !!imported;
   $('air-domain-fields').hidden = isStripline(template);
+  $('lower-air-domain-fields').hidden = !isUnbacked(template);
+  $('lower-air-height-field').hidden = $('lower_air_mode').value !== 'fixed';
+  $('lower_air_mode').disabled = busy || !!imported || !isUnbacked(template);
   $('box-width-field').hidden = $('box_mode').value !== 'fixed';
   $('air-height-field').hidden = $('air_mode').value !== 'fixed';
   $('box_mode').disabled = busy || !!imported;
@@ -62,9 +65,10 @@ function domainControls() {
   $('domain-inspect').disabled = busy || closed;
   $('domain-mode').textContent = imported ? 'Imported geometry · bounds read only' : resolvedDomain ? 'Resolved calculation bounds' : 'Bounds not inspected';
   const air = resolvedDomain && !imported && !isStripline(template) ? resolvedDomain.layers.at(-1).thickness : null;
+  const lowerAir = resolvedDomain?.layers[0]?.name === 'lower_air' ? resolvedDomain.layers[0].thickness : null;
   const total = resolvedDomain?.layers.reduce((sum, layer) => sum + layer.thickness, 0);
   $('domain-values').replaceChildren();
-  for (const [key, label, value] of [['width', 'Box width', resolvedDomain?.box.width], ['height', 'Total height', total], ['air', 'Air layer height', air]]) {
+  for (const [key, label, value] of [['width', 'Box width', resolvedDomain?.box.width], ['height', 'Total height', total], ['air', 'Air layer height', air], ...(isUnbacked(template) || lowerAir !== null ? [['lower_air', 'Lower air height', lowerAir]] : [])]) {
     const term = document.createElement('dt'); term.textContent = label;
     const item = document.createElement('dd'); item.dataset.domainKey = key;
     item.textContent = value == null ? '—' : `${Number((value / scales[unit]).toPrecision(10))} ${unit}`;
@@ -336,7 +340,7 @@ function geometryFields() {
   $('coating-fields').hidden = !isCoated(template);
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -538,7 +542,7 @@ async function run(action) {
 function chooseTemplate(name) {
     template = name; imported = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
-    $('box_mode').value = 'auto'; $('air_mode').value = 'auto';
+    $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
     $('placement').value = name === 'offset_stripline' ? 'fixed' : 'centred';
     if (name === 'offset_stripline') {
       lengthSI.trace_height = (lengthSI.height - lengthSI.thickness) / 2;
@@ -576,6 +580,7 @@ function restoreEditable(restored) {
   $('placement').value = originalParameters.trace_height == null ? 'centred' : 'fixed';
   $('box_mode').value = originalParameters.box_width == null ? 'auto' : 'fixed';
   $('air_mode').value = originalParameters.air_height == null ? 'auto' : 'fixed';
+  $('lower_air_mode').value = originalParameters.lower_air_height == null ? 'auto' : 'fixed';
   resolvedDomain = restored.document;
   geometryFields(); refreshStudyOptions(true); studyControls(); preview();
 }
@@ -589,9 +594,9 @@ for (const id of allFields) $(id).addEventListener('input', () => {
     lengthSI.trace_height = value;
     $('trace_height').value = String(Number((value / scales[unit]).toPrecision(10)));
   }
-  if (['box_mode', 'air_mode'].includes(id) && $(id).value === 'fixed' && resolvedDomain) {
-    const field = id === 'box_mode' ? 'box_width' : 'air_height';
-    const value = id === 'box_mode' ? resolvedDomain.box.width : resolvedDomain.layers.at(-1).thickness;
+  if (['box_mode', 'air_mode', 'lower_air_mode'].includes(id) && $(id).value === 'fixed' && resolvedDomain) {
+    const field = id === 'box_mode' ? 'box_width' : id === 'lower_air_mode' ? 'lower_air_height' : 'air_height';
+    const value = id === 'box_mode' ? resolvedDomain.box.width : id === 'lower_air_mode' ? resolvedDomain.layers[0].thickness : resolvedDomain.layers.at(-1).thickness;
     lengthSI[field] = value; $(field).value = String(Number((value / scales[unit]).toPrecision(10)));
   }
   if (lengthFields.includes(id)) {

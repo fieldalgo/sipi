@@ -23,6 +23,7 @@ def forbid_field_solve(monkeypatch):
 def test_domain_inspect_and_editable_roundtrip_preserve_parameters_and_mesh(template, mode):
     p=parameters(template)
     keys=['box_width']+([] if template in ('stripline','coupled_stripline','offset_stripline') else ['air_height'])
+    if template == 'unbacked_coplanar': keys.append('lower_air_height')
     for key in keys:
         if mode=='omitted': p.pop(key)
         elif mode=='null': p[key]=None
@@ -41,11 +42,13 @@ def test_domain_inspect_and_editable_roundtrip_preserve_parameters_and_mesh(temp
     if mode=='fixed':
         assert doc['box']['width']==p['box_width']
         if 'air_height' in keys: assert doc['layers'][-1]['thickness']==p['air_height']
+        if 'lower_air_height' in keys: assert doc['layers'][0]['thickness']==p['lower_air_height']
     else:
         omitted={k:v for k,v in p.items() if k not in keys}
         assert execute(dict(action='document',template=template,parameters=omitted,mesh=mesh))['document']==doc
     changed={**p,'box_width':.028}
     if 'air_height' in keys: changed['air_height']=.009
+    if 'lower_air_height' in keys: changed['lower_air_height']=.011
     assert execute(dict(action='document',template=template,parameters=changed,mesh=mesh))['document']['mesh']==mesh
 
 

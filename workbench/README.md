@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the eleven-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the twelve-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers eleven cross-section forms, impedance targeting,
+The basic workspace offers twelve cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -31,6 +31,37 @@ every saved contract are not implemented. Explicit-mesh bounded static 3D
 capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
+
+## Unbacked coplanar form
+
+**Unbacked coplanar** has one signal and two finite side ground conductors,
+with no backplane. The substrate lies between lower and upper air. The outer
+edges are insulating finite-domain boundaries; this is not a radiation boundary.
+Gap is the bottom-edge signal-to-ground separation. Taper changes only the
+signal; the ground traces remain rectangular.
+
+In **Domain bounds**, lower air can be automatic (ten times substrate height)
+or explicitly set. Inspecting or fixing it preserves the other parameters and
+any fixed mesh. Editable JSON, unit changes and project variants retain exact
+physical inputs. Lower air, upper air and box width are convergence controls,
+not manufacturing variables in the basic tolerance form. Gap and ground width
+can be sampled with the existing fixed nominal mesh policy.
+
+The fixed-mesh vacuum width example (0.5 mm width, 0.2 mm gap, 1 mm ground
+width, 0.5 mm substrate, relative permittivity 1, zero thickness, 12 mm upper
+and lower air, 24 mm box; edge 1 µm, far 0.25 mm, growth 0.1) uses an independent
+finite-ground free-space target of 115.58150659942925 Ω. Search bounds 0.4–0.6 mm
+and tolerance 1 Ω require both the requested and refined mesh checks. This
+precise example completed in the native host, but its browser width search hit
+the five-minute limit. That browser run remains a failure. A separate explicit
+mesh example (edge 4 µm, far 0.5 mm, growth 0.2) uses the same geometry, target,
+search bounds and 1 Ω residual gates; it still performs independent refinement.
+The application does not switch mesh settings after a failed run. The same
+large-domain example with automatic mesh reaches the existing 300,000-point
+limit during refinement; it does not produce an accepted design. No fallback
+coarsening or limit increase is applied. Check mesh and outer-domain convergence
+for the actual material, geometry and requested accuracy. Automatic domain
+sizes and a successful search alone do not establish that accuracy.
 
 ## Download sample rows as CSV
 
@@ -103,7 +134,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The eleven forms are microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The twelve forms are unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -314,7 +345,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the eleven supported editable templates. Other
+All project designs must use the twelve supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
