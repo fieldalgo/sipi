@@ -167,3 +167,40 @@ export function compareLines(baseline, current) {
     return reject('The displayed difference exceeds the finite numeric range.');
   return {compatible: true, reason: '', rows};
 }
+
+// Display coordinates only; physical geometry validation belongs to the engine.
+export function polygonDrawing(vertices) {
+  if (!Array.isArray(vertices) || vertices.length < 3 || vertices.length > 16384)
+    throw new Error('A displayed polygon needs 3–16384 vertices.');
+  let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
+  const points = vertices.map(point => {
+    if (!Array.isArray(point) || point.length !== 2 || !point.every(Number.isFinite))
+      throw new Error('Polygon display coordinates must be finite numbers.');
+    const [x, y] = point;
+    left = Math.min(left, x); right = Math.max(right, x);
+    bottom = Math.min(bottom, y); top = Math.max(top, y);
+    return [x, y];
+  });
+  return {points, left, right, bottom, top};
+}
+
+export function checkDrawing(model) {
+  if (!model || !Array.isArray(model.layers) || !Array.isArray(model.traces) ||
+      !model.layers.length || !model.traces.length ||
+      model.layers.length > 64 || model.traces.length > 64)
+    throw new Error('The geometry preview supports 1–64 layers and conductors.');
+  if (!Number.isFinite(model.box?.width) || model.box.width <= 0 ||
+      model.layers.some(layer => !Number.isFinite(layer.thickness) || layer.thickness <= 0) ||
+      !Number.isFinite(model.layers.reduce((sum, layer) => sum + layer.thickness, 0)))
+    throw new Error('The geometry preview needs finite positive dimensions.');
+  const regions = model.dielectric_regions ?? [];
+  if (!Array.isArray(regions) || regions.length > 64)
+    throw new Error('The geometry preview supports at most 64 local dielectric regions.');
+  for (const region of regions) polygonDrawing(region.vertices);
+  for (const trace of model.traces) {
+    if (trace.kind === 'polygon') polygonDrawing(trace.vertices);
+    else if (![trace.x, trace.y, trace.width, trace.thickness, trace.top_width ?? trace.width].every(Number.isFinite) ||
+        trace.width <= 0 || (trace.top_width ?? trace.width) <= 0 || trace.thickness < 0)
+      throw new Error('The geometry preview needs finite conductor dimensions.');
+  }
+}

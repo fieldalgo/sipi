@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {checkDrawing, polygonDrawing, scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -256,23 +256,41 @@ function draw(model) {
   const svg = $('cross-section');
   svg.replaceChildren();
   svg.setAttribute('viewBox', '0 0 760 300');
-  if (!model || !Array.isArray(model.layers) || !Array.isArray(model.traces) || model.layers.length > 64 || model.traces.length > 64) return;
+  checkDrawing(model);
   const height = model.layers.reduce((a, layer) => a + layer.thickness, 0);
   const width = model.box?.width;
   if (!Number.isFinite(height) || !Number.isFinite(width) || height <= 0 || width <= 0) return;
   const x = n => 65 + (n / width + 0.5) * 630;
   const y = n => 245 - n / height * 210;
+  const layerLabels = [];
   let base = 0;
   model.layers.forEach(layer => {
     if (!Number.isFinite(layer.thickness) || layer.thickness <= 0) return;
     const top = base + layer.thickness;
     const air = layer.eps_r === 1;
     svg.append(svgNode('rect', {x: 65, y: y(top), width: 630, height: 210 * layer.thickness / height, fill: air ? '#f8fafb' : '#dceae8'}));
-    svg.append(svgNode('text', {x: 77, y: y((top + base) / 2) + 4, fill: '#72928e', 'font-size': 11}, `${String(layer.name).slice(0, 30)} · εr ${format(layer.eps_r, 2)}`));
+    layerLabels.push({x: 77, y: y((top + base) / 2) + 4, tip: y((top + base) / 2), anchor: 'start', kind: 'layer', fill: '#597b76', text: `${String(layer.name).slice(0, 30)} · εr ${format(layer.eps_r, 2)}`});
     base = top;
   });
+  const regions = model.dielectric_regions ?? [];
+  for (const region of regions) {
+    const shape = polygonDrawing(region.vertices);
+    const node = svgNode('polygon', {points: shape.points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '),
+      fill: region.eps_r === 1 ? '#f8fafb' : '#c7d9ed', stroke: '#688bac', 'stroke-width': .5,
+      'data-region': region.name});
+    node.append(svgNode('title', {}, `${region.name} · εr ${region.eps_r} · tan δ ${region.tan_delta}`));
+    svg.append(node);
+  }
   const traceLabels = [];
   for (const trace of model.traces) {
+    if (trace.kind === 'polygon') {
+      const shape = polygonDrawing(trace.vertices);
+      svg.append(svgNode('polygon', {points: shape.points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '),
+        fill: '#b58b51', 'data-trace': trace.name}));
+      traceLabels.push({x: x((shape.left + shape.right) / 2), y: y(shape.top) - 13,
+        tip: y(shape.top), text: `${trace.ground ? 'GND' : String(trace.name).slice(0, 20)} · span ${format((shape.right - shape.left) / scales[unit])} ${unit}`});
+      continue;
+    }
     if (![trace.x, trace.y, trace.width, trace.thickness].every(Number.isFinite) || trace.width <= 0 || trace.thickness < 0) continue;
     const h = trace.thickness === 0 ? 4 : trace.thickness / height * 210;
     const topWidth = trace.top_width ?? trace.width;
@@ -292,13 +310,13 @@ function draw(model) {
   // Measure rendered text rather than estimating character widths. Keep the
   // geometry fixed and move crowded labels to a free row, with a leader back
   // to the conductor. Dense imported sections can extend below the drawing.
-  const occupied = [...svg.querySelectorAll('text, rect[fill="#b58b51"], polygon')].map(node => node.getBBox());
+  const occupied = [...svg.querySelectorAll('text, rect[fill="#b58b51"], polygon[data-trace]')].map(node => node.getBBox());
   let bottom = 300;
-  for (const label of traceLabels) {
-    const node = svgNode('text', {x: label.x, y: label.y, fill: '#8f714e', 'font-size': 11, 'text-anchor': 'middle'}, label.text);
+  for (const label of [...traceLabels, ...layerLabels]) {
+    const node = svgNode('text', {x: label.x, y: label.y, fill: label.fill ?? '#8f714e', 'font-size': 11, 'text-anchor': label.anchor ?? 'middle', 'data-geometry-label': label.kind ?? 'trace'}, label.text);
     svg.append(node);
     const size = node.getBBox();
-    const px = Math.max(8 + size.width / 2, Math.min(752 - size.width / 2, label.x));
+    const px = label.x + (size.x < 8 ? 8 - size.x : size.x + size.width > 752 ? 752 - size.x - size.width : 0);
     node.setAttribute('x', px);
     let box;
     for (let attempt = 0; ; attempt++) {
@@ -320,8 +338,17 @@ function draw(model) {
     svg.insertBefore(svgNode('rect', {x: box.x - 3, y: box.y - 2, width: box.width + 6,
       height: box.height + 4, fill: '#ffffff', 'fill-opacity': 0.88, rx: 2}), node);
   }
+  for (const region of regions) {
+    const py = bottom + 12;
+    svg.append(svgNode('rect', {x: 65, y: py - 8, width: 9, height: 9,
+      fill: region.eps_r === 1 ? '#f8fafb' : '#c7d9ed', stroke: '#688bac', 'stroke-width': .5}));
+    svg.append(svgNode('text', {x: 82, y: py, fill: '#4d6984', 'font-size': 11,
+      'data-region-label': region.name}, `${String(region.name).slice(0, 30)} · εr ${format(region.eps_r, 3)} · tan δ ${format(region.tan_delta, 4)}`));
+    bottom = py + 12;
+  }
   svg.setAttribute('viewBox', `0 0 760 ${bottom}`);
 }
+
 
 function preview() {
   $('drawing-unit').textContent = unit;
@@ -675,8 +702,14 @@ $('file').addEventListener('change', async () => {
       status(`Loaded ${file.name}. Edit the dimensions, calculate, or run a target search or study. Saved mesh settings are retained.`);
       return;
     }
-    if (!['sipi.cross-section/1', 'sipi.cross-section/2'].includes(value?.schema)) throw new Error('Choose a sipi.cross-section/1 or /2 JSON design.');
+    if (!['sipi.cross-section/1', 'sipi.cross-section/2', 'sipi.cross-section/3'].includes(value?.schema)) throw new Error('Choose a sipi.cross-section/1, /2 or /3 JSON design.');
     if (projectText) throw new Error('A geometry-only import cannot replace an editable project design. Open an editable design, or use a separate workspace.');
+    if (value.schema === 'sipi.cross-section/3') {
+      status('Validating polygon geometry…');
+      const restored = await transport.run({action: 'document', document_text: text});
+      if (sequence !== runSequence || closed) return;
+      checkDrawing(restored.document);
+    }
     imported = text;
     originalParameters = null; savedMesh = null; changedFields.clear();
     clearResult(); preview();

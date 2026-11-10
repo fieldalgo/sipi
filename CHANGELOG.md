@@ -1,5 +1,8 @@
 # Changelog
 
+- Open validated polygon geometry files in the basic workspace, render local
+  dielectric regions and conductor vertices, and separate crowded layer labels.
+
 - Connect single and paired planar-coated unbacked coplanar forms, retaining
   coating materials, separate upper/lower air bounds and refined width targets.
 

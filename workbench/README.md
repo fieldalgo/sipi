@@ -750,3 +750,29 @@ explicit apply/reset, same-input restoration and project history behave as in
 the other settings forms. Geometry, material angle/loss, mesh, quantity and
 all unedited settings remain unchanged. No manufacturing or yield guarantee is
 inferred from the sampled results.
+
+### Polygon geometry files
+
+**Open design** also accepts `sipi.cross-section/3` geometry: finite simple
+polygon conductors and local polygon dielectric regions, alongside rectangular
+and tapered traces. The engine validates a version-3 input before the current
+design is replaced. Invalid input or unsupported preview complexity leaves the
+current design and results intact. A valid import clears previous results and
+remains read only; it does not infer an editable template or replace an active
+input-project design.
+
+The preview draws the saved vertices without resampling. Local dielectric
+regions cover the underlying layers, and conductors cover the dielectric.
+Region names, relative permittivity and loss tangent appear in a legend.
+Polygon conductor labels report their horizontal span, not a manufacturing
+width parameter. Layer labels may move with leaders to stay readable; this
+does not move the geometry or change its mesh. The diagram has separate display
+scales and is not a metrology drawing.
+
+Display support is bounded to 64 layers, 64 conductors, 64 local regions and
+16384 vertices per polygon, within the existing 200 KiB file limit. More complex
+inputs can use **Saved analysis** subject to its engine limits. Opening does not
+solve, certify convergence or validate a physical manufacturing model. Calculate
+explicitly, inspect matrices for an asymmetric pair, and vary mesh/domain
+settings separately. Geometry export preserves the versioned input and its
+coordinates; no new geometry or material schema is introduced.
