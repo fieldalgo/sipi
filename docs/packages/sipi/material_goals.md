@@ -64,6 +64,24 @@ chosen snapshot is reused for refinement without calling the callback again.
 Callbacks must be deterministic for a reproducible search. No callback or code
 is serialized in the saved document.
 
+Within one `seek_impedance` call, repeated identical cross-section documents
+reuse their mesh and vacuum capacitance. The key includes geometry, boundaries,
+names/order, default materials and explicit mesh controls. Material models and
+frequency are validated and sampled at every evaluation; material-dependent
+capacitance and loss are recomputed. A changed document discards the previous
+entry before meshing, and the mandatory refinement builds its own finer mesh.
+There is no global or cross-request cache. `history` and `max_evaluations` still
+count search/refinement evaluations, not mesh builds or linear factorizations.
+This benefits fixed-geometry material searches; changing width usually needs a
+new mesh at every point. It does not establish a general runtime guarantee.
+
+`test_material_mesh_reuse.py` compares reused and fresh scalar, complex and
+transverse-tensor evaluations exactly, including asymmetric forward modes. It
+checks document invalidation, material rejection on reuse, independent search
+contexts, and separate refinement. Existing Cohn/Debye criteria, complex-field
+comparisons and retained mesh-limit failures remain required. Reuse adds no
+physical approximation and does not expand the supported material models.
+
 Validation infers homogeneous stripline permittivity from the independent Cohn
 formula within 1%, checks requested/refined residuals within 0.25 ohm, and compares
 a Debye relaxation goal with its independent real-permittivity formula (pole

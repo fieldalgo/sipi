@@ -32,7 +32,7 @@ def test_field_limit_context_preserves_original_cause_completed_rows_and_materia
         if len(calls)==failure_at:raise cause
         value=1/section.traces[0].width
         return SimpleNamespace(z0=value,z_diff_forward=value,even_odd=lambda:{'z_diff':value})
-    def material_field(doc,value,selected_quantity):
+    def material_field(doc,value,selected_quantity, *, mesh_reuse=None):
         assert selected_quantity==quantity
         return fake(doc.section,**doc.mesh_options)
     def models(value):
@@ -124,10 +124,16 @@ def test_saved_request_record_and_project_preserve_actual_failed_goal_without_re
     if saved_mode=='material-leaf':controls.update(variable='dk',bounds=[3.,5.],material_variables={'dk':dict(region='dielectric',path=['eps_r'])})
     goal=ImpedanceDesignDocument('stripline',p,**controls)
     request=SavedExecutionRequest(goal.dumps());original=crosssection.generate;calls=[]
+    original_mesh=CrossSection.mesh;is_refinement=False
+    def observed_mesh(self,**options):
+        nonlocal is_refinement
+        is_refinement=options.get('edge_size')==mesh['edge_size']/2
+        return original_mesh(self,**options)
     def bounded(*args,**kwargs):
         calls.append(1)
-        if len(calls)==4:kwargs['max_points']=4
+        if is_refinement:kwargs['max_points']=4
         return original(*args,**kwargs)
+    monkeypatch.setattr(CrossSection,'mesh',observed_mesh)
     monkeypatch.setattr(crosssection,'generate',bounded)
     receipt=request.run();result=receipt['execution']
     assert result['status']=='failed' and result['result'] is None
@@ -148,7 +154,8 @@ def test_saved_request_record_and_project_preserve_actual_failed_goal_without_re
     assert cli.main(['run',str(source),'--output',str(output)])==1
     assert json.loads(output.read_text(encoding='utf-8'))==receipt
     captured=capsys.readouterr();assert not captured.out and not captured.err
-    assert len(calls)==4 and not list(tmp_path.glob('.sipi-result-*'))
+    assert len(calls)==(2 if saved_mode=='material-leaf' else 4)
+    assert not list(tmp_path.glob('.sipi-result-*'))
     # Synthetic record declaration tests transport, never installed provenance.
     record=SavedExecutionRecord(request,receipt,run_id='test:mesh-limit',artifacts=[dict(component='sipi',version='test-only',kind='wheel',sha256='1'*64)])
     monkeypatch.setattr(CrossSection,'mesh',lambda *a,**kw:pytest.fail('Loading failure metadata solved a field'))

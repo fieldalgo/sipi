@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Reuse identical cross-section meshes and vacuum capacitance within a scalar material-target search. Revalidate and recompute each material evaluation, evict changed inputs, and preserve separate refinement, logical budgets, saved results and mesh-limit failures.
+
 - Reuse the selected requested-mesh matrices for workbench width-target output and pin both runtimes to the supporting engine. Keep returned geometry, history, material semantics, refinement and limits unchanged; exercise the same goal path in the portable host smoke.
 
 - Add opt-in requested-mesh matrix snapshots to impedance targeting without another field solve. Preserve the default result and saved JSON, selection/material history, evaluation budgets and mandatory refinement.

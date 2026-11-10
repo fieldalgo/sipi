@@ -43,7 +43,7 @@ def instrument(monkeypatch, quantity, material_mode, *, failure_at=None,
         matrices['C_loss'][:] = np.eye(n)*len(calls)/100
         return sipi.LineParameters(tuple(f's{i}' for i in range(n)), **matrices)
 
-    def material(doc, value, selected_quantity):
+    def material(doc, value, selected_quantity, *, mesh_reuse=None):
         assert selected_quantity == quantity
         return analyze(doc.section, **doc.mesh_options)
 

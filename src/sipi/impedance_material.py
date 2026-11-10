@@ -7,7 +7,7 @@ from copy import deepcopy
 import numpy as np
 
 from .dielectric import (dielectric_to_dict, dielectric_from_dict, dispersive_line,
-                         _material_samples)
+                         _material_samples, _dispersive_from_mesh)
 from .document import _keys
 from .network import _real
 from .quasistatic import LineParameters
@@ -49,11 +49,37 @@ def _validate_material_input(value, section, quantity):
     return _material_input(frequency, models)
 
 
-def _analyze_material(document, value, quantity):
+class _MaterialMeshReuse:
+    """One search's last exact input mesh and vacuum capacitance, never a global cache."""
+
+    def __init__(self):
+        self._key = None
+        self._meshed = None
+        self._c0 = None
+
+    def evaluate(self, document, frequency, samples):
+        key = document.dumps()
+        if key != self._key:
+            # Release the old mesh before building a changed/refined one.
+            self._key, self._meshed, self._c0 = None, None, None
+            meshed = document.section.mesh(**document.mesh_options)
+            self._key, self._meshed = key, meshed
+        sweep = _dispersive_from_mesh(self._meshed, frequency, samples, c0=self._c0)
+        self._c0 = sweep.C0
+        return sweep
+
+
+def _analyze_material(document, value, quantity, *, mesh_reuse=None):
     """Keep vacuum L and Re(C_complex); this is not lossy characteristic Z."""
     value = _validate_material_input(value, document.section, quantity)
-    sweep = dispersive_line(document.section, [value['frequency_hz']],
-                            materials=_models(value), **document.mesh_options)
+    if mesh_reuse is None:
+        sweep = dispersive_line(document.section, [value['frequency_hz']],
+                                materials=_models(value), **document.mesh_options)
+    else:
+        # Material validation/sampling is repeated even when geometry is reused.
+        frequency, samples = _material_samples(document.section,
+            [value['frequency_hz']], _models(value))
+        sweep = mesh_reuse.evaluate(document, frequency, samples)
     return LineParameters(sweep.names, sweep.C[0], sweep.C0, sweep.L, -sweep.C_complex[0].imag)
 
 
