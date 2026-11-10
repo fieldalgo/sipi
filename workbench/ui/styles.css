@@ -34,6 +34,12 @@ h3{font-size:11px;font-weight:650;margin:0}
 .section-label>span{font-size:9px;color:#8a98a0}
 select{font:inherit;font-size:11px;color:#5a707b;background:#f6f8f9;border:1px solid #e4e9ec;border-radius:4px;padding:3px}
 .fields{display:grid;gap:15px}
+.mesh-settings{margin-top:24px;border-top:1px solid #edf0f2;padding-top:18px}
+.mesh-settings summary{cursor:pointer;font-size:12px;font-weight:600}
+.mesh-values{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:#627580}
+.mesh-values dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.mesh-actions{display:grid;gap:8px}
+.mesh-actions button{min-height:44px}
 label{font-size:11px;color:#627580;display:block}
 .symbol{color:#a3afb7;float:right;font-style:italic}
 .number{display:flex;align-items:center;border:1px solid #dfe6e9;border-radius:5px;margin-top:7px;height:36px;background:#fcfdfd}

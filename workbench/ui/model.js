@@ -4,6 +4,15 @@ export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled
 export const isStripline = template => ['stripline', 'coupled_stripline'].includes(template);
 export const isPair = template => ['coupled_microstrip', 'coupled_stripline'].includes(template);
 
+// Explicit refinement of resolved settings; never mutate a saved design.
+export function refinedMesh(mesh) {
+  const keys = ['edge_size', 'far_size', 'grade', 'min_angle'];
+  if (!mesh || Object.keys(mesh).length !== keys.length || keys.some(key => !Number.isFinite(mesh[key]))) throw new Error('Inspect a valid resolved mesh first.');
+  const out = {...mesh, edge_size: mesh.edge_size / 2, far_size: mesh.far_size / 2, grade: mesh.grade / 2};
+  if (out.edge_size <= 0 || out.far_size <= 0 || out.grade < 0 || !(out.min_angle > 0 && out.min_angle < 34)) throw new Error('This mesh cannot be refined further.');
+  return out;
+}
+
 export function parameterFields(template) {
   return {width: 'width', top_width: 'top_width', thickness: 'thickness',
     height: isStripline(template) ? 'plane_spacing' : 'substrate_height',

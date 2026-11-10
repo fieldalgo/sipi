@@ -58,6 +58,14 @@
             </div>
           </div>
         </form>
+        <details class="mesh-settings">
+          <summary>Mesh settings</summary>
+          <p id="mesh-mode" class="fine">Automatic mesh</p>
+          <dl id="mesh-values" class="mesh-values"></dl>
+          <div class="mesh-actions"><button id="mesh-inspect">Inspect current mesh</button><button id="mesh-refine" disabled>Refine mesh ×2</button><button id="mesh-auto" disabled>Use automatic mesh</button></div>
+          <p class="fine">Lengths above are µm. Inspecting does not solve or freeze automatic settings. Refinement halves edge size, far size and growth, keeping the minimum angle. Fixed meshes survive geometry edits and saving; accuracy still needs convergence checks.</p>
+          <p class="fine">Automatic width targets start finer than the ordinary calculation defaults, then check a second mesh. Imported geometry keeps its own settings.</p>
+        </details>
         <button id="calculate" class="primary wide">Calculate impedance <span>→</span></button>
         <button id="cancel" class="wide" hidden>Cancel calculation</button>
       </aside>

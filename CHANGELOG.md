@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Expose current mesh inspection, explicit twofold refinement and automatic reset in the six-form workbench. Preserve fixed settings through edits, unit changes and project files; keep inspection separate from solving or freezing automatic inputs.
+
 - Separate crowded conductor labels in the cross-section preview using measured text bounds and leader lines, without changing conductor geometry or saved inputs.
 
 - Add a coupled-stripline form with full ground-plane spacing, edge gap, differential width targeting, four-port response and differential studies. Preserve exact editable/project inputs, nullable offset/taper values and mesh through unit changes and reopen; retain coarse-mesh target failures and their refinement history.

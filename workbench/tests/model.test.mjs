@@ -1,6 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parameters, scales, convert, schematic} from '../ui/model.js';
+import {parameters, scales, convert, schematic, refinedMesh} from '../ui/model.js';
+
+test('explicit mesh refinement preserves angle and the original resolved settings', () => {
+  const original = Object.freeze({edge_size:8e-6, far_size:.00025, grade:.3, min_angle:28});
+  const refined = refinedMesh(original);
+  assert.deepEqual(refined, {edge_size:4e-6, far_size:.000125, grade:.15, min_angle:28});
+  assert.deepEqual(original, {edge_size:8e-6, far_size:.00025, grade:.3, min_angle:28});
+  assert.equal(refinedMesh({...original, grade:0}).grade, 0);
+  for (const invalid of [null, {}, {...original, edge_size:0}, {...original, edge_size:Number.MIN_VALUE}, {...original, far_size:Infinity}, {...original, grade:-1}, {...original, min_angle:34}, {...original, min_angle:0}, {...original, edge_size:'0.1'}, {...original, extra:1}]) assert.throws(() => refinedMesh(invalid));
+});
 
 const values = {width: '0.5', height: '1', thickness: '0.035', gap: '0.2', ground_width: '1', eps_r: '4', tan_delta: '0.02'};
 

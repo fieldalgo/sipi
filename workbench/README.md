@@ -73,6 +73,22 @@ within its job limits, or independently validated. The editable path shares the
 native/Worker adapter; current-platform acceptance must use the exact staged
 engine and assets. Advancing the pin alone is not a Windows or Worker pass.
 
+## Inspect and refine the mesh
+
+Open **Mesh settings** and choose **Inspect current mesh** to resolve the current
+settings without solving or changing inputs. The displayed lengths are always
+in micrometres, independent of the geometry display unit. Inspection and an
+ordinary calculation leave an automatic mesh automatic.
+
+**Refine mesh ×2** explicitly fixes a new mesh with edge size, far size and growth
+halved; minimum angle is unchanged. Results are cleared. Recalculate and compare
+convergence. This operation does not certify accuracy or adjust the outer domain.
+Fixed settings survive geometry edits, unit changes, editable files and A/B inputs.
+**Use automatic mesh** discards the fixed settings and clears results. Automatic
+width targets retain their existing finer starting mesh and separate refinement
+check. Saving resolves the settings in the file; reopening restores a fixed mesh.
+Geometry-only imports can be inspected but not changed with these controls.
+
 ## Keep A/B cross-section inputs in a project
 
 Use **Duplicate design** to keep the current cross-section as one variant and

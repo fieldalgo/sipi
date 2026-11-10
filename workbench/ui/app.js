@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, isStripline, isPair, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, isStripline, isPair, refinedMesh, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -9,7 +9,7 @@ if (inBrowser) document.querySelector('.local').lastChild.textContent = ' Browse
 let template = 'microstrip', unit = 'mm', imported = null, latest = null, busy = false;
 let cancelling = false, closed = false, latestNetwork = null, latestStudy = null;
 let runSequence = 0;
-let originalParameters = null, savedMesh = null;
+let originalParameters = null, savedMesh = null, resolvedMesh = null;
 let projectText = null, activeDesign = null;
 const changedFields = new Set();
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
@@ -32,7 +32,22 @@ function setBusy(value) {
   $('design').disabled = value || !!imported;
   $('save-editable').disabled = value || !!imported;
   geometryFields(); studyControls();
-  projectControls();
+  projectControls(); meshControls();
+}
+
+function meshControls() {
+  const mesh = savedMesh ?? resolvedMesh;
+  $('mesh-mode').textContent = imported ? 'Imported geometry · read only' : savedMesh ? 'Fixed mesh' : 'Automatic mesh';
+  $('mesh-values').replaceChildren();
+  for (const [key, label, scale, suffix] of [['edge_size', 'Edge size', 1e6, 'µm'], ['far_size', 'Far size', 1e6, 'µm'], ['grade', 'Growth', 1, ''], ['min_angle', 'Minimum angle', 1, '°']]) {
+    const term = document.createElement('dt'); term.textContent = label;
+    const value = document.createElement('dd'); value.dataset.meshKey = key;
+    value.textContent = mesh ? `${Number((mesh[key] * scale).toPrecision(8))} ${suffix}`.trim() : '—';
+    $('mesh-values').append(term, value);
+  }
+  $('mesh-inspect').disabled = busy || closed;
+  $('mesh-refine').disabled = busy || closed || !!imported || !mesh;
+  $('mesh-auto').disabled = busy || closed || !!imported || !savedMesh;
 }
 
 function projectControls() {
@@ -129,6 +144,7 @@ function clearResult() {
   $('result').hidden = true;
   $('history').hidden = true;
   latestStudy = null; $('study-result').hidden = true;
+  resolvedMesh = null; meshControls();
   status('Inputs changed. Calculate to update the results.');
 }
 
@@ -303,6 +319,7 @@ function render(result) {
     $('refinement').textContent = `Width ${format(d.width / scales[unit], 6)} ${unit} · initial ${format(d.impedance, 5)} Ω · refined ${format(d.refined_impedance, 5)} Ω · mesh change ${format(d.mesh_change, 5)} Ω. Both meet the requested target tolerance.`;
     history(d.history);
   }
+  resolvedMesh = {...result.document.mesh}; meshControls();
   // Retain a useful schematic rather than squeezing the signal into the full air box.
   preview();
   $('preview-label').textContent = 'Schematic · not to scale';
@@ -410,13 +427,17 @@ async function run(action) {
   if (busy) return;
   const sequence = ++runSequence;
   try {
-    const input = request(action);
-    if (!['document', 'template-document'].includes(action)) clearResult();
+    const input = request(action === 'mesh-inspect' ? 'document' : action);
+    if (!['document', 'template-document', 'mesh-inspect'].includes(action)) clearResult();
     setBusy(true);
     status(action === 'study' ? 'Calculating every sampled cross-section…' : action === 'network' ? 'Calculating the cross-section and frequency response…' : action === 'design' ? 'Searching the width range, then checking a finer mesh…' : action === 'analyze' ? (inBrowser ? 'Preparing the browser engine and calculating… The first load can take longer.' : 'Meshing the cross-section and solving locally…') : 'Validating the design file…');
     const result = await transport.run(input);
     if (sequence !== runSequence || closed) return;
-    if (action === 'template-document') {
+    resolvedMesh = {...result.document.mesh}; meshControls();
+    if (action === 'mesh-inspect') {
+      status('Mesh settings inspected without solving or changing the design. Refinement is an explicit input change.');
+    }
+    else if (action === 'template-document') {
       downloadText(result.document_text, 'sipi-editable-design.json', 'application/json');
       status('Editable design saved with its parameters and resolved mesh.');
     }
@@ -450,6 +471,7 @@ function restoreEditable(restored) {
   chooseTemplate(restored.template);
   originalParameters = {...restored.parameters};
   savedMesh = {...restored.document.mesh};
+  meshControls();
   for (const [id, key] of Object.entries(parameterFields(template))) {
     const v = originalParameters[key];
     if (v == null) continue;
@@ -478,6 +500,20 @@ $('unit').addEventListener('change', () => {
   if (latest) render(latest);
 });
 $('calculate').addEventListener('click', () => run('analyze'));
+$('mesh-inspect').addEventListener('click', () => run('mesh-inspect'));
+$('mesh-refine').addEventListener('click', () => {
+  if (busy || closed || imported) return;
+  try {
+    const next = refinedMesh(savedMesh ?? resolvedMesh);
+    savedMesh = next; clearResult();
+    status('Fixed mesh refined: edge size, far size and growth halved. Recalculate and check convergence; this does not certify accuracy.');
+  } catch (error) { status(error.message, true); }
+});
+$('mesh-auto').addEventListener('click', () => {
+  if (busy || closed || imported) return;
+  savedMesh = null; clearResult();
+  status('Automatic mesh restored. Width targets use their finer initial mesh; saved designs resolve and retain actual settings.');
+});
 $('network-calculate').addEventListener('click', () => run('network'));
 $('touchstone-save').addEventListener('click', () => { if (latestNetwork) downloadText(latestNetwork.touchstone, `sipi-line.${latestNetwork.extension}`, 'text/plain'); });
 for (const id of networkFields) $(id).addEventListener('input', () => { latestNetwork = null; if (latest) latest = {...latest, network: undefined}; $('network-result').hidden = true; status('Frequency inputs changed. Recalculate the response.'); });
@@ -558,4 +594,4 @@ $('exit').addEventListener('click', async () => {
   try { await transport.close(); status('Application closed. You can close this browser tab.'); for (const element of document.querySelectorAll('button,input,select')) element.disabled = true; }
   catch (error) { closed = false; status(error.message, true); setBusy(false); }
 });
-geometryFields(); refreshStudyOptions(true); studyControls(); preview(); projectControls();
+geometryFields(); refreshStudyOptions(true); studyControls(); preview(); projectControls(); meshControls();
