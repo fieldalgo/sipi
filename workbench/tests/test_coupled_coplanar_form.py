@@ -104,14 +104,15 @@ def test_single_coplanar_ground_width_study_retains_single_ended_quantity():
 
 
 @pytest.mark.parametrize('template', ['microstrip','stripline','coupled_microstrip','coupled_stripline',
-    'grounded_coplanar','coated_microstrip','coupled_grounded_coplanar'])
+    'grounded_coplanar','coated_microstrip','coupled_grounded_coplanar','offset_stripline',
+    'coupled_coated_microstrip','coated_grounded_coplanar','coupled_coated_grounded_coplanar','unbacked_coplanar'])
 def test_automatic_goal_mesh_policy_preserves_existing_forms(template, monkeypatch):
     from test_editable import parameters
     request=dict(action='design',template=template,parameters=parameters(template),
         design=dict(bounds=[.0004,.0006],target=100,tolerance=1))
     resolved=execute({**request,'action':'document'})['document']['mesh']
     expected=dict(resolved);expected['far_size']/=4
-    if template!='coupled_grounded_coplanar':
+    if template not in ('coupled_grounded_coplanar','coupled_coated_microstrip','coated_grounded_coplanar','coupled_coated_grounded_coplanar','unbacked_coplanar'):
         expected['edge_size']/=4;expected['grade']/=2
     class StopBeforeSolve(Exception): pass
     def capture(*args, **kwargs):

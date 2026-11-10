@@ -359,10 +359,10 @@ def execute(request, *, record_provider=None):
         if mesh is None:
             mesh = doc.section.mesh_settings()
             mesh['far_size'] /= 4
-            # These defaults already resolve small ground gaps or coating.
+            # These defaults already resolve finite ground gaps or coating.
             # Keep their edge/growth settings before the mandatory independent
             # refinement; pre-refining both again can exceed the point budget.
-            if request['template'] not in ('coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
+            if request['template'] not in ('unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
                 mesh['edge_size'] /= 4
                 mesh['grade'] /= 2
         result, line = sipi.seek_impedance(

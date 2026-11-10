@@ -57,9 +57,14 @@ the five-minute limit. That browser run remains a failure. A separate explicit
 mesh example (edge 4 µm, far 0.5 mm, growth 0.2) uses the same geometry, target,
 search bounds and 1 Ω residual gates; it still performs independent refinement.
 The application does not switch mesh settings after a failed run. The same
-large-domain example with automatic mesh reaches the existing 300,000-point
-limit during refinement; it does not produce an accepted design. No fallback
-coarsening or limit increase is applied. Check mesh and outer-domain convergence
+large-domain example previously reached the 300,000-point limit when automatic
+width targeting pre-refined both edge size and growth before its mandatory
+refinement. Automatic width targeting for this form now retains the factory's
+resolved edge size and growth, while dividing its far size by four. It still
+requires the independent refinement and both residual gates. Explicit meshes
+and other forms retain their policies. This is a selected automatic policy,
+not a fallback after an error; point and time limits remain unchanged. The
+precise explicit-mesh browser failure above remains outside its acceptance. Check mesh and outer-domain convergence
 for the actual material, geometry and requested accuracy. Automatic domain
 sizes and a successful search alone do not establish that accuracy.
 

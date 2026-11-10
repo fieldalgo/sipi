@@ -28,21 +28,29 @@ def test_open_domain_editable_roundtrip_without_solving(lower,monkeypatch):
     assert edit['document']['mesh']==doc['mesh']
 
 
-def test_fixed_mesh_width_goal_against_independent_free_space_reference():
+@pytest.mark.parametrize('explicit_mesh',[False,True],ids=['automatic','fixed'])
+def test_width_goal_against_independent_free_space_reference(explicit_mesh):
     target=float(reference(sipi.unbacked_coplanar)[0])
-    result=execute(dict(action='design',template='unbacked_coplanar',parameters=VACUUM,mesh=VAC_FINE,
+    result=execute(dict(action='design',template='unbacked_coplanar',parameters=VACUUM,**({'mesh':VAC_FINE} if explicit_mesh else {}),
         design=dict(bounds=[.4e-3,.6e-3],target=target,tolerance=1.)))
     goal=result['design']
     assert abs(goal['residual'])<=1 and abs(goal['refined_residual'])<=1
     assert goal['width']==pytest.approx(.5e-3,rel=.04) and goal['history'][-1]['stage']=='refinement'
     assert result['line']['z0']==goal['impedance']
-    expected=TemplateSectionDocument('unbacked_coplanar',{**VACUUM,'width':goal['width']},mesh=VAC_FINE)
+    mesh=VAC_FINE if explicit_mesh else sipi.unbacked_coplanar(**VACUUM).mesh_settings()
+    if not explicit_mesh:mesh['far_size']/=4
+    expected=TemplateSectionDocument('unbacked_coplanar',{**VACUUM,'width':goal['width']},mesh=mesh)
     assert result['document']==expected.cross_section.to_dict()
+    if not explicit_mesh:
+        assert abs(goal['refined_impedance']/target-1)<abs(goal['impedance']/target-1)<.02
+        outer=sipi.unbacked_coplanar(**{**VACUUM,'width':goal['width'],
+            'air_height':.024,'lower_air_height':.024,'box_width':.048}).analyze(**mesh)
+        assert outer.z0==pytest.approx(goal['impedance'],rel=.01)
 
 
 def test_automatic_mesh_and_existing_failure_are_forwarded_without_relaxing(monkeypatch):
     section=sipi.unbacked_coplanar(**VACUUM);expected=section.mesh_settings()
-    expected['far_size']/=4;expected['edge_size']/=4;expected['grade']/=2
+    expected['far_size']/=4
     sentinel=ValueError('unchanged numerical failure')
     def seek(factory,bounds,target,**kw):
         assert kw['mesh']==expected and kw['max_evaluations']==32 and kw['return_line'] is True

@@ -14,6 +14,8 @@
 
 ## [Unreleased]
 
+- Retain resolved edge size and growth for automatic single unbacked coplanar width targeting before its mandatory refinement, while preserving explicit meshes, other templates, numerical budgets and target tolerances.
+
 - Add the single unbacked coplanar form with explicit lower-air domain controls, exact editable input retention, finite-ground tolerance samples and fixed-mesh width targeting. Preserve open outer boundaries, existing numerical limits and mandatory refinement.
 
 - Edit paired principal-axis material means, standard deviations and input correlation for normal studies. Preserve variable order, seeded samples and failed rows, including supported correlation ±1 boundaries; keep target and single-variable settings compatible.

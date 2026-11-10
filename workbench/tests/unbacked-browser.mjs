@@ -154,6 +154,16 @@ try {
   for(const key of ['gap','ground_width','lower_air_height','air_height','box_width'])assert.equal(designed.parameters[key],vacuum.parameters[key]);
   assert.ok(Math.abs(goal.design.residual)<=1&&Math.abs(goal.design.refined_residual)<=1);
   assert.ok(await cdp.evaluate('document.querySelector("#refinement").textContent.includes("Both meet")'));
+  await click('mesh-auto');await click('design');
+  const automaticGoal=await cdp.evaluate('window.completedResults.at(-1)');
+  const automaticRequest=await cdp.evaluate('window.domainRequests.at(-1)');
+  assert.equal(automaticRequest.action,'design');assert.equal(Object.hasOwn(automaticRequest,'mesh'),false);
+  assert.ok(Math.abs(automaticGoal.design.residual)<=1&&Math.abs(automaticGoal.design.refined_residual)<=1);
+  assert.ok(Math.abs(automaticGoal.design.width/.0005-1)<.04);
+  assert.deepEqual(automaticGoal.document.mesh,{edge_size:2e-6,far_size:.0245/24/4,grade:.15,min_angle:28});
+  const automaticDesign=await save();assert.deepEqual(automaticDesign.cross_section.mesh,automaticGoal.document.mesh);
+  assert.equal(automaticDesign.parameters.width,automaticGoal.design.width);
+  for(const key of ['gap','ground_width','lower_air_height','air_height','box_width'])assert.equal(automaticDesign.parameters[key],vacuum.parameters[key]);
   await open(precise);
   for(const [id,value] of [['frequency-start','1'],['frequency-stop','1000'],['frequency-points','3'],['line-length','100'],['series-r','2'],['reference-z','50']])await set(id,value);
   await click('network-calculate');const network=await cdp.evaluate('window.completedResults.at(-1)');
@@ -169,10 +179,10 @@ try {
     assert.ok(layout.scrollWidth<=width);for(const control of layout.controls)assert.ok(control.height>=44&&control.left>=0&&control.right<=width,JSON.stringify(control));layouts.push(layout);
     await writeFile(join(output,`unbacked-${width}.png`),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
   }
-  for(const [name,value] of Object.entries({project:projectB,physical,outer,vacuum:vacuumResult,goal,network,study,design:designed}))await writeFile(join(output,name+'.json'),JSON.stringify(value,null,2));
+  for(const [name,value] of Object.entries({project:projectB,physical,outer,vacuum:vacuumResult,goal,network,study,design:designed,automaticGoal,automaticDesign}))await writeFile(join(output,name+'.json'),JSON.stringify(value,null,2));
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'installed host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:12,layouts,errors,externalRequests:remoteRequests,checks:['old eleven exact inputs and new lower air through three units','lower-air auto/fixed and no backplane drawing','open finite side-ground domain','A/B project exact restore','lower-air domain sensitivity and comparison','gap/ground corners with fixed mesh','invalid lower air and study bounds','hidden lower-air isolation','vacuum independent target and both mesh gates','two-port Touchstone response','cancel/restart','four viewports/44px controls','normal shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:12,layouts,errors,externalRequests:remoteRequests,checks:['old eleven exact inputs and new lower air through three units','lower-air auto/fixed and no backplane drawing','open finite side-ground domain','A/B project exact restore','lower-air domain sensitivity and comparison','gap/ground corners with fixed mesh','invalid lower air and study bounds','hidden lower-air isolation','vacuum independent target and both mesh gates','automatic target preserves resolved edge/growth, explicit mode and saved selected mesh','two-port Touchstone response','cancel/restart','four viewports/44px controls','normal shutdown']},null,2));
   console.log('Unbacked coplanar form acceptance passed.');
 } catch(error) {
   let application=null;
