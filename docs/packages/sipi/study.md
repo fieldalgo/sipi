@@ -177,7 +177,13 @@ rows retain the full derived geometry.
 
 `analyze(max_evaluations=128)` checks an explicit integer budget 2–10000 before any
 solve. A larger sample plan raises `ValueError`; it is never silently shortened.
-Every row then builds its own geometry mesh using the saved nominal settings.
+Geometry-only rows build their own mesh using the saved nominal settings.
+Explicit-material rows within one call reuse the last exact cross-section
+document's mesh and vacuum capacitance. A changed document replaces that entry;
+another call starts empty. Each row still validates its current material and
+recomputes its material field, even after a previous row failed. Reuse does not
+change the planned-sample budget, sample order or failure accounting, and does
+not imply per-row mesh convergence.
 `ImpedanceStudy` holds `input_json`, `quantity`, immutable `rows`, `failed`, and
 `summary`. Each `StudyRow` holds index, a read-only parameter map, saved
 `CrossSectionDocument` when construction succeeded, impedance in ohms or `None`,

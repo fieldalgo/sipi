@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Reuse the last identical explicit-material study mesh and vacuum capacitance within each analysis. Recompute every sampled material, retain failed rows and incomplete summaries, and preserve sampling order, budgets and geometry changes.
+
 - Reuse identical material meshes and vacuum capacitance inside two-parameter pair targeting while preserving objective caching, attempted-evaluation budgets, current-model diagnostics and separate frozen-input refinement.
 
 - Pin both workbench runtimes to search-local material mesh reuse and exercise constant/Debye saved targets through native HTTP and actual browser Workers. Preserve selected material snapshots, refinement, exports and existing failure limits.

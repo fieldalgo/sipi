@@ -50,7 +50,7 @@ def _validate_material_input(value, section, quantity):
 
 
 class _MaterialMeshReuse:
-    """One search's last exact input mesh and vacuum capacitance, never a global cache."""
+    """One call's last exact input mesh and vacuum capacitance, never a global cache."""
 
     def __init__(self):
         self._key = None

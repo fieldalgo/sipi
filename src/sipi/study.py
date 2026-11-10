@@ -16,7 +16,7 @@ from .sampling import _numbers, _scalar, _integer, _copy, _validate_sampling, _s
 from .document import CrossSectionDocument, _keys, _unique_object
 from .impedance_material import (_material_input, _validate_material_input,
                                  _analyze_material, _is_material_parameter,
-                                 _material_bindings, _sample_material)
+                                 _material_bindings, _sample_material, _MaterialMeshReuse)
 
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
@@ -290,8 +290,9 @@ class ImpedanceStudyDocument:
         """Evaluate every planned sample, retaining errors; no partial statistics.
 
         max_evaluations is a caller's explicit budget, checked before any solve.
-        The nominal resolved mesh is shared as settings, not as one geometric
-        mesh. Geometry is remeshed per row; no per-row convergence is inferred.
+        Explicit-material rows may reuse the last exact document's mesh and
+        vacuum capacitance within this call. Every material is evaluated again;
+        changed geometry is remeshed. No per-row convergence is inferred.
         """
         budget = _integer(max_evaluations, 2, 10000)
         parameters = self.sample_parameters()
@@ -299,6 +300,7 @@ class ImpedanceStudyDocument:
             raise ValueError('sample count exceeds max_evaluations before any solve')
         data, rows = self._data, []
         samples = self.samples()
+        material_mesh = _MaterialMeshReuse()
         for i, values in enumerate(parameters):
             doc = None
             evaluation = _sample_material(data, samples[i])
@@ -308,7 +310,8 @@ class ImpedanceStudyDocument:
                 section = _TEMPLATES[data['template']](**values)
                 doc = CrossSectionDocument(section, mesh=data['mesh'])
                 line = (doc.analyze() if evaluation is None
-                        else _analyze_material(doc, evaluation, data['quantity']))
+                        else _analyze_material(doc, evaluation, data['quantity'],
+                                               mesh_reuse=material_mesh))
                 value = float(line.even_odd()['z_diff'] if data['quantity'] == 'z_diff'
                               else getattr(line, data['quantity']))
                 if not np.isfinite(value) or value <= 0:

@@ -159,7 +159,12 @@ saved = plan.dumps()  # sipi.impedance-study/2
 
 `analyze(max_evaluations=128)`은 정수 2–10000의 명시 계산 예산을 첫 해석 전에
 검사합니다. 계획 표본 수가 더 크면 `ValueError`이며 표본 수를 조용히 줄이지
-않습니다. 행마다 저장된 nominal 설정으로 별도 형상 메시를 만듭니다.
+않습니다. 형상만 분석하는 행은 저장된 nominal 설정으로 각자의 메시를 만듭니다.
+명시 재료를 쓰는 행은 한 호출 안에서 직전의 동일 단면 문서에 대한 메시와
+진공 정전용량을 재사용합니다. 문서가 달라지면 그 항목을 교체하고, 다음 호출은
+빈 상태에서 시작합니다. 앞 행이 실패했어도 각 행의 현재 재료를 다시 검증하고
+재료 전계를 다시 계산합니다. 재사용은 계획 표본 예산·순서·실패 집계를 바꾸지
+않으며, 각 행의 메시 수렴을 뜻하지 않습니다.
 `ImpedanceStudy`는 `input_json`, `quantity`, 불변 `rows`, `failed`, `summary`를
 보존합니다. `StudyRow`에는 index·읽기 전용 parameters·생성 성공 시 저장된
 CrossSectionDocument·임피던스 Ω 또는 None·error_type/error가 있습니다.

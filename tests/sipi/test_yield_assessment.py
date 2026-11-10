@@ -197,7 +197,7 @@ def test_material_bound_samples_and_failed_row_provenance_survive_yield_export(m
         variables=[dict(name='dk', lower=3.8, upper=4.2)])
     study = plan(sampling=sampling)
     evaluations = study.sample_material_evaluations(); calls = []
-    def observed(document, evaluation, quantity):
+    def observed(document, evaluation, quantity, *, mesh_reuse=None):
         calls.append(evaluation)
         if len(calls) == 2: raise ValueError('material field failure retained')
         return SimpleNamespace(z0=50.)
