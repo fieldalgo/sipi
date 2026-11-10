@@ -1,5 +1,9 @@
 # Changelog
 
+- Add optional conductor detail views with explicit cropped-boundary notices,
+  responsive labels and normal-film upper-air clearance labels; preserve inputs and results.
+  도체 상세 보기·외곽 생략 안내·반응형 라벨·상부 공기 여유 높이 표시를 추가하고 입력과 결과를 보존합니다.
+
 - Connect normal-film unbacked single/pair forms with separate lower-air bounds,
   finite coated grounds, exact projects, coating studies and refined width targets.
   법선 코팅 unbacked 단일·차동 폼에 하부 공기, 유한 접지, 저장·공차·역산을 연결합니다.

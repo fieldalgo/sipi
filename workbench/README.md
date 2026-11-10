@@ -864,3 +864,24 @@ panels, independent complex P1 assembly, lossless-network invariants and exact
 lower-air/film transport. `node workbench/tests/normal-unbacked.test.mjs` checks
 unit and domain handling. `workbench/tests/normal-unbacked-browser.mjs` exercises
 native/Worker editing (`SIPI_NORMAL_UNBACKED_PAIR=1` selects the pair).
+
+## Inspecting conductor details
+
+After inspecting a normal-film form, opening a saved editable normal-film design,
+or importing validated geometry, choose **Conductor detail** to enlarge the
+conductors and local-region heights. **Full domain** restores the complete box
+and is the default when selecting or reopening a design. The detail notice says
+when outer boundaries are cropped; an omitted ground plane has not been removed
+from the calculation. Both axes have separate display scales. Coordinates,
+coating vertices, physical bounds, mesh and calculation results stay unchanged.
+
+Switching these views is a display operation: it starts no calculation, sends no
+engine request and does not change saved JSON. Labels wrap on small screens;
+the view is not a metrology drawing or a convergence check. Detail view is
+unavailable for an uninspected normal-film edit. The view selection is not stored
+in an input project. For normal films, **Upper air clearance** labels the distance
+above the highest coated conductor; ordinary forms retain **Air layer height**.
+
+`node workbench/tests/geometry-view.test.mjs` checks display bounds without changing
+input. `workbench/tests/geometry-view-browser.mjs` checks native/Worker calculation,
+exact saved inputs/geometry, display-only toggles and narrow-screen labels.

@@ -87,8 +87,8 @@
             <label>Domain width<select id="box_mode"><option value="auto">Automatic</option><option value="fixed">Set width</option></select></label>
             <label id="box-width-field" hidden>Box width<div class="number"><input id="box_width" type="number" value="20" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
             <div id="air-domain-fields">
-              <label>Air layer height<select id="air_mode"><option value="auto">Automatic</option><option value="fixed">Set height</option></select></label>
-              <label id="air-height-field" hidden>Air height<div class="number"><input id="air_height" type="number" value="10" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
+              <label><span id="upper-air-mode-label">Air layer height</span><select id="air_mode"><option value="auto">Automatic</option><option value="fixed">Set height</option></select></label>
+              <label id="air-height-field" hidden><span id="upper-air-value-label">Air height</span><div class="number"><input id="air_height" type="number" value="10" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
             </div>
             <div id="lower-air-domain-fields" hidden>
               <label>Lower air layer<select id="lower_air_mode"><option value="auto">Automatic (10 × substrate height)</option><option value="fixed">Set height</option></select></label>
@@ -107,13 +107,13 @@
           <dl id="mesh-values" class="mesh-values"></dl>
           <div class="mesh-actions"><button id="mesh-inspect">Inspect current mesh</button><button id="mesh-refine" disabled>Refine mesh ×2</button><button id="mesh-auto" disabled>Use automatic mesh</button></div>
           <p class="fine">Lengths above are µm. Inspecting does not solve or freeze automatic settings. Refinement halves edge size, far size and growth, keeping the minimum angle. Fixed meshes survive geometry edits and saving; accuracy still needs convergence checks.</p>
-          <p class="fine">Automatic width targets start finer than the ordinary calculation defaults, then check a second mesh. Imported geometry keeps its own settings.</p>
+          <p class="fine">Width targets use a separate starting mesh, then verify the result on a second mesh. Imported geometry keeps its own settings.</p>
         </details>
         <button id="calculate" class="primary wide">Calculate impedance <span>→</span></button>
         <button id="cancel" class="wide" hidden>Cancel calculation</button>
       </aside>
       <section class="canvas-column">
-        <div class="panel drawing"><div class="panel-heading"><h2>Geometry preview</h2><span id="preview-label" class="tag">Schematic</span></div><button id="geometry-inspect" type="button" hidden>Inspect geometry</button><svg id="cross-section" viewBox="0 0 760 300" role="img" aria-label="Cross-section geometry"></svg><div class="legend"><span><i class="copper"></i>Conductor</span><span><i class="dielectric"></i>Dielectric</span><span>Lengths in <b id="drawing-unit">mm</b></span></div></div>
+        <div class="panel drawing"><div class="panel-heading"><h2>Geometry preview</h2><span id="preview-label" class="tag">Schematic</span></div><button id="geometry-inspect" type="button" hidden>Inspect geometry</button><div id="geometry-view-controls" class="geometry-view-controls" hidden><button id="geometry-full" type="button" aria-pressed="true">Full domain</button><button id="geometry-detail" type="button" aria-pressed="false">Conductor detail</button></div><p id="geometry-detail-note" class="fine" hidden></p><svg id="cross-section" viewBox="0 0 760 300" role="img" aria-label="Cross-section geometry"></svg><div class="legend"><span><i class="copper"></i>Conductor</span><span><i class="dielectric"></i>Dielectric</span><span>Lengths in <b id="drawing-unit">mm</b></span></div></div>
         <div class="panel results"><div class="panel-heading"><h2>Line parameters</h2><span class="step">02</span></div><div id="status" role="status" aria-live="polite">Ready when you are. Enter a cross-section and calculate.</div><div id="result" hidden><div id="scalar-summary" class="metrics"><div class="main-metric"><span id="z-label">Characteristic impedance</span><strong id="z-value">—</strong><small>Ω</small></div><div><span id="eps-label">Effective permittivity</span><strong id="eps-value">—</strong></div><div><span id="delay-label">Propagation delay</span><strong id="delay-value">—</strong><small id="delay-unit">ns/m</small></div></div><p id="scalar-note" class="notice" hidden></p><div id="matrices" class="matrices"></div><p id="refinement" class="notice" hidden></p><p class="fine">Quasi-static model · Dielectric loss included · Conductor loss and dispersion not included</p></div></div>
         <section class="panel results comparison" aria-label="Result comparison">
           <div class="panel-heading"><h2>Compare results</h2></div>

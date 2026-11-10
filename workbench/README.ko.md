@@ -752,3 +752,22 @@ P1 조립, 무손실 회로 불변식, 정확한 하부 공기·코팅 전달을
 `node workbench/tests/normal-unbacked.test.mjs`는 단위·영역 처리를,
 `workbench/tests/normal-unbacked-browser.mjs`는 native/Worker 편집 흐름을
 검사합니다(`SIPI_NORMAL_UNBACKED_PAIR=1`은 차동).
+
+## 도체 주변 상세 보기
+
+법선 코팅 폼에서 기하를 확인하거나 저장된 법선 코팅 설계·검증된 기하를 연 뒤
+**Conductor detail**을 누르면 도체와 국소 영역 높이를 확대합니다. **Full domain**은
+계산 영역 전체를 복원하며 단면 선택·설계 재열기의 기본값입니다. 외곽이 잘리면
+상세 보기 안내가 이를 표시합니다. 그림에서 보이지 않는 접지면도 계산에는 그대로
+남습니다. 가로·세로 표시 배율은 다르며 좌표·코팅 꼭짓점·물리 영역·메시·결과를
+바꾸지 않습니다.
+
+보기 전환은 계산이나 엔진 요청을 시작하지 않고 저장 JSON을 바꾸지 않습니다.
+좁은 화면에서는 라벨을 줄바꿈합니다. 그림은 실측 도면이나 수렴 판정이 아닙니다.
+편집 후 아직 기하를 확인하지 않은 법선 코팅에는 상세 보기를 제공하지 않습니다.
+보기 선택은 입력 프로젝트에 저장하지 않습니다. 법선 코팅의 **Upper air clearance**는
+가장 높은 코팅 도체 위의 여유 높이이고 일반 폼은 **Air layer height**를 유지합니다.
+
+`node workbench/tests/geometry-view.test.mjs`는 입력을 바꾸지 않는 표시 범위를,
+`workbench/tests/geometry-view-browser.mjs`는 native/Worker 계산·정확한 저장값과
+기하·표시 전환·좁은 화면 라벨을 확인합니다.

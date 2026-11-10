@@ -209,3 +209,30 @@ export function checkDrawing(model) {
       throw new Error('The geometry preview needs finite conductor dimensions.');
   }
 }
+
+// Display bounds only. The engine supplies and validates all geometry vertices.
+export function drawingWindow(model, detail = false) {
+  checkDrawing(model);
+  if (typeof detail !== 'boolean') throw new Error('Unknown geometry view.');
+  const full = {left: -model.box.width / 2, right: model.box.width / 2,
+    bottom: 0, top: model.layers.reduce((sum, layer) => sum + layer.thickness, 0)};
+  if (!detail) return {...full, detail: false, clipped: []};
+  const boxes = model.traces.map(trace => trace.kind === 'polygon'
+    ? polygonDrawing(trace.vertices)
+    : {left: trace.x - Math.max(trace.width, trace.top_width ?? trace.width) / 2,
+      right: trace.x + Math.max(trace.width, trace.top_width ?? trace.width) / 2,
+      bottom: trace.y, top: trace.y + trace.thickness});
+  const films = (model.dielectric_regions ?? []).map(region => polygonDrawing(region.vertices));
+  let left = Math.min(...boxes.map(b => b.left)), right = Math.max(...boxes.map(b => b.right));
+  let bottom = Math.min(...boxes.map(b => b.bottom), ...films.map(b => b.bottom));
+  let top = Math.max(...boxes.map(b => b.top), ...films.map(b => b.top));
+  const dx = Math.max((right - left) * .08, model.box.width * 1e-6);
+  const dy = Math.max((top - bottom) * .3, full.top * .002);
+  left = Math.max(full.left, left - dx); right = Math.min(full.right, right + dx);
+  bottom = Math.max(full.bottom, bottom - dy); top = Math.min(full.top, top + dy);
+  if (![left, right, bottom, top].every(Number.isFinite) || left >= right || bottom >= top)
+    throw new Error('The conductor detail does not have finite display bounds.');
+  const clipped = ['left', 'right', 'bottom', 'top'].filter(key =>
+    key === 'left' || key === 'bottom' ? ({left, bottom})[key] > full[key] : ({right, top})[key] < full[key]);
+  return {left, right, bottom, top, detail: true, clipped};
+}

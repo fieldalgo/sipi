@@ -1,4 +1,4 @@
-import {checkDrawing, polygonDrawing, scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -9,6 +9,7 @@ if (inBrowser) document.querySelector('.local').lastChild.textContent = ' Browse
 let template = 'microstrip', unit = 'mm', imported = null, latest = null, busy = false;
 let cancelling = false, closed = false, latestNetwork = null, latestStudy = null;
 let runSequence = 0;
+let geometryDetail = false;
 let originalParameters = null, savedMesh = null, resolvedMesh = null, resolvedDomain = null;
 let projectText = null, activeDesign = null, baseline = null;
 const changedFields = new Set();
@@ -75,7 +76,7 @@ function domainControls() {
   const lowerAir = resolvedDomain?.layers[0]?.name === 'lower_air' ? resolvedDomain.layers[0].thickness : null;
   const total = resolvedDomain?.layers.reduce((sum, layer) => sum + layer.thickness, 0);
   $('domain-values').replaceChildren();
-  for (const [key, label, value] of [['width', 'Box width', resolvedDomain?.box.width], ['height', 'Total height', total], ['air', 'Air layer height', air], ...(isUnbacked(template) || lowerAir !== null ? [['lower_air', 'Lower air height', lowerAir]] : [])]) {
+  for (const [key, label, value] of [['width', 'Box width', resolvedDomain?.box.width], ['height', 'Total height', total], ['air', isNormalFilm(template) && !imported ? 'Upper air clearance' : 'Air layer height', air], ...(isUnbacked(template) || lowerAir !== null ? [['lower_air', 'Lower air height', lowerAir]] : [])]) {
     const term = document.createElement('dt'); term.textContent = label;
     const item = document.createElement('dd'); item.dataset.domainKey = key;
     item.textContent = value == null ? '—' : `${Number((value / scales[unit]).toPrecision(10))} ${unit}`;
@@ -259,25 +260,68 @@ function svgNode(name, attrs, text) {
   return node;
 }
 
+// Wrapping changes only display text; the original label stays accessible.
+function wrapGeometryLabel(node, text, x, step, maxWidth = 700) {
+  const parts = Array.isArray(text) ? text : [text];
+  const lines = [];
+  node.setAttribute('aria-label', parts.join(' · '));
+  for (const part of parts) {
+    let rest = part;
+    while (rest.length) {
+      let low = 1, high = rest.length;
+      while (low < high) {
+        const middle = Math.ceil((low + high) / 2);
+        node.textContent = rest.slice(0, middle);
+        if (node.getBBox().width <= maxWidth) low = middle; else high = middle - 1;
+      }
+      let cut = low;
+      const space = rest.lastIndexOf(' ', cut);
+      if (cut < rest.length && space > cut / 2) cut = space;
+      lines.push(rest.slice(0, cut)); rest = rest.slice(cut).trimStart();
+    }
+  }
+  node.replaceChildren(...lines.map((line, index) =>
+    svgNode('tspan', {x, dy: index ? step : 0}, line)));
+  return lines.length;
+}
+
+
 function draw(model) {
   const svg = $('cross-section');
   svg.replaceChildren();
   svg.setAttribute('viewBox', '0 0 760 300');
   checkDrawing(model);
-  const height = model.layers.reduce((a, layer) => a + layer.thickness, 0);
-  const width = model.box?.width;
+  const view = drawingWindow(model, geometryDetail);
+  const height = view.top - view.bottom, width = view.right - view.left;
+  svg.dataset.geometryView = geometryDetail ? 'detail' : 'full';
+  svg.dataset.displayBounds = JSON.stringify(view);
+  $('geometry-detail-note').hidden = !geometryDetail;
+  $('geometry-detail-note').textContent = geometryDetail
+    ? `Conductor detail · axes scaled separately. ${view.clipped.length ? 'Outer boundaries are cropped; use Full domain to see the calculation box.' : 'The complete calculation bounds are visible.'}` : '';
+  let geometry = svg;
+  if (geometryDetail) {
+    const defs = svgNode('defs', {}), clip = svgNode('clipPath', {id: 'geometry-detail-clip'});
+    clip.append(svgNode('rect', {x: 65, y: 35, width: 630, height: 210}));
+    defs.append(clip); svg.append(defs);
+    geometry = svgNode('g', {'clip-path': 'url(#geometry-detail-clip)'}); svg.append(geometry);
+  }
   if (!Number.isFinite(height) || !Number.isFinite(width) || height <= 0 || width <= 0) return;
-  const x = n => 65 + (n / width + 0.5) * 630;
-  const y = n => 245 - n / height * 210;
+  const x = n => 65 + (n - view.left) / width * 630;
+  const y = n => 245 - (n - view.bottom) / height * 210;
+  // Size labels in the displayed viewport, independently of physical coordinates.
+  const labelSize = geometryDetail ? Math.max(11, 11 * 760 / Math.max(svg.clientWidth, 232)) : 11;
+  const labelStep = geometryDetail ? labelSize * 1.6 : 18;
   const layerLabels = [];
   let base = 0;
   model.layers.forEach(layer => {
     if (!Number.isFinite(layer.thickness) || layer.thickness <= 0) return;
     const top = base + layer.thickness;
-    const air = layer.eps_r === 1;
-    svg.append(svgNode('rect', {x: 65, y: y(top), width: 630, height: 210 * layer.thickness / height, fill: air ? '#f8fafb' : '#dceae8'}));
-    layerLabels.push({x: 77, y: y((top + base) / 2) + 4, tip: y((top + base) / 2), anchor: 'start', kind: 'layer', fill: '#597b76', text: `${String(layer.name).slice(0, 30)} · εr ${format(layer.eps_r, 2)}`});
+    const low = Math.max(base, view.bottom), high = Math.min(top, view.top);
     base = top;
+    if (high <= low) return;
+    const air = layer.eps_r === 1;
+    geometry.append(svgNode('rect', {x: 65, y: y(high), width: 630, height: 210 * (high - low) / height, fill: air ? '#f8fafb' : '#dceae8'}));
+    layerLabels.push({x: 77, y: y((high + low) / 2) + 4, tip: y((high + low) / 2), anchor: 'start', kind: 'layer', fill: '#597b76', text: `${String(layer.name).slice(0, 30)} · εr ${format(layer.eps_r, 2)}`});
   });
   const regions = model.dielectric_regions ?? [];
   for (const region of regions) {
@@ -286,13 +330,13 @@ function draw(model) {
       fill: region.eps_r === 1 ? '#f8fafb' : '#c7d9ed', stroke: '#688bac', 'stroke-width': .5,
       'data-region': region.name});
     node.append(svgNode('title', {}, `${region.name} · εr ${region.eps_r} · tan δ ${region.tan_delta}`));
-    svg.append(node);
+    geometry.append(node);
   }
   const traceLabels = [];
   for (const trace of model.traces) {
     if (trace.kind === 'polygon') {
       const shape = polygonDrawing(trace.vertices);
-      svg.append(svgNode('polygon', {points: shape.points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '),
+      geometry.append(svgNode('polygon', {points: shape.points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '),
         fill: '#b58b51', 'data-trace': trace.name}));
       traceLabels.push({x: x((shape.left + shape.right) / 2), y: y(shape.top) - 13,
         tip: y(shape.top), text: `${trace.ground ? 'GND' : String(trace.name).slice(0, 20)} · span ${format((shape.right - shape.left) / scales[unit])} ${unit}`});
@@ -303,13 +347,15 @@ function draw(model) {
     const topWidth = trace.top_width ?? trace.width;
     if (!Number.isFinite(topWidth) || topWidth <= 0) continue;
     const points = [[trace.x - trace.width/2, trace.y], [trace.x + trace.width/2, trace.y], [trace.x + topWidth/2, trace.y + trace.thickness], [trace.x - topWidth/2, trace.y + trace.thickness]];
-    if (topWidth !== trace.width && trace.thickness > 0) svg.append(svgNode('polygon', {points: points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '), fill:'#b58b51', 'data-trace':trace.name}));
-    else svg.append(svgNode('rect', {x: x(trace.x - trace.width / 2), y: y(trace.y) - h, width: trace.width / width * 630, height: h, fill: '#b58b51', rx: 0.5}));
+    if (topWidth !== trace.width && trace.thickness > 0) geometry.append(svgNode('polygon', {points: points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '), fill:'#b58b51', 'data-trace':trace.name}));
+    else geometry.append(svgNode('rect', {x: x(trace.x - trace.width / 2), y: y(trace.y) - h, width: trace.width / width * 630, height: h, fill: '#b58b51', rx: 0.5}));
     traceLabels.push({x: x(trace.x), y: y(trace.y) - h - 13, tip: y(trace.y) - h,
       text: `${trace.ground ? 'GND' : String(trace.name).slice(0, 20)} · ${format(trace.width / scales[unit])} ${unit}`});
   }
-  for (const [boundary, py] of [['bottom', 245], ['top', 35]]) {
-    if (model.box[boundary] === 'ground') {
+  const fullHeight = model.layers.reduce((sum, layer) => sum + layer.thickness, 0);
+  for (const [boundary, coordinate] of [['bottom', 0], ['top', fullHeight]]) {
+    const py = y(coordinate);
+    if (model.box[boundary] === 'ground' && coordinate >= view.bottom && coordinate <= view.top) {
       svg.append(svgNode('rect', {x: 65, y: py, width: 630, height: 5, fill: '#b58b51'}));
       svg.append(svgNode('text', {x: 695, y: py + (boundary === 'bottom' ? 22 : -10), fill: '#a0825c', 'font-size': 10, 'text-anchor': 'end'}, 'GROUND PLANE'));
     }
@@ -320,15 +366,17 @@ function draw(model) {
   const occupied = [...svg.querySelectorAll('text, rect[fill="#b58b51"], polygon[data-trace]')].map(node => node.getBBox());
   let bottom = 300;
   for (const label of [...traceLabels, ...layerLabels]) {
-    const node = svgNode('text', {x: label.x, y: label.y, fill: label.fill ?? '#8f714e', 'font-size': 11, 'text-anchor': label.anchor ?? 'middle', 'data-geometry-label': label.kind ?? 'trace'}, label.text);
+    const node = svgNode('text', {x: label.x, y: label.y, fill: label.fill ?? '#8f714e', 'font-size': labelSize, 'text-anchor': label.anchor ?? 'middle', 'data-geometry-label': label.kind ?? 'trace'}, label.text);
     svg.append(node);
+    if (geometryDetail) wrapGeometryLabel(node, label.text, label.x, labelStep);
     const size = node.getBBox();
     const px = label.x + (size.x < 8 ? 8 - size.x : size.x + size.width > 752 ? 752 - size.x - size.width : 0);
     node.setAttribute('x', px);
+    for (const span of node.querySelectorAll('tspan')) span.setAttribute('x', px);
     let box;
     for (let attempt = 0; ; attempt++) {
-      const offset = attempt === 0 ? 0 : Math.ceil(attempt / 2) * 18 * (attempt % 2 ? -1 : 1);
-      const py = attempt < 32 ? label.y + offset : bottom + 18;
+      const offset = attempt === 0 ? 0 : Math.ceil(attempt / 2) * labelStep * (attempt % 2 ? -1 : 1);
+      const py = attempt < 32 ? label.y + offset : bottom + (geometryDetail ? labelSize + 12 : 18);
       node.setAttribute('y', py);
       box = node.getBBox();
       if (box.y < 8 || (attempt < 32 && box.y + box.height > 280)) continue;
@@ -346,30 +394,48 @@ function draw(model) {
       height: box.height + 4, fill: '#ffffff', 'fill-opacity': 0.88, rx: 2}), node);
   }
   for (const region of regions) {
-    const py = bottom + 12;
+    const py = bottom + (geometryDetail ? labelStep : 12);
     svg.append(svgNode('rect', {x: 65, y: py - 8, width: 9, height: 9,
       fill: region.eps_r === 1 ? '#f8fafb' : '#c7d9ed', stroke: '#688bac', 'stroke-width': .5}));
-    svg.append(svgNode('text', {x: 82, y: py, fill: '#4d6984', 'font-size': 11,
-      'data-region-label': region.name}, `${String(region.name).slice(0, 30)} · εr ${format(region.eps_r, 3)} · tan δ ${format(region.tan_delta, 4)}`));
-    bottom = py + 12;
+    const label = svgNode('text', {x: 82, y: py, fill: '#4d6984', 'font-size': labelSize,
+      'data-region-label': region.name});
+    svg.append(label);
+    let lines = 1;
+    if (geometryDetail) lines = wrapGeometryLabel(label, [String(region.name).slice(0, 30),
+      `εr ${format(region.eps_r, 3)} · tan δ ${format(region.tan_delta, 4)}`], 82, labelStep, 660);
+    else label.textContent = `${String(region.name).slice(0, 30)} · εr ${format(region.eps_r, 3)} · tan δ ${format(region.tan_delta, 4)}`;
+    bottom = py + (geometryDetail ? (lines - 1) * labelStep + 12 : 12);
   }
   svg.setAttribute('viewBox', `0 0 760 ${bottom}`);
 }
 
 
+
+function geometryViewControls() {
+  const available = !!imported || (isNormalFilm(template) && !!resolvedDomain);
+  if (!available) geometryDetail = false;
+  $('geometry-view-controls').hidden = !available;
+  for (const [id, detail] of [['geometry-full', false], ['geometry-detail', true]]) {
+    $(id).disabled = busy || closed || !available;
+    $(id).setAttribute('aria-pressed', String(geometryDetail === detail));
+  }
+}
+
 function preview() {
+  geometryViewControls();
   $('drawing-unit').textContent = unit;
   try {
     if (!imported && isNormalFilm(template) && !resolvedDomain) {
       $('cross-section').replaceChildren(svgNode('text', {x: 65, y: 145, fill: '#4d6984', 'font-size': 15}, 'Inspect geometry to view the current coating.'));
       $('cross-section').setAttribute('viewBox', '0 0 760 300');
       $('preview-label').textContent = 'Geometry not inspected';
+      $('geometry-detail-note').hidden = true;
       return;
     }
     const model = imported ? JSON.parse(imported) : isNormalFilm(template) ? resolvedDomain : schematic(template, currentParameters());
     $('preview-label').textContent = imported || isNormalFilm(template) ? 'Engine geometry · axes scaled separately' : 'Schematic · not to scale';
     draw(model);
-  } catch { $('cross-section').replaceChildren(); }
+  } catch { $('cross-section').replaceChildren(); $('geometry-detail-note').hidden = true; }
 }
 
 function geometryFields() {
@@ -380,6 +446,9 @@ function geometryFields() {
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
   $('coating-fields').hidden = !isCoated(template);
   const normal = isNormalFilm(template);
+  $('upper-air-mode-label').textContent = normal ? 'Upper air clearance' : 'Air layer height';
+  $('upper-air-value-label').textContent = normal ? 'Upper air clearance' : 'Air height';
+  geometryViewControls();
   $('coating-title').textContent = normal ? 'Normal-thickness coating' : 'Planar coating';
   $('coating-description').textContent = normal ? 'Thickness normal to the substrate and exposed copper tops and sides, including finite side grounds. Corners meet at straight miters. Only signals may taper; top width must not exceed bottom width. Upper air starts above the highest coating.' : 'Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.';
   $('coating-height-field').hidden = normal;
@@ -590,7 +659,7 @@ async function run(action) {
 }
 
 function chooseTemplate(name) {
-    template = name; imported = null;
+    template = name; imported = null; geometryDetail = false;
     resolvedMesh = null; resolvedDomain = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
@@ -616,6 +685,7 @@ function chooseTemplate(name) {
 }
 
 function restoreEditable(restored) {
+  geometryDetail = false;
   if (!Object.hasOwn(labels, restored.template)) throw new Error('No editable form is available for this template.');
   chooseTemplate(restored.template);
   originalParameters = {...restored.parameters};
@@ -680,6 +750,20 @@ $('comparison-clear').addEventListener('click', () => {
 $('mesh-inspect').addEventListener('click', () => run('mesh-inspect'));
 $('domain-inspect').addEventListener('click', () => run('domain-inspect'));
 $('geometry-inspect').addEventListener('click', () => run('geometry-inspect'));
+let observedDrawingWidth = 0;
+new ResizeObserver(entries => {
+  const width = Math.round(entries[0].contentRect.width);
+  if (width !== observedDrawingWidth) {
+    observedDrawingWidth = width;
+    if (geometryDetail) preview();
+  }
+}).observe($('cross-section'));
+for (const [id, detail] of [['geometry-full', false], ['geometry-detail', true]]) {
+  $(id).addEventListener('click', () => {
+    if (busy || closed || (!imported && (!isNormalFilm(template) || !resolvedDomain))) return;
+    geometryDetail = detail; preview();
+  });
+}
 $('mesh-refine').addEventListener('click', () => {
   if (busy || closed || imported) return;
   try {
@@ -735,7 +819,7 @@ $('file').addEventListener('change', async () => {
       if (sequence !== runSequence || closed) return;
       checkDrawing(restored.document);
     }
-    imported = text;
+    imported = text; geometryDetail = false;
     originalParameters = null; savedMesh = null; changedFields.clear();
     clearResult(); preview();
     $('import-note').hidden = false;
