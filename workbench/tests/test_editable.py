@@ -13,9 +13,10 @@ from sipi.template_document import TemplateSectionDocument
 def parameters(name):
     p = dict(width=.5e-3, thickness=.035e-3, eps_r=4.1, tan_delta=.01,
              box_width=.03, top_width=None)
-    p['plane_spacing' if name == 'stripline' else 'substrate_height'] = 1e-3
-    if name != 'stripline': p['air_height'] = .0067
-    if name in ('coupled_microstrip', 'grounded_coplanar'): p['gap'] = .2e-3
+    p['plane_spacing' if name in ('stripline', 'coupled_stripline') else 'substrate_height'] = 1e-3
+    if name not in ('stripline', 'coupled_stripline'): p['air_height'] = .0067
+    if name in ('coupled_microstrip', 'coupled_stripline', 'grounded_coplanar'): p['gap'] = .2e-3
+    if name == 'coupled_stripline': p['trace_height'] = .0003
     if name == 'grounded_coplanar': p.update(ground_width=.003)
     if name == 'coated_microstrip': p.update(coating_height=.2e-3, coating_eps_r=3, coating_tan_delta=.02, top_width=.4e-3)
     return p
@@ -56,7 +57,7 @@ def test_open_rejects_mismatch_and_unknown_options():
 
 def test_no_form_for_valid_unsupported_template():
     # Engine support does not imply a matching editable UI form.
-    doc = TemplateSectionDocument('coupled_stripline', dict(width=.0005, gap=.0002, plane_spacing=.001, eps_r=4))
+    doc = TemplateSectionDocument('offset_stripline', dict(width=.0005, trace_height=.0003, plane_spacing=.001, eps_r=4))
     with pytest.raises(ValueError, match='no editable form'):
         execute(dict(action='template-open', text=doc.dumps()))
 

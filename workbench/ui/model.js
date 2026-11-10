@@ -1,10 +1,12 @@
 export const scales = {mm: 1e-3, mil: 25.4e-6};
 export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_width', 'coating_height', 'lower', 'upper'];
-export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', grounded_coplanar: 'Grounded coplanar', coated_microstrip: 'Planar coated microstrip'};
+export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coated_microstrip: 'Planar coated microstrip'};
+export const isStripline = template => ['stripline', 'coupled_stripline'].includes(template);
+export const isPair = template => ['coupled_microstrip', 'coupled_stripline'].includes(template);
 
 export function parameterFields(template) {
   return {width: 'width', top_width: 'top_width', thickness: 'thickness',
-    height: template === 'stripline' ? 'plane_spacing' : 'substrate_height',
+    height: isStripline(template) ? 'plane_spacing' : 'substrate_height',
     gap: 'gap', ground_width: 'ground_width', coating_height: 'coating_height',
     eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
     coating_tan_delta: 'coating_tan_delta'};
@@ -42,8 +44,8 @@ export function parameters(template, values, unit) {
     return v;
   };
   const out = {width: positive('width') * scales[unit], thickness: positive('thickness', true) * scales[unit], eps_r: positive('eps_r'), tan_delta: positive('tan_delta', true)};
-  out[template === 'stripline' ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
-  if (['coupled_microstrip', 'grounded_coplanar'].includes(template)) out.gap = positive('gap') * scales[unit];
+  out[isStripline(template) ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
+  if (isPair(template) || template === 'grounded_coplanar') out.gap = positive('gap') * scales[unit];
   if (template === 'grounded_coplanar') out.ground_width = positive('ground_width') * scales[unit];
   if (values.profile === 'tapered') {
     out.top_width = positive('top_width') * scales[unit];
@@ -68,7 +70,7 @@ export function convert(value, from, to) {
 
 export function studyFields(template, p) {
   const fields = {width: 'Bottom width', eps_r: 'Substrate permittivity',
-    [template === 'stripline' ? 'plane_spacing' : 'substrate_height']: template === 'stripline' ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
+    [isStripline(template) ? 'plane_spacing' : 'substrate_height']: isStripline(template) ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
   if (p.top_width != null) fields.top_width = 'Top width';
   if ('gap' in p) fields.gap = 'Bottom gap';
   if ('coating_height' in p) { fields.coating_height = 'Coating height'; fields.coating_eps_r = 'Coating permittivity'; }
@@ -82,11 +84,11 @@ export function studyScale(name, unit) {
 // This is only a drawing model. The Python template creates all solver inputs.
 export function schematic(template, p) {
   const h = p.substrate_height ?? p.plane_spacing;
-  const strip = template === 'stripline';
-  const y = strip ? (h - p.thickness) / 2 : h;
+  const strip = isStripline(template);
+  const y = strip ? (p.trace_height ?? (h - p.thickness) / 2) : h;
   const signal = {name: 'signal', x: 0, width: p.width, top_width: p.top_width ?? p.width, y, thickness: p.thickness, ground: false};
   let traces = [signal];
-  if (template === 'coupled_microstrip') {
+  if (isPair(template)) {
     const x = (p.width + p.gap) / 2;
     traces = [{...signal, name: 'positive', x: -x}, {...signal, name: 'negative', x}];
   } else if (template === 'grounded_coplanar') {

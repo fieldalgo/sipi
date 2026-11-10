@@ -33,7 +33,7 @@ def saved(request):
     return project
 
 
-@pytest.mark.parametrize('template', ['microstrip', 'stripline', 'coupled_microstrip',
+@pytest.mark.parametrize('template', ['microstrip', 'stripline', 'coupled_microstrip', 'coupled_stripline',
                                       'grounded_coplanar', 'coated_microstrip'])
 def test_forms_create_copy_reopen_without_fields(template, monkeypatch):
     text = TemplateSectionDocument(template, parameters(template)).dumps()
@@ -142,7 +142,7 @@ def test_growth_tamper_and_invalid_edits_leave_original_intact():
 
 
 def test_readable_core_input_without_a_form_is_preserved():
-    text=TemplateSectionDocument('coupled_stripline',dict(width=.0005,gap=.0002,plane_spacing=.001,eps_r=4)).dumps()
+    text=TemplateSectionDocument('offset_stripline',dict(width=.0005,trace_height=.0003,plane_spacing=.001,eps_r=4)).dumps()
     project=saved(create(text))
     assert project.prepare('a').source_text==text
     with pytest.raises(ValueError,match='no editable form'):

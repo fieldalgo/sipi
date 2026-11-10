@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, isStripline, isPair, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -401,10 +401,10 @@ function chooseTemplate(name) {
     for (const b of document.querySelectorAll('[data-template]')) {
       b.classList.toggle('selected', b.dataset.template === name); b.setAttribute('aria-pressed', String(b.dataset.template === name));
     }
-    $('height-label').textContent = template === 'stripline' ? 'Plane spacing' : 'Substrate height';
-    $('gap-field').hidden = !['coupled_microstrip', 'grounded_coplanar'].includes(template);
+    $('height-label').textContent = isStripline(template) ? 'Plane spacing' : 'Substrate height';
+    $('gap-field').hidden = !(isPair(template) || template === 'grounded_coplanar');
     $('ground-field').hidden = template !== 'grounded_coplanar';
-    $('target-label').firstChild.textContent = template === 'coupled_microstrip' ? 'Differential target (Ω)' : 'Target impedance (Ω)';
+    $('target-label').firstChild.textContent = isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
     $('save-editable').disabled = busy;
     geometryFields(); refreshStudyOptions(true); studyControls(); clearResult(); preview(); projectControls();

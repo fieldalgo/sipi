@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the five-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the six-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers five cross-section forms, impedance targeting,
+The basic workspace offers six cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -42,11 +42,21 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The five forms are microstrip, stripline, coupled microstrip, grounded coplanar
+The six forms are microstrip, stripline, coupled microstrip, coupled stripline, grounded coplanar
 and planar coated microstrip. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
 preserves its geometry and mesh but does not enable dimension editing.
+
+For **Coupled stripline**, plane spacing is the full distance between the two
+ground planes and gap is measured between the bottom copper edges. Both traces
+have the same bottom width and profile. The target and study quantity is
+differential impedance; frequency response retains four single-ended ports plus
+its mixed-mode representation. Saved `trace_height` offsets remain unchanged and
+appear in the schematic, even though this form has no separate offset control.
+A failed finer-mesh target check retains its evaluation history instead of
+accepting a coarse result. The saved goal document uses the requested mesh;
+the separate refined impedance is verification, not a substituted saved mesh.
 
 Changing display units does not round the stored SI inputs. Unedited parameters
 and inputs without a visible field (such as air height or box width) retain their
@@ -82,7 +92,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the five supported editable templates. Other
+All project designs must use the six supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace

@@ -24,7 +24,7 @@ Closing only the browser tab does not stop the server. Normal shutdown returns
 0; startup failures return 1. `--help` and `--version` start no host.
 `sipi run` and `sipi validate` remain [headless commands](cli.md).
 
-Choose one of the five existing forms, enter dimensions and materials, calculate,
+Choose one of the six existing forms, enter dimensions and materials, calculate,
 find a target width or run a parameter study. **Save editable design** keeps the
 template inputs and resolved mesh; **Open design** restores those fields.
 **Export geometry** retains the existing geometric JSON behavior. **Saved analysis**

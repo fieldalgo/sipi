@@ -22,7 +22,7 @@ sipi gui --no-browser --port 0
 정상 종료 코드는 0, 시작 실패는 1입니다. `--help`, `--version`은 호스트를 시작하지
 않습니다. `sipi run`, `sipi validate`는 [화면 없는 명령](cli.md)으로 유지됩니다.
 
-기존 폼 5종에서 치수·재료를 입력하고 계산·목표 폭 역산·공차 검토를 수행합니다.
+기존 폼 6종에서 치수·재료를 입력하고 계산·목표 폭 역산·공차 검토를 수행합니다.
 **Save editable design**은 템플릿 입력과 확정 메시를 저장하고 **Open design**으로
 필드를 복원합니다. **Export geometry**는 기존 기하 JSON 동작을 유지합니다.
 **Saved analysis**는 전용 폼이 없는 계산에도 공통 버전 입력 엔진을 사용합니다.

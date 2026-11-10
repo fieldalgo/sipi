@@ -5,6 +5,7 @@ import {editableParameters, parameterFields, scales, studyFields} from '../ui/mo
 const originals = {
   microstrip: {width: .0005000000000123456, thickness: .0000350000000001, eps_r: 4.123456789012345, tan_delta: .0123456789012345, substrate_height: .0010000000000123, top_width: null, air_height: .0067, box_width: .023},
   stripline: {width: .0005, thickness: 0, eps_r: 4, tan_delta: 0, plane_spacing: .001, top_width: null, box_width: .02},
+  coupled_stripline: {width: .0005000000000123456, thickness: .000035, eps_r: 4, tan_delta: .01, plane_spacing: .001, gap: .0002000000000123456, top_width: .0004, box_width: .02, trace_height: .0003},
   coupled_microstrip: {width: .0005, thickness: 0, eps_r: 4, tan_delta: 0, substrate_height: .001, gap: .0002, top_width: null, air_height: null, box_width: null},
   grounded_coplanar: {width: .0005, thickness: .000035, eps_r: 4, tan_delta: 0, substrate_height: .001, gap: .0002, ground_width: .003, top_width: null, air_height: .008, box_width: .03},
   coated_microstrip: {width: .0005, thickness: .0001, eps_r: 4, tan_delta: .01, substrate_height: .001, top_width: .0004, coating_height: .0002, coating_eps_r: 3, coating_tan_delta: .02, air_height: .006, box_width: .02},

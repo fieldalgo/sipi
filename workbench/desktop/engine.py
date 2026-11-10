@@ -8,11 +8,13 @@ from numbers import Real
 
 import numpy as np
 import sipi
-from sipi.templates import coated_microstrip
+from sipi.templates import coated_microstrip, coupled_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
     'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar')}
 TEMPLATES['coated_microstrip'] = coated_microstrip
+TEMPLATES['coupled_stripline'] = coupled_stripline
+PAIR_TEMPLATES = {'coupled_microstrip', 'coupled_stripline'}
 
 
 def engine_info():
@@ -159,7 +161,7 @@ def study_documents(request, nominal):
 
 def execute_study(request, nominal):
     settings, documents = study_documents(request, nominal)
-    quantity = 'z_diff' if request['template'] == 'coupled_microstrip' else 'z0'
+    quantity = 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
     rows = []
     for values, doc in documents:
         row = dict(parameters=values, document=doc.to_dict())
@@ -360,7 +362,7 @@ def execute(request, *, record_provider=None):
             lambda width: factory(**{**params, 'width': width}),
             settings.get('bounds'), settings.get('target'),
             tolerance=settings.get('tolerance', 0.1),
-            quantity='z_diff' if request['template'] == 'coupled_microstrip' else 'z0',
+            quantity='z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
             mesh=mesh, max_evaluations=32)
         # Matrix output must correspond to the returned design, not the initial width.
         out['document'] = sipi.CrossSectionDocument(

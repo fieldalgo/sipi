@@ -5,13 +5,27 @@ import {parameters, scales, convert, schematic} from '../ui/model.js';
 const values = {width: '0.5', height: '1', thickness: '0.035', gap: '0.2', ground_width: '1', eps_r: '4', tan_delta: '0.02'};
 
 test('display units produce identical SI geometry', () => {
-  for (const template of ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar']) {
+  for (const template of ['microstrip', 'stripline', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar']) {
     const mm = parameters(template, values, 'mm');
     const milValues = Object.fromEntries(Object.entries(values).map(([k,v]) => [k, ['eps_r','tan_delta'].includes(k) ? v : convert(v, 'mm', 'mil')]));
     const mil = parameters(template, milValues, 'mil');
     for (const key in mm) assert.ok(Math.abs(mm[key] - mil[key]) < 1e-15);
     assert.equal(mm.width, .0005);
   }
+});
+
+test('a coupled stripline uses two planes, full spacing and bottom-edge gap', () => {
+  const p = parameters('coupled_stripline', values, 'mm');
+  assert.equal(p.plane_spacing, .001); assert.equal(p.gap, .0002);
+  assert.equal(p.substrate_height, undefined); assert.equal(p.ground_width, undefined);
+  const model = schematic('coupled_stripline', p);
+  assert.equal(model.layers.length, 1); assert.equal(model.layers[0].eps_r, 4);
+  assert.equal(model.box.top, 'ground'); assert.equal(model.box.bottom, 'ground');
+  assert.equal(model.traces.length, 2);
+  assert.equal(model.traces[0].y, (.001-.000035)/2);
+  assert.ok(Math.abs(model.traces[1].x-model.traces[0].x-p.width-p.gap) < 1e-18);
+  const offset = schematic('coupled_stripline', {...p, trace_height: .0003, top_width:.0004});
+  for(const trace of offset.traces) {assert.equal(trace.y, .0003);assert.equal(trace.top_width, .0004);}
 });
 
 test('a stripline uses full plane spacing and no surface-only parameters', () => {

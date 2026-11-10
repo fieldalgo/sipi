@@ -358,6 +358,64 @@ try {
   assert.deepEqual(copiedRecord.designs[0].records,editableCases.recorded_project.designs[0].records);
   await writeFile(join(output,'project.json'),JSON.stringify(copiedRecord,null,2));
   await writeFile(join(output,'project.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+  // Use controls for the buried pair, including its differential target and A/B files.
+  await cdp.evaluate(`document.querySelector('#unit').value='mm';document.querySelector('#unit').dispatchEvent(new Event('change'));
+    document.querySelector('[data-template=coupled_stripline]').click();
+    for(const [id,value] of [['profile','rectangular'],['width','.5'],['height','1'],['gap','.2'],['thickness','0'],['eps_r','4'],['tan_delta','0']]) {
+      const field=document.getElementById(id);field.value=value;field.dispatchEvent(new Event('input'));
+    }`);
+  assert.equal(await cdp.evaluate('document.querySelector("#height-label").textContent'),'Plane spacing');
+  assert.equal(await cdp.evaluate('document.querySelector("#gap-field").hidden'),false);
+  assert.equal(await cdp.evaluate('document.querySelector("#ground-field").hidden'),true);
+  assert.ok(await cdp.evaluate('document.querySelector("#target-label").textContent.includes("Differential")'));
+  assert.equal(await cdp.evaluate('document.querySelector("#cross-section").textContent.match(/GROUND PLANE/g).length'),2);
+  async function buriedAction(button, outputSelector, label, timeout=300000) {
+    await cdp.evaluate(`document.querySelector(${JSON.stringify(button)}).click()`);
+    await until(()=>cdp.evaluate(`!document.querySelector(${JSON.stringify(outputSelector)}).hidden || document.querySelector('#status').classList.contains('error')`),label,timeout);
+    assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
+  }
+  await buriedAction('#calculate','#result','buried pair analysis');
+  assert.equal(await cdp.evaluate('document.querySelector("#z-label").textContent'),'Differential impedance');
+  await cdp.evaluate(`for(const [id,value] of [['target','80'],['lower','.4'],['upper','.6'],['tolerance','.1']]) {
+    const field=document.getElementById(id);field.value=value;field.dispatchEvent(new Event('input'));
+  }`);
+  await buriedAction('#design','#refinement','buried pair target');
+  const buriedGoal=await downloadEditable();
+  assert.equal(buriedGoal.template,'coupled_stripline');assert.equal(buriedGoal.parameters.substrate_height,undefined);
+  assert.equal(buriedGoal.parameters.plane_spacing,.001);assert.equal(buriedGoal.cross_section.box.top,'ground');
+  assert.equal(buriedGoal.parameters.width,buriedGoal.cross_section.traces[0].width);
+  await cdp.evaluate('document.querySelector("#frequency-points").value="3"');
+  await buriedAction('#network-calculate','#network-result','buried pair network');
+  assert.ok(await cdp.evaluate('document.querySelector("#network-description").textContent.includes("Sdd21")'));
+  await rm(join(downloads,'sipi-line.s4p'),{force:true});
+  await cdp.evaluate('document.querySelector("#touchstone-save").click()');
+  const buriedNetwork=await until(async()=>{try{return await readFile(join(downloads,'sipi-line.s4p'),'utf8');}catch{}},'buried four-port file');
+  assert.ok(buriedNetwork.includes('[Number of Ports] 4'));
+  await cdp.evaluate(`for(const [id,value] of [['study-mode','sweep'],['study-variable-1','eps_r'],['study-low-1','3.6'],['study-high-1','4.4'],['study-points','2']]) {
+    const field=document.getElementById(id);field.value=value;field.dispatchEvent(new Event('input'));
+  }`);
+  await buriedAction('#study-calculate','#study-result','buried pair study');
+  assert.ok(await cdp.evaluate('document.querySelector("#study-summary").textContent.includes("z_diff")'));
+  await rm(join(downloads,'sipi-parameter-study.json'),{force:true});
+  await cdp.evaluate('document.querySelector("#study-save").click()');
+  const buriedStudy=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-parameter-study.json'),'utf8'));}catch{}},'buried study file');
+  assert.equal(buriedStudy.quantity,'z_diff');assert.equal(buriedStudy.failed,0);
+  assert.ok(Math.abs(buriedStudy.rows[0].impedance*Math.sqrt(3.6)/(buriedStudy.rows[1].impedance*Math.sqrt(4.4))-1)<1e-10);
+  await cdp.evaluate('document.querySelector("#project-label").value="Buried pair A"');
+  const buriedProject=await saveProject();
+  const buriedId=await cdp.evaluate('document.querySelector("#project-design").value');
+  assert.deepEqual(JSON.parse(buriedProject.designs.find(item=>item.design_id===buriedId).source_text),buriedGoal);
+  await cdp.evaluate('document.querySelector("#project-duplicate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#project-duplicate").disabled'),'buried duplicate',180000);
+  const buriedB=await cdp.evaluate('document.querySelector("#project-design").value');
+  await cdp.evaluate('document.querySelector("#width").value=".55";document.querySelector("#width").dispatchEvent(new Event("input"));document.querySelector("#project-label").value="Buried pair B"');
+  const pairVariants=await saveProject(), pairProjectRaw=await readFile(join(downloads,'sipi-project.json'),'utf8');
+  await openProject(pairProjectRaw);await selectDesign(buriedId);
+  assert.deepEqual(await downloadEditable(),buriedGoal);
+  await selectDesign(buriedB);
+  assert.deepEqual(await downloadEditable(),JSON.parse(pairVariants.designs.find(item=>item.design_id===buriedB).source_text));
+  await writeFile(join(output,'buried-pair-project.json'),pairProjectRaw);
+  await writeFile(join(output,'buried-pair.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await cdp.evaluate('document.documentElement.scrollWidth <= innerWidth'),true,'mobile horizontal overflow');
   await writeFile(join(output,'mobile.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
@@ -412,7 +470,7 @@ try {
   }
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   if(webRoot) assert.ok(workerTargets.length>=4,'Observe failed, retried, restarted and parity Worker network contexts.');
-  await writeFile(join(output,'report.json'),JSON.stringify({status:parityFailures.length?'failed':'passed',mode:webRoot?'browser-worker':'local-native',stripline_z0:z,externalRequests:remoteRequests,apiRequests:apiRequests.length,workerTargets,errors,parity,parityFailures,checks:['five editable form exact save/reopen and unit invariance','editable mismatch/duplicate/unsupported refusal','late file read cancellation','reopened goal/edit/analyze/study','asymmetric imported pair matrices/network without even-odd claim','single-ended NEXT/FEXT port mapping','sweep/corners/Monte Carlo','study CSV/JSON download and unit conversion','tapered geometry and v2 save/import','planar coating','invalid taper refusal','frequency sweep','2/4-port Touchstone download','network stale results','render','solve','unit conversion','target width/refinement','stale results','JSON save/import','cancel and restart','mobile','shutdown','page and Worker network observation',...(webRoot?['missing asset error and retry']:[])]},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:parityFailures.length?'failed':'passed',mode:webRoot?'browser-worker':'local-native',stripline_z0:z,externalRequests:remoteRequests,apiRequests:apiRequests.length,workerTargets,errors,parity,parityFailures,checks:['six editable form exact save/reopen and unit invariance','buried pair form/80 ohm target/4port/TEM sweep/A-B raw project resume','editable mismatch/duplicate/unsupported refusal','late file read cancellation','reopened goal/edit/analyze/study','asymmetric imported pair matrices/network without even-odd claim','single-ended NEXT/FEXT port mapping','sweep/corners/Monte Carlo','study CSV/JSON download and unit conversion','tapered geometry and v2 save/import','planar coating','invalid taper refusal','frequency sweep','2/4-port Touchstone download','network stale results','render','solve','unit conversion','target width/refinement','stale results','JSON save/import','cancel and restart','mobile','shutdown','page and Worker network observation',...(webRoot?['missing asset error and retry']:[])]},null,2));
   assert.deepEqual(parityFailures,[],'Browser/native parity must meet the preregistered relative 1e-6 threshold.');
   console.log('Browser acceptance passed: solve, target, JSON save/import, cancel, mobile, shutdown; no external HTTP requests.');
 } catch(error) {
