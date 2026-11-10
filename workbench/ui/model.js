@@ -1,8 +1,9 @@
 export const scales = {mm: 1e-3, mil: 25.4e-6};
-export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_width', 'coating_height', 'lower', 'upper'];
-export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coated_microstrip: 'Planar coated microstrip'};
+export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'lower', 'upper'];
+export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip'};
 export const isStripline = template => ['stripline', 'coupled_stripline'].includes(template);
-export const isPair = template => ['coupled_microstrip', 'coupled_stripline'].includes(template);
+export const isPair = template => ['coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'].includes(template);
+export const isCoplanar = template => ['grounded_coplanar', 'coupled_grounded_coplanar'].includes(template);
 
 // Explicit refinement of resolved settings; never mutate a saved design.
 export function refinedMesh(mesh) {
@@ -16,7 +17,7 @@ export function refinedMesh(mesh) {
 export function parameterFields(template) {
   return {width: 'width', top_width: 'top_width', thickness: 'thickness',
     height: isStripline(template) ? 'plane_spacing' : 'substrate_height',
-    gap: 'gap', ground_width: 'ground_width', coating_height: 'coating_height',
+    gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', coating_height: 'coating_height',
     eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
     coating_tan_delta: 'coating_tan_delta'};
 }
@@ -55,7 +56,8 @@ export function parameters(template, values, unit) {
   const out = {width: positive('width') * scales[unit], thickness: positive('thickness', true) * scales[unit], eps_r: positive('eps_r'), tan_delta: positive('tan_delta', true)};
   out[isStripline(template) ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
   if (isPair(template) || template === 'grounded_coplanar') out.gap = positive('gap') * scales[unit];
-  if (template === 'grounded_coplanar') out.ground_width = positive('ground_width') * scales[unit];
+  if (isCoplanar(template)) out.ground_width = positive('ground_width') * scales[unit];
+  if (template === 'coupled_grounded_coplanar') out.ground_gap = positive('ground_gap') * scales[unit];
   if (values.profile === 'tapered') {
     out.top_width = positive('top_width') * scales[unit];
     if (out.thickness <= 0) throw new Error('A tapered trace needs positive copper thickness.');
@@ -82,6 +84,8 @@ export function studyFields(template, p) {
     [isStripline(template) ? 'plane_spacing' : 'substrate_height']: isStripline(template) ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
   if (p.top_width != null) fields.top_width = 'Top width';
   if ('gap' in p) fields.gap = 'Bottom gap';
+  if ('ground_gap' in p) fields.ground_gap = 'Signal–ground gap';
+  if ('ground_width' in p) fields.ground_width = 'Ground width';
   if ('coating_height' in p) { fields.coating_height = 'Coating height'; fields.coating_eps_r = 'Coating permittivity'; }
   return fields;
 }
@@ -100,8 +104,9 @@ export function schematic(template, p) {
   if (isPair(template)) {
     const x = (p.width + p.gap) / 2;
     traces = [{...signal, name: 'positive', x: -x}, {...signal, name: 'negative', x}];
-  } else if (template === 'grounded_coplanar') {
-    const x = (p.width + p.ground_width) / 2 + p.gap;
+  }
+  if (isCoplanar(template)) {
+    const x = isPair(template) ? p.width + p.gap / 2 + p.ground_gap + p.ground_width / 2 : (p.width + p.ground_width) / 2 + p.gap;
     traces.push({...signal, name: 'ground_left', x: -x, width: p.ground_width, top_width: p.ground_width, ground: true}, {...signal, name: 'ground_right', x, width: p.ground_width, top_width: p.ground_width, ground: true});
   }
   const layers = [{name: strip ? 'dielectric' : 'substrate', thickness: h, eps_r: p.eps_r}];

@@ -8,6 +8,7 @@ const originals = {
   coupled_stripline: {width: .0005000000000123456, thickness: .000035, eps_r: 4, tan_delta: .01, plane_spacing: .001, gap: .0002000000000123456, top_width: .0004, box_width: .02, trace_height: .0003},
   coupled_microstrip: {width: .0005, thickness: 0, eps_r: 4, tan_delta: 0, substrate_height: .001, gap: .0002, top_width: null, air_height: null, box_width: null},
   grounded_coplanar: {width: .0005, thickness: .000035, eps_r: 4, tan_delta: 0, substrate_height: .001, gap: .0002, ground_width: .003, top_width: null, air_height: .008, box_width: .03},
+  coupled_grounded_coplanar: {width:.0005000000000123456, thickness:.000035, eps_r:4, tan_delta:.01, substrate_height:.001, gap:.0003, ground_gap:.0002000000000123456, ground_width:.003, top_width:.0004, air_height:.0067, box_width:.03},
   coated_microstrip: {width: .0005, thickness: .0001, eps_r: 4, tan_delta: .01, substrate_height: .001, top_width: .0004, coating_height: .0002, coating_eps_r: 3, coating_tan_delta: .02, air_height: .006, box_width: .02},
 };
 function form(name, p, unit) {
@@ -44,4 +45,16 @@ test('new form uses exact SI lengths and rejects invalid lengths', () => {
   const got = editableParameters('microstrip', values, 'mil', null, new Set(), si);
   assert.equal(got.width, p.width); assert.equal(got.substrate_height, p.substrate_height);
   assert.throws(() => editableParameters('microstrip', values, 'mil', p, new Set(), {...si, width: NaN}));
+});
+
+test('coplanar ground controls preserve the other exact inputs and expose studies', () => {
+  const p=originals.coupled_grounded_coplanar;
+  for(const unit of ['mm','mil']) {
+    const {values,si}=form('coupled_grounded_coplanar',p,unit);
+    values.ground_gap=String(.0004/scales[unit]);si.ground_gap=.0004;
+    assert.deepEqual(editableParameters('coupled_grounded_coplanar',values,unit,p,new Set(['ground_gap']),si),{...p,ground_gap:.0004});
+  }
+  const fields=studyFields('coupled_grounded_coplanar',p);
+  assert.equal(fields.ground_gap,'Signal–ground gap');assert.equal(fields.ground_width,'Ground width');
+  assert.equal(studyFields('microstrip',originals.microstrip).ground_gap,undefined);
 });

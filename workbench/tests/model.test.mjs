@@ -11,10 +11,10 @@ test('explicit mesh refinement preserves angle and the original resolved setting
   for (const invalid of [null, {}, {...original, edge_size:0}, {...original, edge_size:Number.MIN_VALUE}, {...original, far_size:Infinity}, {...original, grade:-1}, {...original, min_angle:34}, {...original, min_angle:0}, {...original, edge_size:'0.1'}, {...original, extra:1}]) assert.throws(() => refinedMesh(invalid));
 });
 
-const values = {width: '0.5', height: '1', thickness: '0.035', gap: '0.2', ground_width: '1', eps_r: '4', tan_delta: '0.02'};
+const values = {width: '0.5', height: '1', thickness: '0.035', gap: '0.2', ground_width: '1', ground_gap:'0.3', eps_r: '4', tan_delta: '0.02'};
 
 test('display units produce identical SI geometry', () => {
-  for (const template of ['microstrip', 'stripline', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar']) {
+  for (const template of ['microstrip', 'stripline', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar']) {
     const mm = parameters(template, values, 'mm');
     const milValues = Object.fromEntries(Object.entries(values).map(([k,v]) => [k, ['eps_r','tan_delta'].includes(k) ? v : convert(v, 'mm', 'mil')]));
     const mil = parameters(template, milValues, 'mil');
@@ -35,6 +35,21 @@ test('a coupled stripline uses two planes, full spacing and bottom-edge gap', ()
   assert.ok(Math.abs(model.traces[1].x-model.traces[0].x-p.width-p.gap) < 1e-18);
   const offset = schematic('coupled_stripline', {...p, trace_height: .0003, top_width:.0004});
   for(const trace of offset.traces) {assert.equal(trace.y, .0003);assert.equal(trace.top_width, .0004);}
+});
+
+test('coplanar pair keeps signal gap separate from finite side-ground gaps', () => {
+  const p = parameters('coupled_grounded_coplanar', {...values, profile:'tapered', top_width:'0.4'}, 'mm');
+  assert.equal(p.gap,.0002);assert.equal(p.ground_gap,.0003);assert.equal(p.ground_width,.001);
+  const model=schematic('coupled_grounded_coplanar',p);
+  assert.deepEqual(model.traces.map(t=>t.ground),[false,false,true,true]);
+  const [left,right,gl,gr]=model.traces;
+  assert.ok(Math.abs(right.x-left.x-p.width-p.gap)<1e-18);
+  assert.ok(Math.abs(left.x-left.width/2-(gl.x+gl.width/2)-p.ground_gap)<1e-18);
+  assert.ok(Math.abs(gr.x-gr.width/2-(right.x+right.width/2)-p.ground_gap)<1e-18);
+  assert.equal(left.top_width,.0004);assert.equal(right.top_width,.0004);
+  assert.equal(gl.top_width,gl.width);assert.equal(gr.top_width,gr.width);
+  assert.equal(gl.thickness,p.thickness);assert.equal(gr.thickness,p.thickness);
+  assert.equal(model.box.bottom,'ground');assert.equal(model.box.top,'open');
 });
 
 test('a stripline uses full plane spacing and no surface-only parameters', () => {

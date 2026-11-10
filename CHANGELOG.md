@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an editable coupled grounded-coplanar form with distinct signal and ground gaps, finite ground width, differential targeting, four-port response and ground-dimension studies. Preserve exact project inputs and mesh, and keep inactive geometry controls from blocking other forms. Validate the zero-thickness vacuum limit against independent image panels and retain separate mesh/domain checks. Avoid redundant automatic edge/growth pre-refinement for this pair while retaining the mandatory target refinement and existing point limit.
+
 - Select an extracted executable explicitly for Windows onefile recording, retain normalized same-root checks, and preserve the original smoke failure while gracefully stopping the candidate or its owned process tree. Keep the actual Windows recording and cleanup gate required.
 
 - Expose current mesh inspection, explicit twofold refinement and automatic reset in the six-form workbench. Preserve fixed settings through edits, unit changes and project files; keep inspection separate from solving or freezing automatic inputs.

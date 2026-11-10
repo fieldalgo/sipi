@@ -12,13 +12,14 @@ cases = []
 for template, extra in [('microstrip', {}), ('stripline', {}),
                         ('coupled_microstrip', {'gap': .2e-3}),
                         ('coupled_stripline', {'gap': .2e-3}),
-                        ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3})]:
+                        ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3}),
+                        ('coupled_grounded_coplanar', {'gap':.3e-3, 'ground_gap':.2e-3, 'ground_width':1e-3})]:
     parameters = {'width': .5e-3, 'eps_r': 4, 'thickness': 0,
                   'plane_spacing' if template in ('stripline', 'coupled_stripline') else 'substrate_height': 1e-3, **extra}
     request = {'action': 'analyze', 'template': template, 'parameters': parameters,
                'mesh': {'edge_size': 5e-6, 'far_size': .5e-3, 'grade': .2}}
     cases.append({'input': request, 'result': execute(request)})
-for template in ('stripline', 'coupled_microstrip', 'coupled_stripline'):
+for template in ('stripline', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'):
     request = next(row['input'] for row in cases if row['input']['template'] == template)
     request = {**request, 'action':'network', 'network':dict(start_hz=1e6, stop_hz=1e9,
                points=9, length=.1, resistance=2.0, z_ref=50)}

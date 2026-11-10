@@ -11,10 +11,10 @@ import sipi
 from sipi.templates import coated_microstrip, coupled_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
-    'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar')}
+    'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coupled_grounded_coplanar')}
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
-PAIR_TEMPLATES = {'coupled_microstrip', 'coupled_stripline'}
+PAIR_TEMPLATES = {'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'}
 
 
 def engine_info():
@@ -124,7 +124,7 @@ def study_documents(request, nominal):
         raise ValueError('Seed must be an integer from 0 through 4294967295.')
     parameters = request['parameters']
     allowed = {'width', 'top_width', 'substrate_height', 'plane_spacing', 'thickness',
-               'gap', 'eps_r', 'coating_height', 'coating_eps_r'}
+               'gap', 'ground_gap', 'ground_width', 'eps_r', 'coating_height', 'coating_eps_r'}
     names, low, high = [], [], []
     for variable in variables:
         if not isinstance(variable, dict) or set(variable) != {'parameter', 'lower', 'upper'}:
@@ -355,9 +355,13 @@ def execute(request, *, record_provider=None):
         mesh = request.get('mesh')
         if mesh is None:
             mesh = doc.section.mesh_settings()
-            mesh['edge_size'] /= 4
             mesh['far_size'] /= 4
-            mesh['grade'] /= 2
+            # Coplanar pair defaults already resolve the smaller ground gaps.
+            # Keep their edge/growth settings before the mandatory independent
+            # refinement; pre-refining both again can exceed the point budget.
+            if request['template'] != 'coupled_grounded_coplanar':
+                mesh['edge_size'] /= 4
+                mesh['grade'] /= 2
         result = sipi.seek_impedance(
             lambda width: factory(**{**params, 'width': width}),
             settings.get('bounds'), settings.get('target'),

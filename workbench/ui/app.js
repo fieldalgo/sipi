@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, isStripline, isPair, refinedMesh, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, refinedMesh, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -79,7 +79,7 @@ function supportedProject(text) {
   for (const design of project.designs) {
     const input = JSON.parse(design.source_text);
     if (input?.schema !== 'sipi.template-section/1' || !Object.hasOwn(labels, input.template))
-      throw new Error(`No editable form for design “${design.label}”. This workspace opens projects using its five editable templates; the current project is unchanged.`);
+      throw new Error(`No editable form for design “${design.label}”. This workspace opens projects using its supported editable templates; the current project is unchanged.`);
   }
   return project;
 }
@@ -268,8 +268,8 @@ function geometryFields() {
   $('top-width-field').hidden = $('profile').value !== 'tapered';
   $('coating-fields').hidden = template !== 'coated_microstrip';
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
-    $(id).disabled = busy || !!imported || (id === 'top_width' ? $('profile').value !== 'tapered' : template !== 'coated_microstrip');
+  for (const id of ['top_width', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
+    $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
 
@@ -459,7 +459,8 @@ function chooseTemplate(name) {
     }
     $('height-label').textContent = isStripline(template) ? 'Plane spacing' : 'Substrate height';
     $('gap-field').hidden = !(isPair(template) || template === 'grounded_coplanar');
-    $('ground-field').hidden = template !== 'grounded_coplanar';
+    $('ground-field').hidden = !isCoplanar(template);
+    $('ground-gap-field').hidden = template !== 'coupled_grounded_coplanar';
     $('target-label').firstChild.textContent = isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
     $('save-editable').disabled = busy;

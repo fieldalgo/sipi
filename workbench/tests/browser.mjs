@@ -416,6 +416,58 @@ try {
   assert.deepEqual(await downloadEditable(),JSON.parse(pairVariants.designs.find(item=>item.design_id===buriedB).source_text));
   await writeFile(join(output,'buried-pair-project.json'),pairProjectRaw);
   await writeFile(join(output,'buried-pair.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+  // Distinguish the signal gap and finite-ground gap in a real seven-form flow.
+  await cdp.evaluate(`document.querySelector('[data-template=coupled_grounded_coplanar]').click();
+    for(const id of ['ground_gap','ground_width']){const e=document.getElementById(id);e.value='-1';e.dispatchEvent(new Event('input'));}
+    document.querySelector('[data-template=microstrip]').click();`);
+  assert.equal((await downloadEditable()).template,'microstrip','Hidden coplanar values cannot block another template.');
+  await cdp.evaluate(`document.querySelector('[data-template=coupled_grounded_coplanar]').click();
+    for(const [id,value] of [['profile','rectangular'],['width','.5'],['height','.5'],['gap','.3'],['ground_gap','.2'],['ground_width','1'],['thickness','0'],['eps_r','1'],['tan_delta','0']]) {
+      const e=document.getElementById(id);e.value=value;e.dispatchEvent(new Event('input'));
+    }`);
+  assert.equal(await cdp.evaluate('document.querySelector("#ground-gap-field").hidden'),false);
+  assert.equal(await cdp.evaluate('document.querySelector("#ground-field").hidden'),false);
+  assert.ok(await cdp.evaluate('document.querySelector("#target-label").textContent.includes("Differential")'));
+  assert.equal(await cdp.evaluate('document.querySelector("#cross-section").textContent.match(/GROUND PLANE/g).length'),1);
+  const cpwBefore=await downloadEditable();
+  assert.equal(cpwBefore.parameters.gap,.0003);assert.equal(cpwBefore.parameters.ground_gap,.0002);
+  assert.deepEqual(cpwBefore.cross_section.traces.map(t=>t.ground),[false,false,true,true]);
+  await buriedAction('#calculate','#result','coplanar pair analysis');
+  await cdp.evaluate(`for(const [id,value] of [['target','172.45677879183611'],['lower','.4'],['upper','.6'],['tolerance','1']]) {
+    const e=document.getElementById(id);e.value=value;e.dispatchEvent(new Event('input'));
+  }`);
+  await buriedAction('#design','#refinement','independent coplanar pair target');
+  const cpwGoal=await downloadEditable();assert.equal(cpwGoal.template,'coupled_grounded_coplanar');
+  assert.ok(Math.abs(cpwGoal.parameters.width/.0005-1)<.04);
+  assert.equal(cpwGoal.parameters.ground_gap,.0002);assert.equal(cpwGoal.parameters.ground_width,.001);
+  await cdp.evaluate("document.querySelector('#frequency-points').value='3';document.querySelector('#series-r').value='0'");
+  await buriedAction('#network-calculate','#network-result','coplanar pair network');
+  await rm(join(downloads,'sipi-line.s4p'),{force:true});
+  await cdp.evaluate('document.querySelector("#touchstone-save").click()');
+  const cpwNetwork=await until(async()=>{try{return await readFile(join(downloads,'sipi-line.s4p'),'utf8')}catch{}},'coplanar four-port export');
+  assert.ok(cpwNetwork.includes('[Number of Ports] 4'));
+  await cdp.evaluate(`for(const [id,value] of [['study-mode','corners'],['study-count','2'],['study-variable-1','ground_gap'],['study-low-1','.18'],['study-high-1','.22'],['study-variable-2','ground_width'],['study-low-2','.9'],['study-high-2','1.1'],['study-points','3']]) {
+    const e=document.getElementById(id);e.value=value;e.dispatchEvent(new Event('input'));
+  }`);
+  await buriedAction('#study-calculate','#study-result','coplanar ground-dimension corners');
+  await rm(join(downloads,'sipi-parameter-study.json'),{force:true});await cdp.evaluate('document.querySelector("#study-save").click()');
+  const cpwStudy=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-parameter-study.json'),'utf8'))}catch{}},'coplanar corners export');
+  assert.equal(cpwStudy.quantity,'z_diff');assert.equal(cpwStudy.failed,0);assert.equal(cpwStudy.rows.length,4);
+  for(const row of cpwStudy.rows){assert.deepEqual(Object.keys(row.parameters).sort(),['ground_gap','ground_width']);assert.deepEqual(row.document.mesh,cpwGoal.cross_section.mesh);}
+  await cdp.evaluate('document.querySelector("#project-label").value="Coplanar pair A"');
+  const cpwA=await cdp.evaluate('document.querySelector("#project-design").value');await saveProject();
+  await cdp.evaluate('document.querySelector("#project-duplicate").click()');
+  await until(()=>cdp.evaluate('!document.querySelector("#project-duplicate").disabled'),'coplanar duplicate',180000);
+  const cpwB=await cdp.evaluate('document.querySelector("#project-design").value');
+  await cdp.evaluate("document.querySelector('#ground_gap').value='.25';document.querySelector('#ground_gap').dispatchEvent(new Event('input'));document.querySelector('#project-label').value='Coplanar pair B'");
+  const cpwVariants=await saveProject(),cpwRaw=await readFile(join(downloads,'sipi-project.json'),'utf8');
+  await openProject(cpwRaw);await selectDesign(cpwA);assert.deepEqual(await downloadEditable(),cpwGoal);
+  await selectDesign(cpwB);const cpwEdited=await downloadEditable();
+  assert.equal(cpwEdited.parameters.ground_gap,.00025);assert.equal(cpwEdited.parameters.gap,.0003);
+  assert.deepEqual(cpwEdited,JSON.parse(cpwVariants.designs.find(d=>d.design_id===cpwB).source_text));
+  await writeFile(join(output,'coplanar-pair-project.json'),cpwRaw);
+  await writeFile(join(output,'coplanar-pair-study.json'),JSON.stringify(cpwStudy,null,2));
+  await writeFile(join(output,'coplanar-pair.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await cdp.evaluate('document.documentElement.scrollWidth <= innerWidth'),true,'mobile horizontal overflow');
   await writeFile(join(output,'mobile.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
@@ -470,7 +522,7 @@ try {
   }
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   if(webRoot) assert.ok(workerTargets.length>=4,'Observe failed, retried, restarted and parity Worker network contexts.');
-  await writeFile(join(output,'report.json'),JSON.stringify({status:parityFailures.length?'failed':'passed',mode:webRoot?'browser-worker':'local-native',stripline_z0:z,externalRequests:remoteRequests,apiRequests:apiRequests.length,workerTargets,errors,parity,parityFailures,checks:['six editable form exact save/reopen and unit invariance','buried pair form/80 ohm target/4port/TEM sweep/A-B raw project resume','editable mismatch/duplicate/unsupported refusal','late file read cancellation','reopened goal/edit/analyze/study','asymmetric imported pair matrices/network without even-odd claim','single-ended NEXT/FEXT port mapping','sweep/corners/Monte Carlo','study CSV/JSON download and unit conversion','tapered geometry and v2 save/import','planar coating','invalid taper refusal','frequency sweep','2/4-port Touchstone download','network stale results','render','solve','unit conversion','target width/refinement','stale results','JSON save/import','cancel and restart','mobile','shutdown','page and Worker network observation',...(webRoot?['missing asset error and retry']:[])]},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:parityFailures.length?'failed':'passed',mode:webRoot?'browser-worker':'local-native',stripline_z0:z,externalRequests:remoteRequests,apiRequests:apiRequests.length,workerTargets,errors,parity,parityFailures,checks:['coplanar pair independent target/4port/ground-dimension corners/A-B raw resume','seven editable form exact save/reopen and unit invariance','buried pair form/80 ohm target/4port/TEM sweep/A-B raw project resume','editable mismatch/duplicate/unsupported refusal','late file read cancellation','reopened goal/edit/analyze/study','asymmetric imported pair matrices/network without even-odd claim','single-ended NEXT/FEXT port mapping','sweep/corners/Monte Carlo','study CSV/JSON download and unit conversion','tapered geometry and v2 save/import','planar coating','invalid taper refusal','frequency sweep','2/4-port Touchstone download','network stale results','render','solve','unit conversion','target width/refinement','stale results','JSON save/import','cancel and restart','mobile','shutdown','page and Worker network observation',...(webRoot?['missing asset error and retry']:[])]},null,2));
   assert.deepEqual(parityFailures,[],'Browser/native parity must meet the preregistered relative 1e-6 threshold.');
   console.log('Browser acceptance passed: solve, target, JSON save/import, cancel, mobile, shutdown; no external HTTP requests.');
 } catch(error) {

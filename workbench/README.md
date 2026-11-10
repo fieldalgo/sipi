@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the six-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the seven-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers six cross-section forms, impedance targeting,
+The basic workspace offers seven cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -42,8 +42,8 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The six forms are microstrip, stripline, coupled microstrip, coupled stripline, grounded coplanar
-and planar coated microstrip. Other engine templates can use **Saved analysis**;
+The seven forms are microstrip, stripline, coupled microstrip, coupled stripline, grounded coplanar,
+coupled grounded coplanar and planar coated microstrip. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
 preserves its geometry and mesh but does not enable dimension editing.
@@ -57,6 +57,27 @@ appear in the schematic, even though this form has no separate offset control.
 A failed finer-mesh target check retains its evaluation history instead of
 accepting a coarse result. The saved goal document uses the requested mesh;
 the separate refined impedance is verification, not a substituted saved mesh.
+
+For **Coupled coplanar**, two equal signal traces lie between finite side grounds
+above a backing ground plane. **Gap** is the signal-to-signal bottom-edge gap;
+**Signal–ground gap** is the bottom-edge distance to each side ground. **Ground
+width** applies to each rectangular side ground. Grounds share the signal
+thickness; taper changes only the signals. Width targeting and studies use
+differential impedance, and network export has four signal ports. Studies can
+vary either ground dimension; ground width is also available for single-signal
+coplanar. Imported air height and box width remain exact hidden inputs. Check
+mesh and outer-domain convergence after changing these finite grounds.
+For automatic width targets, this pair keeps the resolved edge size and growth,
+reduces the far size by four, and still requires the separate finer-mesh check.
+The default edge size already accounts for the ground gaps. Explicit mesh
+settings are unchanged. If the finer result misses your tolerance, inspect and
+refine the mesh before retrying; neither the point limit nor tolerance is relaxed.
+
+The form reference uses zero-thickness vacuum conductors and an independent
+image-charge panel calculation. Mesh refinement and an enlarged finite domain
+are checked separately. This reference does not establish finite-thickness or
+measured manufacturing accuracy; unequal signals and independent ground thickness
+need their separate engine contracts through **Saved analysis**.
 
 Changing display units does not round the stored SI inputs. Unedited parameters
 and inputs without a visible field (such as air height or box width) retain their
@@ -108,7 +129,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the six supported editable templates. Other
+All project designs must use the seven supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace

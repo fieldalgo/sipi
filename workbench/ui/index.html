@@ -32,6 +32,7 @@
           <button data-template="coupled_microstrip" aria-pressed="false"><span class="mini">━ ━</span>Coupled pair</button>
           <button data-template="coupled_stripline" aria-pressed="false"><span class="mini">═ ═</span>Coupled stripline</button>
           <button data-template="grounded_coplanar" aria-pressed="false"><span class="mini">▰ ━ ▰</span>Grounded coplanar</button>
+          <button data-template="coupled_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ━ ━ ▰</span>Coupled coplanar</button>
           <button data-template="coated_microstrip" aria-pressed="false"><span class="mini">▱</span>Planar coated</button>
         </div>
         <p id="import-note" class="notice" hidden>Imported cross-section. Its geometry and mesh are preserved. Choose a template to start a new design.</p>
@@ -44,6 +45,7 @@
             <label><span id="height-label">Substrate height</span> <span class="symbol">h</span><div class="number"><input id="height" type="number" value="1" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <label>Copper thickness <span class="symbol">t</span><div class="number"><input id="thickness" type="number" value="0" min="0" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="gap-field" hidden>Bottom edge gap <span class="symbol">s</span><div class="number"><input id="gap" type="number" value="0.2" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
+            <label id="ground-gap-field" hidden>Signal–ground gap<div class="number"><input id="ground_gap" type="number" value="0.2" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="ground-field" hidden>Ground width<div class="number"><input id="ground_width" type="number" value="1" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
           </div>
           <div class="section-label"><h3>Dielectric</h3><span>Constant properties</span></div>
