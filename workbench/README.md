@@ -9,6 +9,7 @@ The [receipt transport](RECEIPTS.md) binds saved calculations to their exact inp
 The [installed artifact helper](ARTIFACTS.md) captures actual distribution files for host provenance.
 [Recorded execution](RECORDING.md) can export raw result records and environment manifests from **Saved analysis → Run and keep record** in an installed wheel or staged browser workspace.
 [Browser recording](BROWSER_RECORDING.md) uses checked staged source artifacts for the same record transport.
+[Windows candidate recording](FROZEN_RECORDING.md) identifies the unpacked executable and bundle; acceptance requires its exact real Windows build and smoke.
 
 This source candidate runs the independently installed SIPI engine through a
 local default-browser UI or a browser Worker. It is not a released application.
@@ -172,6 +173,8 @@ hashes, bundled native files and actual EXE size/hash. `build-info.json` is
 embedded and included in calculation exports. `smoke.json` records measured
 startup, calculation, exit and temporary-file cleanup from a Unicode/space path;
 failed launches retain a failed report.
+The smoke also checks two recorded runs, independently hashes the live unpacked
+bundle and verifies raw project attachment/lookup before shutdown.
 Startup failures also retain bounded stdout/stderr with session tokens redacted,
 including processes which exit before announcing the local URL.
 The smoke uses `--no-browser`: Windows 10/11 interactive default-browser acceptance, isolated-network verification,

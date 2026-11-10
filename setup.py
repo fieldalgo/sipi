@@ -12,7 +12,8 @@ class BuildPy(build_py):
     def _copies(self):
         target = Path(self.build_lib) / 'sipi' / '_workbench'
         return [(ROOT / 'workbench' / 'desktop' / name, target / name)
-                for name in ('engine.py', 'main.py', 'artifacts.py', 'recording.py', 'browser_recording.py')] + [
+                for name in ('engine.py', 'main.py', 'artifacts.py', 'recording.py', 'browser_recording.py',
+                             'frozen_recording.py')] + [
             (ROOT / 'workbench' / 'ui' / name, target / 'ui' / name) for name in UI_FILES]
 
     def run(self):

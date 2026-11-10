@@ -8,6 +8,7 @@
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
 [설치 파일 helper](ARTIFACTS.ko.md)는 호스트 출처용 실제 배포물 파일을 수집한다.
 [계산 기록](RECORDING.ko.md)은 설치 wheel 또는 staged 브라우저의 **Saved analysis → Run and keep record**에서 원문 결과 기록과 실행환경 목록을 내보낸다.
+[Windows 후보 기록](FROZEN_RECORDING.ko.md)은 풀린 실행파일·번들을 식별하며 해당 정확 Windows 빌드와 smoke 통과가 수락 조건이다.
 [브라우저 기록](BROWSER_RECORDING.ko.md)은 같은 기록 전달에 검사된 staged 배포 원본을 사용한다.
 
 독립 설치한 SIPI 엔진을 기본 브라우저의 로컬 화면 또는 브라우저 Worker에서
@@ -155,6 +156,8 @@ python workbench/packaging/smoke.py .validation/sipi-windows/FieldAlgo-SIPI.exe
 기록됩니다. `build-info.json`은 내장되어 계산 결과에도 들어갑니다. `smoke.json`은
 한글·공백 경로의 첫 실행·계산·종료·임시파일 정리를 측정하고 실패 시 실패 보고서를
 남깁니다.
+기록 실행 두 번, 살아 있는 추출 번들의 독립 hash 대조, 원문 프로젝트 추가/조회도
+종료 전에 확인합니다.
 로컬 URL을 출력하기 전에 종료되어도 stdout/stderr를 크기 제한·세션 토큰 가림과
 함께 보존합니다.
 `--no-browser` 시험이므로 Windows 10/11의 대화형 기본 브라우저 실행,

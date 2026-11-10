@@ -278,6 +278,12 @@ def execute(request, *, record_provider=None):
                 if not callable(record_provider):
                     raise ValueError('The host record provider must be callable.')
                 return {'engine': engine_info(), **record_provider(prepared)}
+            if globals().get('__compiled__') is not None:
+                if __package__:
+                    from .frozen_recording import run_recorded_frozen
+                else:
+                    from frozen_recording import run_recorded_frozen
+                return {'engine': engine_info(), **run_recorded_frozen(prepared)}
             try:
                 if __package__:
                     from .recording import run_recorded

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a bounded recording provider for the reviewed Windows onefile candidate: identify the extracted executable and complete bundle before/after a saved run, retain raw record/project contracts and refuse changing or invalid payloads. Extend the real Windows smoke to independently verify extracted files and recorded history; platform acceptance still requires that exact build to pass.
+
 - Give saved-analysis project fields and history selectors consistent spacing and 44-pixel minimum control height on desktop and mobile screens.
 
 - Connect Saved analysis to project variants and recorded-run history: preserve raw project files and stored execution controls, duplicate or switch inputs, inspect historical runs and explicitly select matching results. Keep the previous project on failed transformations or excessive growth, preserve standalone record export, and reject stale file/attachment completion.
