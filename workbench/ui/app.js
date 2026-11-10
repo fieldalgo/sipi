@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -333,7 +333,7 @@ function geometryFields() {
   $('placement-mode-field').hidden = template === 'offset_stripline';
   $('trace-height-field').hidden = template !== 'offset_stripline' && $('placement').value !== 'fixed';
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
-  $('coating-fields').hidden = !['coated_microstrip', 'coupled_coated_microstrip'].includes(template);
+  $('coating-fields').hidden = !isCoated(template);
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
   for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
@@ -551,7 +551,7 @@ function chooseTemplate(name) {
       b.classList.toggle('selected', b.dataset.template === name); b.setAttribute('aria-pressed', String(b.dataset.template === name));
     }
     $('height-label').textContent = isStripline(template) ? 'Plane spacing' : 'Substrate height';
-    $('gap-field').hidden = !(isPair(template) || template === 'grounded_coplanar');
+    $('gap-field').hidden = !(isPair(template) || isCoplanar(template));
     $('ground-field').hidden = !isCoplanar(template);
     $('ground-gap-field').hidden = template !== 'coupled_grounded_coplanar';
     $('target-label').firstChild.textContent = isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';

@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the nine-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the ten-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers nine cross-section forms, impedance targeting,
+The basic workspace offers ten cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -42,8 +42,8 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The nine forms are microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip and planar coated pair. Other engine templates can use **Saved analysis**;
+The ten forms are microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+coupled grounded coplanar, planar coated microstrip, planar coated pair and coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
 preserves its geometry and mesh but does not enable dimension editing.
@@ -131,6 +131,19 @@ stay fixed. Qualified checks cover the thin vacuum image-panel reference,
 finite tapered complex-capacitance assembly, mesh and air/box convergence,
 and the air-coating/plain-line limit. They do not establish general measured
 manufacturing accuracy or a conformal-coating model.
+
+For **Coated coplanar**, one signal lies between two finite rectangular grounds,
+with a bottom reference plane and a full-width flat coating. **Gap** is the
+signal-bottom-edge to ground-edge spacing; **Ground width** is the width of
+each side ground. Signal taper leaves both grounds rectangular. Coating height
+starts at the substrate and includes copper height; air clearance starts above
+it. Targets and studies use `z0`; network export has two single-ended ports.
+Coating height/permittivity, gap and ground width can be sampled with the
+same fixed nominal mesh and prevalidated bounds. Automatic width targeting
+retains coating-aware edge/growth defaults and divides far size by four before
+the unchanged mandatory refinement. Explicit meshes remain fixed. Qualified
+image-panel, independent complex-FE, mesh/outer and air-limit checks are
+separate from measured manufacturing accuracy or a conformal-film model.
 
 Changing display units does not round the stored SI inputs. Unedited parameters
 and any inputs without a visible field retain their
@@ -223,7 +236,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the nine supported editable templates. Other
+All project designs must use the ten supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace

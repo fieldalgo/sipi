@@ -81,4 +81,17 @@ for action in ('analyze', 'network', 'study'):
     if action == 'study': request['study'] = dict(mode='sweep', points=2, seed=42,
         variables=[dict(parameter='coating_height', lower=.09e-3, upper=.11e-3)])
     cases.append({'input': request, 'result': execute(request)})
+# Same exact qualified coated-coplanar inputs in native and Worker runtimes.
+coated_coplanar = dict(width=.5e-3, gap=.2e-3, ground_width=1e-3,
+    substrate_height=.5e-3, eps_r=4., tan_delta=.01, thickness=.035e-3, top_width=.4e-3,
+    coating_height=.1e-3, coating_eps_r=3.5, coating_tan_delta=.02, air_height=6e-3, box_width=12e-3)
+request = dict(action='analyze', template='coated_grounded_coplanar', parameters=coated_coplanar,
+    mesh=dict(edge_size=4e-6, far_size=.25e-3, grade=.2))
+cases.append(dict(input=request, result=execute(request)))
+request = {**request, 'action':'network', 'network':dict(start_hz=1e6,stop_hz=1e9,points=3,length=.1,resistance=2.,z_ref=50.)}
+cases.append(dict(input=request, result=execute(request)))
+request = {k:v for k,v in request.items() if k!='network'}
+request.update(action='study', study=dict(mode='sweep',variables=[dict(parameter='ground_width',lower=.8e-3,upper=1.2e-3)],points=2,seed=42))
+cases.append(dict(input=request, result=execute(request)))
+
 print(json.dumps(cases, allow_nan=False))

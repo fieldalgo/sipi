@@ -104,3 +104,16 @@ test('planar coated pair keeps two signals, a full flat layer and distinct mater
     const q=parameters('coupled_coated_microstrip',inputs,unit);for(const key in p)assert.ok(Math.abs(p[key]-q[key])<1e-15);
   }
 });
+
+
+test('coated coplanar keeps one tapered signal, two rectangular grounds and a full coating', () => {
+  const v={...values,profile:'tapered',top_width:'.4',coating_height:'.1',coating_eps_r:'3.5',coating_tan_delta:'.01'};
+  const p=parameters('coated_grounded_coplanar',v,'mm'),m=schematic('coated_grounded_coplanar',p);
+  assert.equal(p.gap,.0002);assert.equal(p.ground_width,.001);assert.equal(p.ground_gap,undefined);
+  assert.equal(m.traces.length,3);const [signal,...grounds]=m.traces;
+  assert.equal(signal.top_width,.0004);assert.equal(signal.ground,false);
+  assert.deepEqual(grounds.map(t=>t.x),[-.00095,.00095]);
+  for(const t of grounds){assert.equal(t.width,.001);assert.equal(t.top_width,.001);assert.equal(t.ground,true);assert.equal(t.thickness,p.thickness);}
+  assert.equal(m.layers[1].thickness,.0001);assert.equal(m.layers[1].eps_r,3.5);assert.equal(m.layers[2].eps_r,1);
+  for(const change of [{gap:''},{ground_width:0},{coating_height:'.035'}])assert.throws(()=>parameters('coated_grounded_coplanar',{...v,...change},'mm'));
+});

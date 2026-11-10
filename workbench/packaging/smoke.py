@@ -144,7 +144,7 @@ def exercise(source, report):
             assert b'GEOS' in request('/notices.txt')
             assert b'Input JSON' in request('/saved.html')
             report['build'] = json.loads(request('/build-info.json'))
-            for template, extra in [('microstrip', {}), ('stripline', {}), ('offset_stripline', {'trace_height':.3e-3}), ('coupled_microstrip', {'gap': .2e-3}), ('coupled_stripline', {'gap': .2e-3}), ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3}), ('coupled_grounded_coplanar', {'gap':.3e-3, 'ground_gap':.2e-3, 'ground_width':1e-3}), ('coupled_coated_microstrip', {'gap':.3e-3, 'coating_height':.1e-3, 'coating_eps_r':3.5})]:
+            for template, extra in [('microstrip', {}), ('stripline', {}), ('offset_stripline', {'trace_height':.3e-3}), ('coupled_microstrip', {'gap': .2e-3}), ('coupled_stripline', {'gap': .2e-3}), ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3}), ('coupled_grounded_coplanar', {'gap':.3e-3, 'ground_gap':.2e-3, 'ground_width':1e-3}), ('coupled_coated_microstrip', {'gap':.3e-3, 'coating_height':.1e-3, 'coating_eps_r':3.5}), ('coated_grounded_coplanar', {'gap':.2e-3, 'ground_width':1e-3, 'coating_height':.1e-3, 'coating_eps_r':3.5})]:
                 report['phase'] = 'analyze ' + template
                 parameters = {'width': .5e-3, 'eps_r': 4,
                     'plane_spacing' if template in ('stripline', 'coupled_stripline', 'offset_stripline') else 'substrate_height': 1e-3, **extra}

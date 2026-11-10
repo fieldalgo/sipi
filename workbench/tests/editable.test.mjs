@@ -11,6 +11,7 @@ const originals = {
   grounded_coplanar: {width: .0005, thickness: .000035, eps_r: 4, tan_delta: 0, substrate_height: .001, gap: .0002, ground_width: .003, top_width: null, air_height: .008, box_width: .03},
   coupled_grounded_coplanar: {width:.0005000000000123456, thickness:.000035, eps_r:4, tan_delta:.01, substrate_height:.001, gap:.0003, ground_gap:.0002000000000123456, ground_width:.003, top_width:.0004, air_height:.0067, box_width:.03},
   coupled_coated_microstrip: {width:.0005000000000123456, gap:.0003000000000123456, thickness:.000035, top_width:.0004, substrate_height:.0005, eps_r:4, tan_delta:.01, coating_height:.0001000000000123456, coating_eps_r:3.5, coating_tan_delta:.02, air_height:.006, box_width:.012},
+  coated_grounded_coplanar: {width:.0005000000000123456, gap:.0002000000000123456, ground_width:.0010000000000123456, thickness:.000035, top_width:.0004, substrate_height:.0005, eps_r:4, tan_delta:.01, coating_height:.0001000000000123456, coating_eps_r:3.5, coating_tan_delta:.02, air_height:.006, box_width:.012},
   coated_microstrip: {width: .0005, thickness: .0001, eps_r: 4, tan_delta: .01, substrate_height: .001, top_width: .0004, coating_height: .0002, coating_eps_r: 3, coating_tan_delta: .02, air_height: .006, box_width: .02},
 };
 function form(name, p, unit) {

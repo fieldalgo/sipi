@@ -101,7 +101,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/editable_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout);
-  assert.equal(fixtures.cases.length,9);assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),9);
+  assert.equal(fixtures.cases.length,10);assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),10);
   for(const input of fixtures.cases){await open(input);for(const unit of ['µm','mil','mm']){await cdp.evaluate(`document.querySelector('#unit').value='${unit}';document.querySelector('#unit').dispatchEvent(new Event('change'))`);assert.deepEqual(await save(),input);}}
   await choose('microstrip');for(const key of ['coating_height','coating_eps_r','coating_tan_delta'])await set(key,'-1');
   assert.equal(await cdp.evaluate('document.querySelector("#coating-fields").hidden'),true);await save();
@@ -161,7 +161,7 @@ try {
   await writeFile(join(output,'coated-project.json'),rawProject);await writeFile(join(output,'coated-design.json'),JSON.stringify(designed,null,2));await writeFile(join(output,'coated-study.json'),JSON.stringify(study,null,2));
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'installed host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:9,physical_zdiff:physicalZ,air_zdiff:airZ,vacuum_zdiff:vacuumZ,layouts,errors,externalRequests:remoteRequests,checks:['nine exact forms and mm/µm/mil','coating/gap controls and inactive-field isolation','finite tapered physical/reference agreement','coating air limit ordering','coating height/eps corners with fixed mesh','clearance bounds and blank coating rejection','independent vacuum target and both mesh gates','four-port Touchstone and mixed response','raw A/B reopen','cancel/restart','four viewports/44px controls','normal shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:10,physical_zdiff:physicalZ,air_zdiff:airZ,vacuum_zdiff:vacuumZ,layouts,errors,externalRequests:remoteRequests,checks:['ten exact forms and mm/µm/mil','coating/gap controls and inactive-field isolation','finite tapered physical/reference agreement','coating air limit ordering','coating height/eps corners with fixed mesh','clearance bounds and blank coating rejection','independent vacuum target and both mesh gates','four-port Touchstone and mixed response','raw A/B reopen','cancel/restart','four viewports/44px controls','normal shutdown']},null,2));
   console.log('Planar coated pair form acceptance passed.');
 } catch(error) {
   let application=null;

@@ -1,9 +1,10 @@
 export const scales = {mm: 1e-3, 'µm': 1e-6, mil: 25.4e-6};
 export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower', 'upper'];
-export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip', coupled_coated_microstrip: 'Planar coated pair'};
+export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip', coupled_coated_microstrip: 'Planar coated pair', coated_grounded_coplanar: 'Planar coated coplanar'};
 export const isStripline = template => ['stripline', 'coupled_stripline', 'offset_stripline'].includes(template);
 export const isPair = template => ['coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip'].includes(template);
-export const isCoplanar = template => ['grounded_coplanar', 'coupled_grounded_coplanar'].includes(template);
+export const isCoplanar = template => ['grounded_coplanar', 'coupled_grounded_coplanar', 'coated_grounded_coplanar'].includes(template);
+export const isCoated = template => ['coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar'].includes(template);
 
 // Explicit refinement of resolved settings; never mutate a saved design.
 export function refinedMesh(mesh) {
@@ -65,14 +66,14 @@ export function parameters(template, values, unit) {
     if (!['centred', 'fixed'].includes(placement)) throw new Error('Unknown vertical placement.');
     if (placement === 'fixed') out.trace_height = positive('trace_height') * scales[unit];
   }
-  if (isPair(template) || template === 'grounded_coplanar') out.gap = positive('gap') * scales[unit];
+  if (isPair(template) || isCoplanar(template)) out.gap = positive('gap') * scales[unit];
   if (isCoplanar(template)) out.ground_width = positive('ground_width') * scales[unit];
   if (template === 'coupled_grounded_coplanar') out.ground_gap = positive('ground_gap') * scales[unit];
   if (values.profile === 'tapered') {
     out.top_width = positive('top_width') * scales[unit];
     if (out.thickness <= 0) throw new Error('A tapered trace needs positive copper thickness.');
   }
-  if (['coated_microstrip', 'coupled_coated_microstrip'].includes(template)) {
+  if (isCoated(template)) {
     out.coating_height = positive('coating_height') * scales[unit];
     out.coating_eps_r = positive('coating_eps_r');
     out.coating_tan_delta = positive('coating_tan_delta', true);
@@ -126,7 +127,7 @@ export function schematic(template, p) {
     traces.push({...signal, name: 'ground_left', x: -x, width: p.ground_width, top_width: p.ground_width, ground: true}, {...signal, name: 'ground_right', x, width: p.ground_width, top_width: p.ground_width, ground: true});
   }
   const layers = [{name: strip ? 'dielectric' : 'substrate', thickness: h, eps_r: p.eps_r}];
-  if (['coated_microstrip', 'coupled_coated_microstrip'].includes(template)) layers.push({name: 'planar coating', thickness: p.coating_height, eps_r: p.coating_eps_r});
+  if (isCoated(template)) layers.push({name: 'planar coating', thickness: p.coating_height, eps_r: p.coating_eps_r});
   if (!strip) layers.push({name: 'air', thickness: Math.max(h * 1.1, p.thickness * 1.5), eps_r: 1});
   return {layers, traces, box: {width: Math.max(h * 5, ...traces.map(t => (Math.abs(t.x) + Math.max(t.width, t.top_width) / 2) * 2.5)), bottom: 'ground', top: strip ? 'ground' : 'open', sides: 'open'}};
 }

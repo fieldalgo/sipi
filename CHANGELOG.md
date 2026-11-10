@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an editable planar-coated coplanar form with finite side-ground controls, coating/ground studies, single-ended width targets and two-port export. Preserve exact SI/project inputs and coating-aware automatic mesh preparation with independent field and domain checks.
+
 - Pin browser and portable candidates to the engine that retains failed goal mesh context. Exercise actual point-budget failures through saved results, execution records and project reopening, followed by a valid calculation, while preserving existing runtime and numerical limits.
 
 - Preserve completed impedance-search history and the failed parameter, stage, resolved mesh and material snapshot when field meshing exceeds its point budget. Keep the error catchable as both a goal failure and a mesher limit, and retain the failure in saved execution records without retrying or relaxing numerical criteria.

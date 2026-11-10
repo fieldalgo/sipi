@@ -34,7 +34,7 @@ def saved(request):
 
 
 @pytest.mark.parametrize('template', ['microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip', 'coupled_stripline',
-                                      'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_microstrip', 'coupled_coated_microstrip'])
+                                      'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar'])
 def test_forms_create_copy_reopen_without_fields(template, monkeypatch):
     text = TemplateSectionDocument(template, parameters(template)).dumps()
     def forbidden(*a, **kw): raise AssertionError('project edits must not solve')
