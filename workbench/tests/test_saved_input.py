@@ -100,3 +100,29 @@ def test_material_goal_preserves_selected_model_and_refinement_through_host(serv
     assert chosen == result['parameter'] and chosen != 4
     original = doc.to_dict()['material_evaluation']['materials']['dielectric']['parameters']
     assert (original['eps_r'] if kind == 'constant' else original['strengths'][0]) == 4
+
+
+@pytest.mark.parametrize('kind', ['pair-goal', 'constant', 'debye', 'tensor', 'mixed-normal'])
+def test_pair_and_sampled_material_saved_execution_through_host(server, kind):
+    from paired_material_cases import pair_material_goal, material_study
+    doc = pair_material_goal() if kind == 'pair-goal' else material_study(kind)
+    assert execute(dict(action='saved-normalize', text=doc.dumps()))['document_text'] == doc.dumps()
+    assert call(server, 'POST', '/api/job', dict(action='saved-analyze', text=doc.dumps()))[0] == 202
+    transport = finish(server)
+    assert transport['status'] == 'complete'
+    actual = transport['result']['execution']
+    assert actual == execute_saved(doc.dumps())
+    if kind == 'mixed-normal':
+        assert actual['status'] == 'incomplete'
+        assert actual['result']['failed'] == 2 and actual['result']['summary'] is None
+    else:
+        assert actual['status'] == 'complete'
+    if kind == 'pair-goal':
+        result = actual['result']
+        assert result['evaluations'] == len(result['history']) <= 64
+        assert result['history'][-1]['stage'] == 'refinement'
+        for i, tolerance in enumerate([1., .5]):
+            assert abs(result['residuals_ohm'][i]) <= tolerance
+            assert abs(result['refined_residuals_ohm'][i]) <= tolerance
+            model = result['material_evaluation']['materials']['dielectric']['parameters']
+            assert model[['axis1', 'axis2'][i]]['parameters']['eps_r'] == result['parameters'][i]

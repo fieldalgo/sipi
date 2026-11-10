@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Pin both workbench runtimes to paired-material and study mesh reuse. Exercise paired targets and complete/incomplete sampled-material documents through native HTTP and actual browser Workers, retaining model snapshots, refinement, row failures and exports.
+
 - Reuse the last identical explicit-material study mesh and vacuum capacitance within each analysis. Recompute every sampled material, retain failed rows and incomplete summaries, and preserve sampling order, budgets and geometry changes.
 
 - Reuse identical material meshes and vacuum capacitance inside two-parameter pair targeting while preserving objective caching, attempted-evaluation budgets, current-model diagnostics and separate frozen-input refinement.

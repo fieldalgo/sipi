@@ -157,6 +157,81 @@ try {
     await writeFile(join(output,'material-'+item.name+'.json'),JSON.stringify(exported,null,2));
     materialGoals.push({name:item.name,seconds,parameter:got.result.parameter,history:got.result.history.length});
   }
+  const materialBatch = [];
+  function compareStudy(actual, expected, path='study') {
+    if(typeof expected === 'number') {
+      assert.equal(typeof actual,'number',path);
+      assert.ok(Number.isFinite(actual),path);
+      assert.ok(Math.abs(actual-expected)<=Math.max(1e-14,1e-10*Math.abs(expected)),path);
+    } else if(expected !== null && typeof expected === 'object') {
+      assert.deepEqual(Object.keys(actual),Object.keys(expected),path);
+      for(const key of Object.keys(expected)) compareStudy(actual[key],expected[key],path+'.'+key);
+    } else assert.equal(actual,expected,path);
+  }
+  function checkPairMaterial(execution, expected) {
+    assert.equal(execution.status,'complete');assert.equal(execution.error,null);
+    assert.deepEqual(execution.input,expected.input);
+    const r=execution.result, e=expected.result;
+    assert.deepEqual(r.quantities,['z_diff','z_common']);
+    assert.deepEqual(r.targets_ohm,[100,34]);assert.deepEqual(r.tolerances_ohm,[1,.5]);
+    assert.deepEqual(r.input,e.input);assert.deepEqual(r.refined_input,e.refined_input);
+    assert.ok(r.evaluations<=64 && r.evaluations===r.history.length);
+    assert.ok(r.history.length>2);assert.deepEqual(r.history[0].parameters,[3,3]);
+    assert.equal(r.history.at(-1).stage,'refinement');
+    function model(parameters, evaluation) {
+      const wanted=structuredClone(execution.input.material_evaluation);
+      for(const [index,axis] of ['axis1','axis2'].entries()) {
+        assert.ok(parameters[index]>=2 && parameters[index]<=6);
+        wanted.materials.dielectric.parameters[axis].parameters.eps_r=parameters[index];
+      }
+      assert.deepEqual(evaluation,wanted);
+    }
+    model(r.parameters,r.material_evaluation);
+    for(const row of r.history) {
+      model(row.parameters,row.material_evaluation);
+      assert.ok(row.stage==='search' || row.stage==='refinement');
+      assert.deepEqual(row.input,row.stage==='search'?r.input:r.refined_input);
+      assert.ok(row.impedances_ohm.every(value=>Number.isFinite(value)&&value>0));
+    }
+    const selected=r.history.find(row=>row.stage==='search' && row.parameters.every((v,i)=>v===r.parameters[i]));
+    assert.ok(selected);assert.deepEqual(selected.impedances_ohm,r.impedances_ohm);
+    assert.deepEqual(r.history.at(-1).parameters,r.parameters);
+    assert.deepEqual(r.history.at(-1).impedances_ohm,r.refined_impedances_ohm);
+    for(let i=0;i<2;i++) {
+      assert.ok(Math.abs(r.parameters[i]-e.parameters[i])<=1e-4*Math.abs(e.parameters[i]));
+      for(const [values,residuals] of [['impedances_ohm','residuals_ohm'],['refined_impedances_ohm','refined_residuals_ohm']]) {
+        assert.equal(r[residuals][i],r[values][i]-r.targets_ohm[i]);
+        assert.ok(Math.abs(r[residuals][i])<=r.tolerances_ohm[i]);
+        assert.ok(Math.abs(r[values][i]-e[values][i])<=1e-5*Math.abs(e[values][i]));
+      }
+    }
+  }
+  for(const item of cases.material_batch) {
+    await input(item.text);
+    await cdp.evaluate('document.querySelector("#check").click()');
+    await until(async()=>(await status()).startsWith('Input checked'),'batch material normalization',180000);
+    await rm(join(downloads,'sipi-input.json'),{force:true});
+    await cdp.evaluate('document.querySelector("#save-input").click()');
+    const saved=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-input.json'),'utf8'));}catch{}},'batch material input export');
+    assert.deepEqual(saved,item.expected.input);
+    const started=Date.now();const got=await calculate();const seconds=(Date.now()-started)/1000;
+    assert.deepEqual(got.input,item.expected.input);
+    if(item.name==='pair-goal') checkPairMaterial(got,item.expected);
+    else {
+      compareStudy(got,item.expected);
+      if(item.name==='mixed-normal') {
+        assert.equal(got.status,'incomplete');assert.equal(got.result.failed,2);
+        assert.equal(got.result.summary,null);
+        assert.deepEqual(got.result.rows.map(row=>row.error_type),item.expected.result.rows.map(row=>row.error_type));
+      } else assert.equal(got.status,'complete');
+    }
+    await rm(join(downloads,'sipi-result.json'),{force:true});
+    await cdp.evaluate('document.querySelector("#save-result").click()');
+    const exported=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-result.json'),'utf8'));}catch{}},'batch material result export');
+    assert.deepEqual(exported.execution,got);
+    await writeFile(join(output,'batch-'+item.name+'.json'),JSON.stringify(exported,null,2));
+    materialBatch.push({name:item.name,seconds,status:got.status});
+  }
   await input('{"schema":"sipi.lumped-network/1","schema":"invalid"}');
   assert.equal(await cdp.evaluate('document.querySelector("#save-result").disabled'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
@@ -215,8 +290,8 @@ try {
   if(!webRoot) await until(()=>server.exitCode===0,'server exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',
-    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
-      'result download','constant/Debye material goals, selected models, refinement and exports','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
+    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,materialBatch,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
+      'result download','constant/Debye material goals, selected models, refinement and exports','pair material goal and complete/incomplete material studies with exports','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
       'pending-start cancellation and restart','stale completion rejection','mobile width','shutdown']},null,2));
   console.log('Saved analysis browser acceptance passed.');
 } catch(error) {

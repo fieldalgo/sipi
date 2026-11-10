@@ -415,3 +415,25 @@ selected models and history, numerical agreement within relative 1e-10, and
 both mesh residuals within the original 1-ohm goal tolerance. These are runtime
 contract checks, not measured-board validation or a general speed guarantee.
 A changed width normally requires a new mesh; existing job limits still apply.
+
+## Paired material targets and material studies
+
+**Saved analysis** also accepts `sipi.pair-impedance-design/2` and
+`sipi.impedance-study/4`. Open the JSON, check it, calculate and export the
+input/result. Pair targets preserve both selected material values and the
+separate requested/refined results. Studies retain every sampled material and
+failed row; one failed row leaves the summary incomplete. Identical material
+geometries reuse a mesh within that analysis, while each material field is
+computed again. Separate calls start with an empty cache.
+
+The browser acceptance exercises a fixed-geometry diagonal-tensor pair goal
+and constant, Debye, correlated-tensor and mixed-validity normal studies on
+native and Worker runtimes. The pair case requires both requested/refined
+100/34-ohm targets within the original 1/.5-ohm tolerances. Across the two
+optimizers, selected parameters agree within relative 1e-4 and impedances
+within 1e-5; iteration histories may differ but must retain consistent models,
+geometry, budgets and refinement. Study values agree within relative 1e-10 or
+absolute 1e-14 with identical inputs, row order and failure status. Exports
+preserve the actual execution. Existing scalar-target criteria stay unchanged.
+These bounded runtime checks do not establish measured accuracy, general
+optimization convergence or automatic study mesh convergence.

@@ -47,7 +47,14 @@ for kind in ('constant', 'debye'):
     text = material_goal(kind).dumps()
     material_goals.append(dict(name=kind, text=text, expected=execute_saved(text)))
 
+from paired_material_cases import pair_material_goal, material_study
+material_batch = []
+for kind in ('pair-goal', 'constant', 'debye', 'tensor', 'mixed-normal'):
+    doc = pair_material_goal() if kind == 'pair-goal' else material_study(kind)
+    text = doc.dumps()
+    material_batch.append(dict(name=kind, text=text, expected=execute_saved(text)))
+
 print(json.dumps(dict(lumped=lumped.dumps(), study=study.dumps(), goal=goal.dumps(),
-                     mesh_goal=mesh_goal.dumps(), material_goals=material_goals,
+                     mesh_goal=mesh_goal.dumps(), material_goals=material_goals, material_batch=material_batch,
                      line=line.dumps(), expected=execute_saved(lumped.dumps()),
                      capacitance3d=capacitance3d), allow_nan=False))
