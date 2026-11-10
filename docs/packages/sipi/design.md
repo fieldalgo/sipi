@@ -168,6 +168,37 @@ for a refinement with `edge_size`, `far_size` and `grade` halved. Both requested
 and refined impedances must meet the target tolerance. `max_evaluations` counts
 all solves, including the final refinement, and must be an integer of at least 3.
 
+
+For a narrower search stopping residual, pass `search_tolerance` in ohms.
+For example, `tolerance=0.5, search_tolerance=0.25` requires the requested-mesh
+search to reach 0.25 Ω, then checks the separately refined result against
+0.5 Ω. The threshold must be positive, finite and no larger than `tolerance`.
+Omitting it, passing `None`, or setting it equal to `tolerance` preserves the
+original behavior. Endpoint acceptance uses the narrower threshold too;
+otherwise a genuine endpoint sign change is still required. This leaves room
+for discretization drift, but does not guarantee success or increase the
+evaluation or mesh budget. A failed refinement still raises an error.
+
+This option currently belongs to the direct Python call only. Saved design
+and execution schemas keep their existing fields and default search behavior;
+they reject an added `search_tolerance` field. Retain the direct-call options
+alongside the selected geometry if you need to reproduce that search.
+
+For a narrower search stopping residual, pass `search_tolerance` in ohms.
+For example, `tolerance=0.5, search_tolerance=0.25` requires the requested-mesh
+search to reach 0.25 Ω, then checks the separately refined result against
+0.5 Ω. The threshold must be positive, finite and no larger than `tolerance`.
+Omitting it, passing `None`, or setting it equal to `tolerance` preserves the
+original behavior. Endpoint acceptance uses the narrower threshold too;
+otherwise a genuine endpoint sign change is still required. This leaves room
+for discretization drift, but does not guarantee success or increase the
+evaluation or mesh budget. A failed refinement still raises an error.
+
+This option currently belongs to the direct Python call only. Saved design
+and execution schemas keep their existing fields and default search behavior;
+they reject an added `search_tolerance` field. Retain the direct-call options
+alongside the selected geometry if you need to reproduce that search.
+
 `ImpedanceDesign` contains the parameter, target, quantity, requested and refined
 impedances, input document and evaluation history. `residual`,
 `refined_residual` and `mesh_change` keep the target error and mesh change

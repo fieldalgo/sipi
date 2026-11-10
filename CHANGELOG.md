@@ -1,5 +1,9 @@
 # Changelog
 
+- Add an optional tighter direct impedance-search stopping tolerance while retaining
+  the final refined acceptance tolerance, default behavior and evaluation budgets.
+  직접 임피던스 역산의 탐색 종료 기준을 별도로 지정하고 최종 오차·기본 동작·평가 예산을 보존합니다.
+
 - Add optional conductor detail views with explicit cropped-boundary notices,
   responsive labels and normal-film upper-air clearance labels; preserve inputs and results.
   도체 상세 보기·외곽 생략 안내·반응형 라벨·상부 공기 여유 높이 표시를 추가하고 입력과 결과를 보존합니다.

@@ -94,7 +94,7 @@ def _positive(name, value):
 
 def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
                    mesh=None, max_evaluations=40, frequency=None, materials=None,
-                   material_factory=None, return_line=False):
+                   material_factory=None, return_line=False, search_tolerance=None):
     """Bisect a positive parameter range, then check a refined mesh.
 
     factory(parameter) returns a CrossSection. quantity is z0 (one signal),
@@ -110,6 +110,14 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     refined impedances must be within tolerance of target, or GoalSeekError is
     raised. Tighten mesh options and rerun if refinement misses the target.
     No function promises monotonicity for an arbitrary factory.
+
+    search_tolerance optionally sets a tighter requested-mesh stopping residual
+    in ohms. It must be positive, finite and no greater than tolerance. None
+    preserves the original search. Both endpoint selection and bisection use
+    this threshold; the separate refined result still uses tolerance. This
+    can leave room for discretization drift, but never guarantees convergence
+    or increases the evaluation/mesh budget. It is a direct-call option, not
+    a field in saved design or execution documents.
 
     Supply frequency (Hz) and materials together to evaluate fixed scalar or
     principal-axis models. Impedance still uses Re(C_complex) and vacuum L,
@@ -145,6 +153,10 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     if lower >= upper:
         raise ValueError('lower bound must be smaller than upper bound')
     target, tolerance = _positive('target', target), _positive('tolerance', tolerance)
+    search_tolerance = (tolerance if search_tolerance is None
+                        else _positive('search_tolerance', search_tolerance))
+    if search_tolerance > tolerance:
+        raise ValueError('search_tolerance must not exceed tolerance')
     if isinstance(max_evaluations, bool) or not isinstance(max_evaluations, int) or max_evaluations < 3:
         raise ValueError('max_evaluations must be an integer >= 3')
     options = {} if mesh is None else dict(mesh)
@@ -206,7 +218,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
 
     fl, dl, ml, ll = evaluate(lower)
     fu, du, mu, lu = evaluate(upper)
-    if abs(fl) <= tolerance or abs(fu) <= tolerance:
+    if abs(fl) <= search_tolerance or abs(fu) <= search_tolerance:
         x, residual, doc, selected_material, selected_line = (
             (lower, fl, dl, ml, ll) if abs(fl) <= abs(fu)
             else (upper, fu, du, mu, lu))
@@ -218,7 +230,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             if x == lower or x == upper:
                 raise GoalSeekError('parameter resolution exhausted before target convergence', history)
             residual, doc, selected_material, selected_line = evaluate(x)
-            if abs(residual) <= tolerance:
+            if abs(residual) <= search_tolerance:
                 break
             if (residual > 0) == (fl > 0):
                 lower, fl = x, residual
