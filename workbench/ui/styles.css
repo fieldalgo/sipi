@@ -159,3 +159,6 @@ footer a{color:inherit;text-underline-offset:3px}
 }
 
 #unit { min-height: 44px; min-width: 64px; padding: 8px; }
+
+/* Coating material and height inputs keep a full touch target. */
+#coating-fields .number { height: 46px; }

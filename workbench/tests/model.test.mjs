@@ -89,3 +89,18 @@ test('taper and planar coating preserve dimensions and reject impossible profile
   const mil = parameters('coated_microstrip', converted, 'mil');
   for (const key in p) assert.ok(Math.abs(p[key] - mil[key]) < 1e-15);
 });
+
+
+test('planar coated pair keeps two signals, a full flat layer and distinct material inputs', () => {
+  const v={...values, profile:'tapered', top_width:'.4', coating_height:'.1', coating_eps_r:'3.5', coating_tan_delta:'.01'};
+  const p=parameters('coupled_coated_microstrip',v,'mm'), model=schematic('coupled_coated_microstrip',p);
+  assert.equal(p.gap,.0002);assert.equal(p.coating_height,.0001);assert.equal(p.coating_tan_delta,.01);
+  assert.equal(model.traces.length,2);assert.deepEqual(model.traces.map(t=>t.x),[-.00035,.00035]);
+  for(const t of model.traces){assert.equal(t.y,.001);assert.equal(t.top_width,.0004);assert.equal(t.ground,false);}
+  assert.equal(model.layers[1].thickness,p.coating_height);assert.equal(model.layers[1].eps_r,3.5);assert.equal(model.layers[2].eps_r,1);
+  for(const coating_height of ['',0,.035,-1])assert.throws(()=>parameters('coupled_coated_microstrip',{...v,coating_height},'mm'));
+  for(const unit of ['µm','mil']){
+    const inputs={...v};for(const key of ['width','top_width','height','thickness','gap','coating_height'])inputs[key]=convert(v[key],'mm',unit);
+    const q=parameters('coupled_coated_microstrip',inputs,unit);for(const key in p)assert.ok(Math.abs(p[key]-q[key])<1e-15);
+  }
+});

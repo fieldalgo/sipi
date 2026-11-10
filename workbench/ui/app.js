@@ -333,7 +333,7 @@ function geometryFields() {
   $('placement-mode-field').hidden = template === 'offset_stripline';
   $('trace-height-field').hidden = template !== 'offset_stripline' && $('placement').value !== 'fixed';
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
-  $('coating-fields').hidden = template !== 'coated_microstrip';
+  $('coating-fields').hidden = !['coated_microstrip', 'coupled_coated_microstrip'].includes(template);
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
   for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {

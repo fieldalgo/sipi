@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a planar-coated pair form with differential width targeting, four-port response, coating studies and exact editable/project inputs. Preserve coating-aware default edge/growth before mandatory target refinement, with independent panel, finite-element and domain-convergence checks.
+
 - Add micrometre display for editable cross sections. Preserve physical target/study bounds across unit changes and one-sided edits; keep empty thickness and study inputs invalid instead of silently converting them to zero.
 
 - Add a separate explicit-height single-stripline form with z0 targeting, two-port response, height studies and exact editable/project preservation; retain independent plane-reference, finite-element and convergence checks.

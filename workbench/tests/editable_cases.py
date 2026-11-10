@@ -6,16 +6,16 @@ from sipi.execution_record import SavedExecutionRecord
 from sipi.project import SavedProject
 
 cases = []
-for name in ('microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_microstrip'):
+for name in ('microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_microstrip', 'coupled_coated_microstrip'):
     p = dict(width=.0005000000000123456, thickness=0, eps_r=4.123456789012345,
              tan_delta=.0123456789012345, box_width=.016)
     p['plane_spacing' if name in ('stripline', 'coupled_stripline', 'offset_stripline') else 'substrate_height'] = .0010000000000123
     if name not in ('stripline', 'coupled_stripline', 'offset_stripline'): p['air_height'] = .0067
-    if name in ('coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar'): p['gap'] = .0002
+    if name in ('coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip'): p['gap'] = .0002
     if name in ('coupled_stripline', 'offset_stripline'): p.update(trace_height=.000300000000012345, thickness=.000035, top_width=.0004)
     if name in ('grounded_coplanar', 'coupled_grounded_coplanar'): p['ground_width'] = .003
     if name == 'coupled_grounded_coplanar': p.update(ground_gap=.0002500000000123456, thickness=.000035, top_width=.0004)
-    if name == 'coated_microstrip': p.update(thickness=.000035, top_width=.0004,
+    if name in ('coated_microstrip', 'coupled_coated_microstrip'): p.update(thickness=.000035, top_width=.0004,
         coating_height=.0002, coating_eps_r=3, coating_tan_delta=.02)
     doc = TemplateSectionDocument(name, p, mesh=dict(edge_size=8e-6, far_size=.00025, grade=.3))
     cases.append(doc.to_dict())

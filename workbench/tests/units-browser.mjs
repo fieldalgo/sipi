@@ -98,8 +98,8 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/editable_cases.py'],{encoding:'utf8',env:{...process.env,OPENBLAS_NUM_THREADS:'1'}});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout);
-  assert.equal(fixtures.cases.length,8);
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),8);
+  assert.equal(fixtures.cases.length,9);
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),9);
   async function changeUnit(unit) {await cdp.evaluate(`document.querySelector('#unit').value=${JSON.stringify(unit)};document.querySelector('#unit').dispatchEvent(new Event('change'))`);}
   for(const input of fixtures.cases) {
     await open(input);
@@ -171,7 +171,7 @@ try {
   await writeFile(join(output,'project.json'),project);
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');
   if(!webRoot)await until(()=>server.exitCode===0,'host exit');assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',editableForms:8,nominal_z0:z,layouts,errors,externalRequests:remoteRequests,checks:['eight exact inputs through mm/µm/mil','exact goal and length/material study bounds through repeated display changes','one-sided edits preserve opposite bound','variable reset physical SI','blank thickness/study bounds stay invalid','network length stays explicit mm','real micrometre target requested/refined gates','real width and dimensionless TEM studies','raw A/B project resume','four viewports and44px unit control','normal shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',editableForms:9,nominal_z0:z,layouts,errors,externalRequests:remoteRequests,checks:['nine exact inputs through mm/µm/mil','exact goal and length/material study bounds through repeated display changes','one-sided edits preserve opposite bound','variable reset physical SI','blank thickness/study bounds stay invalid','network length stays explicit mm','real micrometre target requested/refined gates','real width and dimensionless TEM studies','raw A/B project resume','four viewports and44px unit control','normal shutdown']},null,2));
   console.log('Display-unit precision acceptance passed.');
 } catch(error) {
   let application=null;
