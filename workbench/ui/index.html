@@ -42,6 +42,8 @@
           <button data-template="coupled_coated_microstrip" aria-pressed="false"><span class="mini">▱ ▱</span>Planar coated pair</button>
           <button data-template="coated_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▰</span>Coated coplanar</button>
           <button data-template="coupled_coated_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▱ ▰</span>Coated coplanar pair</button>
+          <button data-template="conformal_coated_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▰</span>Normal-film grounded coplanar</button>
+          <button data-template="coupled_conformal_coated_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▱ ▰</span>Normal-film grounded pair</button>
           <button data-template="conformal_coated_microstrip" aria-pressed="false"><span class="mini">▱</span>Normal-film microstrip</button>
           <button data-template="coupled_conformal_coated_microstrip" aria-pressed="false"><span class="mini">▱ ▱</span>Normal-film pair</button>
         </div>
@@ -78,7 +80,7 @@
         </form>
         <details id="domain-settings" class="domain-settings">
           <summary>Domain bounds</summary>
-          <p class="fine">Inspect the finite calculation region, then vary its size to check boundary sensitivity. The preview is a cropped schematic; changing bounds does not certify convergence.</p>
+          <p class="fine">Inspect the finite calculation region, then vary its size to check boundary sensitivity. The preview label identifies a schematic or inspected engine geometry. Changing bounds does not certify convergence.</p>
           <div id="domain-inputs">
             <label>Domain width<select id="box_mode"><option value="auto">Automatic</option><option value="fixed">Set width</option></select></label>
             <label id="box-width-field" hidden>Box width<div class="number"><input id="box_width" type="number" value="20" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>

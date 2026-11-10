@@ -24,6 +24,10 @@ def parameters(name):
     if name in ('conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'):
         p.update(coating_thickness=.000020000000000123456, coating_eps_r=3.5, coating_tan_delta=.02, top_width=.4e-3)
         if name.startswith('coupled_'): p['gap'] = .3e-3
+    if name in ('conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar'):
+        p.update(gap=.3e-3 if name.startswith('coupled_') else .2e-3, ground_width=.003,
+                 coating_thickness=.000020000000000123456, coating_eps_r=3.5, coating_tan_delta=.02, top_width=.4e-3)
+        if name.startswith('coupled_'): p['ground_gap'] = .0002500000000123456
     return p
 
 

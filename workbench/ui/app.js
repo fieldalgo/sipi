@@ -381,7 +381,7 @@ function geometryFields() {
   $('coating-fields').hidden = !isCoated(template);
   const normal = isNormalFilm(template);
   $('coating-title').textContent = normal ? 'Normal-thickness coating' : 'Planar coating';
-  $('coating-description').textContent = normal ? 'Thickness normal to the substrate, copper top and sloping sides; corners meet at straight miters. Top width must not exceed bottom width. Upper air starts above the highest coated trace.' : 'Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.';
+  $('coating-description').textContent = normal ? 'Thickness normal to the substrate and exposed copper tops and sides, including finite side grounds. Corners meet at straight miters. Only signals may taper; top width must not exceed bottom width. Upper air starts above the highest coating.' : 'Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.';
   $('coating-height-field').hidden = normal;
   $('coating-thickness-field').hidden = !normal;
   $('geometry-inspect').hidden = !normal || !!imported;
