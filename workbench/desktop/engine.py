@@ -8,12 +8,13 @@ from numbers import Real
 
 import numpy as np
 import sipi
-from sipi.templates import coated_microstrip, coupled_stripline
+from sipi.templates import coated_microstrip, coupled_stripline, offset_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
     'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coupled_grounded_coplanar')}
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
+TEMPLATES['offset_stripline'] = offset_stripline
 PAIR_TEMPLATES = {'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'}
 
 
@@ -125,7 +126,7 @@ def study_documents(request, nominal):
     parameters = request['parameters']
     allowed = {'width', 'top_width', 'substrate_height', 'plane_spacing', 'thickness',
                'gap', 'ground_gap', 'ground_width', 'eps_r', 'coating_height', 'coating_eps_r'}
-    if request['template'] == 'coupled_stripline' and parameters.get('trace_height') is not None:
+    if request['template'] in ('coupled_stripline', 'offset_stripline') and parameters.get('trace_height') is not None:
         allowed.add('trace_height')
     names, low, high = [], [], []
     for variable in variables:

@@ -1,7 +1,7 @@
 export const scales = {mm: 1e-3, mil: 25.4e-6};
 export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower', 'upper'];
-export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip'};
-export const isStripline = template => ['stripline', 'coupled_stripline'].includes(template);
+export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip'};
+export const isStripline = template => ['stripline', 'coupled_stripline', 'offset_stripline'].includes(template);
 export const isPair = template => ['coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'].includes(template);
 export const isCoplanar = template => ['grounded_coplanar', 'coupled_grounded_coplanar'].includes(template);
 
@@ -59,6 +59,7 @@ export function parameters(template, values, unit) {
   };
   const out = {width: positive('width') * scales[unit], thickness: positive('thickness', true) * scales[unit], eps_r: positive('eps_r'), tan_delta: positive('tan_delta', true)};
   out[isStripline(template) ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
+  if (template === 'offset_stripline') out.trace_height = positive('trace_height') * scales[unit];
   if (template === 'coupled_stripline') {
     const placement = values.placement ?? 'centred';
     if (!['centred', 'fixed'].includes(placement)) throw new Error('Unknown vertical placement.');
@@ -97,7 +98,7 @@ export function studyFields(template, p) {
   const fields = {width: 'Bottom width', eps_r: 'Substrate permittivity',
     [isStripline(template) ? 'plane_spacing' : 'substrate_height']: isStripline(template) ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
   if (p.top_width != null) fields.top_width = 'Top width';
-  if (template === 'coupled_stripline' && p.trace_height != null) fields.trace_height = 'Bottom-face height';
+  if (['coupled_stripline', 'offset_stripline'].includes(template) && p.trace_height != null) fields.trace_height = 'Bottom-face height';
   if ('gap' in p) fields.gap = 'Bottom gap';
   if ('ground_gap' in p) fields.ground_gap = 'Signal–ground gap';
   if ('ground_width' in p) fields.ground_width = 'Ground width';

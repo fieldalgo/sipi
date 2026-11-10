@@ -29,6 +29,7 @@
         <div class="templates" role="group" aria-label="Cross-section type">
           <button data-template="microstrip" class="selected" aria-pressed="true"><span class="mini">━</span>Microstrip</button>
           <button data-template="stripline" aria-pressed="false"><span class="mini">═</span>Stripline</button>
+          <button data-template="offset_stripline" aria-pressed="false"><span class="mini">═</span>Offset stripline</button>
           <button data-template="coupled_microstrip" aria-pressed="false"><span class="mini">━ ━</span>Coupled pair</button>
           <button data-template="coupled_stripline" aria-pressed="false"><span class="mini">═ ═</span>Coupled stripline</button>
           <button data-template="grounded_coplanar" aria-pressed="false"><span class="mini">▰ ━ ▰</span>Grounded coplanar</button>
@@ -49,7 +50,7 @@
             <label id="ground-field" hidden>Ground width<div class="number"><input id="ground_width" type="number" value="1" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
           </div>
           <div id="placement-fields" hidden>
-            <label>Vertical placement<select id="placement"><option value="centred">Centred between planes</option><option value="fixed">Set bottom-face height</option></select></label>
+            <label id="placement-mode-field">Vertical placement<select id="placement"><option value="centred">Centred between planes</option><option value="fixed">Set bottom-face height</option></select></label>
             <label id="trace-height-field" hidden>Bottom-face height<div class="number"><input id="trace_height" type="number" value="0.3" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <p class="fine">Measured from the lower plane to the copper bottom face. Keep the whole copper thickness between the planes. Explicit placement stays fixed when plane spacing or thickness changes.</p>
           </div>

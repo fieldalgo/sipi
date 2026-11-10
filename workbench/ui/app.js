@@ -325,8 +325,9 @@ function preview() {
 
 function geometryFields() {
   $('top-width-field').hidden = $('profile').value !== 'tapered';
-  $('placement-fields').hidden = template !== 'coupled_stripline';
-  $('trace-height-field').hidden = $('placement').value !== 'fixed';
+  $('placement-fields').hidden = !['coupled_stripline', 'offset_stripline'].includes(template);
+  $('placement-mode-field').hidden = template === 'offset_stripline';
+  $('trace-height-field').hidden = template !== 'offset_stripline' && $('placement').value !== 'fixed';
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
   $('coating-fields').hidden = template !== 'coated_microstrip';
   domainControls();
@@ -519,7 +520,11 @@ function chooseTemplate(name) {
     template = name; imported = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto';
-    $('placement').value = 'centred';
+    $('placement').value = name === 'offset_stripline' ? 'fixed' : 'centred';
+    if (name === 'offset_stripline') {
+      lengthSI.trace_height = (lengthSI.height - lengthSI.thickness) / 2;
+      $('trace_height').value = String(Number((lengthSI.trace_height / scales[unit]).toPrecision(10)));
+    }
     $('import-note').hidden = true;
     $('inputs').hidden = false;
     for (const element of $('inputs').elements) element.disabled = false;

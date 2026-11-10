@@ -144,10 +144,10 @@ def exercise(source, report):
             assert b'GEOS' in request('/notices.txt')
             assert b'Input JSON' in request('/saved.html')
             report['build'] = json.loads(request('/build-info.json'))
-            for template, extra in [('microstrip', {}), ('stripline', {}), ('coupled_microstrip', {'gap': .2e-3}), ('coupled_stripline', {'gap': .2e-3}), ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3}), ('coupled_grounded_coplanar', {'gap':.3e-3, 'ground_gap':.2e-3, 'ground_width':1e-3})]:
+            for template, extra in [('microstrip', {}), ('stripline', {}), ('offset_stripline', {'trace_height':.3e-3}), ('coupled_microstrip', {'gap': .2e-3}), ('coupled_stripline', {'gap': .2e-3}), ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3}), ('coupled_grounded_coplanar', {'gap':.3e-3, 'ground_gap':.2e-3, 'ground_width':1e-3})]:
                 report['phase'] = 'analyze ' + template
                 parameters = {'width': .5e-3, 'eps_r': 4,
-                    'plane_spacing' if template in ('stripline', 'coupled_stripline') else 'substrate_height': 1e-3, **extra}
+                    'plane_spacing' if template in ('stripline', 'coupled_stripline', 'offset_stripline') else 'substrate_height': 1e-3, **extra}
                 request('/api/job', {'action': 'analyze', 'template': template, 'parameters': parameters,
                     'mesh': {'edge_size': 5e-6, 'far_size': .5e-3, 'grade': .2}})
                 deadline = time.monotonic() + 180
