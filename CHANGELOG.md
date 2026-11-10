@@ -1,5 +1,9 @@
 # Changelog
 
+- Add bounded single-material uniform sampling settings with explicit bounds,
+  sample count, seed and frequency; preserve strict validation and saved records.
+
+
 ## [Unreleased]
 
 - Edit paired principal-axis material means, standard deviations and input correlation for normal studies. Preserve variable order, seeded samples and failed rows, including supported correlation ±1 boundaries; keep target and single-variable settings compatible.

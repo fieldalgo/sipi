@@ -9,6 +9,7 @@ const fields = [
 const sweepFields = [fields[2],fields[3],fields[4],['count','Sample count (2–128)']];
 const normalFields = [['mean','Mean (dimensionless)'],['std','Standard deviation (dimensionless)'],
   sweepFields[3],['seed','Random seed (0–4294967295)'],fields[4]];
+const uniformFields = [fields[2],fields[3],sweepFields[3],normalFields[3],fields[4]];
 const correlatedFields = [['meanFirst','Variable 1 mean (dimensionless)'],['stdFirst','Variable 1 standard deviation (dimensionless)'],
   ['meanSecond','Variable 2 mean (dimensionless)'],['stdSecond','Variable 2 standard deviation (dimensionless)'],
   ['correlation','Input correlation (−1 to 1)'],sweepFields[3],normalFields[3],fields[4]];
@@ -56,6 +57,16 @@ export function materialSweepSettings(doc) {
   const values = {lower:variable.lower, upper:variable.upper, frequency:doc.material_evaluation.frequency_hz, count:doc.sampling.count};
   if (!Object.values(values).every(finite)) return null;
   return {kind:'sweep', values, description:`${names[doc.quantity]} sweep · ${description}`};
+}
+
+export function materialUniformSettings(doc) {
+  if (doc?.schema !== 'sipi.impedance-study/4' || !Object.hasOwn(names,doc.quantity) ||
+      doc.sampling?.kind !== 'uniform' || !Array.isArray(doc.sampling.variables) || doc.sampling.variables.length !== 1) return null;
+  const variable=doc.sampling.variables[0],description=bindingDescription(doc,variable?.name);
+  if (!description) return null;
+  const values={lower:variable.lower,upper:variable.upper,count:doc.sampling.count,seed:doc.sampling.seed,frequency:doc.material_evaluation.frequency_hz};
+  if (!Object.values(values).every(finite)) return null;
+  return {kind:'uniform',values,description:`${names[doc.quantity]} uniform sampling · ${description}`};
 }
 
 export function materialNormalSettings(doc) {
@@ -178,6 +189,19 @@ export function applyMaterialPairSettings(doc,drafts) {
   return result;
 }
 
+export function applyMaterialUniformSettings(doc,drafts) {
+  if (!materialUniformSettings(doc)) throw new Error('This input has no supported uniform material sampling form.');
+  const values=numericDrafts(drafts,uniformFields);
+  if (values.lower>=values.upper) throw new Error('Lower sample bound must be below upper.');
+  if (!Number.isInteger(values.count) || values.count<2 || values.count>128) throw new Error('Sample count must be an integer from 2 to 128.');
+  if (!Number.isInteger(values.seed) || values.seed<0 || values.seed>4294967295) throw new Error('Random seed must be an integer from 0 to 4294967295.');
+  if (values.frequency<0) throw new Error('Evaluation frequency must be zero or positive.');
+  const result=structuredClone(doc);
+  result.sampling.variables[0].lower=values.lower;result.sampling.variables[0].upper=values.upper;
+  result.sampling.count=values.count;result.sampling.seed=values.seed;result.material_evaluation.frequency_hz=values.frequency;
+  return result;
+}
+
 export function applyMaterialNormalSettings(doc,drafts) {
   if (!materialNormalSettings(doc)) throw new Error('This input has no supported normal material sampling form.');
   const values=numericDrafts(drafts,normalFields);
@@ -208,6 +232,7 @@ export function applyMaterialCorrelatedSettings(doc,drafts) {
 }
 
 export function applyMaterialSettings(doc,drafts) {
+  if (doc?.schema === 'sipi.impedance-study/4' && doc.sampling?.kind === 'uniform') return applyMaterialUniformSettings(doc,drafts);
   if (doc?.schema === 'sipi.pair-impedance-design/2') return applyMaterialPairSettings(doc,drafts);
   if (doc?.schema === 'sipi.impedance-study/4' && doc.sampling?.kind === 'normal')
     return materialCorrelatedSettings(doc)?applyMaterialCorrelatedSettings(doc,drafts):applyMaterialNormalSettings(doc,drafts);
@@ -234,14 +259,15 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
     apply.disabled=reset.disabled=blocked||!dirty;
     note.textContent=dirty?'Unapplied settings. Apply or reset before running or saving the current input.':
       'Edit these settings, then apply them to the input. Geometry, material poles and mesh stay in the JSON. Applying checks the input without calculating.' +
-      (settings?.kind==='sweep'?' Bounds and materials are checked before running. Failed calculation rows are retained without aggregate statistics. Sampled values do not guarantee manufacturing limits.':
+      (settings?.kind==='uniform'?' Uniform sampling uses the stated input bounds and seed. Bounds and materials are checked before running. Failed rows are retained without aggregate statistics. A finite random sample does not establish output extremes or manufacturing yield.':
+       settings?.kind==='sweep'?' Bounds and materials are checked before running. Failed calculation rows are retained without aggregate statistics. Sampled values do not guarantee manufacturing limits.':
        ['normal','correlated'].includes(settings?.kind)?' Normal sampling is unbounded. Invalid samples remain failed rows without aggregate statistics; they are not clamped or drawn again. The seed repeats this sampling input, not manufacturing limits.'+(settings.kind==='correlated'?' Input correlation describes the distribution, not the observed sample or output correlation.':''):
        settings?.kind==='pair'?' Both targets must pass on the requested and refined meshes. The search is local; an evaluation budget does not guarantee a solution or limit elapsed time. Failed runs remain in the raw record.':'');
   }
   function restore(){
     for(const [name,input] of Object.entries(inputs)){labels[name].hidden=!Object.hasOwn(settings.values,name);input.value=labels[name].hidden?'':String(settings.values[name]);}
-    for(const [name] of settings.kind==='pair'?pairFields:settings.kind==='correlated'?correlatedFields:settings.kind==='normal'?normalFields:settings.kind==='sweep'?sweepFields:fields)grid.append(labels[name]);
-    for(const name of ['lower','upper'])labels[name].firstChild.textContent=`${name==='lower'?'Lower':'Upper'} ${settings.kind==='sweep'?'sample':'search'} bound (dimensionless)`;
+    for(const [name] of settings.kind==='pair'?pairFields:settings.kind==='correlated'?correlatedFields:settings.kind==='uniform'?uniformFields:settings.kind==='normal'?normalFields:settings.kind==='sweep'?sweepFields:fields)grid.append(labels[name]);
+    for(const name of ['lower','upper'])labels[name].firstChild.textContent=`${name==='lower'?'Lower':'Upper'} ${['sweep','uniform'].includes(settings.kind)?'sample':'search'} bound (dimensionless)`;
     dirty=false;update();
   }
   for(const [name,input] of Object.entries(inputs))input.addEventListener('input',()=>{
@@ -257,9 +283,9 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
       blocked=disabled;
       if(text!==source){
         source=text;dirty=false;settings=null;
-        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialSweepSettings(doc)||materialPairSettings(doc)||materialNormalSettings(doc)||materialCorrelatedSettings(doc);}catch{}
+        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialUniformSettings(doc)||materialSweepSettings(doc)||materialPairSettings(doc)||materialNormalSettings(doc)||materialCorrelatedSettings(doc);}catch{}
         container.hidden=settings===null;
-        if(settings){heading.textContent=settings.kind==='sweep'?'Material sweep settings':settings.kind==='pair'?'Paired material target settings':settings.kind==='correlated'?'Correlated material sampling settings':settings.kind==='normal'?'Normal material sampling settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
+        if(settings){heading.textContent=settings.kind==='uniform'?'Uniform material sampling settings':settings.kind==='sweep'?'Material sweep settings':settings.kind==='pair'?'Paired material target settings':settings.kind==='correlated'?'Correlated material sampling settings':settings.kind==='normal'?'Normal material sampling settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
       }
       update();
     },

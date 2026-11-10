@@ -32,6 +32,23 @@ capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
 
+## Bounded uniform material samples
+
+In **Saved analysis**, choose **Bounded uniform material tolerance** or open a
+single-variable `sipi.impedance-study/4` uniform input. Edit the lower and upper
+bounds, sample count (2–128), integer seed (0–4294967295) and evaluation frequency.
+**Apply settings** validates the original and proposed input before replacing it;
+invalid material bounds leave your original input intact. This form supports one
+constant relative permittivity or one Debye strength. Other bindings remain in JSON.
+
+The seed repeats the same sampling input. Uniform samples use the specified input
+bounds; finite random samples do not prove output extremes or manufacturing yield.
+This differs from the unbounded normal distribution. The sampler, geometry, mesh,
+material poles and all failed rows remain unchanged. Failed calculations retain
+their original row and withhold aggregate statistics. Current settings, project
+restoration and historical records remain separate.
+
+
 ## Save a design and keep editing
 
 Choose a template, enter its dimensions and materials, then use **Save editable

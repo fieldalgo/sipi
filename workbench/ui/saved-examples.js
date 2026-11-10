@@ -472,5 +472,65 @@ export const SAVED_EXAMPLES = [
     "schema": "sipi.impedance-study/4",
     "template": "stripline"
   }
+},
+{
+  "id": "uniform-study",
+  "label": "Bounded uniform material tolerance",
+  "description": "Sample one relative permittivity within explicit bounds with a reproducible seed. Finite samples do not prove output extremes or yield.",
+  "document": {
+    "fixed_pitch_m": null,
+    "fixed_plane_spacing_m": null,
+    "material_evaluation": {
+      "frequency_hz": 100000000.0,
+      "materials": {
+        "dielectric": {
+          "kind": "constant",
+          "parameters": {
+            "eps_r": 4.0,
+            "tan_delta": 0.01
+          },
+          "schema": "sipi.dielectric/1"
+        }
+      }
+    },
+    "material_variables": {
+      "dk": {
+        "path": [
+          "eps_r"
+        ],
+        "region": "dielectric"
+      }
+    },
+    "mesh": {
+      "edge_size": 5e-06,
+      "far_size": 0.000125,
+      "grade": 0.15,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "box_width": 0.006,
+      "eps_r": 1.0,
+      "plane_spacing": 0.001,
+      "tan_delta": 0.0,
+      "thickness": 0.0,
+      "top_width": null,
+      "width": 0.0003
+    },
+    "quantity": "z0",
+    "sampling": {
+      "count": 8,
+      "kind": "uniform",
+      "variables": [
+        {
+          "lower": 2.0,
+          "name": "dk",
+          "upper": 6.0
+        }
+      ],
+      "seed": 9
+    },
+    "schema": "sipi.impedance-study/4",
+    "template": "stripline"
+  }
 }
 ];

@@ -13,6 +13,7 @@ from material_goal_form_cases import edited_goal
 from material_sweep_form_cases import edited_study
 from material_normal_form_cases import normal_study
 from correlated_material_form_cases import correlated_study
+from material_uniform_form_cases import uniform_study
 from sipi.study import ImpedanceStudyDocument
 from test_desktop import server
 
@@ -23,9 +24,9 @@ def test_catalog_documents_are_exact_validated_inputs_without_solving(monkeypatc
     rows = json.loads(source.split('export const SAVED_EXAMPLES = ', 1)[1].removesuffix(';\n'))
     expected = [LumpedNetworkDocument([0, 1e9], resistance=10, inductance=2e-9),
         material_goal('constant'), material_goal('debye'), pair_material_goal(),
-        material_study('constant'), material_study('tensor'), ImpedanceStudyDocument.from_dict(normal_study('constant'))]
+        material_study('constant'), material_study('tensor'), ImpedanceStudyDocument.from_dict(normal_study('constant')), ImpedanceStudyDocument.from_dict(uniform_study('constant'))]
     assert [row['id'] for row in rows] == ['rlc', 'constant-target', 'debye-target',
-                                         'pair-target', 'material-sweep', 'correlated-study', 'normal-study']
+                                         'pair-target', 'material-sweep', 'correlated-study', 'normal-study', 'uniform-study']
     def forbidden(*args, **kwargs):
         raise AssertionError('loading or normalizing an example must not solve')
     monkeypatch.setattr(CrossSection, 'mesh', forbidden)
@@ -140,4 +141,25 @@ def test_rank_one_material_settings_preserve_standardized_relation(name, rho, mo
     assert document['material_variables'] == material_study('tensor').to_dict()['material_variables']
     document['sampling']['correlation'] = [[1., 1.01], [1.01, 1.]]
     with pytest.raises(ValueError, match='correlation'):
+        normalize_saved(json.dumps(document))
+
+
+@pytest.mark.parametrize('kind', ['constant', 'debye'])
+def test_uniform_settings_keep_seeded_affine_samples_and_reject_invalid_corners(kind, monkeypatch):
+    import numpy as np
+    def forbidden(*args, **kwargs):
+        raise AssertionError('uniform input normalization and sampling must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    document = uniform_study(kind, edited=True)
+    study = ImpedanceStudyDocument.from_dict(document)
+    values = study.samples()[:, 0]
+    assert np.all((values >= 1.) & (values <= 5.))
+    scaled = json.loads(json.dumps(document))
+    scaled['sampling']['variables'][0].update(lower=3., upper=11.)
+    np.testing.assert_allclose(ImpedanceStudyDocument.from_dict(scaled).samples()[:, 0], 2*values+1, rtol=0, atol=2e-15)
+    assert study.samples().tolist() == ImpedanceStudyDocument.loads(normalize_saved(study.dumps())).samples().tolist()
+    scaled['sampling']['seed'] = 18
+    assert ImpedanceStudyDocument.from_dict(scaled).samples().tolist() != (2*values+1).reshape(-1, 1).tolist()
+    document['sampling']['variables'][0]['lower'] = -.5
+    with pytest.raises(ValueError):
         normalize_saved(json.dumps(document))
