@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add opt-in requested-mesh matrix snapshots to impedance targeting without another field solve. Preserve the default result and saved JSON, selection/material history, evaluation budgets and mandatory refinement.
+
 - Add a planar-coated coplanar-pair form with distinct signal and ground gaps, finite rectangular grounds, differential width targets, coating/ground studies and four-port response. Preserve exact SI/project inputs and independent field, mesh and domain checks.
 
 - Deliver local HTTP rejections before bounded connection cleanup so unread request data does not reset ordinary oversized uploads. Retain input limits and exercise backpressure, stalled peers and the actual portable host rejection path.

@@ -9,11 +9,13 @@ from contextlib import contextmanager
 import math
 import json
 from numbers import Real
+import numpy as np
 from meshine import MeshSizeLimitError
 
 from .crosssection import CrossSection
 from .document import CrossSectionDocument
 from .impedance_material import _material_input, _analyze_material, _frequency
+from .quasistatic import LineParameters
 
 __all__ = ['ImpedanceDesign', 'DesignEvaluation', 'GoalSeekError',
            'GoalMeshSizeLimitError', 'seek_impedance']
@@ -91,7 +93,7 @@ def _positive(name, value):
 
 def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
                    mesh=None, max_evaluations=40, frequency=None, materials=None,
-                   material_factory=None):
+                   material_factory=None, return_line=False):
     """Bisect a positive parameter range, then check a refined mesh.
 
     factory(parameter) returns a CrossSection. quantity is z0 (one signal),
@@ -115,7 +117,15 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     Alternatively, material_factory(parameter) returns the model mapping at
     each search point. Supply a fixed frequency and omit materials. The chosen
     mapping is captured once and reused unchanged for the refinement solve.
+
+    With return_line=True, return (ImpedanceDesign, LineParameters). The line
+    contains independent read-only matrix snapshots from the selected requested
+    mesh and material evaluation, not the refined mesh. No additional field
+    solve occurs. The default False preserves the original result type/fields.
+    Both modes require the same successful refinement; failures return no line.
     """
+    if type(return_line) is not bool:
+        raise ValueError('return_line must be a boolean')
     if not callable(factory):
         raise TypeError('factory must be callable')
     if quantity not in ('z0', 'z_diff', 'z_diff_forward'):
@@ -167,7 +177,17 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
                     else _analyze_material(doc, evaluated_material, quantity))
         value = impedance(line)
         history.append(DesignEvaluation(parameter, value, 'search'))
-        return value-target, doc, evaluated_material
+        # Snapshot before another factory/solver call can reuse mutable arrays.
+        # Only small per-unit-length matrices are retained, never field vectors.
+        selected_line = None
+        if return_line:
+            matrices = {}
+            for name in ('C', 'C0', 'L', 'C_loss'):
+                array = np.array(getattr(line, name), copy=True)
+                array.setflags(write=False)
+                matrices[name] = array
+            selected_line = LineParameters(tuple(line.names), **matrices)
+        return value-target, doc, evaluated_material, selected_line
 
     def impedance(line):
         value = line.even_odd()['z_diff'] if quantity == 'z_diff' else getattr(line, quantity)
@@ -175,11 +195,12 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             raise GoalSeekError('solver returned invalid impedance', history)
         return float(value)
 
-    fl, dl, ml = evaluate(lower)
-    fu, du, mu = evaluate(upper)
+    fl, dl, ml, ll = evaluate(lower)
+    fu, du, mu, lu = evaluate(upper)
     if abs(fl) <= tolerance or abs(fu) <= tolerance:
-        x, residual, doc, selected_material = ((lower, fl, dl, ml) if abs(fl) <= abs(fu)
-                                                else (upper, fu, du, mu))
+        x, residual, doc, selected_material, selected_line = (
+            (lower, fl, dl, ml, ll) if abs(fl) <= abs(fu)
+            else (upper, fu, du, mu, lu))
     else:
         if (fl > 0) == (fu > 0):
             raise GoalSeekError('target is not bracketed by the endpoint impedances', history)
@@ -187,7 +208,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             x = lower+(upper-lower)/2
             if x == lower or x == upper:
                 raise GoalSeekError('parameter resolution exhausted before target convergence', history)
-            residual, doc, selected_material = evaluate(x)
+            residual, doc, selected_material, selected_line = evaluate(x)
             if abs(residual) <= tolerance:
                 break
             if (residual > 0) == (fl > 0):
@@ -209,4 +230,5 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
         raise GoalSeekError('refined mesh misses target; tighten mesh settings and rerun', history)
     saved = (None if selected_material is None else
              json.dumps(selected_material, sort_keys=True, allow_nan=False))
-    return ImpedanceDesign(x, target, residual+target, refined, quantity, doc, tuple(history), saved)
+    result = ImpedanceDesign(x, target, residual+target, refined, quantity, doc, tuple(history), saved)
+    return (result, selected_line) if return_line else result

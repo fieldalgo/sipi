@@ -179,6 +179,15 @@ print(result.parameter, result.impedance, result.refined_impedance)
 
 ## 검증
 
+행렬 후처리에는 `result, line = seek_impedance(..., return_line=True)`를 사용합니다.
+`line`은 선택한 **요청 메시**의 `LineParameters`이며 지정했다면 선택 주파수·재료
+평가를 반영합니다. C, C0, L, C_loss는 독립적인 읽기 전용 복사본입니다. 추가 전계
+풀이 없이 반환하며 전계 벡터나 요청 간 캐시를 보존하지 않습니다. 별도 세분 검사는
+여전히 통과해야 하며 실패 시 설계와 행렬을 반환하지 않습니다. `return_line`은
+bool만 허용합니다. 기본 `False`는 기존 필드 그대로 `ImpedanceDesign`을 반환하며
+저장 설계·실행 JSON에 옵션이나 행렬을 추가하지 않습니다. 이 행렬은 실수 준정적
+선로이며 복소 유손실 특성 임피던스를 의미하지 않습니다.
+
 `tests/sipi/test_design_documents.py`에서 네 템플릿과 직접 작성한 형상을 비교하고 JSON
 왕복 후 C, C0, L, 유전 손실 행렬 보존을 검사합니다. 잘못된 필드·외부 변경 격리·탐색 실패
 경로도 검사합니다. 실제 FEM의 50 Ω 스트립라인 탐색을 독립적으로 근을 구한 Cohn 등각사상

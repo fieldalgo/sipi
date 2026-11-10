@@ -109,15 +109,27 @@ def test_mesh_settings_rejects_invalid_values_before_generation(options):
         sample().section.mesh_settings(**options)
 
 
-def test_stripline_goal_matches_independent_cohn_width():
+@pytest.mark.parametrize('return_line', [False, True])
+def test_stripline_goal_matches_independent_cohn_width(return_line, monkeypatch):
     from test_sipi_references import stripline_z0
+    original = CrossSection.analyze
+    calls = []
+    def observed(self, **mesh):
+        calls.append(dict(mesh))
+        return original(self, **mesh)
+    monkeypatch.setattr(CrossSection, 'analyze', observed)
     b, er, target = 1e-3, 4.0, 50.0
     expected = brentq(lambda w: stripline_z0(w, b, er)-target, .3e-3, .8e-3,
                       xtol=1e-14)
     result = seek_impedance(lambda w: stripline(width=w, plane_spacing=b, eps_r=er),
                             (.3e-3, .8e-3), target,
                             mesh=dict(edge_size=.5e-6, far_size=.125e-3, grade=.075),
-                            tolerance=.1, max_evaluations=20)
+                            tolerance=.1, max_evaluations=20, return_line=return_line)
+    if return_line:
+        result, line = result
+        assert line.z0 == result.impedance
+        assert not line.C.flags.writeable
+    assert len(calls) == len(result.history)
     assert result.parameter == pytest.approx(expected, rel=1e-2)
     assert abs(result.residual) <= .1
     assert abs(result.refined_residual) <= .1

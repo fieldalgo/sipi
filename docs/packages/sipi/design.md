@@ -191,6 +191,16 @@ factories. Box/material uncertainty needs separate analysis.
 
 ## Validation
 
+For matrix postprocessing, use `result, line = seek_impedance(..., return_line=True)`.
+`line` is a `LineParameters` snapshot from the selected **requested mesh**, including
+the selected frequency/material evaluation when supplied. Its C, C0, L and C_loss
+arrays are independent read-only copies. No extra field solve is performed and no
+field vectors or cross-request cache are retained. The separate refinement must
+still pass; a failure returns neither a design nor a line. `return_line` must be a
+boolean. The default `False` returns the original `ImpedanceDesign` with unchanged
+fields; saved design/execution JSON does not gain a new option or matrix payload.
+The snapshot is a real quasi-static line, not a complex lossy characteristic impedance.
+
 `tests/sipi/test_design_documents.py` checks all four templates against explicit
 geometry and checks that JSON round trips preserve C, C0, L and dielectric-loss
 matrices. Invalid fields, mutation isolation and search failure paths are covered.
