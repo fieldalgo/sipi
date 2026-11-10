@@ -108,7 +108,7 @@ try {
     const got=await cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');
     assert.equal(got.status,item.expected.status);assert.deepEqual(got.input,item.expected.input);close(got.result,item.expected.result);close(got.error,item.expected.error);
     if(got.status==='complete')assert.ok(Math.abs(got.result.residual)<=1&&Math.abs(got.result.refined_residual)<=1);
-    else {assert.match(got.error.message,/not bracketed/);assert.equal(got.error.history.length,2);assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);}
+    else {assert.match(got.error.message,/not bracketed/);assert.equal(got.error.history.length,2);assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),false);assert.match(await cdp.evaluate('document.querySelector("#material-results h3").textContent'),/target not accepted/);}
     const raw=await download('save-record','sipi-execution-record.json');records.push(JSON.parse(raw));
     await writeFile(join(output,item.id+'-execution.json'),JSON.stringify(got,null,2));await writeFile(join(output,item.id+'-record.json'),raw);
     const project=JSON.parse(await download('project-save','sipi-analysis-project.json'));

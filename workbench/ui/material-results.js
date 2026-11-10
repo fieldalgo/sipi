@@ -83,10 +83,45 @@ function pairView(input, result, status) {
         ['Refined',result.targets_ohm[i],result.refined_impedances_ohm[i],result.refined_residuals_ohm[i],result.tolerances_ohm[i]]]))]};
 }
 
+function failedScalarView(input, error) {
+  if (!['GoalSeekError','GoalMeshSizeLimitError'].includes(error?.type) || error.unit !== 'ohm' ||
+      typeof error.message !== 'string' || !error.message || !Object.hasOwn(quantity,input.quantity) ||
+      typeof input.variable !== 'string' || !input.variable || !positive(input.target_ohm) ||
+      !positive(input.tolerance_ohm) || !numbers(input.bounds,2,positive) || input.bounds[0] >= input.bounds[1] ||
+      !Number.isInteger(input.max_evaluations) || input.max_evaluations < 3 || input.max_evaluations > 10000 ||
+      !Array.isArray(error.history) || error.history.length > input.max_evaluations ||
+      !(error.parameter === null || positive(error.parameter))) return null;
+  const stages = ['search','refinement'];
+  if (!error.history.every((row,index) => positive(row.parameter) && positive(row.value) && stages.includes(row.stage) &&
+      (row.stage !== 'refinement' || index === error.history.length-1))) return null;
+  const tables = [
+    table('Requested target — not accepted', ['Quantity','Target (Ω)','Tolerance (Ω)'],
+      [[quantity[input.quantity],input.target_ohm,input.tolerance_ohm]]),
+    table('Search interval', ['Variable','Lower bound in input units','Upper bound in input units'],
+      [[input.variable,...input.bounds]])];
+  if (error.history.length) tables.push(table('Completed evaluations only',
+    ['Row index','Stage','Parameter in input units','Impedance (Ω)'],
+    error.history.map((row,index) => [index,row.stage,row.parameter,row.value])));
+  if (error.type === 'GoalMeshSizeLimitError') {
+    if (!positive(error.parameter) || !stages.includes(error.stage) || error.history.some(row => row.stage === 'refinement') ||
+        !Number.isInteger(error.attempts) || error.attempts !== error.history.length+1 ||
+        error.attempts > input.max_evaluations || typeof error.cause_type !== 'string' || !error.cause_type ||
+        error.input?.schema !== 'sipi.cross-section/1') return null;
+    tables.push(table('Stopped evaluation — no impedance calculated',
+      ['Attempt','Stage','Parameter in input units','Impedance (Ω)','Cause'],
+      [[error.attempts,error.stage,error.parameter,null,error.cause_type]]));
+  }
+  return {title:'Impedance target not accepted', failed:true,
+    note:`${error.message}. ${error.history.length} completed evaluations. History does not select a solution or certify convergence.`, tables};
+}
+
 export function materialResultView(execution) {
   try {
-    if (execution?.schema !== 'sipi.execution/1' || !execution.result || execution.error !== null) return null;
-    const {input,result,status} = execution;
+    if (execution?.schema !== 'sipi.execution/1') return null;
+    const {input,result,status,error} = execution;
+    if (status === 'failed' && result === null && ['sipi.impedance-design/1','sipi.impedance-design/2','sipi.impedance-design/3'].includes(input.schema))
+      return failedScalarView(input,error);
+    if (!result || error !== null) return null;
     if (input.schema === 'sipi.impedance-study/4') return studyView(input,result,status);
     if (input.schema === 'sipi.impedance-design/3') return scalarView(input,result,status);
     if (input.schema === 'sipi.pair-impedance-design/2') return pairView(input,result,status);
@@ -105,7 +140,10 @@ export function renderMaterialResults(container, execution, {historical = false}
   const document = container.ownerDocument;
   const element = (tag, text) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; return node; };
   const fragment = document.createDocumentFragment();
-  fragment.append(element('h3',(historical ? 'Saved run · ' : '') + view.title),element('p',view.note));
+  const heading = element('h3',(historical ? 'Saved run · ' : '') + view.title);
+  const description = element('p',view.note);
+  if (view.failed) { heading.className = 'error'; description.className = 'error'; }
+  fragment.append(heading,description);
   for (const item of view.tables) {
     const wrap = element('div'); wrap.className = 'material-table'; wrap.tabIndex = 0;
     wrap.setAttribute('role','region'); wrap.setAttribute('aria-label',item.caption);

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Show failed scalar impedance targets with their completed search/refinement history and a separate stopped mesh attempt when available. Preserve failure status, all original records and raw JSON without selecting a solution from the history.
+
 - Edit constant-permittivity and Debye-strength scalar target settings in saved analysis. Apply explicitly through the existing input validator, retain geometry/material poles/mesh, and block calculations using unapplied settings. Unsupported documents remain in the JSON workflow.
 
 - Show readable material target and study tables in saved analysis, retaining separate requested/refined results, every failed row and exact JSON exports. Historical tables use their saved run and clear when input changes; unsupported display shapes keep the raw JSON view.

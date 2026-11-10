@@ -90,12 +90,19 @@ try {
     assert.equal(await cdp.evaluate('document.querySelector("#characteristic").checked || document.querySelector("#modes").checked'),false);
   }
   async function checkResultView(out) {
-    const supported=out.error===null && ['sipi.impedance-study/4','sipi.impedance-design/3','sipi.pair-impedance-design/2'].includes(out.input.schema);
+    const failed=out.status==='failed' && ['sipi.impedance-design/1','sipi.impedance-design/2','sipi.impedance-design/3'].includes(out.input.schema);
+    const supported=failed || out.error===null && ['sipi.impedance-study/4','sipi.impedance-design/3','sipi.pair-impedance-design/2'].includes(out.input.schema);
     const view=await cdp.evaluate(`(()=>{const c=document.querySelector('#material-results');return {hidden:c.hidden,text:c.textContent,tables:Array.from(c.querySelectorAll('table'),t=>Array.from(t.querySelectorAll('tbody tr'),r=>Array.from(r.cells,cell=>({text:cell.textContent,value:cell.dataset.value??null}))))};})()`);
     assert.equal(view.hidden,!supported);
     if(!supported) {assert.deepEqual(view.tables,[]);return;}
     const r=out.result;let expected;
-    if(out.input.schema==='sipi.impedance-study/4') {
+    if(failed){
+      const names={z0:'Single-ended',z_diff:'Differential',z_common:'Common',z_diff_forward:'Differential launch'};
+      expected=[[[names[out.input.quantity],out.input.target_ohm,out.input.tolerance_ohm]],[[out.input.variable,...out.input.bounds]]];
+      if(out.error.history.length)expected.push(out.error.history.map((row,index)=>[index,row.stage,row.parameter,row.value]));
+      if(out.error.type==='GoalMeshSizeLimitError')expected.push([[out.error.attempts,out.error.stage,out.error.parameter,null,out.error.cause_type]]);
+      assert.match(view.text,/target not accepted/);assert.ok(view.text.includes(out.error.message));
+    } else if(out.input.schema==='sipi.impedance-study/4') {
       const names=out.input.sampling.variables.map(v=>v.name);
       expected=[r.rows.map(row=>[row.index,...names.map(name=>{
         const binding=out.input.material_variables[name];
@@ -348,6 +355,13 @@ try {
   assert.deepEqual(result.error.input.mesh,{edge_size:1e-12,far_size:.0002,grade:.2,min_angle:28});
   assert.equal(result.error.input.traces[0].width,.0002);
   assert.equal(result.error.material_evaluation,null);assert.match(result.error.message,/300000 points/);
+  for(const width of [1400,390]){
+    await cdp.call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});
+    assert.equal(await cdp.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+    const clip=await cdp.evaluate('(()=>{const r=document.querySelector("#material-results").getBoundingClientRect();return{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1}})()');
+    await writeFile(join(output,'mesh-failure-view-'+width+'.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip})).data,'base64'));
+  }
+  await cdp.call('Emulation.setDeviceMetricsOverride',{width:1400,height:900,deviceScaleFactor:1,mobile:false});
   assert.ok((await status()).startsWith('Target not met:'));
   await rm(join(downloads,'sipi-result.json'),{force:true});
   await cdp.evaluate('document.querySelector("#save-result").click()');

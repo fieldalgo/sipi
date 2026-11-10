@@ -463,7 +463,7 @@ and records retain the full reported values.
 Viewing a historical material record labels its table **Saved run** and uses
 that record's execution, even when the current input differs. Editing input,
 cancelling or starting another run clears the old table. Unsupported schemas,
-failed goals and unavailable display shapes retain the raw JSON view. Tables
+unsupported errors and unavailable display shapes retain the raw JSON view. Tables
 are a read-only presentation, with no additional solver or statistics step.
 
 ## Edit a material target
@@ -487,3 +487,19 @@ draft; it does not modify a historical record. The form is disabled while busy
 or closed. Editing JSON remains available, and cancels acceptance of a pending
 form update. Material model validity and requested/refined target checks still
 apply; this is not a new optimization or accuracy guarantee.
+
+## Inspect a failed impedance target
+
+Saved scalar impedance targets show **Impedance target not accepted** when a
+bounded search fails. The requested target, interval and every completed
+evaluation remain visible, with separate search/refinement stages. The final
+row is not an accepted solution. A mesh-limit failure shows its stopped attempt
+separately, without inventing an impedance; zero completed evaluations is an
+explicit outcome. No values are recalculated by this view.
+
+The view supports known scalar design schemas 1–3 and their existing goal/mesh
+failure contracts. Other errors or malformed display shapes keep raw JSON.
+Viewing an old failure uses that saved record and leaves current input alone;
+editing or recovering with a successful run clears the old failure display.
+Failed records stay in project history and export unchanged. Numerical target
+tolerance, mesh limits and runtime limits remain unchanged.
