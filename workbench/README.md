@@ -519,8 +519,8 @@ Switching inputs replaces the draft and shows only that input's supported
 fields. Explicitly reloading the same example, file or project also resets the
 draft, even when the saved input bytes are identical. Editing raw JSON resets
 the form draft too. Projects restore current settings while historical records stay
-unchanged. Normal, correlated and multi-variable sampling have no dedicated
-form here and keep their JSON input. Their existing failed rows and withheld
+unchanged. Multi-variable and other unsupported sampling inputs keep their
+JSON workflow. Their existing failed rows and withheld
 aggregate summary remain intact. A completed finite sweep is a set of sampled
 values, not a guarantee of manufacturing bounds or continuous-range coverage.
 
@@ -566,3 +566,26 @@ errors or malformed history retain raw JSON. Failed status and numerical
 criteria are unchanged. Viewing a historical failure leaves current input
 alone; a subsequent successful run clears failure presentation while keeping
 the failed record in project history and export.
+
+## Edit single-variable normal material sampling
+
+Load **Single-variable material tolerance**, or open a saved single-variable
+constant-permittivity or Debye-strength normal study. **Normal material sampling
+settings** exposes the finite mean, positive standard deviation, sample count
+(2–128), integer random seed (0–4294967295) and evaluation frequency (Hz).
+Mean and standard deviation are dimensionless. A negative mean is not silently
+changed. **Apply settings** validates the original and candidate documents;
+it does not run or filter the samples.
+
+The form supports `impedance-study/4` with one material variable and the explicit
+one-variable correlation matrix `[[1]]`. Other correlated/multi-variable inputs
+keep their JSON workflow. Geometry, material model/poles, binding, quantity,
+mesh, sampling method and correlation remain unchanged. Draft, reset, input
+restoration and historical-record behavior match the other settings forms.
+
+Normal sampling is unbounded. Invalid physical samples remain in their original
+row positions with errors; they are not clamped or drawn again. An incomplete
+run has no aggregate summary. A seed reproduces this sampling input, and a new
+seed is a new explicit input recorded separately. Sample statistics are not a
+manufacturing limit, worst-case bound or yield guarantee. The original full
+precision input, rows, failures and any complete summary remain in exports.

@@ -407,5 +407,70 @@ export const SAVED_EXAMPLES = [
       "schema": "sipi.impedance-study/4",
       "template": "coupled_stripline"
     }
+  },
+{
+  "id": "normal-study",
+  "label": "Single-variable material tolerance",
+  "description": "Sample a normally distributed relative permittivity with an explicit seed. Invalid values stay failed rows; samples do not guarantee manufacturing limits.",
+  "document": {
+    "fixed_pitch_m": null,
+    "fixed_plane_spacing_m": null,
+    "material_evaluation": {
+      "frequency_hz": 100000000.0,
+      "materials": {
+        "dielectric": {
+          "kind": "constant",
+          "parameters": {
+            "eps_r": 4.0,
+            "tan_delta": 0.01
+          },
+          "schema": "sipi.dielectric/1"
+        }
+      }
+    },
+    "material_variables": {
+      "dk": {
+        "path": [
+          "eps_r"
+        ],
+        "region": "dielectric"
+      }
+    },
+    "mesh": {
+      "edge_size": 5e-06,
+      "far_size": 0.000125,
+      "grade": 0.15,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "box_width": 0.006,
+      "eps_r": 1.0,
+      "plane_spacing": 0.001,
+      "tan_delta": 0.0,
+      "thickness": 0.0,
+      "top_width": null,
+      "width": 0.0003
+    },
+    "quantity": "z0",
+    "sampling": {
+      "correlation": [
+        [
+          1.0
+        ]
+      ],
+      "count": 6,
+      "kind": "normal",
+      "seed": 9,
+      "variables": [
+        {
+          "mean": 4.0,
+          "name": "dk",
+          "std": 0.2
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/4",
+    "template": "stripline"
   }
+}
 ];

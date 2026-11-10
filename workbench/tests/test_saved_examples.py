@@ -11,6 +11,8 @@ from material_goal_cases import material_goal
 from paired_material_cases import pair_material_goal, material_study
 from material_goal_form_cases import edited_goal
 from material_sweep_form_cases import edited_study
+from material_normal_form_cases import normal_study
+from sipi.study import ImpedanceStudyDocument
 from test_desktop import server
 
 
@@ -20,9 +22,9 @@ def test_catalog_documents_are_exact_validated_inputs_without_solving(monkeypatc
     rows = json.loads(source.split('export const SAVED_EXAMPLES = ', 1)[1].removesuffix(';\n'))
     expected = [LumpedNetworkDocument([0, 1e9], resistance=10, inductance=2e-9),
         material_goal('constant'), material_goal('debye'), pair_material_goal(),
-        material_study('constant'), material_study('tensor')]
+        material_study('constant'), material_study('tensor'), ImpedanceStudyDocument.from_dict(normal_study('constant'))]
     assert [row['id'] for row in rows] == ['rlc', 'constant-target', 'debye-target',
-                                         'pair-target', 'material-sweep', 'correlated-study']
+                                         'pair-target', 'material-sweep', 'correlated-study', 'normal-study']
     def forbidden(*args, **kwargs):
         raise AssertionError('loading or normalizing an example must not solve')
     monkeypatch.setattr(CrossSection, 'mesh', forbidden)
@@ -100,3 +102,22 @@ def test_edited_pair_settings_validate_without_meshing(monkeypatch):
     edited.update(initial=original['initial'], variables=original['variables'], targets_ohm=original['targets_ohm'])
     edited['material_evaluation']['frequency_hz'] = original['material_evaluation']['frequency_hz']
     assert edited == original
+
+
+@pytest.mark.parametrize('kind', ['constant', 'debye'])
+def test_normal_settings_keep_seeded_invalid_samples_without_meshing(kind, monkeypatch):
+    def forbidden(*args, **kwargs):
+        raise AssertionError('normalizing or sampling must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    edited = normal_study(kind, mixed=True)
+    text = normalize_saved(json.dumps(edited))
+    document = ImpedanceStudyDocument.loads(text)
+    samples = document.samples().tolist()
+    assert len(samples) == 4 and min(row[0] for row in samples) < 0
+    assert ImpedanceStudyDocument.loads(text).samples().tolist() == samples
+    assert len(document.sample_material_evaluations()) == 4
+    edited['sampling']['seed'] = 10
+    assert ImpedanceStudyDocument.from_dict(edited).samples().tolist() != samples
+    edited['sampling']['seed'] = 2**32
+    with pytest.raises(ValueError, match='integer'):
+        normalize_saved(json.dumps(edited))

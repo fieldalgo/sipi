@@ -27,7 +27,7 @@ for(const change of [d=>d.schema='future/1',d=>d.sampling.kind='normal',d=>d.sam
   d=>d.material_variables.extra={},d=>d.material_variables.dk.path=['tan_delta'],d=>d.material_evaluation.materials.dielectric.schema='future/1',d=>d.sampling.count=null]){
   const copy=structuredClone(constant);change(copy);assert.equal(materialSweepSettings(copy),null);checks++;
 }
-for(const id of ['rlc','constant-target','debye-target','pair-target','correlated-study']){
+for(const id of ['rlc','constant-target','debye-target','pair-target','correlated-study','normal-study']){
   assert.equal(materialSweepSettings(SAVED_EXAMPLES.find(item=>item.id===id).document),null);checks++;
 }
 console.log(JSON.stringify({status:'passed',checks}));

@@ -126,12 +126,12 @@ try {
   await field('target','51');await example('constant-target');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-target").value'),'50');assert.equal(await cdp.evaluate('document.querySelector("#run").disabled'),false);
   await example('material-sweep');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-count").value'),'8');assert.equal(await cdp.evaluate('document.querySelector("#run").disabled'),false);
   await example('correlated-study');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-editor").hidden'),true);
-  const normal=cases[2];await openFile(JSON.stringify(normal.input));assert.equal(await cdp.evaluate('document.querySelector("#material-goal-editor").hidden'),true);
+  const normal=cases[2];await openFile(JSON.stringify(normal.input));assert.equal((await visible()).length,5);
   await click('record');await idle();const incomplete=await cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');compare(incomplete,normal.execution);
   assert.equal(incomplete.status,'incomplete');assert.equal(incomplete.result.failed,2);assert.equal(incomplete.result.summary,null);
   assert.equal(await cdp.evaluate('document.querySelectorAll("#material-results table").length'),1);
   const normalRaw=await download('save-record','sipi-execution-record.json');records.push({raw:normalRaw,value:JSON.parse(normalRaw)});await writeFile(join(output,'mixed-normal-execution.json'),JSON.stringify(incomplete,null,2));
-  checks.push('goal/sweep/unsupported switches discard drafts, hidden fields have no effect, original normal failures remain incomplete');
+  checks.push('goal/sweep/normal/unsupported switches discard drafts, hidden fields have no effect, original normal failures remain incomplete');
   await openFile(JSON.stringify(cases[1].input));const saved=await download('project-save','sipi-analysis-project.json'),savedInput=await text();
   await example('rlc');await openFile(saved,true);assert.equal(await text(),savedInput);assert.equal(await cdp.evaluate('document.querySelector("#material-goal-count").value'),'5');
   await field('count','7');await openFile(saved,true);assert.equal(await text(),savedInput);assert.equal(await cdp.evaluate('document.querySelector("#material-goal-count").value'),'5');
@@ -143,7 +143,7 @@ try {
   checks.push('project reopens current sweep settings and historical record without changing either; labeled responsive form');
   await field('count','6');
   await cdp.evaluate(`(async()=>{const browser=document.documentElement.dataset.runtime==='browser';const m=await import(browser?'./browser-transport.js':'./transport.js');const p=(browser?m.BrowserTransport:m.LocalTransport).prototype;const original=p.run;p.run=async function(input){p.run=original;await new Promise(resolve=>window.releaseSweepApply=resolve);return original.call(this,input);};})()`);
-  await click('material-goal-apply');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-count").disabled'),true);const raw=JSON.stringify(normal.input);await input(raw);await cdp.evaluate('window.releaseSweepApply()');await idle();assert.equal(await text(),raw);assert.equal(await cdp.evaluate('document.querySelector("#material-goal-editor").hidden'),true);
+  await click('material-goal-apply');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-count").disabled'),true);const raw=JSON.stringify(normal.input);await input(raw);await cdp.evaluate('window.releaseSweepApply()');await idle();assert.equal(await text(),raw);assert.equal((await visible()).length,5);
   await example('material-sweep');await click('exit');await until(async()=>/closed|stopped/.test(await status()),'shutdown');assert.equal(await cdp.evaluate('Array.from(document.querySelectorAll("#material-goal-editor input, #material-goal-editor button")).every(e=>e.disabled)'),true);if(!webRoot)await until(()=>server.exitCode===0,'host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
   checks.push('stale study apply cannot replace changed source; busy/closed guards and clean shutdown');
