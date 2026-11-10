@@ -115,12 +115,49 @@ function failedScalarView(input, error) {
     note:`${error.message}. ${error.history.length} completed evaluations. History does not select a solution or certify convergence.`, tables};
 }
 
+function failedPairView(input,error) {
+  if (error?.type !== 'PairImpedanceGoalError' || error.unit !== 'ohm' ||
+      !['budget','convergence','refinement/target'].includes(error.stage) || error.cause_type !== null ||
+      typeof error.message !== 'string' || !error.message ||
+      !Array.isArray(error.quantities) || error.quantities.length !== 2 ||
+      error.quantities[0] !== 'z_diff' || error.quantities[1] !== 'z_common' ||
+      !Array.isArray(input.variables) || input.variables.length !== 2 ||
+      !input.variables.every(v=>typeof v?.name==='string' && v.name && numbers(v.bounds,2,positive) && v.bounds[0]<v.bounds[1]) ||
+      input.variables[0].name===input.variables[1].name ||
+      !Number.isInteger(input.max_evaluations) || input.max_evaluations<2 || input.max_evaluations>10000 ||
+      !Array.isArray(error.history) || !error.history.length || error.history.length>input.max_evaluations ||
+      !Number.isInteger(error.attempts) || error.attempts!==error.history.length) return null;
+  for (const values of [input.targets_ohm,input.tolerances_ohm])
+    if (!values || Object.keys(values).length!==2 || !error.quantities.every(name=>Object.hasOwn(values,name)&&positive(values[name]))) return null;
+  const inBounds=values=>numbers(values,2,positive)&&values.every((value,i)=>value>=input.variables[i].bounds[0]&&value<=input.variables[i].bounds[1]);
+  if (!inBounds(error.failed_parameters)) return null;
+  for (const [index,row] of error.history.entries()) {
+    if (!inBounds(row.parameters) || !numbers(row.impedances_ohm,2,positive) ||
+        !['search','refinement'].includes(row.stage) ||
+        (row.stage==='refinement' && (index!==error.history.length-1 || error.stage!=='refinement/target'))) return null;
+  }
+  if (error.stage==='refinement/target' && (error.history.length<2 || error.history.at(-1).stage!=='refinement' ||
+      !error.failed_parameters.every((value,i)=>value===error.history.at(-1).parameters[i]))) return null;
+  return {title:'Paired impedance targets not accepted',failed:true,
+    note:`${error.message}. ${error.history.length} completed evaluations. History does not select a solution or certify convergence.`,tables:[
+      table('Requested targets — not accepted',['Quantity','Target (Ω)','Tolerance (Ω)'],
+        error.quantities.map(name=>[quantity[name],input.targets_ohm[name],input.tolerances_ohm[name]])),
+      table('Search intervals',['Variable','Lower bound in input units','Upper bound in input units'],
+        input.variables.map(v=>[v.name,...v.bounds])),
+      table('Completed evaluations only',['Row index','Stage',...input.variables.map(v=>v.name+' in input units'),'Differential impedance (Ω)','Common impedance (Ω)'],
+        error.history.map((row,i)=>[i,row.stage,...row.parameters,...row.impedances_ohm])),
+      table(error.stage==='budget'?'Budget stopped before this evaluation — no impedance calculated':'Failure context — not an accepted solution',
+        ['Stage',...input.variables.map(v=>v.name+' in input units')],[[error.stage,...error.failed_parameters]])]};
+}
+
 export function materialResultView(execution) {
   try {
     if (execution?.schema !== 'sipi.execution/1') return null;
     const {input,result,status,error} = execution;
     if (status === 'failed' && result === null && ['sipi.impedance-design/1','sipi.impedance-design/2','sipi.impedance-design/3'].includes(input.schema))
       return failedScalarView(input,error);
+    if (status === 'failed' && result === null && ['sipi.pair-impedance-design/1','sipi.pair-impedance-design/2'].includes(input.schema))
+      return failedPairView(input,error);
     if (!result || error !== null) return null;
     if (input.schema === 'sipi.impedance-study/4') return studyView(input,result,status);
     if (input.schema === 'sipi.impedance-design/3') return scalarView(input,result,status);

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Show retained paired impedance target failures with both requested targets, search intervals and every completed two-variable evaluation. Keep budget-stopped parameters separate from calculated values; preserve raw records and avoid selecting a solution from failed history.
+
 - Edit two principal-axis permittivities against differential and common-mode targets in saved analysis. Apply explicit targets, tolerances, bounds, initial values, frequency and evaluation budget through the existing validator; preserve failed runs, project records and scalar/sweep settings.
 
 - Add explicit settings for single constant-permittivity and Debye-strength material sweeps. Edit bounds, sample count and frequency through the existing validator; keep scalar target drafts, project history and unsupported sampling inputs separate. Invalid sweep corners are rejected before applying.

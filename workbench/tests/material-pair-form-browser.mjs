@@ -115,7 +115,7 @@ try {
     await click('material-goal-apply');await idle();assert.match(await status(),/applied and checked/);assert.deepEqual(JSON.parse(await text()),item.input);
     assert.deepEqual(JSON.parse(await download('save-input','sipi-input.json')),item.input);
     await click('record');await idle();const execution=await cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');compareExecution(execution,item.execution);
-    if(item.name==='budget-failure')assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);
+    if(item.name==='budget-failure')assert.match(await cdp.evaluate('document.querySelector("#material-results h3").textContent'),/targets not accepted/);
     else assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),false);
     const raw=await download('save-record','sipi-execution-record.json');records.push({raw,value:JSON.parse(raw)});
     await writeFile(join(output,item.name+'-execution.json'),JSON.stringify(execution,null,2));await writeFile(join(output,item.name+'-record.json'),raw);

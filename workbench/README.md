@@ -549,3 +549,20 @@ its original error and completed history in the raw execution record. Increasing
 the budget is a new explicit input, not a reinterpretation of that failure.
 Project history retains the failed and successful runs separately, while
 viewing an old run leaves the current form unchanged.
+
+## Read a failed paired target search
+
+Known paired target failures show **Paired impedance targets not accepted**,
+both requested targets and tolerances, two search intervals and all completed
+evaluations in their original order. Each row includes both parameter values,
+both impedances and its search/refinement stage. A budget-stopped evaluation
+has a separate parameter context; it has no calculated impedance and is not
+counted as an additional completed evaluation. Convergence and refined-target
+failures show their reported context without selecting a solution.
+
+This view accepts the existing `PairImpedanceGoalError` budget, convergence and
+refined-target contracts for pair design schemas 1–2. Other phases, unknown
+errors or malformed history retain raw JSON. Failed status and numerical
+criteria are unchanged. Viewing a historical failure leaves current input
+alone; a subsequent successful run clears failure presentation while keeping
+the failed record in project history and export.
