@@ -2,7 +2,7 @@ import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 import {SAVED_EXAMPLES} from './saved-examples.js';
 import {renderMaterialResults, clearMaterialResults} from './material-results.js';
-import {createMaterialGoalEditor, applyMaterialGoalSettings} from './material-goal-form.js';
+import {createMaterialSettingsEditor, applyMaterialSettings as updatedMaterialSettings} from './material-goal-form.js';
 
 const $ = id => document.getElementById(id);
 const browser = document.documentElement.dataset.runtime === 'browser';
@@ -15,7 +15,7 @@ let generation = 0, activeRun = null, busy = false, closed = false, checked = nu
 let recorded = null;
 let projectText = null, activeDesign = null, projectDirty = false;
 const bytes = value => new TextEncoder().encode(value).length;
-const materialEditor = createMaterialGoalEditor($('material-goal-editor'), {onDraft:invalidate, onApply:applyMaterialSettings});
+const materialEditor = createMaterialSettingsEditor($('material-goal-editor'), {onDraft:invalidate, onApply:applyMaterialSettings});
 
 function state(message, error = false) {
   $('status').textContent = message;
@@ -104,6 +104,7 @@ async function snapshot(current, text = $('input-text').value, settings = execut
 function commitProject(snapshot, restore = false, runId = null) {
   projectText = snapshot.text; activeDesign = snapshot.id; projectDirty = false;
   if (restore) {
+    materialEditor.clearDraft();
     const current = design(); $('input-text').value = current.source_text;
     for (const id of ['characteristic', 'modes']) $(id).checked = current.controls.diagnostics.includes(id);
   }
@@ -169,14 +170,14 @@ function request(action) {
 }
 async function applyMaterialSettings(source, drafts) {
   if (busy || closed || source !== $('input-text').value) return;
-  try { applyMaterialGoalSettings(JSON.parse(source), drafts); }
+  try { updatedMaterialSettings(JSON.parse(source), drafts); }
   catch (error) { state(error.message, true); return; }
   const current = ++generation; activeRun = current; busy = true; controls(); state('Checking material settings…');
   try {
     // Validate the original text first: parsing in JavaScript must not silently
     // accept duplicate keys or repair a malformed saved input during editing.
     const original = await projectCall({action:'saved-normalize',text:source},current);
-    const candidate = applyMaterialGoalSettings(JSON.parse(original.document_text),drafts);
+    const candidate = updatedMaterialSettings(JSON.parse(original.document_text),drafts);
     const result = await projectCall({action:'saved-normalize',text:JSON.stringify(candidate)},current);
     if (source !== $('input-text').value || current !== generation || closed) return;
     $('input-text').value = result.document_text; materialEditor.clearDraft(); invalidate(); checked = result.document_text;
@@ -242,7 +243,7 @@ function download(filename, text) {
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-$('input-text').addEventListener('input', invalidate);
+$('input-text').addEventListener('input', () => { materialEditor.clearDraft(); invalidate(); });
 for (const id of ['characteristic', 'modes']) $(id).addEventListener('change', invalidate);
 $('open').onclick = () => $('file').click();
 $('file').onchange = async () => {
@@ -253,7 +254,7 @@ $('file').onchange = async () => {
     if (file.size > 200 * 1024) throw new Error('Input exceeds 200 KiB.');
     const text = await file.text();
     if (current !== generation || closed) return;
-    $('input-text').value = text; controls(); state('File opened. Check or run its saved settings.');
+    materialEditor.clearDraft(); $('input-text').value = text; controls(); state('File opened. Check or run its saved settings.');
   } catch (error) { if (current === generation) state(error.message, true); }
 };
 $('example-choice').onchange = () => {
@@ -263,7 +264,7 @@ $('example').onclick = () => {
   if (busy || closed) return;
   const example = SAVED_EXAMPLES.find(item => item.id === $('example-choice').value);
   if (!example) { state('Choose an example before loading it.', true); return; }
-  invalidate(); $('input-text').value = JSON.stringify(example.document, null, 2);
+  materialEditor.clearDraft(); invalidate(); $('input-text').value = JSON.stringify(example.document, null, 2);
   $('characteristic').checked = $('modes').checked = false;
   controls();
   state(`${example.label} example loaded. Edit its values, check the input or run the analysis.`);

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit settings for single constant-permittivity and Debye-strength material sweeps. Edit bounds, sample count and frequency through the existing validator; keep scalar target drafts, project history and unsupported sampling inputs separate. Invalid sweep corners are rejected before applying.
+
 - Show failed scalar impedance targets with their completed search/refinement history and a separate stopped mesh attempt when available. Preserve failure status, all original records and raw JSON without selecting a solution from the history.
 
 - Edit constant-permittivity and Debye-strength scalar target settings in saved analysis. Apply explicitly through the existing input validator, retain geometry/material poles/mesh, and block calculations using unapplied settings. Unsupported documents remain in the JSON workflow.

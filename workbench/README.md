@@ -472,7 +472,7 @@ Load the constant or Debye material target example to open **Material target
 settings**. Change the target and allowed error in ohms, positive ordered
 search bounds, evaluation frequency in Hz and evaluation budget (3–128).
 The form supports a single constant relative-permittivity or Debye-strength
-binding in `sipi.impedance-design/3`; other inputs retain the JSON workflow.
+binding in `sipi.impedance-design/3`; other target inputs retain the JSON workflow.
 The quantity, material region and searched parameter are identified above the
 fields. Geometry, material poles, mesh and fixed dimensions remain unchanged.
 
@@ -503,3 +503,23 @@ Viewing an old failure uses that saved record and leaves current input alone;
 editing or recovering with a successful run clears the old failure display.
 Failed records stay in project history and export unchanged. Numerical target
 tolerance, mesh limits and runtime limits remain unchanged.
+
+## Edit a material sweep
+
+Load **Dielectric sweep**, or open a saved single-variable constant-permittivity
+or Debye-strength sweep, to show **Material sweep settings**. Set finite ordered
+lower/upper sample bounds, sample count (2–128) and evaluation frequency (Hz).
+**Apply settings** checks both the original and proposed `impedance-study/4`
+input before replacing it. Existing material/endpoint checks can reject a
+range; the original input stays unchanged, with no clamping or resampling.
+Geometry, material poles, mesh, quantity and sampling kind stay in the document.
+
+Drafts block running and saving the current input until applied or reset.
+Switching inputs replaces the draft and shows only that input's supported
+fields. Explicitly reloading the same example, file or project also resets the
+draft, even when the saved input bytes are identical. Editing raw JSON resets
+the form draft too. Projects restore current settings while historical records stay
+unchanged. Normal, correlated and multi-variable sampling have no dedicated
+form here and keep their JSON input. Their existing failed rows and withheld
+aggregate summary remain intact. A completed finite sweep is a set of sampled
+values, not a guarantee of manufacturing bounds or continuous-range coverage.

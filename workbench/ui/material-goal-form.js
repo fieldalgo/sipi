@@ -6,12 +6,13 @@ const fields = [
   ['lower', 'Lower search bound (dimensionless)'], ['upper', 'Upper search bound (dimensionless)'],
   ['frequency', 'Evaluation frequency (Hz)'], ['budget', 'Maximum evaluations (3–128)'],
 ];
+const sweepFields = [fields[2],fields[3],fields[4],['count','Sample count (2–128)']];
 
-export function materialGoalSettings(doc) {
-  if (doc?.schema !== 'sipi.impedance-design/3' || !Object.hasOwn(names,doc.quantity) ||
-      !doc.material_variables || Object.keys(doc.material_variables).length !== 1 ||
-      !Object.hasOwn(doc.material_variables,doc.variable)) return null;
-  const binding = doc.material_variables[doc.variable], evaluation = doc.material_evaluation;
+function bindingDescription(doc, alias) {
+  if (typeof alias !== 'string' || !doc.material_variables || Object.keys(doc.material_variables).length !== 1 ||
+      !Object.hasOwn(doc.material_variables,alias)) return null;
+  const binding = doc.material_variables[alias], evaluation = doc.material_evaluation;
+  if (typeof binding?.region !== 'string') return null;
   const model = evaluation?.materials?.[binding?.region], path = binding?.path;
   if (model?.schema !== 'sipi.dielectric/1' || !Array.isArray(path)) return null;
   let variable;
@@ -21,22 +22,43 @@ export function materialGoalSettings(doc) {
       path[1] < model.parameters.strengths.length) variable = `Debye strength ${path[1]+1}`;
   else return null;
   const leaf = model.kind === 'constant' ? model.parameters?.eps_r : model.parameters.strengths[path[1]];
-  if (!finite(leaf) || !Array.isArray(doc.bounds) || doc.bounds.length !== 2) return null;
-  const values = {target:doc.target_ohm, tolerance:doc.tolerance_ohm, lower:doc.bounds[0],
-    upper:doc.bounds[1], frequency:evaluation.frequency_hz, budget:doc.max_evaluations};
-  if (!Object.values(values).every(finite)) return null;
-  return {values, description:`${names[doc.quantity]} target · ${variable} · region ${binding.region}`};
+  return finite(leaf) ? `${variable} · region ${binding.region}` : null;
 }
 
-export function applyMaterialGoalSettings(doc, drafts) {
-  if (!materialGoalSettings(doc)) throw new Error('This input has no supported material target form.');
+export function materialGoalSettings(doc) {
+  if (doc?.schema !== 'sipi.impedance-design/3' || !Object.hasOwn(names,doc.quantity)) return null;
+  const description = bindingDescription(doc,doc.variable);
+  if (!description || !Array.isArray(doc.bounds) || doc.bounds.length !== 2) return null;
+  const values = {target:doc.target_ohm, tolerance:doc.tolerance_ohm, lower:doc.bounds[0],
+    upper:doc.bounds[1], frequency:doc.material_evaluation.frequency_hz, budget:doc.max_evaluations};
+  if (!Object.values(values).every(finite)) return null;
+  return {kind:'goal', values, description:`${names[doc.quantity]} target · ${description}`};
+}
+
+export function materialSweepSettings(doc) {
+  if (doc?.schema !== 'sipi.impedance-study/4' || !Object.hasOwn(names,doc.quantity) ||
+      doc.sampling?.kind !== 'sweep' || !Array.isArray(doc.sampling.variables) || doc.sampling.variables.length !== 1) return null;
+  const variable = doc.sampling.variables[0], description = bindingDescription(doc,variable?.name);
+  if (!description) return null;
+  const values = {lower:variable.lower, upper:variable.upper, frequency:doc.material_evaluation.frequency_hz, count:doc.sampling.count};
+  if (!Object.values(values).every(finite)) return null;
+  return {kind:'sweep', values, description:`${names[doc.quantity]} sweep · ${description}`};
+}
+
+function numericDrafts(drafts, selectedFields) {
   const values = {};
-  for (const [name,label] of fields) {
+  for (const [name,label] of selectedFields) {
     const raw = drafts[name];
     if (typeof raw !== 'string' || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(raw.trim()) ||
         !Number.isFinite(Number(raw))) throw new Error(`${label}: enter a finite number.`);
     values[name] = Number(raw);
   }
+  return values;
+}
+
+export function applyMaterialGoalSettings(doc, drafts) {
+  if (!materialGoalSettings(doc)) throw new Error('This input has no supported material target form.');
+  const values = numericDrafts(drafts,fields);
   if (values.target <= 0 || values.tolerance <= 0) throw new Error('Target and allowed error must be positive.');
   if (values.lower <= 0 || values.lower >= values.upper) throw new Error('Search bounds must be positive, with lower below upper.');
   if (values.frequency < 0) throw new Error('Evaluation frequency must be zero or positive.');
@@ -48,15 +70,31 @@ export function applyMaterialGoalSettings(doc, drafts) {
   return result;
 }
 
-export function createMaterialGoalEditor(container, {onDraft, onApply}) {
+export function applyMaterialSweepSettings(doc, drafts) {
+  if (!materialSweepSettings(doc)) throw new Error('This input has no supported material sweep form.');
+  const values = numericDrafts(drafts,sweepFields);
+  if (values.lower >= values.upper) throw new Error('Lower sample bound must be below upper.');
+  if (values.frequency < 0) throw new Error('Evaluation frequency must be zero or positive.');
+  if (!Number.isInteger(values.count) || values.count < 2 || values.count > 128) throw new Error('Sample count must be an integer from 2 to 128.');
+  const result = structuredClone(doc);
+  result.sampling.variables[0].lower = values.lower; result.sampling.variables[0].upper = values.upper;
+  result.sampling.count = values.count; result.material_evaluation.frequency_hz = values.frequency;
+  return result;
+}
+
+export function applyMaterialSettings(doc,drafts) {
+  return doc?.schema === 'sipi.impedance-study/4' ? applyMaterialSweepSettings(doc,drafts) : applyMaterialGoalSettings(doc,drafts);
+}
+
+export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
   const document = container.ownerDocument;
   const node = (tag,text) => {const value=document.createElement(tag); if(text!==undefined)value.textContent=text; return value;};
   const heading=node('h3','Material target settings'), description=node('p'), grid=node('div');grid.className='material-goal-fields';
-  const inputs={};
-  for(const [name,text] of fields){
-    const label=node('label',text), input=node('input');input.type='number';input.step=name==='budget'?'1':'any';
+  const inputs={},labels={};
+  for(const [name,text] of [...fields,sweepFields[3]]){
+    const label=node('label',text), input=node('input');input.type='number';input.step=['budget','count'].includes(name)?'1':'any';
     input.id='material-goal-'+name;input.setAttribute('aria-describedby','material-goal-note');label.htmlFor=input.id;
-    label.append(input);grid.append(label);inputs[name]=input;
+    label.append(input);grid.append(label);inputs[name]=input;labels[name]=label;
   }
   const actions=node('div');actions.className='saved-actions';
   const apply=node('button','Apply settings'), reset=node('button','Reset form');apply.id='material-goal-apply';reset.id='material-goal-reset';actions.append(apply,reset);
@@ -67,12 +105,17 @@ export function createMaterialGoalEditor(container, {onDraft, onApply}) {
     for(const input of Object.values(inputs))input.disabled=blocked;
     apply.disabled=reset.disabled=blocked||!dirty;
     note.textContent=dirty?'Unapplied settings. Apply or reset before running or saving the current input.':
-      'Edit these settings, then apply them to the input. Geometry, material poles and mesh stay in the JSON. Applying checks the input without calculating.';
+      'Edit these settings, then apply them to the input. Geometry, material poles and mesh stay in the JSON. Applying checks the input without calculating.' +
+      (settings?.kind==='sweep'?' Bounds and materials are checked before running. Failed calculation rows are retained without aggregate statistics. Sampled values do not guarantee manufacturing limits.':'');
   }
-  function restore(){for(const [name,input] of Object.entries(inputs))input.value=String(settings.values[name]);dirty=false;update();}
-  for(const input of Object.values(inputs))input.addEventListener('input',()=>{
-    if(blocked)return;
-    dirty=Object.entries(inputs).some(([name,input])=>input.value!==String(settings.values[name]));update();onDraft();
+  function restore(){
+    for(const [name,input] of Object.entries(inputs)){labels[name].hidden=!Object.hasOwn(settings.values,name);input.value=labels[name].hidden?'':String(settings.values[name]);}
+    for(const name of ['lower','upper'])labels[name].firstChild.textContent=`${name==='lower'?'Lower':'Upper'} ${settings.kind==='sweep'?'sample':'search'} bound (dimensionless)`;
+    dirty=false;update();
+  }
+  for(const [name,input] of Object.entries(inputs))input.addEventListener('input',()=>{
+    if(blocked||!settings||!Object.hasOwn(settings.values,name))return;
+    dirty=Object.keys(settings.values).some(name=>inputs[name].value!==String(settings.values[name]));update();onDraft();
   });
   apply.onclick=()=>{if(!blocked&&dirty)onApply(source,Object.fromEntries(Object.entries(inputs).map(([k,v])=>[k,v.value])));};
   reset.onclick=()=>{if(!blocked&&dirty){restore();onDraft();}};
@@ -83,11 +126,13 @@ export function createMaterialGoalEditor(container, {onDraft, onApply}) {
       blocked=disabled;
       if(text!==source){
         source=text;dirty=false;settings=null;
-        try{settings=materialGoalSettings(JSON.parse(text));}catch{}
+        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialSweepSettings(doc);}catch{}
         container.hidden=settings===null;
-        if(settings){description.textContent=settings.description;restore();}
+        if(settings){heading.textContent=settings.kind==='sweep'?'Material sweep settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
       }
       update();
     },
   };
 }
+
+export const createMaterialGoalEditor = createMaterialSettingsEditor;

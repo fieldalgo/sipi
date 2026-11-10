@@ -10,6 +10,7 @@ from sipi.execution import normalize_saved
 from material_goal_cases import material_goal
 from paired_material_cases import pair_material_goal, material_study
 from material_goal_form_cases import edited_goal
+from material_sweep_form_cases import edited_study
 from test_desktop import server
 
 
@@ -61,3 +62,22 @@ def test_edited_material_goal_validates_without_meshing(kind, monkeypatch):
                   max_evaluations=original['max_evaluations'])
     edited['material_evaluation']['frequency_hz'] = original['material_evaluation']['frequency_hz']
     assert edited == original
+
+
+@pytest.mark.parametrize('kind', ['constant', 'debye'])
+def test_edited_material_sweep_checks_corners_without_meshing(kind, monkeypatch):
+    original = material_study(kind).to_dict()
+    def forbidden(*args, **kwargs):
+        raise AssertionError('editing a sweep must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    edited = edited_study(kind)
+    assert edited['sampling']['count'] == 5
+    assert edited['sampling']['variables'][0] == dict(name='dk', lower=1., upper=5.)
+    assert edited['material_evaluation']['frequency_hz'] == 2e8
+    edited['sampling'] = original['sampling']
+    edited['material_evaluation']['frequency_hz'] = original['material_evaluation']['frequency_hz']
+    assert edited == original
+    invalid = material_study('constant').to_dict()
+    invalid['sampling']['variables'][0]['lower'] = -.5
+    with pytest.raises(ValueError, match='relative permittivity'):
+        normalize_saved(json.dumps(invalid))

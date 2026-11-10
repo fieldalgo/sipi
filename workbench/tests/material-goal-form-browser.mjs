@@ -95,7 +95,7 @@ try {
   for(const item of cases){
     await example(item.kind+'-target');const before=await text();
     assert.equal(await cdp.evaluate('document.querySelector("#material-goal-editor").hidden'),false);
-    assert.equal(await cdp.evaluate('document.querySelectorAll("#material-goal-editor label[for]").length'),6);
+    assert.equal(await cdp.evaluate('Array.from(document.querySelectorAll("#material-goal-editor label[for]")).filter(label=>!label.hidden).length'),6);
     for(const [key,value] of Object.entries({target:String(item.target),tolerance:'1',lower:'2.5',upper:'7.5',frequency:'2e8',budget:'48'}))await field(key,value);
     assert.equal(await text(),before);
     assert.equal(await cdp.evaluate('["run","record","check","save-input","project-save","project-duplicate"].every(id=>document.getElementById(id).disabled)'),true);
