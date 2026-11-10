@@ -162,4 +162,4 @@ footer a{color:inherit;text-underline-offset:3px}
 
 /* Coating material and height inputs keep a full touch target. */
 #coating-fields .number { height: 46px; }
-#gap-field .number, #ground-field .number { height: 46px; }
+#gap-field .number, #ground-field .number, #ground-gap-field .number { height: 46px; }

@@ -94,4 +94,13 @@ request = {k:v for k,v in request.items() if k!='network'}
 request.update(action='study', study=dict(mode='sweep',variables=[dict(parameter='ground_width',lower=.8e-3,upper=1.2e-3)],points=2,seed=42))
 cases.append(dict(input=request, result=execute(request)))
 
+# Finite coated coplanar pair: distinct signal/ground gaps and four-port response.
+paired_coating={**coated_coplanar, 'gap':.3e-3, 'ground_gap':.2e-3}
+for action in ('analyze','network','study'):
+    request=dict(action=action,template='coupled_coated_grounded_coplanar',parameters=paired_coating,
+        mesh=dict(edge_size=4e-6,far_size=.25e-3,grade=.2))
+    if action=='network':request['network']=dict(start_hz=1e6,stop_hz=1e9,points=3,length=.1,resistance=2.,z_ref=50.)
+    if action=='study':request['study']=dict(mode='sweep',variables=[dict(parameter='ground_gap',lower=.15e-3,upper=.25e-3)],points=2,seed=42)
+    cases.append(dict(input=request,result=execute(request)))
+
 print(json.dumps(cases, allow_nan=False))

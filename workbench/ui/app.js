@@ -553,7 +553,7 @@ function chooseTemplate(name) {
     $('height-label').textContent = isStripline(template) ? 'Plane spacing' : 'Substrate height';
     $('gap-field').hidden = !(isPair(template) || isCoplanar(template));
     $('ground-field').hidden = !isCoplanar(template);
-    $('ground-gap-field').hidden = template !== 'coupled_grounded_coplanar';
+    $('ground-gap-field').hidden = !(isPair(template) && isCoplanar(template));
     $('target-label').firstChild.textContent = isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
     $('save-editable').disabled = busy;

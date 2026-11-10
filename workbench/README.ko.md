@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 10종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 11종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 10종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 11종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -39,7 +39,7 @@ Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar 10종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar 11종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -112,6 +112,16 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 핀 변경만으로 Windows나 Worker 통과를 주장하지 않습니다.
 
 ## 표시 단위와 물리 입력
+
+**Coated coplanar pair**는 유한 옆 접지 사이의 같은 신호선 두 개입니다.
+**Gap**은 신호 도체끼리 아랫면 모서리 간격이고 **Signal–ground gap**은 바깥
+신호 모서리에서 옆 접지까지의 별도 간격입니다. 신호 테이퍼는 접지 단면을
+바꾸지 않습니다. 평면 코팅·공기 여유 정의는 단일 코팅 coplanar와 같습니다.
+목표·공차는 차동 임피던스를 사용하며 단일종단 4포트와 mixed-mode 응답을
+보존합니다. 두 간격·접지 폭·코팅 치수를 고정 기준 메시로 분석할 수 있습니다.
+자동 폭 역산은 확정 edge/growth를 유지한 뒤 기존 세분 검증을 수행하며 명시
+메시는 그대로 둡니다. 독립 image-panel·복소 FE·메시/외곽·공기 극한 검증은
+명시한 대칭 기하의 근거이며 실측 제조 정확도 보증은 아닙니다.
 
 단면 길이와 폭 범위는 mm, µm, mil로 표시할 수 있습니다. 단위를 바꿔도 SI 기하,
 목표 역산의 폭 범위, 길이 공차 범위는 그대로입니다. 명시적으로 편집한 물리 값만
@@ -202,7 +212,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 10종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 11종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는

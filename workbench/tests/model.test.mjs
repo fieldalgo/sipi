@@ -117,3 +117,20 @@ test('coated coplanar keeps one tapered signal, two rectangular grounds and a fu
   assert.equal(m.layers[1].thickness,.0001);assert.equal(m.layers[1].eps_r,3.5);assert.equal(m.layers[2].eps_r,1);
   for(const change of [{gap:''},{ground_width:0},{coating_height:'.035'}])assert.throws(()=>parameters('coated_grounded_coplanar',{...v,...change},'mm'));
 });
+
+
+test('coated coplanar pair keeps signal and ground gaps distinct with rectangular grounds', () => {
+  const input={...values, profile:'tapered', top_width:'.4', gap:'.3', ground_gap:'.2',
+    coating_height:'.1', coating_eps_r:'3.5', coating_tan_delta:'.02'};
+  const p=parameters('coupled_coated_grounded_coplanar',input,'mm');
+  assert.equal(p.gap,.0003);assert.equal(p.ground_gap,.0002);
+  const model=schematic('coupled_coated_grounded_coplanar',p);
+  const signals=model.traces.filter(t=>!t.ground),grounds=model.traces.filter(t=>t.ground);
+  assert.equal(signals.length,2);assert.equal(grounds.length,2);
+  assert.ok(Math.abs(signals[1].x-signals[0].x-p.width-p.gap)<1e-18);
+  assert.ok(Math.abs(grounds[1].x-p.ground_width/2-signals[1].x-p.width/2-p.ground_gap)<1e-18);
+  for(const ground of grounds)assert.equal(ground.top_width,ground.width);
+  assert.equal(model.layers[1].thickness,p.coating_height);
+  for(const name of ['gap','ground_gap','ground_width','coating_height'])assert.throws(()=>parameters('coupled_coated_grounded_coplanar',{...input,[name]:'0'},'mm'));
+  assert.equal(parameters('coated_grounded_coplanar',{...input,ground_gap:'-1'},'mm').ground_gap,undefined);
+});

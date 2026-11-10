@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a planar-coated coplanar-pair form with distinct signal and ground gaps, finite rectangular grounds, differential width targets, coating/ground studies and four-port response. Preserve exact SI/project inputs and independent field, mesh and domain checks.
+
 - Deliver local HTTP rejections before bounded connection cleanup so unread request data does not reset ordinary oversized uploads. Retain input limits and exercise backpressure, stalled peers and the actual portable host rejection path.
 
 - Add an editable planar-coated coplanar form with finite side-ground controls, coating/ground studies, single-ended width targets and two-port export. Preserve exact SI/project inputs and coating-aware automatic mesh preparation with independent field and domain checks.

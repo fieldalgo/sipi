@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the ten-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the eleven-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers ten cross-section forms, impedance targeting,
+The basic workspace offers eleven cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -42,8 +42,8 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The ten forms are microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair and coated grounded coplanar. Other engine templates can use **Saved analysis**;
+The eleven forms are microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
 preserves its geometry and mesh but does not enable dimension editing.
@@ -145,6 +145,17 @@ the unchanged mandatory refinement. Explicit meshes remain fixed. Qualified
 image-panel, independent complex-FE, mesh/outer and air-limit checks are
 separate from measured manufacturing accuracy or a conformal-film model.
 
+For **Coated coplanar pair**, two equal signals sit between the finite grounds.
+**Gap** is the signal-to-signal bottom-edge gap; **Signal–ground gap** is the
+separate distance from each outer signal edge to its ground. Signal taper does
+not taper the grounds. The same planar coating and air-clearance definitions
+apply. Targeting and studies use differential impedance, with four single-ended
+ports and a mixed-mode response. Both gaps, ground width and coating dimensions
+can be studied with the fixed nominal mesh. Automatic width targets retain
+resolved edge/growth before the unchanged refinement, and explicit meshes are
+preserved. The qualified image-panel, complex-FE, mesh/domain and air-limit
+checks cover the stated symmetric geometry, not measured manufacturing accuracy.
+
 Changing display units does not round the stored SI inputs. Unedited parameters
 and any inputs without a visible field retain their
 saved values. An explicit field edit invalidates displayed results. A successful
@@ -236,7 +247,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the ten supported editable templates. Other
+All project designs must use the eleven supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
