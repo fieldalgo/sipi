@@ -125,6 +125,8 @@ def study_documents(request, nominal):
     parameters = request['parameters']
     allowed = {'width', 'top_width', 'substrate_height', 'plane_spacing', 'thickness',
                'gap', 'ground_gap', 'ground_width', 'eps_r', 'coating_height', 'coating_eps_r'}
+    if request['template'] == 'coupled_stripline' and parameters.get('trace_height') is not None:
+        allowed.add('trace_height')
     names, low, high = [], [], []
     for variable in variables:
         if not isinstance(variable, dict) or set(variable) != {'parameter', 'lower', 'upper'}:

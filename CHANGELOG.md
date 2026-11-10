@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Expose centred or explicit bottom-face placement for coupled striplines. Preserve exact nullable inputs, units, fixed mesh and project variants; retain placement in width targets and enable explicit height studies with pre-solve plane-contact checks. Validate qualified parallel-plane references, mesh/domain/reflection and independent finite-element assembly.
+
 - Add an explicit session-only baseline for successful cross-section results, with ordered-signal scalar/matrix differences and exact geometry/mesh inspection. Preserve the baseline while invalidating stale current results; keep zero percentages, asymmetric summaries, project persistence and convergence claims explicit. Stack the primary line metric above the other values on narrow screens.
 
 - Add explicit or automatic box-width and surface air-height controls, with non-solving inspection of resolved bounds. Preserve canonical nullable inputs, exact SI values, fixed mesh and A/B files; keep imported bounds read-only and domain convergence separate from mesh refinement.

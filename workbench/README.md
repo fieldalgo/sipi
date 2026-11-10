@@ -52,8 +52,27 @@ For **Coupled stripline**, plane spacing is the full distance between the two
 ground planes and gap is measured between the bottom copper edges. Both traces
 have the same bottom width and profile. The target and study quantity is
 differential impedance; frequency response retains four single-ended ports plus
-its mixed-mode representation. Saved `trace_height` offsets remain unchanged and
-appear in the schematic, even though this form has no separate offset control.
+its mixed-mode representation. Choose centred placement or an explicit `trace_height` with **Vertical placement**.
+The height is measured from the lower plane to the copper bottom face; the
+whole conductor must remain strictly between the two planes. Saved precise
+heights appear in the schematic and survive mm/mil changes, width edits,
+fixed meshes and project variants. Returning to centred placement explicitly
+saves the existing nullable value; this does not change the JSON schema.
+
+Explicit height stays fixed when spacing or thickness changes. A centred
+trace follows `(plane_spacing - thickness) / 2`. Width targets keep placement
+unchanged, and a manually positioned pair exposes **Bottom-face height** in
+parameter studies. Centred/null height is not a numeric study variable. Study
+bounds that touch or cross either plane are rejected before field solves.
+This control belongs to the coupled-stripline form; it does not silently
+convert a centred single stripline into another template.
+
+The qualified thin-strip uniform-dielectric checks use an independent
+parallel-plane Green-function panel calculation, its centred single-strip
+elliptic-integral limit and separate mesh/domain/reflection tests. A finite
+35 µm rectangular pair also has an independent same-mesh complex/vacuum
+finite-element comparison. These checks do not establish general measured
+PCB accuracy or certify every placement and material.
 A failed finer-mesh target check retains its evaluation history instead of
 accepting a coarse result. The saved goal document uses the requested mesh;
 the separate refined impedance is verification, not a substituted saved mesh.
@@ -65,7 +84,7 @@ width** applies to each rectangular side ground. Grounds share the signal
 thickness; taper changes only the signals. Width targeting and studies use
 differential impedance, and network export has four signal ports. Studies can
 vary either ground dimension; ground width is also available for single-signal
-coplanar. Imported air height and box width remain exact hidden inputs. Check
+coplanar. Imported air height and box width remain exact and can be edited in Domain bounds. Check
 mesh and outer-domain convergence after changing these finite grounds.
 For automatic width targets, this pair keeps the resolved edge size and growth,
 reduces the far size by four, and still requires the separate finer-mesh check.

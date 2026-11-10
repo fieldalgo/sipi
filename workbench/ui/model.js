@@ -1,5 +1,5 @@
 export const scales = {mm: 1e-3, mil: 25.4e-6};
-export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower', 'upper'];
+export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower', 'upper'];
 export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip'};
 export const isStripline = template => ['stripline', 'coupled_stripline'].includes(template);
 export const isPair = template => ['coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'].includes(template);
@@ -16,7 +16,7 @@ export function refinedMesh(mesh) {
 
 export function parameterFields(template) {
   return {width: 'width', top_width: 'top_width', thickness: 'thickness',
-    height: isStripline(template) ? 'plane_spacing' : 'substrate_height',
+    height: isStripline(template) ? 'plane_spacing' : 'substrate_height', trace_height: 'trace_height',
     gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', box_width: 'box_width', air_height: 'air_height', coating_height: 'coating_height',
     eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
     coating_tan_delta: 'coating_tan_delta'};
@@ -42,6 +42,7 @@ export function editableParameters(template, values, unit, original, changed, le
     if (Object.hasOwn(entered, key)) out[key] = entered[key];
   }
   if (changed.has('profile')) out.top_width = entered.top_width ?? null;
+  if (template === 'coupled_stripline' && changed.has('placement')) out.trace_height = entered.trace_height ?? null;
   for (const [mode, key] of [['box_mode', 'box_width'], ...(!isStripline(template) ? [['air_mode', 'air_height']] : [])]) {
     if (changed.has(mode)) out[key] = entered[key] ?? null;
   }
@@ -58,6 +59,11 @@ export function parameters(template, values, unit) {
   };
   const out = {width: positive('width') * scales[unit], thickness: positive('thickness', true) * scales[unit], eps_r: positive('eps_r'), tan_delta: positive('tan_delta', true)};
   out[isStripline(template) ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
+  if (template === 'coupled_stripline') {
+    const placement = values.placement ?? 'centred';
+    if (!['centred', 'fixed'].includes(placement)) throw new Error('Unknown vertical placement.');
+    if (placement === 'fixed') out.trace_height = positive('trace_height') * scales[unit];
+  }
   if (isPair(template) || template === 'grounded_coplanar') out.gap = positive('gap') * scales[unit];
   if (isCoplanar(template)) out.ground_width = positive('ground_width') * scales[unit];
   if (template === 'coupled_grounded_coplanar') out.ground_gap = positive('ground_gap') * scales[unit];
@@ -91,6 +97,7 @@ export function studyFields(template, p) {
   const fields = {width: 'Bottom width', eps_r: 'Substrate permittivity',
     [isStripline(template) ? 'plane_spacing' : 'substrate_height']: isStripline(template) ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
   if (p.top_width != null) fields.top_width = 'Top width';
+  if (template === 'coupled_stripline' && p.trace_height != null) fields.trace_height = 'Bottom-face height';
   if ('gap' in p) fields.gap = 'Bottom gap';
   if ('ground_gap' in p) fields.ground_gap = 'Signal–ground gap';
   if ('ground_width' in p) fields.ground_width = 'Ground width';

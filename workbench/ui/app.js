@@ -13,7 +13,7 @@ let originalParameters = null, savedMesh = null, resolvedMesh = null, resolvedDo
 let projectText = null, activeDesign = null, baseline = null;
 const changedFields = new Set();
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
-const allFields = [...lengthFields, 'profile', 'box_mode', 'air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
+const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
 
 function status(text, error = false) {
@@ -325,10 +325,13 @@ function preview() {
 
 function geometryFields() {
   $('top-width-field').hidden = $('profile').value !== 'tapered';
+  $('placement-fields').hidden = template !== 'coupled_stripline';
+  $('trace-height-field').hidden = $('placement').value !== 'fixed';
+  $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
   $('coating-fields').hidden = template !== 'coated_microstrip';
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -516,6 +519,7 @@ function chooseTemplate(name) {
     template = name; imported = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto';
+    $('placement').value = 'centred';
     $('import-note').hidden = true;
     $('inputs').hidden = false;
     for (const element of $('inputs').elements) element.disabled = false;
@@ -545,6 +549,7 @@ function restoreEditable(restored) {
     else $(id).value = String(v);
   }
   $('profile').value = originalParameters.top_width == null ? 'rectangular' : 'tapered';
+  $('placement').value = originalParameters.trace_height == null ? 'centred' : 'fixed';
   $('box_mode').value = originalParameters.box_width == null ? 'auto' : 'fixed';
   $('air_mode').value = originalParameters.air_height == null ? 'auto' : 'fixed';
   resolvedDomain = restored.document;
@@ -555,6 +560,11 @@ for (const button of document.querySelectorAll('[data-template]')) {
 }
 $('inputs').addEventListener('submit', event => event.preventDefault());
 for (const id of allFields) $(id).addEventListener('input', () => {
+  if (id === 'placement' && $('placement').value === 'fixed') {
+    const value = (lengthSI.height - lengthSI.thickness) / 2;
+    lengthSI.trace_height = value;
+    $('trace_height').value = String(Number((value / scales[unit]).toPrecision(10)));
+  }
   if (['box_mode', 'air_mode'].includes(id) && $(id).value === 'fixed' && resolvedDomain) {
     const field = id === 'box_mode' ? 'box_width' : 'air_height';
     const value = id === 'box_mode' ? resolvedDomain.box.width : resolvedDomain.layers.at(-1).thickness;

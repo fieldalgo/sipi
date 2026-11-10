@@ -137,6 +137,9 @@ footer a{color:inherit;text-underline-offset:3px}
 #domain-inputs, #air-domain-fields { display: grid; gap: 12px; }
 #domain-inputs select { display: block; width: 100%; min-height: 44px; margin-top: 7px; padding: 8px 10px; }
 #domain-inputs .number { height: 46px; }
+#placement-fields { display: grid; gap: 12px; margin-top: 18px; }
+#placement { display: block; width: 100%; min-height: 44px; margin-top: 7px; padding: 8px 10px; }
+#placement-fields .number { height: 46px; }
 
 .comparison { min-width: 0; }
 .comparison-actions { display: flex; flex-wrap: wrap; gap: 10px; }
