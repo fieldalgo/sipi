@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 23종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 24종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 23종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 24종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -27,6 +27,29 @@ Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 
 전용 입력 폼까지 구현한 것은 아닙니다. 명시적인 메시를 담은 유한 영역 3D
 정전용량 입력은 저장한 절연 경계·도체 순서를 유지해 전체 C(F)를 반환합니다.
 기하 편집기·비아 전이 L/S·열린 공간 프린징까지 지원한다는 뜻은 아닙니다.
+
+## 두 기준면 사이의 broadside 차동쌍
+
+**Broadside pair**는 균일 유전체 안에서 직사각형 신호선 두 개를 위아래로
+배치합니다. **Vertical metal-face gap**은 구리 두께를 제외한 도체 면 사이
+수직 간격입니다. 두 신호선은 같은 폭과 양수 두께를 가지며 두 기준면 사이에
+전체 쌍이 중앙 배치됩니다. **Horizontal offset**은 위쪽 중심에서 아래쪽
+중심을 뺀 수평 거리로 음수·0·양수를 허용하고 수직 간격은 바꾸지 않습니다.
+측면 접지·공기 높이·사다리꼴 프로필 입력은 없습니다. 두께가 0인 설계에서
+선택하면 표시된 두께가 35 µm로 시작하므로 실제 설계값으로 변경하십시오.
+
+편집 JSON이나 A/B 프로젝트는 부호 있는 오프셋과 결정된 메시를 정확히
+저장·복원하며 단위 전환은 원래 SI 값을 보존합니다. 오프셋·간격 공차 계산은
+명목 메시와 실패 행을 보존합니다. 음수나 0 오프셋에서도 기본 탐색 하한이
+상한보다 작습니다. 표본 범위의 메시·외곽 수렴을 확인하기 전에는 분포를
+제조 수율로 해석하지 마십시오.
+
+폭 역산은 오프셋·간격·두께를 유지합니다. 양 끝 임피던스 사이에 목표가 있는
+폭 범위를 입력해야 하며, 밖에 있는 목표는 오류입니다. 자동 역산은 기존
+일반 초기 메시 정책(edge·far를 1/4, growth를 1/2)과 별도 세분 해석을 씁니다.
+명시 메시와 최종 허용오차, 32회·300,000점·5분 제한을 유지합니다. 임의 입력의
+수렴이나 특정 폭을 보장하지 않습니다. 균일 준정적 단면이므로 적층 전이나
+3차원 접속부 효과는 포함하지 않습니다.
 
 ## 두 기준면 사이의 coplanar 신호선
 
@@ -152,7 +175,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair) 23종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline 24종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -363,7 +386,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 23종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 24종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는

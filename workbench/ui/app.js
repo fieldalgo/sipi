@@ -439,6 +439,10 @@ function preview() {
 }
 
 function geometryFields() {
+  const broadside = template === 'broadside_stripline';
+  $('broadside-fields').hidden = !broadside;
+  $('profile').disabled = busy || !!imported || broadside;
+  $('gap-label').textContent = broadside ? 'Vertical metal-face gap' : 'Bottom edge gap';
   $('top-width-field').hidden = $('profile').value !== 'tapered';
   $('placement-fields').hidden = !['coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
   $('placement-mode-field').hidden = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
@@ -456,7 +460,7 @@ function geometryFields() {
   $('geometry-inspect').hidden = !normal || !!imported;
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -543,6 +547,10 @@ function resetStudyBounds(i) {
     studySI[i] = {parameter:key,
       low:['eps_r','coating_eps_r'].includes(key) ? Math.max(1, value*.9) : value*.9,
       high:value === 0 ? .05*scales.mm : value*1.1};
+    if (template === 'broadside_stripline' && key === 'offset') {
+      const span = value === 0 ? .05 * scales.mm : Math.abs(value) * .1;
+      studySI[i] = {parameter: key, low: value - span, high: value + span};
+    }
     displayStudyBounds(i);
   } catch { /* Invalid nominal inputs are reported by the ordinary request path. */ }
 }
@@ -664,6 +672,13 @@ function chooseTemplate(name) {
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
     $('placement').value = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name) ? 'fixed' : 'centred';
+    if (name === 'broadside_stripline') {
+      $('profile').value = 'rectangular';
+      if (lengthSI.thickness === 0) {
+        lengthSI.thickness = 35e-6;
+        $('thickness').value = String(Number((lengthSI.thickness / scales[unit]).toPrecision(10)));
+      }
+    }
     if (['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name)) {
       lengthSI.trace_height = (lengthSI.height - lengthSI.thickness) / 2;
       $('trace_height').value = String(Number((lengthSI.trace_height / scales[unit]).toPrecision(10)));

@@ -38,6 +38,9 @@ def parameters(name):
         p.update(plane_spacing=.001, trace_height=.0003000000000123456,
                  gap=.0002, ground_width=.003)
         if name.startswith('coupled_'): p['ground_gap'] = .0002500000000123456
+    if name == 'broadside_stripline':
+        p.pop('substrate_height', None); p.pop('air_height', None); p.pop('top_width', None)
+        p.update(plane_spacing=.001, gap=.0002, offset=-.0001000000000123456)
     return p
 
 
@@ -76,7 +79,7 @@ def test_open_rejects_mismatch_and_unknown_options():
 
 def test_no_form_for_valid_unsupported_template():
     # Engine support does not imply a matching editable UI form.
-    doc = TemplateSectionDocument('broadside_stripline', dict(width=.0005, gap=.0002, thickness=.000035, plane_spacing=.001, eps_r=4))
+    doc = TemplateSectionDocument('layered_stripline', dict(width=.0005, thickness=.000035, lower_height=.0004, upper_height=.0006, lower_eps_r=4, upper_eps_r=4))
     with pytest.raises(ValueError, match='no editable form'):
         execute(dict(action='template-open', text=doc.dumps()))
 

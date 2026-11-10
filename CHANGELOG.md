@@ -1,5 +1,8 @@
 # Changelog
 
+- Add a rectangular broadside-pair form with vertical metal-face gap, signed horizontal offset, exact projects and offset/gap studies.
+  수직 broadside 쌍에 도체 면 사이 간격·부호 있는 수평 오프셋·정확한 프로젝트·공차 흐름을 연결합니다.
+
 - Add single and paired buried coplanar forms with explicit bottom-face height,
   finite side grounds, exact editable projects, height studies and refined width goals.
   매립 coplanar 단일·차동 폼에 도체 높이·측면 접지·편집 프로젝트·공차·폭 역산을 연결합니다.

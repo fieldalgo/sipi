@@ -170,3 +170,7 @@ footer a{color:inherit;text-underline-offset:3px}
 .geometry-view-controls button[aria-pressed=true]{background:#e5f2ef;border-color:#217e74}
 
 .drawing svg[data-geometry-view=detail]{height:auto;min-height:210px}
+
+/* Keep broadside offset and required copper thickness easy to edit. */
+#broadside-fields .number,
+#inputs:has(#broadside-fields:not([hidden])) .number:has(#thickness) { height: 46px; }
