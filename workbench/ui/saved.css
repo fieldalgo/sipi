@@ -10,6 +10,10 @@
 .saved-input, .saved-output { padding: 24px; min-width: 0; }
 .saved-input textarea { box-sizing: border-box; width: 100%; min-height: 360px; padding: 14px; border: 1px solid #c9d1d9; border-radius: 8px; font: 13px/1.6 ui-monospace, monospace; resize: vertical; }
 .saved-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+.saved-example { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: 20px; }
+.saved-example label { min-width: 0; }
+.saved-example select { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; margin-top: 8px; padding: 10px 12px; border: 1px solid #dfe6e9; border-radius: 5px; font: inherit; color: #263f4d; background: #fcfdfd; }
+.saved-example select:disabled { color: #92a2aa; background: #f3f6f5; }
 .saved-input fieldset { border: 1px solid #d7dedb; border-radius: 8px; margin-top: 20px; padding: 16px; }
 .saved-input fieldset label { display: block; margin: 8px 0; }
 .saved-input input[type=checkbox] { width: auto; }
@@ -22,4 +26,8 @@
   .topbar { height: auto; min-height: 68px; padding-top: 12px; padding-bottom: 12px; gap: 12px; flex-wrap: wrap; }
   .topbar .brand { flex-shrink: 0; }
   .top-actions { flex-wrap: wrap; gap: 12px; min-width: 0; }
+}
+@media (max-width: 480px) {
+  .saved-example { grid-template-columns: minmax(0, 1fr); }
+  .saved-example button { justify-self: start; }
 }

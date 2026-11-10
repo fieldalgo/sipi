@@ -79,11 +79,33 @@ try {
   async function input(text) {
     await cdp.evaluate(`document.querySelector('#input-text').value=${JSON.stringify(text)};document.querySelector('#input-text').dispatchEvent(new Event('input'));`);
   }
+  async function loadExample(id, expected) {
+    const before=await cdp.evaluate('document.querySelector("#input-text").value');
+    await cdp.evaluate(`document.querySelector('#example-choice').value=${JSON.stringify(id)};document.querySelector('#example-choice').dispatchEvent(new Event('change'));`);
+    assert.equal(await cdp.evaluate('document.querySelector("#input-text").value'),before,'selection alone keeps edits');
+    assert.ok((await cdp.evaluate('document.querySelector("#example-help").textContent')).length>20);
+    await cdp.evaluate('document.querySelector("#example").click()');
+    assert.deepEqual(await cdp.evaluate('JSON.parse(document.querySelector("#input-text").value)'),expected);
+    assert.equal(await cdp.evaluate('document.querySelector("#output").hidden && document.querySelector("#save-result").disabled'),true);
+    assert.equal(await cdp.evaluate('document.querySelector("#characteristic").checked || document.querySelector("#modes").checked'),false);
+  }
   async function calculate() {
-    await cdp.evaluate('document.querySelector("#run").click()');
+    assert.equal(await cdp.evaluate('document.querySelector("#run").click();document.querySelector("#example-choice").disabled && document.querySelector("#example").disabled'),true);
     await until(()=>cdp.evaluate('!document.querySelector("#run").disabled'),'calculation finished',180000);
+    assert.equal(await cdp.evaluate('document.querySelector("#example-choice").disabled || document.querySelector("#example").disabled'),false);
     assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),false,await status());
     return cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');
+  }
+  assert.deepEqual(await cdp.evaluate('Array.from(document.querySelector("#example-choice").options, item=>item.value)'),
+    ['rlc','constant-target','debye-target','pair-target','material-sweep','correlated-study']);
+  assert.equal(await cdp.evaluate('document.querySelector("label[for=example-choice]") !== null'),true);
+  const untouched=await cdp.evaluate('document.querySelector("#input-text").value');
+  await cdp.evaluate('document.querySelector("#example-choice").focus()');
+  for(const key of ['ArrowDown','ArrowUp']) {
+    await cdp.call('Input.dispatchKeyEvent',{type:'keyDown',key,code:key,windowsVirtualKeyCode:key==='ArrowDown'?40:38});
+    await cdp.call('Input.dispatchKeyEvent',{type:'keyUp',key,code:key,windowsVirtualKeyCode:key==='ArrowDown'?40:38});
+    assert.equal(await cdp.evaluate('document.querySelector("#example-choice").value'),key==='ArrowDown'?'constant-target':'rlc');
+    assert.equal(await cdp.evaluate('document.querySelector("#input-text").value'),untouched);
   }
   await cdp.evaluate('document.querySelector("#example").click();document.querySelector("#check").click()');
   await until(async()=>(await status()).startsWith('Input checked'),'checked input',180000);
@@ -134,7 +156,7 @@ try {
     } else assert.equal(actual,expected,path);
   }
   for(const item of cases.material_goals) {
-    await input(item.text);
+    await loadExample(item.name==='constant'?'constant-target':'debye-target',item.expected.input);
     await cdp.evaluate('document.querySelector("#check").click()');
     await until(async()=>(await status()).startsWith('Input checked'),'material normalization',180000);
     await rm(join(downloads,'sipi-input.json'),{force:true});
@@ -207,7 +229,10 @@ try {
     }
   }
   for(const item of cases.material_batch) {
-    await input(item.text);
+    const exampleId={'pair-goal':'pair-target',constant:'material-sweep',tensor:'correlated-study'}[item.name];
+    if(exampleId) await loadExample(exampleId,item.expected.input);
+    else await input(item.text);
+    if(exampleId==='pair-target') await writeFile(join(output,'saved-material-example.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
     await cdp.evaluate('document.querySelector("#check").click()');
     await until(async()=>(await status()).startsWith('Input checked'),'batch material normalization',180000);
     await rm(join(downloads,'sipi-input.json'),{force:true});
@@ -273,7 +298,7 @@ try {
   await cdp.evaluate(`document.querySelector('#modes').checked=true;document.querySelector('#modes').dispatchEvent(new Event('change'));`);
   result=await calculate();assert.equal(result.status,'complete');assert.equal(result.result.diagnostics.modes.status,'failed');
   assert.equal(await cdp.evaluate('document.querySelector("#diagnostic-status").hidden'),false);
-  await cdp.evaluate('document.querySelector("#example").click();document.querySelector("#run").click();document.querySelector("#cancel").click()');
+  await cdp.evaluate('document.querySelector("#example-choice").value="rlc";document.querySelector("#example-choice").dispatchEvent(new Event("change"));document.querySelector("#example").click();document.querySelector("#run").click();document.querySelector("#cancel").click()');
   await until(async()=>(await status()).startsWith('Calculation cancelled'),'cancel pending start');
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
   result=await calculate();assert.equal(result.status,'complete');
@@ -287,10 +312,11 @@ try {
   await writeFile(join(output,'saved-mobile.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
   await cdp.evaluate('document.querySelector("#exit").click()');
   await until(async()=>/closed|stopped/.test(await status()),'shutdown');
+  assert.equal(await cdp.evaluate('document.querySelector("#example-choice").disabled && document.querySelector("#example").disabled'),true);
   if(!webRoot) await until(()=>server.exitCode===0,'server exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',
-    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,materialBatch,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
+    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,materialBatch,checks:['six canonical examples, explicit load and keyboard selection','busy/closed example controls','raw duplicate rejection','canonical input download','RLC native S within 1e-12',
       'result download','constant/Debye material goals, selected models, refinement and exports','pair material goal and complete/incomplete material studies with exports','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
       'pending-start cancellation and restart','stale completion rejection','mobile width','shutdown']},null,2));
   console.log('Saved analysis browser acceptance passed.');

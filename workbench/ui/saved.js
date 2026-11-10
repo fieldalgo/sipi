@@ -1,14 +1,14 @@
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
+import {SAVED_EXAMPLES} from './saved-examples.js';
 
 const $ = id => document.getElementById(id);
 const browser = document.documentElement.dataset.runtime === 'browser';
 const transport = browser ? new BrowserTransport() : new LocalTransport();
-const example = {
-  schema: 'sipi.lumped-network/1', frequency_hz: [0, 1e9],
-  branch: {resistance_ohms: 10, inductance_h: 2e-9, capacitance_f: null},
-  placement: 'series', reference_ohms: [50, 50], port_names: ['near', 'far'],
-};
+$('example-choice').replaceChildren(...SAVED_EXAMPLES.map(item => {
+  const option = document.createElement('option'); option.value = item.id; option.textContent = item.label; return option;
+}));
+$('example-help').textContent = SAVED_EXAMPLES[0].description;
 let generation = 0, activeRun = null, busy = false, closed = false, checked = null, report = null;
 let recorded = null;
 let projectText = null, activeDesign = null, projectDirty = false;
@@ -19,7 +19,7 @@ function state(message, error = false) {
   $('status').classList.toggle('error', error);
 }
 function controls() {
-  for (const id of ['open', 'example', 'check', 'run', 'record']) $(id).disabled = busy || closed;
+  for (const id of ['open', 'example', 'example-choice', 'check', 'run', 'record']) $(id).disabled = busy || closed;
   $('save-input').disabled = busy || closed || checked === null;
   $('save-result').disabled = busy || closed || report === null;
   $('save-record').disabled = busy || closed || recorded === null;
@@ -227,10 +227,16 @@ $('file').onchange = async () => {
     $('input-text').value = text; state('File opened. Check or run its saved settings.');
   } catch (error) { if (current === generation) state(error.message, true); }
 };
+$('example-choice').onchange = () => {
+  $('example-help').textContent = SAVED_EXAMPLES.find(item => item.id === $('example-choice').value)?.description || '';
+};
 $('example').onclick = () => {
-  invalidate(); $('input-text').value = JSON.stringify(example, null, 2);
+  if (busy || closed) return;
+  const example = SAVED_EXAMPLES.find(item => item.id === $('example-choice').value);
+  if (!example) { state('Choose an example before loading it.', true); return; }
+  invalidate(); $('input-text').value = JSON.stringify(example.document, null, 2);
   $('characteristic').checked = $('modes').checked = false;
-  state('RLC example loaded. Check the input or run the analysis.');
+  state(`${example.label} example loaded. Edit its values, check the input or run the analysis.`);
 };
 $('check').onclick = () => run('saved-normalize');
 $('run').onclick = () => run('saved-analyze');

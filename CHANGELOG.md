@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a saved-analysis example selector for validated material targets and studies alongside the default RLC network. Load inputs explicitly, preserve project history, and disable loading during calculations or after shutdown.
+
 - Pin both workbench runtimes to paired-material and study mesh reuse. Exercise paired targets and complete/incomplete sampled-material documents through native HTTP and actual browser Workers, retaining model snapshots, refinement, row failures and exports.
 
 - Reuse the last identical explicit-material study mesh and vacuum capacitance within each analysis. Recompute every sampled material, retain failed rows and incomplete summaries, and preserve sampling order, budgets and geometry changes.

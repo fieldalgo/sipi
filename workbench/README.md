@@ -437,3 +437,15 @@ absolute 1e-14 with identical inputs, row order and failure status. Exports
 preserve the actual execution. Existing scalar-target criteria stay unchanged.
 These bounded runtime checks do not establish measured accuracy, general
 optimization convergence or automatic study mesh convergence.
+
+## Start a saved analysis from an example
+
+On **Saved analysis**, choose a starting example and press **Load example**.
+The catalog includes an RLC network, constant or Debye material targets, paired
+differential/common targets, a dielectric sweep and a correlated dielectric
+study. Choosing an item only changes its description; loading it replaces the
+input, clears stale results and leaves existing project history intact. Edit
+the values in JSON, check them, run the analysis and save the input/result or
+project to continue later. Loading is disabled during a calculation or after
+shutdown. These are bounded starting inputs, not a visual editor for every
+engine model or a guarantee of accuracy for edited geometries and materials.
