@@ -5,15 +5,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import contextmanager
 import math
 import json
 from numbers import Real
+from meshine import MeshSizeLimitError
 
 from .crosssection import CrossSection
 from .document import CrossSectionDocument
 from .impedance_material import _material_input, _analyze_material, _frequency
 
-__all__ = ['ImpedanceDesign', 'DesignEvaluation', 'GoalSeekError', 'seek_impedance']
+__all__ = ['ImpedanceDesign', 'DesignEvaluation', 'GoalSeekError',
+           'GoalMeshSizeLimitError', 'seek_impedance']
 
 
 @dataclass(frozen=True)
@@ -62,6 +65,24 @@ class GoalSeekError(RuntimeError):
         self.history = tuple(history)
 
 
+class GoalMeshSizeLimitError(GoalSeekError, MeshSizeLimitError):
+    """A field mesh exceeded its point budget, retaining completed goal work.
+
+    Catchable as either original exception family. parameter has the factory's
+    units; stage is search or refinement. input_json contains the failed
+    geometry with resolved mesh settings, without attempting another solve.
+    """
+    def __init__(self, message, history, *, parameter, stage, cause_type,
+                 input_json, material_evaluation_json=None):
+        super().__init__(message, history)
+        self.parameter = parameter
+        self.stage = stage
+        self.attempts = len(self.history) + 1
+        self.cause_type = cause_type
+        self.input_json = input_json
+        self.material_evaluation_json = material_evaluation_json
+
+
 def _positive(name, value):
     if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value) or value <= 0:
         raise ValueError(f'{name} must be a positive finite real number')
@@ -77,6 +98,8 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     z_diff (a symmetric pair), or z_diff_forward (a pair's real lossless
     forward-current launch, Icommon=0). bounds have the factory parameter's units;
     target/tolerance are ohms. Factory errors propagate unchanged.
+    A field MeshSizeLimitError becomes GoalMeshSizeLimitError with its original
+    cause, completed history and failed input; other solver errors propagate.
 
     Both endpoints must be valid. Apart from an endpoint already within
     tolerance, their residuals must bracket zero. Reserve one solve for a final
@@ -117,6 +140,21 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
         material = _material_input(frequency, materials)
     history = []
 
+    @contextmanager
+    def preserve_mesh_failure(parameter, stage, document, evaluated_material):
+        try:
+            yield
+        except MeshSizeLimitError as exc:
+            section = document.section
+            failed = CrossSectionDocument(section,
+                mesh=section.mesh_settings(**document.mesh_options))
+            material_json = (None if evaluated_material is None else
+                             json.dumps(evaluated_material, sort_keys=True, allow_nan=False))
+            raise GoalMeshSizeLimitError(
+                f'mesh point limit during {stage}: {exc}', history,
+                parameter=parameter, stage=stage, cause_type=type(exc).__name__,
+                input_json=failed.dumps(), material_evaluation_json=material_json) from exc
+
     def evaluate(parameter):
         if len(history) >= max_evaluations-1:
             raise GoalSeekError('evaluation limit reached before target convergence', history)
@@ -124,8 +162,9 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
         doc = CrossSectionDocument(section, mesh=options)
         evaluated_material = (material if material_factory is None else
                               _material_input(frequency, material_factory(parameter)))
-        line = (doc.analyze() if evaluated_material is None
-                else _analyze_material(doc, evaluated_material, quantity))
+        with preserve_mesh_failure(parameter, 'search', doc, evaluated_material):
+            line = (doc.analyze() if evaluated_material is None
+                    else _analyze_material(doc, evaluated_material, quantity))
         value = impedance(line)
         history.append(DesignEvaluation(parameter, value, 'search'))
         return value-target, doc, evaluated_material
@@ -160,8 +199,10 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     fine = section.mesh_settings(**doc.mesh_options)
     for key in ('edge_size', 'far_size', 'grade'):
         fine[key] /= 2
-    refined_line = (section.analyze(**fine) if selected_material is None
-                    else _analyze_material(CrossSectionDocument(section, mesh=fine), selected_material, quantity))
+    refined_doc = CrossSectionDocument(section, mesh=fine)
+    with preserve_mesh_failure(x, 'refinement', refined_doc, selected_material):
+        refined_line = (section.analyze(**fine) if selected_material is None
+                        else _analyze_material(refined_doc, selected_material, quantity))
     refined = impedance(refined_line)
     history.append(DesignEvaluation(x, refined, 'refinement'))
     if abs(refined-target) > tolerance:

@@ -17,7 +17,7 @@ from .document import CrossSectionDocument, _unique_object
 from .template_document import TemplateSectionDocument
 from .study import ImpedanceStudyDocument
 from .design_document import ImpedanceDesignDocument
-from .design import GoalSeekError
+from .design import GoalSeekError, GoalMeshSizeLimitError
 from .aperture import ApertureDocument
 from .aperture_section import ApertureSectionDocument
 from .aperture_study import ApertureStudyDocument, ApertureDesignDocument, CapacitanceGoalError
@@ -430,8 +430,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     completed execution keeps the fit's accepted flag as a separate decision.
     diagnostics may contain 'characteristic' and/or 'modes', only for top-level
     transmission/volume/panel lines. A failed diagnostic preserves the base output.
-    Failed goals return status='failed' with completed history; malformed input
-    and other solver failures raise their original exceptions. Study failures
+    Failed goals return status='failed' with completed history. Impedance goal
+    mesh point limits also retain failed-input context; malformed input and
+    other solver failures raise their original exceptions. Study failures
     remain rows with status='incomplete', without a partial summary.
     """
     budget = _integer('max_evaluations', max_evaluations, 2, 10000)
@@ -567,6 +568,11 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         except (GoalSeekError, CapacitanceGoalError) as exc:
             out.update(status='failed', error=dict(type=type(exc).__name__, message=str(exc),
                 unit=unit, history=_history(exc.history, value), parameter=getattr(exc, 'parameter', None)))
+            if isinstance(exc, GoalMeshSizeLimitError):
+                out['error'].update(stage=exc.stage, attempts=exc.attempts,
+                    cause_type=exc.cause_type, input=json.loads(exc.input_json),
+                    material_evaluation=(None if exc.material_evaluation_json is None
+                                         else json.loads(exc.material_evaluation_json)))
     elif isinstance(doc, (ImpedanceStudyDocument, ApertureStudyDocument)):
         result = doc.analyze(max_evaluations=budget)
         value, unit = ('impedance', 'ohm') if isinstance(doc, ImpedanceStudyDocument) else ('capacitance', 'F/m')

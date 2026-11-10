@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve completed impedance-search history and the failed parameter, stage, resolved mesh and material snapshot when field meshing exceeds its point budget. Keep the error catchable as both a goal failure and a mesher limit, and retain the failure in saved execution records without retrying or relaxing numerical criteria.
+
 - Add a planar-coated pair form with differential width targeting, four-port response, coating studies and exact editable/project inputs. Preserve coating-aware default edge/growth before mandatory target refinement, with independent panel, finite-element and domain-convergence checks.
 
 - Add micrometre display for editable cross sections. Preserve physical target/study bounds across unit changes and one-sided edits; keep empty thickness and study inputs invalid instead of silently converting them to zero.

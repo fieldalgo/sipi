@@ -156,8 +156,17 @@ print(result.parameter, result.impedance, result.refined_impedance)
 `ImpedanceDesign`은 파라미터·목표·선택량·원/세분 임피던스·입력 문서·평가 이력을 담습니다.
 `residual`, `refined_residual`, `mesh_change`로 목표 오차와 메시 변화를 구분합니다.
 문서는 원 메시 입력입니다. 구간·평가 상한·파라미터 분해능·세분 검사 실패 시
-`GoalSeekError.history`에 완료된 평가가 남습니다. 잘못된 입력과 factory/solver 오류는
-전파하며 실패를 성공 설계로 반환하지 않습니다. 세분 검사 실패 시 메시를 더 촘촘하게 설정해
+`GoalSeekError.history`에 완료된 평가가 남습니다. 전계 계산에서 메시 점수 상한을
+넘으면 `GoalMeshSizeLimitError`를 반환하며, 기존 `GoalSeekError`와
+`meshine.MeshSizeLimitError` 어느 쪽으로도 잡을 수 있습니다. `__cause__`는 원래
+메시 예외입니다. 완료 `history`, 실패한 `parameter`(factory의 단위),
+`stage`(`search` 또는 `refinement`), `attempts`(완료 풀이와 실패 시도 합),
+`cause_type`을 보존합니다. `input_json`은 모든 메시 설정을 확정한 실패 기하이며,
+재료 평가가 있으면 `material_evaluation_json`에 선택한 주파수·모델을 보존합니다.
+실패한 풀이는 완료 이력에 넣지 않고 자동 재시도나 메시 완화를 하지 않습니다.
+
+잘못된 입력, factory/material-factory와 그 밖의 솔버 예외는 원래대로 전파하며
+실패를 성공 설계로 반환하지 않습니다. 세분 검사 실패 시 메시를 더 촘촘하게 설정해
 다시 탐색하세요. 이는 수치적 목표 검사이지 제조 공차 보장이나 임의 factory의 단조성 증명이
 아닙니다. 영역·재료 불확실성은 별도로 분석해야 합니다.
 

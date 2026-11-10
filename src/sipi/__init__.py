@@ -101,7 +101,7 @@ from .debye_reactive_startup_document import DebyeReactiveLadderDocument
 from .coupled_debye_startup_document import CoupledDebyeRLGCLadderDocument
 from .pair_design import (PairImpedanceEvaluation, PairImpedanceDesign,
                           PairImpedanceGoalError, seek_pair_impedances)
-from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, seek_impedance
+from .design import DesignEvaluation, ImpedanceDesign, GoalSeekError, GoalMeshSizeLimitError, seek_impedance
 from .design_document import ImpedanceDesignDocument
 from .plane import (COPPER_CONDUCTIVITY, IRDropResult, PowerPlane, Sink, Source, circle, edge,
                     rectangle_outline)
@@ -210,7 +210,7 @@ __all__ = ['AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridP
            "layered_broadside_stripline",
            "coplanar_stripline", "coupled_coplanar_stripline",
            "layered_coplanar_stripline", "coupled_layered_coplanar_stripline",
-           "DesignEvaluation", "ImpedanceDesign", "GoalSeekError", "seek_impedance",
+           "DesignEvaluation", "ImpedanceDesign", "GoalSeekError", "GoalMeshSizeLimitError", "seek_impedance",
            "ImpedanceDesignDocument",
            "PowerPlane", "Source", "Sink", "IRDropResult", "circle", "edge", "rectangle_outline",
            "COPPER_CONDUCTIVITY", "__version__"]

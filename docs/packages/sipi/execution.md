@@ -98,6 +98,13 @@ capacitance, propagation impedance or 3D via transition.
   `result` is null; `error` retains type/message, value unit, completed history
   and the failing parameter when the underlying API supplies it.
 
+For an impedance goal's `GoalMeshSizeLimitError`, `error` additionally retains
+`stage`, `attempts`, `cause_type`, the failed cross-section `input` with resolved
+mesh, and `material_evaluation` (null when absent). The failed attempt has no
+fabricated value or completed history row. Saved requests, records and projects
+preserve this failed result without implicitly re-running it. This applies to
+a mesher point-limit exception, not an externally cancelled or timed-out job.
+
 Malformed input and other solver errors propagate as exceptions. The transport
 must present them as failures. Cancellation/timeout is the caller's responsibility;
 this module does not disguise an interrupted solve as an empty successful result.

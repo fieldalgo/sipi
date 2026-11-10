@@ -173,8 +173,18 @@ impedances, input document and evaluation history. `residual`,
 `refined_residual` and `mesh_change` keep the target error and mesh change
 distinct. The document is the requested-mesh input. `GoalSeekError.history`
 records completed evaluations when a bracket, evaluation budget, parameter
-resolution or refinement check fails. Invalid input and factory/solver errors
-propagate; a failure is never returned as a successful design. On a refinement
+resolution or refinement check fails. A field extraction that exceeds the
+mesher's point budget raises `GoalMeshSizeLimitError`, catchable as both
+`GoalSeekError` and `meshine.MeshSizeLimitError`. Its `__cause__` is the original
+mesher exception. It retains completed `history`, failed `parameter` (in the
+factory's units), `stage` (`search` or `refinement`), `attempts` (completed
+solves plus the failed attempt), and `cause_type`. `input_json` holds the failed
+geometry with all resolved mesh settings; `material_evaluation_json` retains
+the selected frequency/models when present. No failed solve becomes a completed
+history row, and no retry or automatic mesh relaxation occurs.
+
+Invalid input, factory/material-factory errors and other solver exceptions
+propagate unchanged; a failure is never returned as a successful design. On a refinement
 failure, tighten mesh settings and rerun. This is a numerical target check, not
 a manufacturing-tolerance guarantee or a proof of monotonicity for arbitrary
 factories. Box/material uncertainty needs separate analysis.
