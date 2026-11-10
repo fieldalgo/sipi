@@ -41,7 +41,13 @@ doc = Capacitance3DDocument(mesh, eps_r=3.8, conductors=signals,
     ground=np.unique(np.concatenate(list(mesh.boundary.values()))))
 text = json.dumps(doc.to_dict(), separators=(',', ':'))
 capacitance3d.append(dict(name='two-internal-nodal-electrodes', text=text, expected=execute_saved(text)))
+from material_goal_cases import material_goal
+material_goals = []
+for kind in ('constant', 'debye'):
+    text = material_goal(kind).dumps()
+    material_goals.append(dict(name=kind, text=text, expected=execute_saved(text)))
+
 print(json.dumps(dict(lumped=lumped.dumps(), study=study.dumps(), goal=goal.dumps(),
-                     mesh_goal=mesh_goal.dumps(),
+                     mesh_goal=mesh_goal.dumps(), material_goals=material_goals,
                      line=line.dumps(), expected=execute_saved(lumped.dumps()),
                      capacitance3d=capacitance3d), allow_nan=False))

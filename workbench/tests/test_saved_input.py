@@ -79,3 +79,24 @@ def test_saved_3d_capacitance_runs_in_spawned_process(server):
     bad = doc.to_dict(); bad['ground'] = bad['conductors'][0]['nodes']
     with pytest.raises(ValueError, match='disjoint'):
         execute(dict(action='saved-normalize', text=json.dumps(bad)))
+
+
+@pytest.mark.parametrize('kind', ['constant', 'debye'])
+def test_material_goal_preserves_selected_model_and_refinement_through_host(server, kind):
+    from material_goal_cases import material_goal
+    doc = material_goal(kind)
+    assert execute(dict(action='saved-normalize', text=doc.dumps()))['document_text'] == doc.dumps()
+    assert call(server, 'POST', '/api/job', dict(action='saved-analyze', text=doc.dumps()))[0] == 202
+    response = finish(server)
+    assert response['status'] == 'complete'
+    output = response['result']['execution']
+    assert output == execute_saved(doc.dumps())
+    assert output['status'] == 'complete' and output['error'] is None
+    result = output['result']
+    assert abs(result['residual']) <= 1 and abs(result['refined_residual']) <= 1
+    assert result['history'][-1]['stage'] == 'refinement'
+    model = result['material_evaluation']['materials']['dielectric']['parameters']
+    chosen = model['eps_r'] if kind == 'constant' else model['strengths'][0]
+    assert chosen == result['parameter'] and chosen != 4
+    original = doc.to_dict()['material_evaluation']['materials']['dielectric']['parameters']
+    assert (original['eps_r'] if kind == 'constant' else original['strengths'][0]) == 4

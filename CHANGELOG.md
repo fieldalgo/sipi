@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Pin both workbench runtimes to search-local material mesh reuse and exercise constant/Debye saved targets through native HTTP and actual browser Workers. Preserve selected material snapshots, refinement, exports and existing failure limits.
+
 - Reuse identical cross-section meshes and vacuum capacitance within a scalar material-target search. Revalidate and recompute each material evaluation, evict changed inputs, and preserve separate refinement, logical budgets, saved results and mesh-limit failures.
 
 - Reuse the selected requested-mesh matrices for workbench width-target output and pin both runtimes to the supporting engine. Keep returned geometry, history, material semantics, refinement and limits unchanged; exercise the same goal path in the portable host smoke.

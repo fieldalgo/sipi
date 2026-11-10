@@ -399,3 +399,19 @@ It is not a successful design. No automatic retry or relaxed mesh is applied.
 Other solver errors, cancellation and timeouts keep their existing behavior.
 Actual platform build and execution evidence is required for each candidate;
 changing the pin alone does not establish Windows or release acceptance.
+
+## Material targets from saved input
+
+Open a `sipi.impedance-design/3` material-target document in **Saved analysis**,
+check the input, run it, and export the input/result JSON. The selected material
+snapshot and search/refinement history stay attached to the result. The fixed
+engine reuses an identical geometry mesh and vacuum capacitance within that
+search, evaluates each material anew, and builds the required refinement
+separately. This does not change evaluation budgets or numerical acceptance.
+
+The actual browser acceptance includes constant-permittivity and Debye-strength
+stripline goals on native and Worker runtimes. It checks input/result export,
+selected models and history, numerical agreement within relative 1e-10, and
+both mesh residuals within the original 1-ohm goal tolerance. These are runtime
+contract checks, not measured-board validation or a general speed guarantee.
+A changed width normally requires a new mesh; existing job limits still apply.

@@ -122,6 +122,41 @@ try {
     assert.deepEqual(exported.execution,got);
     capacitance3d.push({name:item.name,ratios});
   }
+  const materialGoals = [];
+  function compareMaterial(actual, expected, path='result') {
+    if(typeof expected === 'number') {
+      assert.equal(typeof actual,'number',path);
+      assert.ok(Number.isFinite(actual),path);
+      assert.ok(Math.abs(actual-expected)<=1e-10*Math.max(Math.abs(expected),1e-30),path);
+    } else if(expected !== null && typeof expected === 'object') {
+      assert.deepEqual(Object.keys(actual),Object.keys(expected),path);
+      for(const key of Object.keys(expected)) compareMaterial(actual[key],expected[key],path+'.'+key);
+    } else assert.equal(actual,expected,path);
+  }
+  for(const item of cases.material_goals) {
+    await input(item.text);
+    await cdp.evaluate('document.querySelector("#check").click()');
+    await until(async()=>(await status()).startsWith('Input checked'),'material normalization',180000);
+    await rm(join(downloads,'sipi-input.json'),{force:true});
+    await cdp.evaluate('document.querySelector("#save-input").click()');
+    const saved=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-input.json'),'utf8'));}catch{}},'material input export');
+    assert.deepEqual(saved,item.expected.input);
+    const started=Date.now();const got=await calculate();const seconds=(Date.now()-started)/1000;
+    assert.equal(got.status,'complete');assert.equal(got.error,null);
+    assert.deepEqual(got.input,item.expected.input);
+    assert.deepEqual(got.result.document,item.expected.result.document);
+    assert.deepEqual(got.result.material_evaluation,item.expected.result.material_evaluation);
+    assert.deepEqual(got.result.history.map(row=>[row.parameter,row.stage]),item.expected.result.history.map(row=>[row.parameter,row.stage]));
+    compareMaterial(got.result,item.expected.result);
+    assert.ok(Math.abs(got.result.residual)<=1 && Math.abs(got.result.refined_residual)<=1);
+    assert.equal(got.result.history.at(-1).stage,'refinement');
+    await rm(join(downloads,'sipi-result.json'),{force:true});
+    await cdp.evaluate('document.querySelector("#save-result").click()');
+    const exported=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-result.json'),'utf8'));}catch{}},'material result export');
+    assert.deepEqual(exported.execution,got);
+    await writeFile(join(output,'material-'+item.name+'.json'),JSON.stringify(exported,null,2));
+    materialGoals.push({name:item.name,seconds,parameter:got.result.parameter,history:got.result.history.length});
+  }
   await input('{"schema":"sipi.lumped-network/1","schema":"invalid"}');
   assert.equal(await cdp.evaluate('document.querySelector("#save-result").disabled'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
@@ -180,8 +215,8 @@ try {
   if(!webRoot) await until(()=>server.exitCode===0,'server exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',
-    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
-      'result download','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
+    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,checks:['raw duplicate rejection','canonical input download','RLC native S within 1e-12',
+      'result download','constant/Debye material goals, selected models, refinement and exports','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
       'pending-start cancellation and restart','stale completion rejection','mobile width','shutdown']},null,2));
   console.log('Saved analysis browser acceptance passed.');
 } catch(error) {
