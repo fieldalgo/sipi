@@ -3,18 +3,21 @@
 import argparse
 from contextlib import contextmanager
 import hashlib
+import http.client
 import json
 import os
 from pathlib import Path
 import queue
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
 import threading
 import time
 from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
 
 STARTUP_URL = re.compile(r'(http://127\.0\.0\.1:\d+)/#token=([\w-]+)')
 
@@ -96,6 +99,28 @@ def capture_output(stream, ready, report):
             report['process_output_truncated'] = True
 
 
+def check_rejected_request(url, token):
+    """The frozen HTTP host must deliver an early error despite send backpressure."""
+    address = urlsplit(url)
+    body = json.dumps({'x': 'x' * 270000})
+    statuses = []
+    for _ in range(3):
+        conn = http.client.HTTPConnection(address.hostname, address.port, timeout=10)
+        try:
+            conn.connect()
+            conn.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 4096)
+            conn.request('POST', '/api/job', body, {'Authorization': 'Bearer ' + token,
+                         'Content-Type': 'application/json'})
+            response = conn.getresponse()
+            value = json.loads(response.read())
+            assert response.status == 413 and '256 KiB' in value['message']
+            statuses.append(response.status)
+        finally:
+            conn.close()
+    return dict(body_bytes=len(body.encode('utf-8')), requested_send_buffer=4096,
+                statuses=statuses)
+
+
 def exercise(source, report):
     report['phase'] = 'prepare temporary directory'
     with candidate_directory(report) as folder:
@@ -144,6 +169,9 @@ def exercise(source, report):
             assert b'GEOS' in request('/notices.txt')
             assert b'Input JSON' in request('/saved.html')
             report['build'] = json.loads(request('/build-info.json'))
+            report['phase'] = 'oversized request response'
+            report['rejected_request'] = check_rejected_request(url, token)
+            assert json.loads(request('/api/job'))['status'] == 'idle'
             for template, extra in [('microstrip', {}), ('stripline', {}), ('offset_stripline', {'trace_height':.3e-3}), ('coupled_microstrip', {'gap': .2e-3}), ('coupled_stripline', {'gap': .2e-3}), ('grounded_coplanar', {'gap': .2e-3, 'ground_width': 1e-3}), ('coupled_grounded_coplanar', {'gap':.3e-3, 'ground_gap':.2e-3, 'ground_width':1e-3}), ('coupled_coated_microstrip', {'gap':.3e-3, 'coating_height':.1e-3, 'coating_eps_r':3.5}), ('coated_grounded_coplanar', {'gap':.2e-3, 'ground_width':1e-3, 'coating_height':.1e-3, 'coating_eps_r':3.5})]:
                 report['phase'] = 'analyze ' + template
                 parameters = {'width': .5e-3, 'eps_r': 4,

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Deliver local HTTP rejections before bounded connection cleanup so unread request data does not reset ordinary oversized uploads. Retain input limits and exercise backpressure, stalled peers and the actual portable host rejection path.
+
 - Add an editable planar-coated coplanar form with finite side-ground controls, coating/ground studies, single-ended width targets and two-port export. Preserve exact SI/project inputs and coating-aware automatic mesh preparation with independent field and domain checks.
 
 - Pin browser and portable candidates to the engine that retains failed goal mesh context. Exercise actual point-budget failures through saved results, execution records and project reopening, followed by a valid calculation, while preserving existing runtime and numerical limits.

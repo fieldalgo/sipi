@@ -6,6 +6,7 @@ import mimetypes
 import multiprocessing
 from pathlib import Path
 import secrets
+import socket
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -104,6 +105,29 @@ class Server(ThreadingHTTPServer):
 
 
 class Handler(BaseHTTPRequestHandler):
+    def finish(self):
+        try:
+            super().finish()
+        finally:
+            # HTTP/1.0 closes after each response. Closing with an unread request
+            # body can reset TCP before the client receives a rejection. Send EOF
+            # first, then discard only bounded bytes/time without parsing input.
+            deadline = time.monotonic() + 1.0
+            remaining = 4 * MAX_BODY
+            try:
+                self.connection.shutdown(socket.SHUT_WR)
+                while remaining:
+                    timeout = deadline - time.monotonic()
+                    if timeout <= 0:
+                        break
+                    self.connection.settimeout(timeout)
+                    chunk = self.connection.recv(min(65536, remaining))
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
+            except OSError:
+                pass  # A closed, aborted or stalled peer must not block cleanup.
+
     def log_message(self, *_args):
         pass  # Do not log tokens or user input.
 

@@ -271,6 +271,14 @@ Use **Exit** to stop it. Merely closing a browser tab does not stop the server.
 to five minutes. These are not a complete memory/output-size quota. Cancelling
 stops the calculation process or Worker.
 
+The local HTTP host sends its response before closing the sending side, then
+spends at most one second discarding at most 1 MiB of unread socket data. This
+keeps ordinary oversized requests from losing their rejection to a connection
+reset, without raising the 256 KiB accepted-input limit or waiting indefinitely
+for a stalled sender. It does not guarantee response delivery to an aborted or
+unbounded sender. Windows candidate smoke checks actual oversized-request
+responses before calculations, normal exit and temporary-file cleanup.
+
 ## Local browser staging and acceptance
 
 Staging requires clean checkouts at the exact engine and shared-package pins,
