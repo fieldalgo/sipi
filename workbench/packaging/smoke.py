@@ -121,6 +121,32 @@ def check_rejected_request(url, token):
                 statuses=statuses)
 
 
+def check_width_goal(request):
+    """Exercise the installed adapter's selected-matrix result through its API."""
+    parameters = dict(width=.5e-3, plane_spacing=1e-3, eps_r=4)
+    mesh = dict(edge_size=5e-6, far_size=.5e-3, grade=.2)
+    def run(payload):
+        request('/api/job', payload)
+        deadline = time.monotonic() + 180
+        while time.monotonic() < deadline:
+            value = json.loads(request('/api/job'))
+            if value['status'] != 'running':
+                break
+            time.sleep(.2)
+        assert value['status'] == 'complete', value
+        return value['result']
+    nominal = run(dict(action='analyze', template='stripline', parameters=parameters, mesh=mesh))
+    result = run(dict(action='design', template='stripline', parameters=parameters, mesh=mesh,
+        design=dict(bounds=[.25e-3,.75e-3],target=nominal['line']['z0'],tolerance=1.)))
+    assert result['design']['width'] == parameters['width']
+    assert result['line'] == nominal['line']
+    assert result['document'] == nominal['document']
+    assert abs(result['design']['residual']) <= 1.
+    assert abs(result['design']['refined_residual']) <= 1.
+    assert result['design']['history'][-1]['stage'] == 'refinement'
+    return result
+
+
 def exercise(source, report):
     report['phase'] = 'prepare temporary directory'
     with candidate_directory(report) as folder:
@@ -190,6 +216,8 @@ def exercise(source, report):
                 if template == 'stripline':
                     assert abs(line['z0'] - 50.216) < .6
                 report['cases'].append({'template': template, 'line': line})
+            report['phase'] = 'width target with selected matrices'
+            report['width_goal'] = check_width_goal(request)
             report['phase'] = 'saved analysis'
             saved = dict(schema='sipi.lumped-network/1', frequency_hz=[0, 1e9],
                 branch=dict(resistance_ohms=10., inductance_h=2e-9, capacitance_f=None),

@@ -365,17 +365,17 @@ def execute(request, *, record_provider=None):
             if request['template'] not in ('coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
                 mesh['edge_size'] /= 4
                 mesh['grade'] /= 2
-        result = sipi.seek_impedance(
+        result, line = sipi.seek_impedance(
             lambda width: factory(**{**params, 'width': width}),
             settings.get('bounds'), settings.get('target'),
             tolerance=settings.get('tolerance', 0.1),
             quantity='z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
-            mesh=mesh, max_evaluations=32)
+            mesh=mesh, max_evaluations=32, return_line=True)
         # Matrix output must correspond to the returned design, not the initial width.
         out['document'] = sipi.CrossSectionDocument(
             result.document.section,
             mesh=result.document.section.mesh_settings(**result.document.mesh_options)).to_dict()
-        out['line'] = serialize_line(result.document.analyze())
+        out['line'] = serialize_line(line)
         out['design'] = {
             'width': result.parameter, 'target': result.target,
             'impedance': result.impedance, 'refined_impedance': result.refined_impedance,

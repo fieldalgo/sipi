@@ -156,6 +156,12 @@ resolved edge/growth before the unchanged refinement, and explicit meshes are
 preserved. The qualified image-panel, complex-FE, mesh/domain and air-limit
 checks cover the stated symmetric geometry, not measured manufacturing accuracy.
 
+Width-target matrix output reuses the selected requested-mesh calculation after
+the separate refinement passes. It does not solve that selected mesh again.
+Both runtimes pin the supporting engine; existing inputs, history and numerical
+limits are unchanged. This avoids one redundant solve, without promising that
+every explicit mesh will finish within the calculation deadline.
+
 Changing display units does not round the stored SI inputs. Unedited parameters
 and any inputs without a visible field retain their
 saved values. An explicit field edit invalidates displayed results. A successful

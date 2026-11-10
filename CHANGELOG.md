@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Reuse the selected requested-mesh matrices for workbench width-target output and pin both runtimes to the supporting engine. Keep returned geometry, history, material semantics, refinement and limits unchanged; exercise the same goal path in the portable host smoke.
+
 - Add opt-in requested-mesh matrix snapshots to impedance targeting without another field solve. Preserve the default result and saved JSON, selection/material history, evaluation budgets and mandatory refinement.
 
 - Add a planar-coated coplanar-pair form with distinct signal and ground gaps, finite rectangular grounds, differential width targets, coating/ground studies and four-port response. Preserve exact SI/project inputs and independent field, mesh and domain checks.
