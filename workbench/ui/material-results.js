@@ -166,6 +166,26 @@ export function materialResultView(execution) {
   return null;
 }
 
+// Export parsed numeric values, not the rounded display cells. Keep the raw
+// execution record as the authoritative input/provenance and text representation.
+export function materialStudyCSV(execution) {
+  if (execution?.input?.schema !== 'sipi.impedance-study/4') return null;
+  const view=materialResultView(execution);
+  if (!view) return null;
+  const samples=view.tables[0];
+  const cell=value=>{
+    if (value===null) return '';
+    if (typeof value==='number') return String(value);
+    let text=String(value);
+    // Quoting alone does not stop spreadsheet formula interpretation.
+    if (/^[\s\uFEFF]*[=+\-@]|^[\t\r\n]/u.test(text)) text="'"+text;
+    return '"'+text.replaceAll('"','""')+'"';
+  };
+  const rows=[['Input schema','Quantity',...samples.columns],
+    ...samples.rows.map(row=>[execution.input.schema,execution.input.quantity,...row])];
+  return '\uFEFF'+rows.map(row=>row.map(cell).join(',')).join('\r\n')+'\r\n';
+}
+
 export function clearMaterialResults(container) {
   container.replaceChildren(); container.hidden = true;
 }

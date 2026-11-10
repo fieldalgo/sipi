@@ -32,6 +32,32 @@ capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
 
+## Download sample rows as CSV
+
+After a supported `sipi.impedance-study/4` calculation, use **Save sample table
+CSV** to download every sample row in its original order. The columns identify
+the input schema, impedance quantity, row index, ordered variables, impedance
+in ohms and outcome. CSV uses all reported numeric digits, not the seven-digit
+screen rounding. Failed impedance cells stay empty and their outcome retains
+the failure reason; no row is omitted and no summary is invented.
+
+**View saved run** offers **Save saved-run samples CSV** for that historical
+execution, without changing or calculating the current input. Explicitly viewing
+a saved run also permits its CSV export while preserving unrelated unapplied
+settings in the current form. The historical
+filename is `sipi-saved-study-samples.csv`; a current result uses
+`sipi-study-samples.csv`. Editing inputs or unapplied settings clears the export;
+unsupported result shapes have no CSV action. Busy and closed workspaces cannot
+export. CSV is a table convenience: keep the JSON execution record and environment
+manifest for full input, control and provenance details.
+
+Files use UTF-8 with a BOM, comma-separated quoted text and CRLF records. Text
+that starts with spreadsheet formula prefixes or certain control characters is
+prefixed with an apostrophe; numeric cells retain their numeric values. Embedded
+commas, quotes and newlines are escaped. The JSON keeps the original text.
+This does not certify how every spreadsheet application interprets a file.
+
+
 ## Four material corner combinations
 
 In **Saved analysis**, choose **Four material corner combinations** to edit the

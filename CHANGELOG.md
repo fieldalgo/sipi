@@ -1,5 +1,9 @@
 # Changelog
 
+- Export current or historical impedance-study samples as CSV, retaining reported
+  numeric precision, ordered variables and all failed rows without recalculation.
+
+
 - Add explicit two-material corner settings and a four-combination example,
   preserving variable order, physical input checks and saved execution records.
 

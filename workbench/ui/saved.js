@@ -1,7 +1,7 @@
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 import {SAVED_EXAMPLES} from './saved-examples.js';
-import {renderMaterialResults, clearMaterialResults} from './material-results.js';
+import {renderMaterialResults, clearMaterialResults, materialStudyCSV} from './material-results.js';
 import {createMaterialSettingsEditor, applyMaterialSettings as updatedMaterialSettings} from './material-goal-form.js';
 
 const $ = id => document.getElementById(id);
@@ -12,7 +12,7 @@ $('example-choice').replaceChildren(...SAVED_EXAMPLES.map(item => {
 }));
 $('example-help').textContent = SAVED_EXAMPLES[0].description;
 let generation = 0, activeRun = null, busy = false, closed = false, checked = null, report = null;
-let recorded = null;
+let recorded = null, sampleCSV = null;
 let projectText = null, activeDesign = null, projectDirty = false;
 const bytes = value => new TextEncoder().encode(value).length;
 const materialEditor = createMaterialSettingsEditor($('material-goal-editor'), {onDraft:invalidate, onApply:applyMaterialSettings});
@@ -26,6 +26,8 @@ function controls() {
   for (const id of ['open', 'example', 'example-choice', 'check', 'run', 'record']) $(id).disabled = busy || closed;
   $('save-input').disabled = busy || closed || checked === null;
   $('save-result').disabled = busy || closed || report === null;
+  $('save-study-csv').hidden = sampleCSV === null;
+  $('save-study-csv').disabled = busy || closed || sampleCSV === null;
   $('save-record').disabled = busy || closed || recorded === null;
   $('save-environment').disabled = busy || closed || !recorded?.environment;
   for (const id of ['project-open', 'project-save', 'project-duplicate', 'project-label']) $(id).disabled = busy || closed;
@@ -41,7 +43,7 @@ function controls() {
   }
 }
 function invalidate() {
-  ++generation; checked = report = recorded = null;
+  ++generation; checked = report = recorded = sampleCSV = null;
   if (projectText) projectDirty = true;
   projectNote();
   $('record-status').hidden = true;
@@ -79,8 +81,14 @@ function showProject(preferredRun = null) {
   if (preferredRun && current.records.some(item => item.run_id === preferredRun)) $('project-record').value = preferredRun;
   projectNote(); controls();
 }
+function showMaterial(execution, historical = false) {
+  renderMaterialResults($('material-results'), execution, {historical});
+  const text=materialStudyCSV(execution);
+  sampleCSV=text===null?null:{text,filename:historical?'sipi-saved-study-samples.csv':'sipi-study-samples.csv'};
+  $('save-study-csv').textContent=historical?'Save saved-run samples CSV ↓':'Save sample table CSV ↓';
+}
 function clearOutput() {
-  checked = report = recorded = null;
+  checked = report = recorded = sampleCSV = null;
   $('output').hidden = true; clearMaterialResults($('material-results')); $('output').textContent = '';
   $('diagnostic-status').hidden = true; $('record-status').hidden = true;
 }
@@ -114,7 +122,7 @@ function showStored(result) {
   const record = JSON.parse(result.record_text);
   report = checked = null; recorded = {text:result.record_text, environment:null};
   $('output').textContent = JSON.stringify(record.receipt.execution, null, 2); $('output').hidden = false;
-  renderMaterialResults($('material-results'), record.receipt.execution, {historical:true});
+  showMaterial(record.receipt.execution, true);
   $('diagnostic-status').hidden = true;
   const kind = projectDirty ? 'Current input has unsaved changes.' : !result.matches_current ? 'Historical input or execution settings.' :
     result.selected ? 'Selected in the saved project for this input.' : 'Matches this input but is not selected.';
@@ -191,7 +199,7 @@ async function run(action) {
   try { input = request(action); } catch (error) { state(error.message, true); return; }
   const current = ++generation;
   activeRun = current;
-  busy = true; checked = report = recorded = null;
+  busy = true; checked = report = recorded = sampleCSV = null;
   $('record-status').hidden = true;
   $('output').hidden = true; clearMaterialResults($('material-results')); $('output').textContent = ''; $('diagnostic-status').hidden = true;
   state(action === 'saved-normalize' ? 'Checking input…' : 'Calculating…'); controls();
@@ -215,7 +223,7 @@ async function run(action) {
         $('record-status').hidden = false;
       }
       $('output').textContent = JSON.stringify(out, null, 2); $('output').hidden = false;
-      renderMaterialResults($('material-results'), out);
+      showMaterial(out);
       if (out.status === 'failed') state('Target not met: ' + out.error.message, true);
       else if (out.status === 'incomplete') state(`${out.result.failed} sample(s) failed. All rows are retained; no summary was calculated.`, true);
       else state('Calculation complete. Review the result and model limits.');
@@ -238,8 +246,8 @@ async function run(action) {
     if (current === generation && !closed) state(error.message, error.name !== 'AbortError');
   } finally { if (activeRun === current) { activeRun = null; busy = false; controls(); } }
 }
-function download(filename, text) {
-  const url = URL.createObjectURL(new Blob([text], {type: 'application/json'}));
+function download(filename, text, type = 'application/json') {
+  const url = URL.createObjectURL(new Blob([text], {type}));
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -274,6 +282,7 @@ $('run').onclick = () => run('saved-analyze');
 $('record').onclick = () => run('saved-record');
 $('save-input').onclick = () => { if (!busy && checked !== null) download('sipi-input.json', checked); };
 $('save-result').onclick = () => { if (!busy && report !== null) download('sipi-result.json', JSON.stringify(report, null, 2)); };
+$('save-study-csv').onclick = () => { if (!busy && !closed && sampleCSV !== null) download(sampleCSV.filename, sampleCSV.text, 'text/csv;charset=utf-8'); };
 $('save-record').onclick = () => { if (!busy && !closed && recorded !== null) download('sipi-execution-record.json', recorded.text); };
 $('save-environment').onclick = () => { if (!busy && !closed && recorded?.environment) download('sipi-runtime-manifest.json', recorded.environment); };
 $('project-start').onclick = () => projectOperation('start');
@@ -302,7 +311,7 @@ $('project-file').onchange = async () => {
 };
 $('cancel').onclick = async () => {
   const current = ++generation; activeRun = current; busy = true;
-  checked = report = recorded = null; $('output').hidden = true; clearMaterialResults($('material-results')); $('diagnostic-status').hidden = true;
+  checked = report = recorded = sampleCSV = null; $('output').hidden = true; clearMaterialResults($('material-results')); $('diagnostic-status').hidden = true;
   $('record-status').hidden = true; controls();
   try { await transport.cancel(); if (current === generation) state('Calculation cancelled. You can run another input.'); }
   catch (error) { if (current === generation) state(error.message, true); }
