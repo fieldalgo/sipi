@@ -71,7 +71,7 @@ differential impedance; frequency response retains four single-ended ports plus
 its mixed-mode representation. Choose centred placement or an explicit `trace_height` with **Vertical placement**.
 The height is measured from the lower plane to the copper bottom face; the
 whole conductor must remain strictly between the two planes. Saved precise
-heights appear in the schematic and survive mm/mil changes, width edits,
+heights appear in the schematic and survive mm/µm/mil changes, width edits,
 fixed meshes and project variants. Returning to centred placement explicitly
 saves the existing nullable value; this does not change the JSON schema.
 
@@ -129,6 +129,21 @@ within its job limits, or independently validated. The editable path shares the
 native/Worker adapter; current-platform acceptance must use the exact staged
 engine and assets. Advancing the pin alone is not a Windows or Worker pass.
 
+## Display units and physical inputs
+
+Choose mm, µm or mil for cross-section lengths and width bounds. Switching
+units changes the display, not the stored SI geometry, target-search bounds
+or length-study bounds. An explicit edit updates only that physical value;
+display rounding cannot overwrite the opposite bound. Material bounds remain
+dimensionless. Changing a study variable resets its physical bounds from
+the current nominal input, independently of the display unit.
+
+An empty copper thickness stays invalid through unit changes; enter `0`
+explicitly for the thin-conductor model. Empty study bounds also stay invalid.
+Target and study settings remain session controls and are not added to input
+project files. The frequency-response length still uses its separately labelled
+mm input, while mesh inspection always shows µm.
+
 ## Set and inspect the finite domain
 
 Open **Domain bounds** to inspect the actual calculation width and total height
@@ -138,7 +153,7 @@ read-only inspection. The preview remains a cropped schematic, not a drawing of
 the finite computational boundary.
 
 Choose **Set width** or **Set height** to enter an explicit box width or air-layer
-height in the current mm/mil display unit. When inspected values are available,
+height in the current mm/µm/mil display unit. When inspected values are available,
 selecting an explicit mode starts from that resolved value. Other original
 parameters and a previously fixed mesh stay unchanged. Unit changes do not
 round stored SI values. Use **Automatic** to return that dimension to the

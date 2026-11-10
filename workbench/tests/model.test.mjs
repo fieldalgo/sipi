@@ -67,6 +67,7 @@ test('invalid visible numbers never silently become zero or NaN', () => {
   assert.throws(() => parameters('unknown', values, 'mm'));
   assert.throws(() => parameters('microstrip', values, 'cm'));
   assert.equal(scales.mil, 25.4e-6);
+  assert.equal(scales['µm'], 1e-6);
 });
 
 test('taper and planar coating preserve dimensions and reject impossible profiles', () => {

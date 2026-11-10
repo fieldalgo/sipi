@@ -12,6 +12,8 @@ let runSequence = 0;
 let originalParameters = null, savedMesh = null, resolvedMesh = null, resolvedDomain = null;
 let projectText = null, activeDesign = null, baseline = null;
 const changedFields = new Set();
+// Display changes never become physical edits to target or study bounds.
+const studySI = {};
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
 const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
@@ -224,15 +226,17 @@ function request(action) {
     const variables = [];
     for (let i=1; i<=count; i++) {
       for (const suffix of ['low', 'high']) if (!$(`study-${suffix}-${i}`).reportValidity()) throw new Error('Check the study bounds.');
-      const parameter = $(`study-variable-${i}`).value, factor = studyScale(parameter, unit);
-      variables.push({parameter, lower:Number($(`study-low-${i}`).value)*factor, upper:Number($(`study-high-${i}`).value)*factor});
+      const parameter = $(`study-variable-${i}`).value, bounds = studySI[i];
+      if (bounds?.parameter !== parameter || !Number.isFinite(bounds.low) || !Number.isFinite(bounds.high)) throw new Error('Check the study bounds.');
+      variables.push({parameter, lower:bounds.low, upper:bounds.high});
     }
     for (const id of ['study-points','study-seed']) if (!$(id).reportValidity()) throw new Error('Check study samples and seed.');
     input.study = {mode, variables, points:Number($('study-points').value), seed:Number($('study-seed').value)};
   }
   if (action === 'design') {
     for (const id of ['target', 'lower', 'upper', 'tolerance']) if (!$(id).reportValidity()) throw new Error('Check the target and width bounds.');
-    input.design = {target: Number($('target').value), bounds: [Number($('lower').value) * scales[unit], Number($('upper').value) * scales[unit]], tolerance: Number($('tolerance').value)};
+    if (![lengthSI.lower, lengthSI.upper].every(value => Number.isFinite(value) && value > 0)) throw new Error('Check the target width bounds.');
+    input.design = {target: Number($('target').value), bounds: [lengthSI.lower, lengthSI.upper], tolerance: Number($('tolerance').value)};
   }
   return input;
 }
@@ -406,13 +410,28 @@ function studyControls() {
   }
 }
 
+function displayStudyBounds(i, displayUnit = unit) {
+  const key = $(`study-variable-${i}`).value, bounds = studySI[i];
+  for (const side of ['low', 'high']) {
+    const value = bounds?.parameter === key ? bounds[side] : NaN;
+    $(`study-${side}-${i}`).value = Number.isFinite(value) ? String(Number((value / studyScale(key, displayUnit)).toPrecision(10))) : '';
+  }
+}
+
 function resetStudyBounds(i) {
   try {
-    const p=currentParameters(), key=$(`study-variable-${i}`).value;
-    const value=p[key]/studyScale(key,unit);
-    $(`study-low-${i}`).value=String(['eps_r','coating_eps_r'].includes(key) ? Math.max(1,value*.9) : value*.9);
-    $(`study-high-${i}`).value=String(value === 0 ? .05*scales.mm/scales[unit] : value*1.1);
+    const p = currentParameters(), key = $(`study-variable-${i}`).value, value = p[key];
+    studySI[i] = {parameter:key,
+      low:['eps_r','coating_eps_r'].includes(key) ? Math.max(1, value*.9) : value*.9,
+      high:value === 0 ? .05*scales.mm : value*1.1};
+    displayStudyBounds(i);
   } catch { /* Invalid nominal inputs are reported by the ordinary request path. */ }
+}
+
+function rememberStudyBound(i, side) {
+  const parameter = $(`study-variable-${i}`).value, raw = $(`study-${side}-${i}`).value.trim();
+  if (studySI[i]?.parameter !== parameter) studySI[i] = {parameter, low:NaN, high:NaN};
+  studySI[i][side] = raw ? Number(raw)*studyScale(parameter, unit) : NaN;
 }
 
 function refreshStudyOptions(reset=false) {
@@ -575,14 +594,17 @@ for (const id of allFields) $(id).addEventListener('input', () => {
     const value = id === 'box_mode' ? resolvedDomain.box.width : resolvedDomain.layers.at(-1).thickness;
     lengthSI[field] = value; $(field).value = String(Number((value / scales[unit]).toPrecision(10)));
   }
-  if (lengthFields.includes(id)) lengthSI[id] = Number($(id).value) * scales[unit];
+  if (lengthFields.includes(id)) {
+    const raw = $(id).value.trim();
+    lengthSI[id] = raw ? Number(raw) * scales[unit] : NaN;
+  }
   changedFields.add(id);
   geometryFields(); refreshStudyOptions(); studyControls(); clearResult(); preview();
 });
 $('unit').addEventListener('change', () => {
   const next = $('unit').value;
   for (const id of lengthFields) $(id).value = String(Number((lengthSI[id] / scales[next]).toPrecision(10)));
-  for (let i=1; i<=2; i++) { const key=$(`study-variable-${i}`).value; for (const side of ['low','high']) $(`study-${side}-${i}`).value=String(Number($(`study-${side}-${i}`).value)*studyScale(key,unit)/studyScale(key,next)); }
+  for (let i=1; i<=2; i++) displayStudyBounds(i, next);
   unit = next; studyControls();
   for (const label of document.querySelectorAll('.unit-label')) label.textContent = unit;
   preview();
@@ -622,6 +644,8 @@ $('study-save').addEventListener('click', () => { if(latestStudy) downloadText(J
 $('study-csv').addEventListener('click', () => { if(latestStudy) downloadText(studyCSV(latestStudy),'sipi-parameter-study.csv','text/csv'); });
 for (const id of ['study-mode','study-points','study-seed','study-count','study-variable-1','study-variable-2','study-low-1','study-high-1','study-low-2','study-high-2']) $(id).addEventListener('input', () => {
   if(id.startsWith('study-variable')) resetStudyBounds(Number(id.at(-1)));
+  const bound = /^study-(low|high)-([12])$/.exec(id);
+  if (bound) rememberStudyBound(Number(bound[2]), bound[1]);
   studyControls(); latestStudy=null; if(latest) latest={...latest,study:undefined}; $('study-result').hidden=true;
 });
 $('design').addEventListener('click', () => run('design'));

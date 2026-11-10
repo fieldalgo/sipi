@@ -1,4 +1,4 @@
-export const scales = {mm: 1e-3, mil: 25.4e-6};
+export const scales = {mm: 1e-3, 'µm': 1e-6, mil: 25.4e-6};
 export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower', 'upper'];
 export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip'};
 export const isStripline = template => ['stripline', 'coupled_stripline', 'offset_stripline'].includes(template);

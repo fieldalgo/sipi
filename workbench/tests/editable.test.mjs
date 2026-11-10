@@ -23,7 +23,7 @@ function form(name, p, unit) {
 }
 for (const [name, original] of Object.entries(originals)) {
   test(`${name}: unit/display changes retain every exact parameter`, () => {
-    for (const unit of ['mm', 'mil', 'mm']) {
+    for (const unit of ['mm', 'µm', 'mil', 'µm', 'mm']) {
       const {values, si} = form(name, original, unit);
       assert.deepEqual(editableParameters(name, values, unit, original, new Set(), si), original);
       const enteredWidth = .0007;
@@ -50,7 +50,7 @@ test('new form uses exact SI lengths and rejects invalid lengths', () => {
 
 test('coplanar ground controls preserve the other exact inputs and expose studies', () => {
   const p=originals.coupled_grounded_coplanar;
-  for(const unit of ['mm','mil']) {
+  for(const unit of ['mm','µm','mil']) {
     const {values,si}=form('coupled_grounded_coplanar',p,unit);
     values.ground_gap=String(.0004/scales[unit]);si.ground_gap=.0004;
     assert.deepEqual(editableParameters('coupled_grounded_coplanar',values,unit,p,new Set(['ground_gap']),si),{...p,ground_gap:.0004});
@@ -64,7 +64,7 @@ test('coplanar ground controls preserve the other exact inputs and expose studie
 for (const [name, original] of Object.entries(originals)) {
   test(`${name}: domain controls retain omitted/null/exact inputs and explicitly reset`, () => {
     const keys=isStripline(name) ? ['box_width'] : ['box_width','air_height'];
-    for (const shape of ['original','omitted','null']) for (const unit of ['mm','mil']) {
+    for (const shape of ['original','omitted','null']) for (const unit of ['mm','µm','mil']) {
       const p={...original};
       if(shape==='omitted')for(const key of keys)delete p[key];
       if(shape==='null')for(const key of keys)p[key]=null;

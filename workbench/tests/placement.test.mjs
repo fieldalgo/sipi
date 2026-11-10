@@ -10,7 +10,7 @@ function form(p,unit='mm') {
   return {values,si};
 }
 test('precise placement survives units and changes only through explicit edits',()=>{
- for(const unit of ['mm','mil','mm']) {
+ for(const unit of ['mm','µm','mil','µm','mm']) {
   const {values,si}=form(original,unit);
   assert.deepEqual(editableParameters('coupled_stripline',values,unit,original,new Set(),si),original);
   si.trace_height=.0004000000000123456;values.trace_height=String(Number((si.trace_height/scales[unit]).toPrecision(10)));

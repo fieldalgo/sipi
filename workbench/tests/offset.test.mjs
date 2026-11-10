@@ -22,7 +22,7 @@ test('offset single remains a distinct one-signal two-plane contract',()=>{
  assert.ok(!('trace_height' in centred));assert.equal(schematic('stripline',centred).traces[0].y,(p.plane_spacing-p.thickness)/2);
 });
 test('exact saved offset survives display units and changes only on explicit edits',()=>{
- for(const unit of ['mm','mil','mm']) {
+ for(const unit of ['mm','µm','mil','µm','mm']) {
   const {values,si}=form(unit);
   assert.deepEqual(editableParameters('offset_stripline',values,unit,p,new Set(),si),p);
   si.trace_height=.0004000000000123456;values.trace_height=String(si.trace_height/scales[unit]);
