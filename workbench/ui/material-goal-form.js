@@ -22,6 +22,8 @@ const pairFields = [
   ['initialSecond','Variable 2 initial value (dimensionless)'], fields[4], ['pairBudget','Maximum evaluations (2–128)'],
 ];
 
+const cornerFields = [pairFields[4],pairFields[5],pairFields[7],pairFields[8],fields[4]];
+
 function bindingDescription(doc, alias) {
   if (typeof alias !== 'string' || !doc.material_variables || Object.keys(doc.material_variables).length !== 1 ||
       !Object.hasOwn(doc.material_variables,alias)) return null;
@@ -98,6 +100,17 @@ function principalBindingsDescription(doc,variables) {
   }
   if (aliases[0]===aliases[1] || axes[0]===axes[1] || regions[0]!==regions[1]) return null;
   return `variable 1 ${descriptions[0]} · variable 2 ${descriptions[1]} · region ${regions[0]}`;
+}
+
+export function materialCornerSettings(doc) {
+  if (doc?.schema !== 'sipi.impedance-study/4' || !Object.hasOwn(names,doc.quantity) || doc.sampling?.kind!=='corners') return null;
+  const description=principalBindingsDescription(doc,doc.sampling.variables);
+  if (!description) return null;
+  const values={lowerFirst:doc.sampling.variables[0].lower,upperFirst:doc.sampling.variables[0].upper,
+    lowerSecond:doc.sampling.variables[1].lower,upperSecond:doc.sampling.variables[1].upper,
+    frequency:doc.material_evaluation.frequency_hz};
+  if (!Object.values(values).every(finite)) return null;
+  return {kind:'corners',values,description:`${names[doc.quantity]} four corner combinations · ${description}`};
 }
 
 export function materialPairSettings(doc) {
@@ -189,6 +202,19 @@ export function applyMaterialPairSettings(doc,drafts) {
   return result;
 }
 
+export function applyMaterialCornerSettings(doc,drafts) {
+  if (!materialCornerSettings(doc)) throw new Error('This input has no supported material corner form.');
+  const values=numericDrafts(drafts,cornerFields);
+  if (values.lowerFirst>=values.upperFirst || values.lowerSecond>=values.upperSecond)
+    throw new Error('Each lower sample bound must be below its upper bound.');
+  if (values.frequency<0) throw new Error('Evaluation frequency must be zero or positive.');
+  const result=structuredClone(doc);
+  result.sampling.variables[0].lower=values.lowerFirst;result.sampling.variables[0].upper=values.upperFirst;
+  result.sampling.variables[1].lower=values.lowerSecond;result.sampling.variables[1].upper=values.upperSecond;
+  result.material_evaluation.frequency_hz=values.frequency;
+  return result;
+}
+
 export function applyMaterialUniformSettings(doc,drafts) {
   if (!materialUniformSettings(doc)) throw new Error('This input has no supported uniform material sampling form.');
   const values=numericDrafts(drafts,uniformFields);
@@ -232,6 +258,7 @@ export function applyMaterialCorrelatedSettings(doc,drafts) {
 }
 
 export function applyMaterialSettings(doc,drafts) {
+  if (doc?.schema === 'sipi.impedance-study/4' && doc.sampling?.kind === 'corners') return applyMaterialCornerSettings(doc,drafts);
   if (doc?.schema === 'sipi.impedance-study/4' && doc.sampling?.kind === 'uniform') return applyMaterialUniformSettings(doc,drafts);
   if (doc?.schema === 'sipi.pair-impedance-design/2') return applyMaterialPairSettings(doc,drafts);
   if (doc?.schema === 'sipi.impedance-study/4' && doc.sampling?.kind === 'normal')
@@ -259,14 +286,15 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
     apply.disabled=reset.disabled=blocked||!dirty;
     note.textContent=dirty?'Unapplied settings. Apply or reset before running or saving the current input.':
       'Edit these settings, then apply them to the input. Geometry, material poles and mesh stay in the JSON. Applying checks the input without calculating.' +
-      (settings?.kind==='uniform'?' Uniform sampling uses the stated input bounds and seed. Bounds and materials are checked before running. Failed rows are retained without aggregate statistics. A finite random sample does not establish output extremes or manufacturing yield.':
+      (settings?.kind==='corners'?' All four endpoint combinations are evaluated in the saved variable order. There is no seed or random sample count. Bounds and materials are checked before running. Corner extrema do not guarantee extrema inside the bounds or manufacturing yield. Failed rows remain without aggregate statistics.':
+       settings?.kind==='uniform'?' Uniform sampling uses the stated input bounds and seed. Bounds and materials are checked before running. Failed rows are retained without aggregate statistics. A finite random sample does not establish output extremes or manufacturing yield.':
        settings?.kind==='sweep'?' Bounds and materials are checked before running. Failed calculation rows are retained without aggregate statistics. Sampled values do not guarantee manufacturing limits.':
        ['normal','correlated'].includes(settings?.kind)?' Normal sampling is unbounded. Invalid samples remain failed rows without aggregate statistics; they are not clamped or drawn again. The seed repeats this sampling input, not manufacturing limits.'+(settings.kind==='correlated'?' Input correlation describes the distribution, not the observed sample or output correlation.':''):
        settings?.kind==='pair'?' Both targets must pass on the requested and refined meshes. The search is local; an evaluation budget does not guarantee a solution or limit elapsed time. Failed runs remain in the raw record.':'');
   }
   function restore(){
     for(const [name,input] of Object.entries(inputs)){labels[name].hidden=!Object.hasOwn(settings.values,name);input.value=labels[name].hidden?'':String(settings.values[name]);}
-    for(const [name] of settings.kind==='pair'?pairFields:settings.kind==='correlated'?correlatedFields:settings.kind==='uniform'?uniformFields:settings.kind==='normal'?normalFields:settings.kind==='sweep'?sweepFields:fields)grid.append(labels[name]);
+    for(const [name] of settings.kind==='corners'?cornerFields:settings.kind==='pair'?pairFields:settings.kind==='correlated'?correlatedFields:settings.kind==='uniform'?uniformFields:settings.kind==='normal'?normalFields:settings.kind==='sweep'?sweepFields:fields)grid.append(labels[name]);
     for(const name of ['lower','upper'])labels[name].firstChild.textContent=`${name==='lower'?'Lower':'Upper'} ${['sweep','uniform'].includes(settings.kind)?'sample':'search'} bound (dimensionless)`;
     dirty=false;update();
   }
@@ -283,9 +311,9 @@ export function createMaterialSettingsEditor(container, {onDraft, onApply}) {
       blocked=disabled;
       if(text!==source){
         source=text;dirty=false;settings=null;
-        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialUniformSettings(doc)||materialSweepSettings(doc)||materialPairSettings(doc)||materialNormalSettings(doc)||materialCorrelatedSettings(doc);}catch{}
+        try{const doc=JSON.parse(text);settings=materialGoalSettings(doc)||materialCornerSettings(doc)||materialUniformSettings(doc)||materialSweepSettings(doc)||materialPairSettings(doc)||materialNormalSettings(doc)||materialCorrelatedSettings(doc);}catch{}
         container.hidden=settings===null;
-        if(settings){heading.textContent=settings.kind==='uniform'?'Uniform material sampling settings':settings.kind==='sweep'?'Material sweep settings':settings.kind==='pair'?'Paired material target settings':settings.kind==='correlated'?'Correlated material sampling settings':settings.kind==='normal'?'Normal material sampling settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
+        if(settings){heading.textContent=settings.kind==='corners'?'Material corner settings':settings.kind==='uniform'?'Uniform material sampling settings':settings.kind==='sweep'?'Material sweep settings':settings.kind==='pair'?'Paired material target settings':settings.kind==='correlated'?'Correlated material sampling settings':settings.kind==='normal'?'Normal material sampling settings':'Material target settings';container.setAttribute('aria-label',heading.textContent);description.textContent=settings.description;restore();}
       }
       update();
     },

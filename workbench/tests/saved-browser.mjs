@@ -144,7 +144,7 @@ try {
     await checkResultView(execution);return execution;
   }
   assert.deepEqual(await cdp.evaluate('Array.from(document.querySelector("#example-choice").options, item=>item.value)'),
-    ['rlc','constant-target','debye-target','pair-target','material-sweep','correlated-study','normal-study','uniform-study']);
+    ['rlc','constant-target','debye-target','pair-target','material-sweep','correlated-study','normal-study','uniform-study','corner-study']);
   assert.equal(await cdp.evaluate('document.querySelector("label[for=example-choice]") !== null'),true);
   const untouched=await cdp.evaluate('document.querySelector("#input-text").value');
   await cdp.evaluate('document.querySelector("#example-choice").focus()');

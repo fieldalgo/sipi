@@ -14,6 +14,7 @@ from material_sweep_form_cases import edited_study
 from material_normal_form_cases import normal_study
 from correlated_material_form_cases import correlated_study
 from material_uniform_form_cases import uniform_study
+from material_corner_form_cases import corner_study
 from sipi.study import ImpedanceStudyDocument
 from test_desktop import server
 
@@ -24,9 +25,9 @@ def test_catalog_documents_are_exact_validated_inputs_without_solving(monkeypatc
     rows = json.loads(source.split('export const SAVED_EXAMPLES = ', 1)[1].removesuffix(';\n'))
     expected = [LumpedNetworkDocument([0, 1e9], resistance=10, inductance=2e-9),
         material_goal('constant'), material_goal('debye'), pair_material_goal(),
-        material_study('constant'), material_study('tensor'), ImpedanceStudyDocument.from_dict(normal_study('constant')), ImpedanceStudyDocument.from_dict(uniform_study('constant'))]
+        material_study('constant'), material_study('tensor'), ImpedanceStudyDocument.from_dict(normal_study('constant')), ImpedanceStudyDocument.from_dict(uniform_study('constant')), ImpedanceStudyDocument.from_dict(corner_study())]
     assert [row['id'] for row in rows] == ['rlc', 'constant-target', 'debye-target',
-                                         'pair-target', 'material-sweep', 'correlated-study', 'normal-study', 'uniform-study']
+                                         'pair-target', 'material-sweep', 'correlated-study', 'normal-study', 'uniform-study', 'corner-study']
     def forbidden(*args, **kwargs):
         raise AssertionError('loading or normalizing an example must not solve')
     monkeypatch.setattr(CrossSection, 'mesh', forbidden)
@@ -162,4 +163,27 @@ def test_uniform_settings_keep_seeded_affine_samples_and_reject_invalid_corners(
     assert ImpedanceStudyDocument.from_dict(scaled).samples().tolist() != (2*values+1).reshape(-1, 1).tolist()
     document['sampling']['variables'][0]['lower'] = -.5
     with pytest.raises(ValueError):
+        normalize_saved(json.dumps(document))
+
+
+@pytest.mark.parametrize('reverse', [False, True])
+def test_material_corners_are_exact_cartesian_endpoints_without_meshing(reverse, monkeypatch):
+    from itertools import product
+    def forbidden(*args, **kwargs):
+        raise AssertionError('corner input validation and sampling must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    document = corner_study(reversed_order=reverse, edited=True)
+    study = ImpedanceStudyDocument.from_dict(document)
+    variables = document['sampling']['variables']
+    expected = [list(row) for row in product(*[(v['lower'], v['upper']) for v in variables])]
+    assert study.samples().tolist() == expected
+    assert json.loads(normalize_saved(study.dumps())) == document
+    assert set(document['sampling']) == {'kind', 'variables'}
+    for values, evaluation in zip(expected, study.sample_material_evaluations()):
+        axes = evaluation['materials']['dielectric']['parameters']
+        for variable, value in zip(variables, values):
+            axis = document['material_variables'][variable['name']]['path'][0]
+            assert axes[axis]['parameters']['eps_r'] == value
+    document['sampling']['variables'][0]['lower'] = -.5
+    with pytest.raises(ValueError, match='relative permittivity'):
         normalize_saved(json.dumps(document))

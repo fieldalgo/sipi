@@ -32,6 +32,24 @@ capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
 
+## Four material corner combinations
+
+In **Saved analysis**, choose **Four material corner combinations** to edit the
+two lower/upper bounds and evaluation frequency. The known two-variable
+`sipi.impedance-study/4` corner form supports the constant permittivities of
+two distinct principal axes in one material. The description identifies each
+ordered variable and axis; reversing the input variable order preserves it.
+Other bindings and shapes remain editable in JSON.
+
+**Apply settings** validates the original and candidate before changing the input.
+All four Cartesian endpoint combinations are evaluated in the saved order.
+There is no random seed or sample count. Invalid material corners reject before
+field calculations; calculation failures retain their row and suppress aggregate
+statistics. Reported extrema describe these four points, not guaranteed extrema
+inside the bounds or manufacturing yield. Geometry, angle, loss, mesh and saved
+execution/project history retain their original contracts.
+
+
 ## Bounded uniform material samples
 
 In **Saved analysis**, choose **Bounded uniform material tolerance** or open a

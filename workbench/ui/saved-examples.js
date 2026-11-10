@@ -532,5 +532,95 @@ export const SAVED_EXAMPLES = [
     "schema": "sipi.impedance-study/4",
     "template": "stripline"
   }
+},
+{
+  "id": "corner-study",
+  "label": "Four material corner combinations",
+  "description": "Evaluate all four endpoint combinations of two principal permittivities. Corner results do not prove interior extremes or yield.",
+  "document": {
+    "fixed_pitch_m": null,
+    "fixed_plane_spacing_m": null,
+    "material_evaluation": {
+      "frequency_hz": 100000000.0,
+      "materials": {
+        "dielectric": {
+          "kind": "principal-axes",
+          "parameters": {
+            "angle_rad": 0.0,
+            "axis1": {
+              "kind": "constant",
+              "parameters": {
+                "eps_r": 3.0,
+                "tan_delta": 0.01
+              },
+              "schema": "sipi.dielectric/1"
+            },
+            "axis2": {
+              "kind": "constant",
+              "parameters": {
+                "eps_r": 5.0,
+                "tan_delta": 0.02
+              },
+              "schema": "sipi.dielectric/1"
+            }
+          },
+          "schema": "sipi.dielectric/2"
+        }
+      }
+    },
+    "material_variables": {
+      "x": {
+        "path": [
+          "axis1",
+          "parameters",
+          "eps_r"
+        ],
+        "region": "dielectric"
+      },
+      "y": {
+        "path": [
+          "axis2",
+          "parameters",
+          "eps_r"
+        ],
+        "region": "dielectric"
+      }
+    },
+    "mesh": {
+      "edge_size": 5e-06,
+      "far_size": 0.000125,
+      "grade": 0.15,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "box_width": 0.006,
+      "eps_r": 1.0,
+      "gap": 0.0003,
+      "plane_spacing": 0.001,
+      "tan_delta": 0.0,
+      "thickness": 0.0,
+      "top_width": null,
+      "trace_height": null,
+      "width": 0.0003
+    },
+    "quantity": "z_diff",
+    "sampling": {
+      "kind": "corners",
+      "variables": [
+        {
+          "name": "x",
+          "lower": 2.0,
+          "upper": 4.0
+        },
+        {
+          "name": "y",
+          "lower": 4.0,
+          "upper": 6.0
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/4",
+    "template": "coupled_stripline"
+  }
 }
 ];

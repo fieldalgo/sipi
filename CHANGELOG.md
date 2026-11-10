@@ -1,5 +1,9 @@
 # Changelog
 
+- Add explicit two-material corner settings and a four-combination example,
+  preserving variable order, physical input checks and saved execution records.
+
+
 - Add bounded single-material uniform sampling settings with explicit bounds,
   sample count, seed and frequency; preserve strict validation and saved records.
 
