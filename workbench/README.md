@@ -519,7 +519,7 @@ Switching inputs replaces the draft and shows only that input's supported
 fields. Explicitly reloading the same example, file or project also resets the
 draft, even when the saved input bytes are identical. Editing raw JSON resets
 the form draft too. Projects restore current settings while historical records stay
-unchanged. Multi-variable and other unsupported sampling inputs keep their
+unchanged. Unsupported sampling inputs keep their
 JSON workflow. Their existing failed rows and withheld
 aggregate summary remain intact. A completed finite sweep is a set of sampled
 values, not a guarantee of manufacturing bounds or continuous-range coverage.
@@ -578,8 +578,9 @@ changed. **Apply settings** validates the original and candidate documents;
 it does not run or filter the samples.
 
 The form supports `impedance-study/4` with one material variable and the explicit
-one-variable correlation matrix `[[1]]`. Other correlated/multi-variable inputs
-keep their JSON workflow. Geometry, material model/poles, binding, quantity,
+one-variable correlation matrix `[[1]]`. The two principal-axis variables below
+have a separate correlated form; other inputs keep their JSON workflow.
+Geometry, material model/poles, binding, quantity,
 mesh, sampling method and correlation remain unchanged. Draft, reset, input
 restoration and historical-record behavior match the other settings forms.
 
@@ -589,3 +590,27 @@ run has no aggregate summary. A seed reproduces this sampling input, and a new
 seed is a new explicit input recorded separately. Sample statistics are not a
 manufacturing limit, worst-case bound or yield guarantee. The original full
 precision input, rows, failures and any complete summary remain in exports.
+
+## Edit correlated principal-axis material sampling
+
+Load **Correlated dielectric study** to edit the two saved principal-axis
+constant permittivity distributions. **Correlated material sampling settings**
+shows each variable's mean and positive standard deviation, input correlation
+from −1 to 1, sample count (2–128), integer seed (0–4294967295) and evaluation
+frequency (Hz). The description maps variable 1/2 to the saved aliases and
+material axes. The variable order and bindings stay unchanged.
+
+The form supports two distinct constant principal-axis bindings in one material
+and an explicit symmetric correlation matrix `[[1,rho],[rho,1]]`. It changes both
+off-diagonal entries together. The existing engine permits the rank-one ±1
+boundaries: standardized draws are equal or opposite, respectively. Other
+material models, variable counts and correlation shapes stay in the JSON path.
+
+This is an input distribution correlation, not the observed finite-sample or
+impedance correlation. The existing seeded sampler is unchanged. Both normal
+distributions remain unbounded; invalid rows are retained without resampling
+or an aggregate summary for incomplete runs. Strict original/candidate checks,
+explicit apply/reset, same-input restoration and project history behave as in
+the other settings forms. Geometry, material angle/loss, mesh, quantity and
+all unedited settings remain unchanged. No manufacturing or yield guarantee is
+inferred from the sampled results.

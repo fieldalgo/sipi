@@ -125,7 +125,7 @@ try {
   await field('seed','11');await example('material-sweep');assert.equal((await visible()).length,4);await field('seed','12');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-apply").disabled'),true);
   await example('constant-target');assert.equal((await visible()).length,6);await field('mean','3');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-apply").disabled'),true);
   await example('pair-target');assert.equal((await visible()).length,12);await field('std','1');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-apply").disabled'),true);
-  await example('correlated-study');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-editor").hidden'),true);
+  await example('correlated-study');assert.equal((await visible()).length,8);
   await example('normal-study');assert.equal((await visible()).length,5);await field('lower','1');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-apply").disabled'),true);
   checks.push('normal/sweep/scalar/pair/unsupported transitions clear drafts; hidden fields do not affect active settings');
   await openFile(before);const saved=await download('project-save','sipi-analysis-project.json');assert.equal(JSON.parse(saved).designs[0].records.length,6);JSON.parse(saved).designs[0].records.forEach((record,i)=>assert.deepEqual(record,records[i].value));await example('rlc');await openFile(saved,true);assert.equal(await text(),before);

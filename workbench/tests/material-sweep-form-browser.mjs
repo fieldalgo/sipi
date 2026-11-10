@@ -125,7 +125,7 @@ try {
   assert.equal((await visible()).length,6);assert.match(await cdp.evaluate('document.querySelector("#material-goal-editor h3").textContent'),/target/);const goal=await text();await field('count','9');assert.equal(await text(),goal);assert.equal(await cdp.evaluate('document.querySelector("#material-goal-apply").disabled'),true);
   await field('target','51');await example('constant-target');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-target").value'),'50');assert.equal(await cdp.evaluate('document.querySelector("#run").disabled'),false);
   await example('material-sweep');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-count").value'),'8');assert.equal(await cdp.evaluate('document.querySelector("#run").disabled'),false);
-  await example('correlated-study');assert.equal(await cdp.evaluate('document.querySelector("#material-goal-editor").hidden'),true);
+  await example('correlated-study');assert.equal((await visible()).length,8);
   const normal=cases[2];await openFile(JSON.stringify(normal.input));assert.equal((await visible()).length,5);
   await click('record');await idle();const incomplete=await cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');compare(incomplete,normal.execution);
   assert.equal(incomplete.status,'incomplete');assert.equal(incomplete.result.failed,2);assert.equal(incomplete.result.summary,null);

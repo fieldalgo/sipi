@@ -12,6 +12,7 @@ from paired_material_cases import pair_material_goal, material_study
 from material_goal_form_cases import edited_goal
 from material_sweep_form_cases import edited_study
 from material_normal_form_cases import normal_study
+from correlated_material_form_cases import correlated_study
 from sipi.study import ImpedanceStudyDocument
 from test_desktop import server
 
@@ -121,3 +122,22 @@ def test_normal_settings_keep_seeded_invalid_samples_without_meshing(kind, monke
     edited['sampling']['seed'] = 2**32
     with pytest.raises(ValueError, match='integer'):
         normalize_saved(json.dumps(edited))
+
+
+@pytest.mark.parametrize('name,rho', [('positive-rank-one', 1.), ('negative-rank-one', -1.)])
+def test_rank_one_material_settings_preserve_standardized_relation(name, rho, monkeypatch):
+    def forbidden(*args, **kwargs):
+        raise AssertionError('validating or sampling correlation must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    document = correlated_study(name)
+    study = ImpedanceStudyDocument.from_dict(document)
+    assert json.loads(normalize_saved(study.dumps())) == document
+    first, second = document['sampling']['variables']
+    for row in study.samples():
+        a = (row[0]-first['mean'])/first['std']
+        b = (row[1]-second['mean'])/second['std']
+        assert abs(b-rho*a) < 1e-12
+    assert document['material_variables'] == material_study('tensor').to_dict()['material_variables']
+    document['sampling']['correlation'] = [[1., 1.01], [1.01, 1.]]
+    with pytest.raises(ValueError, match='correlation'):
+        normalize_saved(json.dumps(document))

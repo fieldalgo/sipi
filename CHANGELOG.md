@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Edit paired principal-axis material means, standard deviations and input correlation for normal studies. Preserve variable order, seeded samples and failed rows, including supported correlation ±1 boundaries; keep target and single-variable settings compatible.
+
 - Add a single-variable normal material sampling example and explicit mean, standard deviation, count, seed and frequency controls. Keep seeded sample order, invalid rows and incomplete summaries unchanged; preserve existing sweep and target settings.
 
 - Show retained paired impedance target failures with both requested targets, search intervals and every completed two-variable evaluation. Keep budget-stopped parameters separate from calculated values; preserve raw records and avoid selecting a solution from failed history.
