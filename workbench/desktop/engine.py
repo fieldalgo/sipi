@@ -11,11 +11,11 @@ import sipi
 from sipi.templates import coated_microstrip, coupled_stripline, offset_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
-    'microstrip', 'stripline', 'coupled_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar')}
+    'microstrip', 'stripline', 'coupled_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar')}
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
 TEMPLATES['offset_stripline'] = offset_stripline
-PAIR_TEMPLATES = {'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
+PAIR_TEMPLATES = {'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
 
 
 def engine_info():
@@ -362,7 +362,7 @@ def execute(request, *, record_provider=None):
             # These defaults already resolve finite ground gaps or coating.
             # Keep their edge/growth settings before the mandatory independent
             # refinement; pre-refining both again can exceed the point budget.
-            if request['template'] not in ('unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
+            if request['template'] not in ('unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
                 mesh['edge_size'] /= 4
                 mesh['grade'] /= 2
         result, line = sipi.seek_impedance(

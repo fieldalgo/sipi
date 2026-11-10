@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect single and paired planar-coated unbacked coplanar forms, retaining
+  coating materials, separate upper/lower air bounds and refined width targets.
+
 - Add an editable unbacked coplanar pair with separate signal and ground gaps,
   preserved lower-air bounds, differential width targeting and four-port export.
 

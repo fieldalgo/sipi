@@ -15,12 +15,12 @@ def parameters(name):
              box_width=.03, top_width=None)
     p['plane_spacing' if name in ('stripline', 'coupled_stripline', 'offset_stripline') else 'substrate_height'] = 1e-3
     if name not in ('stripline', 'coupled_stripline', 'offset_stripline'): p['air_height'] = .0067
-    if name in ('coupled_unbacked_coplanar', 'unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p['gap'] = .2e-3
+    if name in ('coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p['gap'] = .2e-3
     if name in ('coupled_stripline', 'offset_stripline'): p['trace_height'] = .0003
-    if name in ('coupled_unbacked_coplanar', 'unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(ground_width=.003)
-    if name in ('coupled_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p['ground_gap'] = .0002500000000123456
-    if name in ('coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(coating_height=.2e-3, coating_eps_r=3, coating_tan_delta=.02, top_width=.4e-3)
-    if name in ('unbacked_coplanar', 'coupled_unbacked_coplanar'): p['lower_air_height'] = .006700000000123456
+    if name in ('coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(ground_width=.003)
+    if name in ('coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p['ground_gap'] = .0002500000000123456
+    if name in ('coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(coating_height=.2e-3, coating_eps_r=3, coating_tan_delta=.02, top_width=.4e-3)
+    if name in ('unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar'): p['lower_air_height'] = .006700000000123456
     return p
 
 

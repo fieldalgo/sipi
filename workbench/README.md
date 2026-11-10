@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the thirteen-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the fifteen-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers thirteen cross-section forms, impedance targeting,
+The basic workspace offers fifteen cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -139,7 +139,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The thirteen forms are unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The fifteen forms are coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -160,6 +160,26 @@ mesh, lateral-domain and vertical-reflection gates. Finite 35 µm rectangular
 copper has an independent same-mesh complex/vacuum finite-element check.
 Width targets retain both requested and refined mesh tolerance checks. These
 checks do not certify arbitrary placements, materials or measured PCB accuracy.
+
+**Coated unbacked coplanar** and **Coated unbacked pair** add a full-width planar
+film above the finite substrate. Film height starts at the substrate surface,
+includes the copper and must exceed its thickness. Upper air starts above that
+film; lower air remains below the substrate. No backing plane or central ground
+is introduced. Signals may taper while the finite side grounds stay rectangular.
+The film has its own relative permittivity and loss tangent. Precise film and
+domain inputs survive unit changes, editable JSON and project variants.
+
+The single form uses scalar impedance and two-port frequency export; the equal
+pair uses differential impedance and four ports. Film height/permittivity and
+ground dimensions remain available to fixed-nominal-mesh studies. Invalid film
+bounds that touch the copper are rejected before field solves. Automatic width
+targets retain the factory edge/growth and refine the far mesh before the
+mandatory independent refinement; both residuals still must meet the target.
+Independent neutral free-space panels, finite-film mesh/outer convergence,
+complex P1 energy and the air-film limit are separate checks. The film is planar,
+not a normal-thickness conformal coating, and these checks do not certify
+arbitrary materials or measured fabrication accuracy. The same quasi-TEM and
+explicit series-resistance limitations apply to the basic frequency form.
 
 For **Unbacked coplanar pair**, two equal signals lie between finite rectangular
 side grounds with no backing plane or central ground. **Gap** is between signal
@@ -369,7 +389,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the thirteen supported editable templates. Other
+All project designs must use the fifteen supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace

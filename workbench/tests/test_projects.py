@@ -33,7 +33,7 @@ def saved(request):
     return project
 
 
-@pytest.mark.parametrize('template', ['unbacked_coplanar', 'coupled_unbacked_coplanar', 'microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip', 'coupled_stripline',
+@pytest.mark.parametrize('template', ['coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip', 'coupled_stripline',
                                       'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'])
 def test_forms_create_copy_reopen_without_fields(template, monkeypatch):
     text = TemplateSectionDocument(template, parameters(template)).dumps()

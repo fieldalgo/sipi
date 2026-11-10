@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 13종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 15종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 13종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 15종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -124,7 +124,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar 13종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair) 15종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -140,6 +140,23 @@ coupled grounded coplanar, planar coated microstrip, planar coated pair, coated 
 메시·횡방향 외곽·수직 반사를 따로 확인합니다. 유한 35 µm 직사각 도체는 같은 메시의
 독립 복소/진공 유한요소 계산과 비교합니다. 폭 역산은 요청·세분 메시의 허용 오차를
 모두 만족해야 합니다. 임의 배치·재료 또는 실측 PCB 정확도 전체를 보증하는 검증은 아닙니다.
+
+**Coated unbacked coplanar**와 **Coated unbacked pair**는 유한 기판 위에
+전체 폭의 평면 코팅을 추가합니다. 코팅 높이는 기판 표면부터 구리를 포함한 높이이며
+구리 두께보다 커야 합니다. 상부 공기는 코팅 위에서, 하부 공기는 기판 아래에서
+시작합니다. 뒷면·중앙 접지는 추가하지 않습니다. 신호는 테이퍼를 쓸 수 있고 양쪽
+유한 접지는 직사각형입니다. 코팅의 유전율·손실탄젠트는 별도 입력이며 정밀한
+코팅·계산 영역 값은 단위 변경·편집 JSON·프로젝트 변형에서 유지됩니다.
+
+단일 폼은 스칼라 임피던스·2포트, 같은 폭의 차동 쌍은 차동 임피던스·4포트를
+사용합니다. 코팅 높이·유전율과 접지 치수는 공칭 메시를 고정한 공차 연구에
+사용할 수 있습니다. 코팅이 구리에 닿는 공차 범위는 전계 계산 전에 거부합니다.
+자동 폭 역산은 factory의 가장자리·성장률을 유지하고 외곽 메시를 세분한 뒤
+독립 세분 검사를 수행하며 두 메시 모두 목표 오차를 만족해야 합니다.
+독립 중성 자유공간 패널·유한 코팅의 메시/외곽 수렴·복소 P1 에너지·코팅이 공기가
+되는 극한을 따로 검증합니다. 법선 두께의 conformal 코팅을 의미하지 않는 평면
+모델이며, 임의 재료·실측 제조 정확도를 보증하지 않습니다. 기본 주파수 폼의
+quasi-TEM·명시 직렬 저항 모델 한계도 동일합니다.
 
 **Unbacked coplanar pair**는 같은 폭의 신호 두 개와 양쪽 유한 폭 직사각
 접지를 사용하며 뒷면 접지면·중앙 접지가 없습니다. **Gap**은 신호 아랫면 사이,
@@ -318,7 +335,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 13종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 15종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는

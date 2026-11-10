@@ -23,7 +23,7 @@ def forbid_field_solve(monkeypatch):
 def test_domain_inspect_and_editable_roundtrip_preserve_parameters_and_mesh(template, mode):
     p=parameters(template)
     keys=['box_width']+([] if template in ('stripline','coupled_stripline','offset_stripline') else ['air_height'])
-    if template in ('unbacked_coplanar', 'coupled_unbacked_coplanar'): keys.append('lower_air_height')
+    if template in ('unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar'): keys.append('lower_air_height')
     for key in keys:
         if mode=='omitted': p.pop(key)
         elif mode=='null': p[key]=None
