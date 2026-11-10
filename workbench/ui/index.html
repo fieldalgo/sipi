@@ -42,6 +42,8 @@
           <button data-template="coupled_coated_microstrip" aria-pressed="false"><span class="mini">▱ ▱</span>Planar coated pair</button>
           <button data-template="coated_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▰</span>Coated coplanar</button>
           <button data-template="coupled_coated_grounded_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▱ ▰</span>Coated coplanar pair</button>
+          <button data-template="conformal_coated_microstrip" aria-pressed="false"><span class="mini">▱</span>Normal-film microstrip</button>
+          <button data-template="coupled_conformal_coated_microstrip" aria-pressed="false"><span class="mini">▱ ▱</span>Normal-film pair</button>
         </div>
         <p id="import-note" class="notice" hidden>Imported cross-section. Its geometry and mesh are preserved. Choose a template to start a new design.</p>
         <form id="inputs">
@@ -64,10 +66,11 @@
           <div class="section-label"><h3>Dielectric</h3><span>Constant properties</span></div>
           <div class="fields"><label>Relative permittivity <span class="symbol">εr</span><div class="number"><input id="eps_r" type="number" value="4" min="0.000001" step="any" required></div></label><label>Loss tangent <span class="symbol">tan δ</span><div class="number"><input id="tan_delta" type="number" value="0" min="0" step="any" required></div></label></div>
           <div id="coating-fields" hidden>
-            <div class="section-label"><h3>Planar coating</h3></div>
-            <p class="fine">Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.</p>
+            <div class="section-label"><h3 id="coating-title">Planar coating</h3></div>
+            <p id="coating-description" class="fine">Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.</p>
             <div class="fields">
-              <label>Coating height<div class="number"><input id="coating_height" type="number" value="0.2" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+              <label id="coating-height-field">Coating height<div class="number"><input id="coating_height" type="number" value="0.2" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+              <label id="coating-thickness-field" hidden>Normal thickness<div class="number"><input id="coating_thickness" type="number" value="0.02" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
               <label>Coating permittivity<div class="number"><input id="coating_eps_r" type="number" value="3.5" min="0.000001" step="any" required></div></label>
               <label>Coating loss tangent<div class="number"><input id="coating_tan_delta" type="number" value="0" min="0" step="any" required></div></label>
             </div>
@@ -106,7 +109,7 @@
         <button id="cancel" class="wide" hidden>Cancel calculation</button>
       </aside>
       <section class="canvas-column">
-        <div class="panel drawing"><div class="panel-heading"><h2>Geometry preview</h2><span id="preview-label" class="tag">Schematic</span></div><svg id="cross-section" viewBox="0 0 760 300" role="img" aria-label="Cross-section geometry"></svg><div class="legend"><span><i class="copper"></i>Conductor</span><span><i class="dielectric"></i>Dielectric</span><span>Lengths in <b id="drawing-unit">mm</b></span></div></div>
+        <div class="panel drawing"><div class="panel-heading"><h2>Geometry preview</h2><span id="preview-label" class="tag">Schematic</span></div><button id="geometry-inspect" type="button" hidden>Inspect geometry</button><svg id="cross-section" viewBox="0 0 760 300" role="img" aria-label="Cross-section geometry"></svg><div class="legend"><span><i class="copper"></i>Conductor</span><span><i class="dielectric"></i>Dielectric</span><span>Lengths in <b id="drawing-unit">mm</b></span></div></div>
         <div class="panel results"><div class="panel-heading"><h2>Line parameters</h2><span class="step">02</span></div><div id="status" role="status" aria-live="polite">Ready when you are. Enter a cross-section and calculate.</div><div id="result" hidden><div id="scalar-summary" class="metrics"><div class="main-metric"><span id="z-label">Characteristic impedance</span><strong id="z-value">—</strong><small>Ω</small></div><div><span id="eps-label">Effective permittivity</span><strong id="eps-value">—</strong></div><div><span id="delay-label">Propagation delay</span><strong id="delay-value">—</strong><small id="delay-unit">ns/m</small></div></div><p id="scalar-note" class="notice" hidden></p><div id="matrices" class="matrices"></div><p id="refinement" class="notice" hidden></p><p class="fine">Quasi-static model · Dielectric loss included · Conductor loss and dispersion not included</p></div></div>
         <section class="panel results comparison" aria-label="Result comparison">
           <div class="panel-heading"><h2>Compare results</h2></div>

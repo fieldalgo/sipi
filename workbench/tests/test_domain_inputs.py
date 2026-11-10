@@ -41,7 +41,9 @@ def test_domain_inspect_and_editable_roundtrip_preserve_parameters_and_mesh(temp
     assert doc==direct
     if mode=='fixed':
         assert doc['box']['width']==p['box_width']
-        if 'air_height' in keys: assert doc['layers'][-1]['thickness']==p['air_height']
+        if 'air_height' in keys:
+            expected = p['thickness']+p['coating_thickness']+p['air_height'] if 'coating_thickness' in p else p['air_height']
+            assert doc['layers'][-1]['thickness']==expected
         if 'lower_air_height' in keys: assert doc['layers'][0]['thickness']==p['lower_air_height']
     else:
         omitted={k:v for k,v in p.items() if k not in keys}

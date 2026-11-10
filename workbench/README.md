@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the fifteen-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the seventeen-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers fifteen cross-section forms, impedance targeting,
+The basic workspace offers seventeen cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -139,7 +139,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The fifteen forms are coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The seventeen forms include normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -389,7 +389,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the fifteen supported editable templates. Other
+All project designs must use the seventeen supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
@@ -776,3 +776,37 @@ solve, certify convergence or validate a physical manufacturing model. Calculate
 explicitly, inspect matrices for an asymmetric pair, and vary mesh/domain
 settings separately. Geometry export preserves the versioned input and its
 coordinates; no new geometry or material schema is introduced.
+
+## Normal-thickness coating forms
+
+**Normal-film microstrip** and **Normal-film pair** use `coating_thickness`,
+measured normal to the substrate, copper top and sloping sides. This is separate
+from planar `coating_height`. Corners meet at straight miters; traces can be
+rectangular or narrowing-top trapezoids. Joined film envelopes become one local
+dielectric region. Overhangs, unresolved gaps, enclosed air pockets and film
+outside the box are rejected. No rounded corner, meniscus or measured deposition
+profile is inferred. Upper air is the clearance above the highest coated trace.
+
+After editing, choose **Inspect geometry** to validate and draw the engine's
+actual polygon vertices without meshing or solving. An edit clears the previous
+inspection; opening a saved design restores its geometry. The two display axes
+are scaled separately and a large outer domain can make a thin film difficult
+to see. The picture does not establish mesh or outer-domain convergence.
+
+Editable JSON and input projects retain normal thickness, coating permittivity,
+loss tangent, domain bounds and fixed mesh settings. Thickness and permittivity
+can be swept or sampled together. Width targeting uses `z0` for one signal and
+`z_diff` for the equal pair, followed by a separate refined-mesh check. The
+automatic normal-film target starts at five times the factory edge size and
+one quarter of its far size, retaining growth and minimum angle. Factory
+forward calculations and explicit meshes are unchanged. The 32-evaluation,
+300,000-point and five-minute limits still apply; a failed refined
+mesh is an unsuccessful target, not a completed result. These forms use the
+existing quasi-static model and do not certify a manufactured stackup.
+
+Related checks: `workbench/tests/test_normal_film_forms.py`,
+`tests/sipi/test_conformal_coating.py`, `tests/sipi/test_conformal_resolution.py`,
+`node workbench/tests/normal-film.test.mjs` and the real native/Worker flow
+`workbench/tests/normal-film-browser.mjs` (`SIPI_NORMAL_PAIR=1` selects the pair).
+These checks include independent electrostatic references, lossless network
+invariants, geometry/JSON retention and separate mesh/domain convergence.

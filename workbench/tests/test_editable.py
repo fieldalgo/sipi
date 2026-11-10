@@ -21,6 +21,9 @@ def parameters(name):
     if name in ('coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p['ground_gap'] = .0002500000000123456
     if name in ('coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(coating_height=.2e-3, coating_eps_r=3, coating_tan_delta=.02, top_width=.4e-3)
     if name in ('unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar'): p['lower_air_height'] = .006700000000123456
+    if name in ('conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'):
+        p.update(coating_thickness=.000020000000000123456, coating_eps_r=3.5, coating_tan_delta=.02, top_width=.4e-3)
+        if name.startswith('coupled_'): p['gap'] = .3e-3
     return p
 
 

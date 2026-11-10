@@ -1,5 +1,9 @@
 # Changelog
 
+- Connect normal-thickness coated single and paired microstrip forms with exact
+  engine geometry inspection, editable inputs, studies and refined width targets.
+  법선 두께 코팅 단일·차동 폼에 엔진 기하 확인, 편집 입력, 공차와 세분 검증 역산을 연결합니다.
+
 - Open validated polygon geometry files in the basic workspace, render local
   dielectric regions and conductor vertices, and separate crowded layer labels.
 

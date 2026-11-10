@@ -166,9 +166,9 @@ try {
   await cdp.evaluate('document.querySelector("#calculate").click();document.querySelector("#cancel").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("cancelled")'),'cancel');
   await click('calculate');assert.deepEqual(await save('save','sipi-cross-section.json'),original);
   // All supported editable choices still draw, with layer labels separated.
-  const names=await cdp.evaluate('[...document.querySelectorAll("[data-template]")].map(b=>b.dataset.template)');assert.equal(names.length,15);
+  const names=await cdp.evaluate('[...document.querySelectorAll("[data-template]")].map(b=>b.dataset.template)');assert.equal(names.length,17);
   await cdp.evaluate(`document.querySelector('#unit').value='mm';document.querySelector('#unit').dispatchEvent(new Event('change'))`);
-  for(const name of names){await choose(name);await set('profile','rectangular');await set('thickness','0');await set('width','.5');await set('height','1');await set('coating_height','.2');
+  for(const name of names){await choose(name);await set('profile','rectangular');await set('thickness','0');await set('width','.5');await set('height','1');await set('coating_height','.2');if(name.includes('conformal_'))await click('geometry-inspect');
     const labels=await cdp.evaluate('[...document.querySelectorAll("#cross-section [data-geometry-label]")].map(p=>{const b=p.getBBox();return {x:b.x,y:b.y,w:b.width,h:b.height}})');assert.ok(labels.length>=2,name);
     for(let i=0;i<labels.length;i++)for(const b of labels.slice(i+1)){const a=labels[i];assert.ok(!(a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h),name);}
   }
@@ -185,7 +185,7 @@ try {
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'installed host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
   await writeFile(join(output,'results.json'),JSON.stringify(results,null,2));
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,drawingChecks,editableForms:names.length,layouts,errors,externalRequests:remoteRequests,checks:['v3 validation before replacement','concave and clockwise vertices','region below metal and exact coordinates','four geometry inputs across three prior display units','read-only exact geometry export','scalar/asymmetric matrices and two/four-port export','invalid/duplicate/complexity input preserves prior result','late file cancellation preserves previous result','safe literal material names','cancel/restart','all15 form layer labels separated','four viewports','project preservation','shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,drawingChecks,editableForms:names.length,layouts,errors,externalRequests:remoteRequests,checks:['v3 validation before replacement','concave and clockwise vertices','region below metal and exact coordinates','four geometry inputs across three prior display units','read-only exact geometry export','scalar/asymmetric matrices and two/four-port export','invalid/duplicate/complexity input preserves prior result','late file cancellation preserves previous result','safe literal material names','cancel/restart','all17 form layer labels separated','four viewports','project preservation','shutdown']},null,2));
   console.log('Polygon import and geometry display acceptance passed.');
 } catch(error) {
   let application=null;

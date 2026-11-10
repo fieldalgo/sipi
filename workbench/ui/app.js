@@ -1,4 +1,4 @@
-import {checkDrawing, polygonDrawing, scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {checkDrawing, polygonDrawing, scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -52,6 +52,13 @@ function meshControls() {
   $('mesh-auto').disabled = busy || closed || !!imported || !savedMesh;
 }
 
+function resolvedAirHeight() {
+  const height = resolvedDomain.layers.at(-1).thickness;
+  if (imported || !isNormalFilm(template)) return height;
+  const top = Math.max(...resolvedDomain.dielectric_regions.flatMap(r => r.vertices.map(p => p[1])));
+  return resolvedDomain.layers.reduce((sum, layer) => sum + layer.thickness, 0) - top;
+}
+
 function domainControls() {
   $('domain-inputs').hidden = !!imported;
   $('air-domain-fields').hidden = isStripline(template);
@@ -64,7 +71,7 @@ function domainControls() {
   $('air_mode').disabled = busy || !!imported || isStripline(template);
   $('domain-inspect').disabled = busy || closed;
   $('domain-mode').textContent = imported ? 'Imported geometry · bounds read only' : resolvedDomain ? 'Resolved calculation bounds' : 'Bounds not inspected';
-  const air = resolvedDomain && !imported && !isStripline(template) ? resolvedDomain.layers.at(-1).thickness : null;
+  const air = resolvedDomain && !imported && !isStripline(template) ? resolvedAirHeight() : null;
   const lowerAir = resolvedDomain?.layers[0]?.name === 'lower_air' ? resolvedDomain.layers[0].thickness : null;
   const total = resolvedDomain?.layers.reduce((sum, layer) => sum + layer.thickness, 0);
   $('domain-values').replaceChildren();
@@ -353,7 +360,14 @@ function draw(model) {
 function preview() {
   $('drawing-unit').textContent = unit;
   try {
-    const model = imported ? JSON.parse(imported) : schematic(template, currentParameters());
+    if (!imported && isNormalFilm(template) && !resolvedDomain) {
+      $('cross-section').replaceChildren(svgNode('text', {x: 65, y: 145, fill: '#4d6984', 'font-size': 15}, 'Inspect geometry to view the current coating.'));
+      $('cross-section').setAttribute('viewBox', '0 0 760 300');
+      $('preview-label').textContent = 'Geometry not inspected';
+      return;
+    }
+    const model = imported ? JSON.parse(imported) : isNormalFilm(template) ? resolvedDomain : schematic(template, currentParameters());
+    $('preview-label').textContent = imported || isNormalFilm(template) ? 'Engine geometry · axes scaled separately' : 'Schematic · not to scale';
     draw(model);
   } catch { $('cross-section').replaceChildren(); }
 }
@@ -365,9 +379,15 @@ function geometryFields() {
   $('trace-height-field').hidden = template !== 'offset_stripline' && $('placement').value !== 'fixed';
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
   $('coating-fields').hidden = !isCoated(template);
+  const normal = isNormalFilm(template);
+  $('coating-title').textContent = normal ? 'Normal-thickness coating' : 'Planar coating';
+  $('coating-description').textContent = normal ? 'Thickness normal to the substrate, copper top and sloping sides; corners meet at straight miters. Top width must not exceed bottom width. Upper air starts above the highest coated trace.' : 'Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.';
+  $('coating-height-field').hidden = normal;
+  $('coating-thickness-field').hidden = !normal;
+  $('geometry-inspect').hidden = !normal || !!imported;
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['top_width', 'trace_height', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -420,9 +440,8 @@ function render(result) {
     history(d.history);
   }
   resolvedMesh = {...result.document.mesh}; resolvedDomain = result.document; meshControls(); domainControls();
-  // Retain a useful schematic rather than squeezing the signal into the full air box.
+  // Normal films display the resolved engine geometry; other forms retain their schematic.
   preview();
-  $('preview-label').textContent = 'Schematic · not to scale';
 }
 
 function studyControls() {
@@ -542,14 +561,18 @@ async function run(action) {
   if (busy) return;
   const sequence = ++runSequence;
   try {
-    const input = request(['mesh-inspect', 'domain-inspect'].includes(action) ? 'document' : action);
-    if (!['document', 'template-document', 'mesh-inspect', 'domain-inspect'].includes(action)) clearResult();
+    const input = request(['mesh-inspect', 'domain-inspect', 'geometry-inspect'].includes(action) ? 'document' : action);
+    if (!['document', 'template-document', 'mesh-inspect', 'domain-inspect', 'geometry-inspect'].includes(action)) clearResult();
     setBusy(true);
     status(action === 'study' ? 'Calculating every sampled cross-section…' : action === 'network' ? 'Calculating the cross-section and frequency response…' : action === 'design' ? 'Searching the width range, then checking a finer mesh…' : action === 'analyze' ? (inBrowser ? 'Preparing the browser engine and calculating… The first load can take longer.' : 'Meshing the cross-section and solving locally…') : 'Validating the design file…');
     const result = await transport.run(input);
     if (sequence !== runSequence || closed) return;
     resolvedMesh = {...result.document.mesh}; resolvedDomain = result.document; meshControls(); domainControls();
-    if (action === 'mesh-inspect') {
+    if (!imported && isNormalFilm(template)) preview();
+    if (action === 'geometry-inspect') {
+      status('Geometry inspected without solving. The coating uses the engine vertices; axes are scaled separately.');
+    }
+    else if (action === 'mesh-inspect') {
       status('Mesh settings inspected without solving or changing the design. Refinement is an explicit input change.');
     }
     else if (action === 'domain-inspect') {
@@ -568,6 +591,7 @@ async function run(action) {
 
 function chooseTemplate(name) {
     template = name; imported = null;
+    resolvedMesh = null; resolvedDomain = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
     $('placement').value = name === 'offset_stripline' ? 'fixed' : 'centred';
@@ -623,7 +647,7 @@ for (const id of allFields) $(id).addEventListener('input', () => {
   }
   if (['box_mode', 'air_mode', 'lower_air_mode'].includes(id) && $(id).value === 'fixed' && resolvedDomain) {
     const field = id === 'box_mode' ? 'box_width' : id === 'lower_air_mode' ? 'lower_air_height' : 'air_height';
-    const value = id === 'box_mode' ? resolvedDomain.box.width : id === 'lower_air_mode' ? resolvedDomain.layers[0].thickness : resolvedDomain.layers.at(-1).thickness;
+    const value = id === 'box_mode' ? resolvedDomain.box.width : id === 'lower_air_mode' ? resolvedDomain.layers[0].thickness : resolvedAirHeight();
     lengthSI[field] = value; $(field).value = String(Number((value / scales[unit]).toPrecision(10)));
   }
   if (lengthFields.includes(id)) {
@@ -655,6 +679,7 @@ $('comparison-clear').addEventListener('click', () => {
 });
 $('mesh-inspect').addEventListener('click', () => run('mesh-inspect'));
 $('domain-inspect').addEventListener('click', () => run('domain-inspect'));
+$('geometry-inspect').addEventListener('click', () => run('geometry-inspect'));
 $('mesh-refine').addEventListener('click', () => {
   if (busy || closed || imported) return;
   try {

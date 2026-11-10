@@ -1,11 +1,12 @@
 export const scales = {mm: 1e-3, 'µm': 1e-6, mil: 25.4e-6};
-export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower_air_height', 'lower', 'upper'];
-export const labels = {coated_unbacked_coplanar: 'Coated unbacked coplanar', coupled_coated_unbacked_coplanar: 'Coated unbacked pair',coupled_unbacked_coplanar: 'Unbacked coplanar pair', unbacked_coplanar: 'Unbacked coplanar', microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip', coupled_coated_microstrip: 'Planar coated pair', coated_grounded_coplanar: 'Planar coated coplanar', coupled_coated_grounded_coplanar: 'Planar coated coplanar pair'};
+export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'coating_thickness', 'box_width', 'air_height', 'lower_air_height', 'lower', 'upper'];
+export const labels = {conformal_coated_microstrip: 'Normal-film microstrip', coupled_conformal_coated_microstrip: 'Normal-film pair', coated_unbacked_coplanar: 'Coated unbacked coplanar', coupled_coated_unbacked_coplanar: 'Coated unbacked pair',coupled_unbacked_coplanar: 'Unbacked coplanar pair', unbacked_coplanar: 'Unbacked coplanar', microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip', coupled_coated_microstrip: 'Planar coated pair', coated_grounded_coplanar: 'Planar coated coplanar', coupled_coated_grounded_coplanar: 'Planar coated coplanar pair'};
 export const isStripline = template => ['stripline', 'coupled_stripline', 'offset_stripline'].includes(template);
-export const isPair = template => ['coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'].includes(template);
+export const isPair = template => ['coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'].includes(template);
 export const isUnbacked = template => ['coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'unbacked_coplanar', 'coupled_unbacked_coplanar'].includes(template);
 export const isCoplanar = template => ['coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'].includes(template);
-export const isCoated = template => ['coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'].includes(template);
+export const isNormalFilm = template => ['conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'].includes(template);
+export const isCoated = template => ['conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'].includes(template);
 
 // Explicit refinement of resolved settings; never mutate a saved design.
 export function refinedMesh(mesh) {
@@ -19,7 +20,7 @@ export function refinedMesh(mesh) {
 export function parameterFields(template) {
   return {width: 'width', top_width: 'top_width', thickness: 'thickness',
     height: isStripline(template) ? 'plane_spacing' : 'substrate_height', trace_height: 'trace_height',
-    gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', box_width: 'box_width', air_height: 'air_height', lower_air_height: 'lower_air_height', coating_height: 'coating_height',
+    gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', box_width: 'box_width', air_height: 'air_height', lower_air_height: 'lower_air_height', coating_height: 'coating_height', coating_thickness: 'coating_thickness',
     eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
     coating_tan_delta: 'coating_tan_delta'};
 }
@@ -75,10 +76,12 @@ export function parameters(template, values, unit) {
     if (out.thickness <= 0) throw new Error('A tapered trace needs positive copper thickness.');
   }
   if (isCoated(template)) {
-    out.coating_height = positive('coating_height') * scales[unit];
+    if (isNormalFilm(template)) out.coating_thickness = positive('coating_thickness') * scales[unit];
+    else out.coating_height = positive('coating_height') * scales[unit];
     out.coating_eps_r = positive('coating_eps_r');
     out.coating_tan_delta = positive('coating_tan_delta', true);
-    if (out.coating_height <= out.thickness) throw new Error('Coating height must exceed copper thickness.');
+    if (isNormalFilm(template) && out.top_width > out.width) throw new Error('Normal films require top width no greater than bottom width.');
+    if (!isNormalFilm(template) && out.coating_height <= out.thickness) throw new Error('Coating height must exceed copper thickness.');
   }
   for (const [mode, key] of [['box_mode', 'box_width'], ...(!isStripline(template) ? [['air_mode', 'air_height']] : []), ...(isUnbacked(template) ? [['lower_air_mode', 'lower_air_height']] : [])]) {
     const selected = values[mode] ?? 'auto';
@@ -105,6 +108,7 @@ export function studyFields(template, p) {
   if ('ground_gap' in p) fields.ground_gap = 'Signal–ground gap';
   if ('ground_width' in p) fields.ground_width = 'Ground width';
   if ('coating_height' in p) { fields.coating_height = 'Coating height'; fields.coating_eps_r = 'Coating permittivity'; }
+  if ('coating_thickness' in p) { fields.coating_thickness = 'Normal coating thickness'; fields.coating_eps_r = 'Coating permittivity'; }
   return fields;
 }
 
@@ -114,6 +118,7 @@ export function studyScale(name, unit) {
 
 // This is only a drawing model. The Python template creates all solver inputs.
 export function schematic(template, p) {
+  if (isNormalFilm(template)) throw new Error('Inspect the engine geometry for normal films.');
   const h = p.substrate_height ?? p.plane_spacing;
   const strip = isStripline(template);
   const lowerAir = isUnbacked(template) ? (p.lower_air_height ?? 10 * h) : 0;

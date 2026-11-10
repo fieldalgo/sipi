@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 15종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 17종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 15종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 17종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -124,7 +124,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair) 15종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair) 17종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -335,7 +335,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 15종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 17종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는
@@ -674,3 +674,34 @@ JSON 경로를 유지합니다. 기하·재료 모델/pole·
 모델의 물리 검증이 아닙니다. 계산을 명시적으로 실행하고 비대칭 쌍은 전체
 행렬을 확인하며 메시와 외곽 영역은 별도로 바꾸어 검증하세요. 기하 내보내기는
 버전 있는 입력과 좌표를 보존하며 새 기하·재료 스키마를 도입하지 않습니다.
+
+## 법선 두께 코팅 입력 폼
+
+**Normal-film microstrip**과 **Normal-film pair**의 `coating_thickness`는
+기판, 도체 윗면, 경사 옆면에 수직인 두께입니다. 평면 코팅의 `coating_height`와
+별개입니다. 모서리는 직선 마이터로 만나며 직사각형과 위쪽이 좁아지는 사다리꼴
+도체를 지원합니다. 만나는 필름은 하나의 국소 유전체 영역으로 합칩니다.
+돌출 윗면, 해상도 미만 틈, 갇힌 공기, 외곽을 벗어나는 코팅은 거부합니다.
+둥근 모서리·메니스커스·실제 증착 형상을 추정하지 않습니다. 상부 공기 높이는
+가장 높은 코팅 표면 위의 여유 높이입니다.
+
+입력을 바꾼 뒤 **Inspect geometry**를 누르면 메시나 전계 계산 없이 엔진이 만든
+실제 다각형 꼭짓점을 검증하고 표시합니다. 입력 수정은 이전 단면 확인을 지우며,
+저장 설계를 열면 해당 기하를 복원합니다. 가로·세로 표시 배율은 서로 다르고
+외곽이 크면 얇은 필름이 작게 보일 수 있습니다. 그림만으로 메시·외곽 수렴을
+판정할 수는 없습니다.
+
+편집 JSON과 입력 프로젝트는 법선 두께, 유전율, 손실 탄젠트, 외곽과 고정 메시를
+보존합니다. 두께와 유전율을 함께 공차 샘플링하거나 변화시킬 수 있습니다.
+폭 역산은 단일 선로 `z0`, 같은 차동 쌍 `z_diff`를 사용한 뒤 별도 세분 메시로
+확인합니다. 자동 역산의 초기 메시만 기본 가장자리 크기의 5배, 원거리 크기의
+1/4로 잡고 성장률·최소 각도를 유지합니다. 일반 전방 계산과 사용자가 지정한
+메시는 바꾸지 않습니다. 32회 평가·30만 점·5분 제한을 유지하며 세분 단계 실패는 목표 달성이
+아닙니다. 기존 준정적 모델을 사용하므로 실제 제조 적합성을 인증하지 않습니다.
+
+관련 검증은 `workbench/tests/test_normal_film_forms.py`,
+`tests/sipi/test_conformal_coating.py`, `tests/sipi/test_conformal_resolution.py`,
+`node workbench/tests/normal-film.test.mjs`와 실제 native/Worker 흐름
+`workbench/tests/normal-film-browser.mjs`입니다. 차동 쌍은 `SIPI_NORMAL_PAIR=1`로
+선택합니다. 독립 정전계 기준, 무손실 네트워크 불변식, 기하·JSON 보존과
+서로 분리한 메시·외곽 수렴 검사를 포함합니다.

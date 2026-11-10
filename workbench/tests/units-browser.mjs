@@ -99,7 +99,7 @@ try {
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/editable_cases.py'],{encoding:'utf8',env:{...process.env,OPENBLAS_NUM_THREADS:'1'}});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout);
   assert.equal(fixtures.cases.length,11);
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),15);
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),17);
   async function changeUnit(unit) {await cdp.evaluate(`document.querySelector('#unit').value=${JSON.stringify(unit)};document.querySelector('#unit').dispatchEvent(new Event('change'))`);}
   for(const input of fixtures.cases) {
     await open(input);
