@@ -1,5 +1,8 @@
 # Changelog
 
+- Add an editable unbacked coplanar pair with separate signal and ground gaps,
+  preserved lower-air bounds, differential width targeting and four-port export.
+
 - Export current or historical impedance-study samples as CSV, retaining reported
   numeric precision, ordered variables and all failed rows without recalculation.
 

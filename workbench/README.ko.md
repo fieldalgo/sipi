@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 12종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 13종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 12종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 13종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -124,7 +124,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar 12종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar 13종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -140,6 +140,22 @@ coupled grounded coplanar, planar coated microstrip, planar coated pair, coated 
 메시·횡방향 외곽·수직 반사를 따로 확인합니다. 유한 35 µm 직사각 도체는 같은 메시의
 독립 복소/진공 유한요소 계산과 비교합니다. 폭 역산은 요청·세분 메시의 허용 오차를
 모두 만족해야 합니다. 임의 배치·재료 또는 실측 PCB 정확도 전체를 보증하는 검증은 아닙니다.
+
+**Unbacked coplanar pair**는 같은 폭의 신호 두 개와 양쪽 유한 폭 직사각
+접지를 사용하며 뒷면 접지면·중앙 접지가 없습니다. **Gap**은 신호 아랫면 사이,
+**Signal–ground gap**은 바깥 신호 끝과 접지 사이 간격입니다. 테이퍼는 신호에만
+적용합니다. 하부 공기는 기판 높이의 10배 자동값 또는 지정값이며 단위·편집 JSON·
+선택 메시 저장·A/B 프로젝트에서 유지됩니다. 제조 공차 변수가 아닌 수치 계산 영역입니다.
+상부·하부 공기와 횡방향 외곽은 메시 세분과 별도로 수렴을 확인해야 합니다.
+
+폭 역산과 간격·접지 공차는 차동 임피던스를 사용합니다. 자동 역산은 factory의
+가장자리 크기·성장률을 유지하고 외곽 메시를 세분한 뒤 요청·독립 세분 메시가 모두
+목표 허용 오차를 만족해야 합니다. 명시 메시 설정은 그대로 유지합니다.
+폭 0.5 mm·신호 간격 0.3 mm·접지 간격 0.2 mm 진공 예제의 독립 유한 접지 패널
+목표는 181.05076148507075 Ω입니다. 모드별 메시·외곽 수렴과 유한 구리의 복소 에너지
+대조는 해당 예제의 검증이며 임의 기하나 실측 제조 정확도를 보증하지 않습니다.
+주파수 내보내기는 single-ended 4포트와 기존 mixed-mode 응답을 보존하며,
+같은 quasi-TEM·지정 직렬 저항 모델의 한계를 따릅니다.
 
 **Coupled stripline**의 plane spacing은 두 접지면 사이 전체 거리이고 gap은
 구리 아랫면 모서리 사이 간격입니다. 두 도체는 같은 아랫폭과 단면 형상을 사용합니다.
@@ -302,7 +318,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 12종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 13종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는
