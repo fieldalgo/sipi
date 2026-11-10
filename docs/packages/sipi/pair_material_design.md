@@ -39,7 +39,9 @@ assert json.loads(result.material_evaluation_json)['frequency_hz'] == 1e9
 
 Each uncached parameter attempt includes geometry, material encoding, field
 extraction and diagnostics, counting once even when one step fails. Jacobian
-probes count; cache hits do not. One attempt remains reserved for refinement.
+probes count; repeated parameter tuples served by the objective cache do not.
+Mesh reuse during a new parameter evaluation still counts as one attempt.
+One attempt remains reserved for refinement.
 Each completed `PairImpedanceEvaluation` retains `material_evaluation_json`;
 its dictionary contains `material_evaluation` when a mapping exists. Ordinary
 geometry-only rows retain their previous dictionary shape and four-argument
@@ -60,6 +62,28 @@ continues to support fixed materials only; this API changes no input schema.
 
 [Saved version 2 goals](pair_material_document.md) use explicit named numeric
 material bindings instead of serializing the callback.
+
+## Repeated geometry within one search
+
+Material evaluations with the same complete cross-section document reuse one
+mesh and its vacuum capacitance inside that search. Geometry, boundary and
+signal/material names and order, default materials and explicit mesh settings
+all participate in the key. A changed document discards the entry before a new
+mesh is built. Refinement uses its separate finer mesh. There is no global or
+cross-search cache, and no retained field vectors.
+
+Every uncached parameter evaluation still validates and evaluates its current
+material, computes its material-dependent capacitance/loss and performs the
+same pair diagnostics. Factory calls, attempted-evaluation budgets and error
+context are unchanged. The independent objective cache continues to handle
+repeated parameter tuples. This can reduce repeated meshing in fixed-geometry
+material searches without claiming unique parameter recovery or a general
+elapsed-time improvement.
+
+The reuse tests cover a real diagonal-tensor search, a second independent
+search, actual refinement mesh failure, changed-material field failure,
+invalid material on reused geometry and unchanged attempted-evaluation limits.
+These control/compatibility checks complement the physical criteria below.
 
 ## Independent acceptance and scope
 

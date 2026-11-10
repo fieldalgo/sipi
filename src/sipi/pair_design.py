@@ -8,7 +8,8 @@ import numpy as np
 from scipy.optimize import least_squares
 
 from .document import CrossSectionDocument, _mesh
-from .impedance_material import _material_input, _analyze_material, _frequency
+from .impedance_material import (_material_input, _analyze_material, _frequency,
+                                 _MaterialMeshReuse)
 from .sampling import _numbers, _integer
 
 __all__ = ['PairImpedanceEvaluation', 'PairImpedanceDesign',
@@ -118,8 +119,13 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
     1e-4 and gtol=1e-3. Local convergence does not establish feasibility,
     uniqueness, a global optimum or outer-domain/physical accuracy.
 
-    Every uncached geometry/material/extraction attempt, including failures and Jacobian
-    probes, consumes the budget. Cache hits do not. Reserve one final attempt
+    Every uncached parameter evaluation, including failures and Jacobian
+    probes, consumes the budget. Repeated parameter tuples use the existing
+    objective cache without another attempt. Separately, material evaluations
+    with identical full geometry documents and mesh controls reuse one mesh
+    and vacuum capacitance within this search. They still validate and evaluate
+    the current material and consume an attempt. Changed documents evict that
+    entry, and refinement builds a separate mesh. Reserve one final attempt
     at the frozen selected input with edge_size/far_size/grade halved, keeping
     min_angle and all physical inputs. Both meshes must satisfy both targets.
     An initial point already satisfying both targets skips optimization but
@@ -156,6 +162,7 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
     attempts = 0
     identity = None
     cache = {}
+    material_mesh = _MaterialMeshReuse()
 
     def failure(message, stage, parameters=None, *, cause=None, text=None, material_json=None):
         return PairImpedanceGoalError(message, history, attempts=attempts, stage=stage,
@@ -198,7 +205,8 @@ def seek_pair_impedances(factory, bounds, targets, *, tolerances, initial=None,
             else:
                 current = None if current_text is None else json.loads(current_text)
             phase = 'extraction'
-            line = doc.analyze() if current is None else _analyze_material(doc, current, 'z_diff')
+            line = doc.analyze() if current is None else _analyze_material(
+                doc, current, 'z_diff', mesh_reuse=material_mesh)
             phase = 'diagnostic'
             if tuple(line.names) != names:
                 raise ValueError('extraction changed ordered signal names')

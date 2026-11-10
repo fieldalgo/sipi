@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Reuse identical material meshes and vacuum capacitance inside two-parameter pair targeting while preserving objective caching, attempted-evaluation budgets, current-model diagnostics and separate frozen-input refinement.
+
 - Pin both workbench runtimes to search-local material mesh reuse and exercise constant/Debye saved targets through native HTTP and actual browser Workers. Preserve selected material snapshots, refinement, exports and existing failure limits.
 
 - Reuse identical cross-section meshes and vacuum capacitance within a scalar material-target search. Revalidate and recompute each material evaluation, evict changed inputs, and preserve separate refinement, logical budgets, saved results and mesh-limit failures.

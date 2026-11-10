@@ -35,7 +35,7 @@ def fake(values):
 @pytest.fixture
 def affine(monkeypatch):
     calls=[]
-    def analyze(doc,material,quantity):
+    def analyze(doc,material,quantity, *, mesh_reuse=None):
         width=doc.section.traces[0].width
         strength=material['materials']['dielectric']['parameters']['strengths'][0]
         assert material['frequency_hz']==F and quantity=='z_diff'
@@ -79,7 +79,7 @@ def test_refinement_freezes_models_without_recalling_either_factory(monkeypatch)
     counts={'geometry':0,'material':0};mapping=models(.5e-3,4.);observed=[]
     def geometry(a,b):counts['geometry']+=1;assert counts['geometry']==1;return factory(a,b)
     def material(a,b):counts['material']+=1;assert counts['material']==1;return mapping
-    def analyze(doc,value,quantity):
+    def analyze(doc,value,quantity, *, mesh_reuse=None):
         observed.append(json.dumps(value,sort_keys=True));mapping.clear();return fake([100.,40.])
     monkeypatch.setattr(module,'_analyze_material',analyze)
     result=seek_pair_impedances(geometry,BOUNDS,[100,40],tolerances=[1,1],frequency=F,
@@ -134,7 +134,7 @@ def test_encoded_invalid_material_retained_before_meshing(monkeypatch,kind):
 def test_field_failure_keeps_current_model_not_previous_model(monkeypatch):
     calls=[]
     def material(a,b):return {'dielectric':ConstantDielectric(2+1000*a)}
-    def analyze(doc,value,quantity):
+    def analyze(doc,value,quantity, *, mesh_reuse=None):
         calls.append(json.dumps(value,sort_keys=True))
         if len(calls)==2:raise ArithmeticError('field failed')
         return fake([100.,40.])
@@ -174,7 +174,7 @@ def test_budget_counts_parameter_attempts_not_two_factory_calls(affine):
 
 def test_zero_frequency_uses_existing_nonnegative_contract(monkeypatch):
     observed=[]
-    def analyze(doc,value,quantity):
+    def analyze(doc,value,quantity, *, mesh_reuse=None):
         observed.append(value['frequency_hz']);return fake([100.,40.])
     monkeypatch.setattr(module,'_analyze_material',analyze)
     result=seek_pair_impedances(factory,BOUNDS,[100,40],tolerances=[1,1],frequency=0.,

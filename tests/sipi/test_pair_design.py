@@ -179,7 +179,7 @@ def test_rank_deficient_feasible_objective_does_not_claim_unique_parameters(monk
 
 def test_material_snapshot_and_same_fixed_frequency_on_both_meshes(monkeypatch):
     supplied={'substrate':ConstantDielectric(4.,.02)};observed=[]
-    def material(doc,value,quantity):
+    def material(doc,value,quantity, *, mesh_reuse=None):
         observed.append(json.dumps(value,sort_keys=True));assert quantity=='z_diff'
         supplied.clear()
         return SimpleNamespace(names=('positive','negative'),even_odd=lambda:dict(z_diff=100.,z_common=40.))
@@ -192,7 +192,7 @@ def test_material_snapshot_and_same_fixed_frequency_on_both_meshes(monkeypatch):
 
 def test_tilted_tensor_rejected_before_field_extraction(monkeypatch):
     def forbidden(*args,**kwargs):pytest.fail('tilted material reached field extraction')
-    monkeypatch.setattr('sipi.impedance_material.dispersive_line',forbidden)
+    monkeypatch.setattr(CrossSection,'mesh',forbidden)
     model=PrincipalAxisDielectric(ConstantDielectric(2),ConstantDielectric(4),30.)
     with pytest.raises(PairImpedanceGoalError,match='diagonal'):
         seek_pair_impedances(factory,BOUNDS,[100,40],tolerances=[1,1],mesh=MESH,
@@ -201,7 +201,7 @@ def test_tilted_tensor_rejected_before_field_extraction(monkeypatch):
 
 def test_failure_retains_material_snapshot_after_caller_mutation(monkeypatch):
     supplied={'substrate':ConstantDielectric(4.,.02)};calls=0
-    def material(doc,value,quantity):
+    def material(doc,value,quantity, *, mesh_reuse=None):
         nonlocal calls
         calls+=1;supplied.clear()
         if calls==2:raise ArithmeticError('refinement failed')

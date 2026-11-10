@@ -53,7 +53,9 @@ unique parameters. Geometry errors are retained, never clipped or resampled.
 
 `max_evaluations` is an integer from 2 to 10000 (default 64). Each uncached
 factory/extraction attempt counts, including Jacobian probes and failed
-attempts. Repeated physical parameter tuples are cached. One final attempt is
+attempts. Repeated physical parameter tuples use cached objective results.
+Reusing a mesh during a new parameter evaluation still consumes an attempt.
+One final attempt is
 reserved for refinement. An initial point within both tolerances skips search
 but still needs this second attempt. Counts therefore differ from SciPy's
 `nfev`. Each attempt can perform several field solves; this budget does not

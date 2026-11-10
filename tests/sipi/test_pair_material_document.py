@@ -140,7 +140,7 @@ def test_execution_budget_is_checked_before_factories(monkeypatch):
 
 def test_execution_retains_distinct_completed_and_current_failed_materials(monkeypatch):
     calls=[]
-    def analyze(doc,value,quantity):
+    def analyze(doc,value,quantity, *, mesh_reuse=None):
         calls.append(json.loads(json.dumps(value)))
         if len(calls)==2:raise ArithmeticError('field failure with changed strength')
         return SimpleNamespace(names=('positive','negative'),even_odd=lambda:dict(z_diff=100.,z_common=40.))
