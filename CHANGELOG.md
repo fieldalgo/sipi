@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add an explicit session-only baseline for successful cross-section results, with ordered-signal scalar/matrix differences and exact geometry/mesh inspection. Preserve the baseline while invalidating stale current results; keep zero percentages, asymmetric summaries, project persistence and convergence claims explicit. Stack the primary line metric above the other values on narrow screens.
+
 - Add explicit or automatic box-width and surface air-height controls, with non-solving inspection of resolved bounds. Preserve canonical nullable inputs, exact SI values, fixed mesh and A/B files; keep imported bounds read-only and domain convergence separate from mesh refinement.
 
 - Add an editable coupled grounded-coplanar form with distinct signal and ground gaps, finite ground width, differential targeting, four-port response and ground-dimension studies. Preserve exact project inputs and mesh, and keep inactive geometry controls from blocking other forms. Validate the zero-thickness vacuum limit against independent image panels and retain separate mesh/domain checks. Avoid redundant automatic edge/growth pre-refinement for this pair while retaining the mandatory target refinement and existing point limit.

@@ -122,3 +122,37 @@ export function schematic(template, p) {
   if (!strip) layers.push({name: 'air', thickness: Math.max(h * 1.1, p.thickness * 1.5), eps_r: 1});
   return {layers, traces, box: {width: Math.max(h * 5, ...traces.map(t => (Math.abs(t.x) + Math.max(t.width, t.top_width) / 2) * 2.5)), bottom: 'ground', top: strip ? 'ground' : 'open', sides: 'open'}};
 }
+
+// Display-only comparison of completed, ordered cross-section summaries.
+export function compareLines(baseline, current) {
+  const reject = reason => ({compatible: false, reason, rows: []});
+  const names = baseline?.names;
+  if (!Array.isArray(names) || ![1, 2].includes(names.length) ||
+      !Array.isArray(current?.names) || names.length !== current.names.length ||
+      names.some((name, i) => typeof name !== 'string' || name !== current.names[i]))
+    return reject('Comparison requires the same ordered names for one or two signals.');
+  const matrices = [['C', 'C', 'pF/m', 1e12], ['L', 'L', 'nH/m', 1e9], ['G_1GHz', 'G at 1 GHz', 'mS/m', 1e3]];
+  for (const [key] of matrices) for (const line of [baseline, current]) {
+    if (!Array.isArray(line[key]) || line[key].length !== names.length ||
+        line[key].some(row => !Array.isArray(row) || row.length !== names.length || row.some(value => !Number.isFinite(value))))
+      return reject('Both results must contain finite C, L and G matrices with matching dimensions.');
+  }
+  const rows = [];
+  function add(key, label, unit, factor, before, after) {
+    const delta = after - before;
+    rows.push({key, label, unit, baseline: before * factor, current: after * factor,
+      delta: delta * factor, percent: before === 0 ? null : 100 * delta / Math.abs(before)});
+  }
+  if (!baseline.scalar_summary_unavailable && !current.scalar_summary_unavailable) {
+    const scalars = names.length === 1 ? [['z0', 'Characteristic impedance', 'Ω', 1], ['eps_eff', 'Effective permittivity', '1', 1], ['delay', 'Propagation delay', 'ns/m', 1e9]] :
+      [['z_diff', 'Differential impedance', 'Ω', 1], ['z_common', 'Common-mode impedance', 'Ω', 1], ['z_even', 'Even-mode impedance', 'Ω', 1], ['z_odd', 'Odd-mode impedance', 'Ω', 1], ['eps_eff_even', 'Even-mode permittivity', '1', 1], ['eps_eff_odd', 'Odd-mode permittivity', '1', 1]];
+    for (const [key, label, unit, factor] of scalars)
+      if (Number.isFinite(baseline[key]) && Number.isFinite(current[key])) add(key, label, unit, factor, baseline[key], current[key]);
+  }
+  for (const [key, label, unit, factor] of matrices)
+    for (let i = 0; i < names.length; i++) for (let j = 0; j < names.length; j++)
+      add(`${key}:${i}:${j}`, `${label} [${names[i]}, ${names[j]}]`, unit, factor, baseline[key][i][j], current[key][i][j]);
+  if (rows.some(row => ['baseline', 'current', 'delta', 'percent'].some(key => row[key] !== null && !Number.isFinite(row[key]))))
+    return reject('The displayed difference exceeds the finite numeric range.');
+  return {compatible: true, reason: '', rows};
+}

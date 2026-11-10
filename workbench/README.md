@@ -224,6 +224,31 @@ This does not establish general remeshing or all-result pointwise parity.
 Existing tolerances remain unchanged. All results retain the engine's physical
 model limits; a local aperture capacitance is not a complete 3D transition.
 
+## Keep a comparison baseline
+
+After a successful cross-section calculation, choose **Keep current as baseline**.
+The workspace takes a separate snapshot of that result and its actual geometry,
+mesh and engine metadata. Change a dimension, outer domain or mesh and calculate
+again to compare the new result. **Clear baseline** removes the snapshot; keeping
+a new result explicitly replaces it. Inspect the geometry/mesh details to see
+which physical inputs or numerical settings changed.
+
+Comparison requires one or two signals with the same names in the same order;
+it does not infer conductor correspondence. Shared finite scalar quantities and
+every C, L and G-at-1-GHz matrix entry are shown in the stated units. Asymmetric
+pairs retain matrix comparisons without inventing symmetric scalar summaries.
+Change means current minus baseline; the percentage divides by the absolute
+baseline value. Zero baselines have no percentage. A nonfinite matrix or an
+overflowing displayed difference refuses comparison.
+
+Editing inputs, failed calculations and cancellation hide current differences
+while retaining the baseline. Changing display units does not change either
+result. On narrow screens, the primary line metric moves above the other
+summary values; comparison tables scroll inside their panel. The snapshot lives only in this tab: it is not saved in an input project
+and disappears on reload. Use Saved analysis records for persistent execution
+history. Network traces and study rows are not compared here. A small difference
+alone is not a mesh/domain convergence certificate or an accuracy measurement.
+
 ## Windows candidate verification
 
 The topic-only `workbench-candidate.yml` workflow builds exact first-party

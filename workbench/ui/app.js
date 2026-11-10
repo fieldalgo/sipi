@@ -1,4 +1,4 @@
-import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, refinedMesh, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {scales, lengthFields, labels, isStripline, isPair, isCoplanar, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -10,7 +10,7 @@ let template = 'microstrip', unit = 'mm', imported = null, latest = null, busy =
 let cancelling = false, closed = false, latestNetwork = null, latestStudy = null;
 let runSequence = 0;
 let originalParameters = null, savedMesh = null, resolvedMesh = null, resolvedDomain = null;
-let projectText = null, activeDesign = null;
+let projectText = null, activeDesign = null, baseline = null;
 const changedFields = new Set();
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
 const allFields = [...lengthFields, 'profile', 'box_mode', 'air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
@@ -32,7 +32,7 @@ function setBusy(value) {
   $('design').disabled = value || !!imported;
   $('save-editable').disabled = value || !!imported;
   geometryFields(); studyControls();
-  projectControls(); meshControls();
+  projectControls(); meshControls(); comparisonControls();
 }
 
 function meshControls() {
@@ -68,6 +68,39 @@ function domainControls() {
     item.textContent = value == null ? '—' : `${Number((value / scales[unit]).toPrecision(10))} ${unit}`;
     $('domain-values').append(term, item);
   }
+}
+
+function comparisonControls() {
+  $('comparison-pin').disabled = busy || closed || !latest?.line;
+  $('comparison-clear').disabled = busy || closed || !baseline;
+  $('comparison-table-wrap').hidden = true;
+  $('comparison-rows').replaceChildren();
+  $('comparison-details').hidden = !baseline;
+  $('comparison-inputs').textContent = baseline ? JSON.stringify({
+    baseline: {label: baseline.label, pinned_at: baseline.pinnedAt, engine: baseline.result.engine, document: baseline.result.document},
+    current: latest?.line ? {engine: latest.engine, document: latest.document} : null,
+  }, null, 2) : '';
+  if (!baseline) {
+    $('comparison-status').textContent = 'Calculate, then keep a result as the comparison baseline.';
+    return;
+  }
+  const prefix = `Baseline: ${baseline.label}. `;
+  if (!latest?.line) {
+    $('comparison-status').textContent = prefix + 'Baseline retained. Calculate the current inputs to compare.';
+    return;
+  }
+  const comparison = compareLines(baseline.result.line, latest.line);
+  $('comparison-status').textContent = prefix + (comparison.compatible ? 'Current successful result compared below.' : comparison.reason);
+  if (!comparison.compatible) return;
+  const number = value => value === null ? '—' : String(Number(value.toPrecision(7)));
+  for (const item of comparison.rows) {
+    const row = document.createElement('tr'); row.dataset.comparisonKey = item.key;
+    for (const value of [`${item.label} (${item.unit})`, number(item.baseline), number(item.current), number(item.delta), number(item.percent)]) {
+      const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
+    }
+    $('comparison-rows').append(row);
+  }
+  $('comparison-table-wrap').hidden = false;
 }
 
 function projectControls() {
@@ -164,7 +197,7 @@ function clearResult() {
   $('result').hidden = true;
   $('history').hidden = true;
   latestStudy = null; $('study-result').hidden = true;
-  resolvedMesh = null; resolvedDomain = null; meshControls(); domainControls();
+  resolvedMesh = null; resolvedDomain = null; meshControls(); domainControls(); comparisonControls();
   status('Inputs changed. Calculate to update the results.');
 }
 
@@ -310,6 +343,7 @@ function render(result) {
   if (result.network) renderNetwork(result.network);
   if (result.study) renderStudy(result.study, result.runtime);
   const line = result.line;
+  comparisonControls();
   if (!line) return;
   $('result').hidden = false;
   const unavailable = line.scalar_summary_unavailable;
@@ -541,6 +575,15 @@ $('unit').addEventListener('change', () => {
   domainControls();
 });
 $('calculate').addEventListener('click', () => run('analyze'));
+$('comparison-pin').addEventListener('click', () => {
+  if (busy || closed || !latest?.line) return;
+  baseline = {result: structuredClone(latest), label: `${$('project-label').value} · ${imported ? 'Imported geometry' : labels[template]}`, pinnedAt: new Date().toISOString()};
+  comparisonControls();
+});
+$('comparison-clear').addEventListener('click', () => {
+  if (busy || closed) return;
+  baseline = null; comparisonControls();
+});
 $('mesh-inspect').addEventListener('click', () => run('mesh-inspect'));
 $('domain-inspect').addEventListener('click', () => run('domain-inspect'));
 $('mesh-refine').addEventListener('click', () => {
@@ -636,4 +679,4 @@ $('exit').addEventListener('click', async () => {
   try { await transport.close(); status('Application closed. You can close this browser tab.'); for (const element of document.querySelectorAll('button,input,select')) element.disabled = true; }
   catch (error) { closed = false; status(error.message, true); setBusy(false); }
 });
-geometryFields(); refreshStudyOptions(true); studyControls(); preview(); projectControls(); meshControls();
+geometryFields(); refreshStudyOptions(true); studyControls(); preview(); projectControls(); meshControls(); comparisonControls();

@@ -137,3 +137,20 @@ footer a{color:inherit;text-underline-offset:3px}
 #domain-inputs, #air-domain-fields { display: grid; gap: 12px; }
 #domain-inputs select { display: block; width: 100%; min-height: 44px; margin-top: 7px; padding: 8px 10px; }
 #domain-inputs .number { height: 46px; }
+
+.comparison { min-width: 0; }
+.comparison-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.comparison-actions button { min-height: 44px; }
+#comparison-status { font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.comparison-scroll { overflow: auto; max-height: 330px; }
+.comparison table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.comparison th, .comparison td { padding: 8px; border-bottom: 1px solid #e4eceb; text-align: right; }
+.comparison th:first-child, .comparison td:first-child { text-align: left; min-width: 160px; }
+.comparison td:not(:first-child) { white-space: nowrap; font-family: ui-monospace, monospace; }
+.comparison details { min-width: 0; }
+
+@media (max-width: 420px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metrics > .main-metric { grid-column: 1 / -1; }
+  .metrics > div:nth-child(2) { padding-left: 0; border-left: 0; }
+}
