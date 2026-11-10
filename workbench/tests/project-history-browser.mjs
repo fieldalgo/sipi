@@ -214,6 +214,23 @@ try {
   await saveRecord('unattached-record');
   assert.equal(await saveProject('unchanged-large-project'),cases.large);
   checks.push('combined project growth refuses attachment but preserves standalone record and original project');
+  await openProject(initialProject);
+  const materialInput=physical.material_goals[0].text;
+  await input(materialInput);const materialExecution=await recorded();
+  const materialRaw=await saveRecord('material-table-record'),materialRecord=JSON.parse(materialRaw);
+  assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),false);
+  await input(cases.changed);assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);
+  await saveProject('material-table-historical-project');
+  await choose('project-record',materialRecord.run_id);await click('project-view');
+  assert.match(await status(),/Historical input/);
+  const summary=await cdp.evaluate('({heading:document.querySelector("#material-results h3").textContent,numbers:Array.from(document.querySelectorAll("#material-results td[data-value]"),cell=>Number(cell.dataset.value))})');
+  assert.match(summary.heading,/^Saved run/);
+  const mr=materialExecution.result;
+  assert.deepEqual(summary.numbers,[mr.parameter,mr.target,mr.value,mr.residual,1,mr.target,mr.refined_value,mr.refined_residual,1]);
+  assert.equal(await saveRecord('material-table-viewed-record'),materialRaw);
+  assert.equal(await cdp.evaluate('document.querySelector("#input-text").value'),cases.changed);
+  await input(cases.changed_again);assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);
+  checks.push('historical material table uses its record, preserves current edits and raw bytes, then clears on edit');
   await openProject(cases.long);
   for(const width of [1400,390,320]){
     await cdp.call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});

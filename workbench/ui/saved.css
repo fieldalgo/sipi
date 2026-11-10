@@ -31,3 +31,14 @@
   .saved-example { grid-template-columns: minmax(0, 1fr); }
   .saved-example button { justify-self: start; }
 }
+.material-results { margin: 20px 0; min-width: 0; }
+.material-results h3 { margin: 0 0 10px; font-size: 17px; }
+.material-results > p { line-height: 1.5; }
+.material-table { max-width: 100%; overflow-x: auto; margin: 16px 0; border: 1px solid #dfe6e9; border-radius: 5px; }
+.material-table table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.material-table caption { text-align: left; padding: 12px; font-weight: 600; background: #f3f6f5; }
+.material-table th, .material-table td { padding: 10px 12px; text-align: left; vertical-align: top; border-top: 1px solid #dfe6e9; overflow-wrap: anywhere; }
+.material-table th { font-weight: 600; background: #fcfdfd; white-space: nowrap; }
+.material-table td:not([data-value]) { min-width: 7rem; max-width: 24rem; }
+.material-table td[data-value] { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.material-table:focus-visible { outline: 2px solid #137f75; outline-offset: 2px; }

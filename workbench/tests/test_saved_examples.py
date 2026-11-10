@@ -1,6 +1,8 @@
 """Delivered starting documents and their actual loopback static response."""
 import http.client
 import json
+
+import pytest
 from pathlib import Path
 
 from sipi import CrossSection, LumpedNetworkDocument
@@ -30,13 +32,14 @@ def test_catalog_documents_are_exact_validated_inputs_without_solving(monkeypatc
         assert row['label'] and row['description']
 
 
-def test_example_module_is_served_as_javascript_without_authentication(server):
+@pytest.mark.parametrize('module', ['saved-examples.js', 'material-results.js'])
+def test_ui_module_is_served_as_javascript_without_authentication(server, module):
     connection = http.client.HTTPConnection('127.0.0.1', server.server_port, timeout=10)
     try:
-        connection.request('GET', '/saved-examples.js')
+        connection.request('GET', '/' + module)
         response = connection.getresponse()
         assert response.status == 200
         assert response.getheader('Content-Type').split(';')[0] == 'text/javascript'
-        assert response.read() == (Path(__file__).resolve().parents[1] / 'ui/saved-examples.js').read_bytes()
+        assert response.read() == (Path(__file__).resolve().parents[1] / 'ui' / module).read_bytes()
     finally:
         connection.close()

@@ -1,6 +1,7 @@
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 import {SAVED_EXAMPLES} from './saved-examples.js';
+import {renderMaterialResults, clearMaterialResults} from './material-results.js';
 
 const $ = id => document.getElementById(id);
 const browser = document.documentElement.dataset.runtime === 'browser';
@@ -37,7 +38,7 @@ function invalidate() {
   if (projectText) projectDirty = true;
   projectNote();
   $('record-status').hidden = true;
-  $('output').hidden = true; $('output').textContent = '';
+  $('output').hidden = true; clearMaterialResults($('material-results')); $('output').textContent = '';
   $('diagnostic-status').hidden = true;
   state(busy ? 'Inputs changed. Cancel the current calculation to run these settings.' : 'Inputs changed. Check or run the updated analysis.');
   controls();
@@ -73,7 +74,7 @@ function showProject(preferredRun = null) {
 }
 function clearOutput() {
   checked = report = recorded = null;
-  $('output').hidden = true; $('output').textContent = '';
+  $('output').hidden = true; clearMaterialResults($('material-results')); $('output').textContent = '';
   $('diagnostic-status').hidden = true; $('record-status').hidden = true;
 }
 async function projectCall(input, current) {
@@ -104,6 +105,7 @@ function showStored(result) {
   const record = JSON.parse(result.record_text);
   report = checked = null; recorded = {text:result.record_text, environment:null};
   $('output').textContent = JSON.stringify(record.receipt.execution, null, 2); $('output').hidden = false;
+  renderMaterialResults($('material-results'), record.receipt.execution, {historical:true});
   $('diagnostic-status').hidden = true;
   const kind = projectDirty ? 'Current input has unsaved changes.' : !result.matches_current ? 'Historical input or execution settings.' :
     result.selected ? 'Selected in the saved project for this input.' : 'Matches this input but is not selected.';
@@ -164,7 +166,7 @@ async function run(action) {
   activeRun = current;
   busy = true; checked = report = recorded = null;
   $('record-status').hidden = true;
-  $('output').hidden = true; $('output').textContent = ''; $('diagnostic-status').hidden = true;
+  $('output').hidden = true; clearMaterialResults($('material-results')); $('output').textContent = ''; $('diagnostic-status').hidden = true;
   state(action === 'saved-normalize' ? 'Checking input…' : 'Calculating…'); controls();
   try {
     const pending = action === 'saved-record' && projectText ? await snapshot(current, input.text, input.controls) : null;
@@ -186,6 +188,7 @@ async function run(action) {
         $('record-status').hidden = false;
       }
       $('output').textContent = JSON.stringify(out, null, 2); $('output').hidden = false;
+      renderMaterialResults($('material-results'), out);
       if (out.status === 'failed') state('Target not met: ' + out.error.message, true);
       else if (out.status === 'incomplete') state(`${out.result.failed} sample(s) failed. All rows are retained; no summary was calculated.`, true);
       else state('Calculation complete. Review the result and model limits.');
@@ -271,7 +274,7 @@ $('project-file').onchange = async () => {
 };
 $('cancel').onclick = async () => {
   const current = ++generation; activeRun = current; busy = true;
-  checked = report = recorded = null; $('output').hidden = true; $('diagnostic-status').hidden = true;
+  checked = report = recorded = null; $('output').hidden = true; clearMaterialResults($('material-results')); $('diagnostic-status').hidden = true;
   $('record-status').hidden = true; controls();
   try { await transport.cancel(); if (current === generation) state('Calculation cancelled. You can run another input.'); }
   catch (error) { if (current === generation) state(error.message, true); }

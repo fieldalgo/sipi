@@ -449,3 +449,19 @@ the values in JSON, check them, run the analysis and save the input/result or
 project to continue later. Loading is disabled during a calculation or after
 shutdown. These are bounded starting inputs, not a visual editor for every
 engine model or a guarantee of accuracy for edited geometries and materials.
+
+## Read material results
+
+Saved scalar/pair material targets show selected input values and separate
+requested/refined target, impedance, residual and tolerance rows. Material
+studies show the original zero-based row index, sampled input values, impedance
+or retained error, and the engine's sample statistics only when all rows pass.
+A failed row never becomes a partial aggregate summary. Values use the input
+units and are rounded to seven significant digits on screen; raw JSON, exports
+and records retain the full reported values.
+
+Viewing a historical material record labels its table **Saved run** and uses
+that record's execution, even when the current input differs. Editing input,
+cancelling or starting another run clears the old table. Unsupported schemas,
+failed goals and unavailable display shapes retain the raw JSON view. Tables
+are a read-only presentation, with no additional solver or statistics step.

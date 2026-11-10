@@ -86,15 +86,55 @@ try {
     assert.ok((await cdp.evaluate('document.querySelector("#example-help").textContent')).length>20);
     await cdp.evaluate('document.querySelector("#example").click()');
     assert.deepEqual(await cdp.evaluate('JSON.parse(document.querySelector("#input-text").value)'),expected);
-    assert.equal(await cdp.evaluate('document.querySelector("#output").hidden && document.querySelector("#save-result").disabled'),true);
+    assert.equal(await cdp.evaluate('document.querySelector("#output").hidden && document.querySelector("#save-result").disabled && document.querySelector("#material-results").hidden'),true);
     assert.equal(await cdp.evaluate('document.querySelector("#characteristic").checked || document.querySelector("#modes").checked'),false);
+  }
+  async function checkResultView(out) {
+    const supported=out.error===null && ['sipi.impedance-study/4','sipi.impedance-design/3','sipi.pair-impedance-design/2'].includes(out.input.schema);
+    const view=await cdp.evaluate(`(()=>{const c=document.querySelector('#material-results');return {hidden:c.hidden,text:c.textContent,tables:Array.from(c.querySelectorAll('table'),t=>Array.from(t.querySelectorAll('tbody tr'),r=>Array.from(r.cells,cell=>({text:cell.textContent,value:cell.dataset.value??null}))))};})()`);
+    assert.equal(view.hidden,!supported);
+    if(!supported) {assert.deepEqual(view.tables,[]);return;}
+    const r=out.result;let expected;
+    if(out.input.schema==='sipi.impedance-study/4') {
+      const names=out.input.sampling.variables.map(v=>v.name);
+      expected=[r.rows.map(row=>[row.index,...names.map(name=>{
+        const binding=out.input.material_variables[name];
+        if(!binding)return row.parameters[name];
+        return binding.path.reduce((value,key)=>value[key],row.material_evaluation.materials[binding.region].parameters);
+      }),row.value,row.error===null?'Calculated':row.error_type+': '+row.error])];
+      if(r.failed) {assert.equal(r.summary,null);assert.match(view.text,/no aggregate summary/);}
+      else expected.push([['Minimum',r.summary.minimum],['Maximum',r.summary.maximum],['Mean',r.summary.mean],['Sample standard deviation',r.summary.sample_std],['5th percentile',r.summary.p05],['95th percentile',r.summary.p95]]);
+    } else if(out.input.schema==='sipi.impedance-design/3') {
+      expected=[[[out.input.variable,r.parameter]],[['Requested',r.target,r.value,r.residual,out.input.tolerance_ohm],['Refined',r.target,r.refined_value,r.refined_residual,out.input.tolerance_ohm]]];
+    } else {
+      expected=[out.input.variables.map((v,i)=>[v.name,r.parameters[i]]),...r.quantities.map((_,i)=>[
+        ['Requested',r.targets_ohm[i],r.impedances_ohm[i],r.residuals_ohm[i],r.tolerances_ohm[i]],
+        ['Refined',r.targets_ohm[i],r.refined_impedances_ohm[i],r.refined_residuals_ohm[i],r.tolerances_ohm[i]]])];
+    }
+    assert.deepEqual(view.tables,expected.map(rows=>rows.map(row=>row.map(value=>({text:value===null?'—':typeof value==='number'?String(Number(value.toPrecision(7))):value,value:typeof value==='number'?String(value):null})))));
+    assert.match(view.text,/7 significant digits/);
+  }
+  async function checkViewFallbackAndText(out) {
+    const before=await cdp.evaluate('document.querySelector("#output").textContent');
+    const observed=await cdp.evaluate(`(async()=>{
+      const {renderMaterialResults}=await import('./material-results.js'),c=document.querySelector('#material-results');
+      const original=${JSON.stringify(out)},mutations=[v=>v.input.schema='future/1',v=>v.result=null,v=>v.result.parameter=null,v=>v.result.value=Infinity];
+      const hidden=mutations.map(change=>{const copy=structuredClone(original);change(copy);renderMaterialResults(c,copy);return c.hidden&&c.children.length===0;});
+      const hostile=structuredClone(original);hostile.input.variable='<img src=x onerror="window.materialViewInjected=true">';
+      renderMaterialResults(c,hostile);const inert=c.textContent.includes(hostile.input.variable)&&c.querySelector('img')===null&&window.materialViewInjected===undefined;
+      renderMaterialResults(c,original);return {hidden,inert,unchanged:JSON.stringify(original)===${JSON.stringify(JSON.stringify(out))}};
+    })()`);
+    assert.ok(observed.hidden.every(Boolean));assert.equal(observed.inert,true);assert.equal(observed.unchanged,true);
+    assert.equal(await cdp.evaluate('document.querySelector("#output").textContent'),before);
+    await checkResultView(out);
   }
   async function calculate() {
     assert.equal(await cdp.evaluate('document.querySelector("#run").click();document.querySelector("#example-choice").disabled && document.querySelector("#example").disabled'),true);
     await until(()=>cdp.evaluate('!document.querySelector("#run").disabled'),'calculation finished',180000);
     assert.equal(await cdp.evaluate('document.querySelector("#example-choice").disabled || document.querySelector("#example").disabled'),false);
     assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),false,await status());
-    return cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');
+    const execution=await cdp.evaluate('JSON.parse(document.querySelector("#output").textContent)');
+    await checkResultView(execution);return execution;
   }
   assert.deepEqual(await cdp.evaluate('Array.from(document.querySelector("#example-choice").options, item=>item.value)'),
     ['rlc','constant-target','debye-target','pair-target','material-sweep','correlated-study']);
@@ -177,6 +217,7 @@ try {
     const exported=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-result.json'),'utf8'));}catch{}},'material result export');
     assert.deepEqual(exported.execution,got);
     await writeFile(join(output,'material-'+item.name+'.json'),JSON.stringify(exported,null,2));
+    if(item.name==='constant') await checkViewFallbackAndText(got);
     materialGoals.push({name:item.name,seconds,parameter:got.result.parameter,history:got.result.history.length});
   }
   const materialBatch = [];
@@ -255,11 +296,30 @@ try {
     const exported=await until(async()=>{try{return JSON.parse(await readFile(join(downloads,'sipi-result.json'),'utf8'));}catch{}},'batch material result export');
     assert.deepEqual(exported.execution,got);
     await writeFile(join(output,'batch-'+item.name+'.json'),JSON.stringify(exported,null,2));
+    if(item.name==='pair-goal' || item.name==='mixed-normal') await writeFile(join(output,'result-table-'+item.name+'.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+    if(item.name==='pair-goal' || item.name==='mixed-normal') {
+      await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+      assert.equal(await cdp.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+      await writeFile(join(output,'result-table-'+item.name+'-mobile.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+      await cdp.call('Emulation.setDeviceMetricsOverride',{width:1400,height:1100,deviceScaleFactor:1,mobile:false});
+    }
+    if(item.name==='mixed-normal') {
+      const probe=await cdp.evaluate(`(async()=>{
+        const {renderMaterialResults}=await import('./material-results.js'),c=document.querySelector('#material-results'),original=${JSON.stringify(got)};
+        const partial=structuredClone(original);partial.result.summary={mean:50};renderMaterialResults(c,partial);const hidden=c.hidden;
+        const hostile=structuredClone(original),failed=hostile.result.rows.find(row=>row.error!==null);
+        failed.error='<svg onload="window.materialErrorInjected=true">';renderMaterialResults(c,hostile);
+        const inert=c.textContent.includes(failed.error)&&c.querySelector('svg')===null&&window.materialErrorInjected===undefined;
+        renderMaterialResults(c,original);return {hidden,inert};
+      })()`);
+      assert.deepEqual(probe,{hidden:true,inert:true});await checkResultView(got);
+    }
     materialBatch.push({name:item.name,seconds,status:got.status});
   }
   await input('{"schema":"sipi.lumped-network/1","schema":"invalid"}');
   assert.equal(await cdp.evaluate('document.querySelector("#save-result").disabled'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);
   await cdp.evaluate('document.querySelector("#check").click()');
   await until(()=>cdp.evaluate('!document.querySelector("#check").disabled'),'duplicate rejection');
   assert.ok((await status()).toLowerCase().includes('duplicate'));
@@ -301,11 +361,13 @@ try {
   await cdp.evaluate('document.querySelector("#example-choice").value="rlc";document.querySelector("#example-choice").dispatchEvent(new Event("change"));document.querySelector("#example").click();document.querySelector("#run").click();document.querySelector("#cancel").click()');
   await until(async()=>(await status()).startsWith('Calculation cancelled'),'cancel pending start');
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);
   result=await calculate();assert.equal(result.status,'complete');
   // A late successful result must not replace edited input or become exportable.
   await cdp.evaluate(`document.querySelector('#run').click();document.querySelector('#input-text').value+=' ';document.querySelector('#input-text').dispatchEvent(new Event('input'));`);
   await until(()=>cdp.evaluate('!document.querySelector("#run").disabled'),'stale completion');
   assert.equal(await cdp.evaluate('document.querySelector("#output").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#material-results").hidden'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#save-result").disabled'),true);
   await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await cdp.evaluate('document.documentElement.scrollWidth <= innerWidth'),true);
@@ -316,7 +378,7 @@ try {
   if(!webRoot) await until(()=>server.exitCode===0,'server exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',
-    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,materialBatch,checks:['six canonical examples, explicit load and keyboard selection','busy/closed example controls','raw duplicate rejection','canonical input download','RLC native S within 1e-12',
+    externalRequests:remoteRequests,errors,workerTargets,capacitance3d,materialGoals,materialBatch,checks:['material result cells match exact execution with display rounding','malformed display fallback and inert hostile labels','summary clears on edits, cancellation and stale completion','six canonical examples, explicit load and keyboard selection','busy/closed example controls','raw duplicate rejection','canonical input download','RLC native S within 1e-12',
       'result download','constant/Debye material goals, selected models, refinement and exports','pair material goal and complete/incomplete material studies with exports','fixed-mesh 3D C/energy/charge and export','Unicode file input','incomplete study','refined target failure history','optional diagnostic failure',
       'pending-start cancellation and restart','stale completion rejection','mobile width','shutdown']},null,2));
   console.log('Saved analysis browser acceptance passed.');

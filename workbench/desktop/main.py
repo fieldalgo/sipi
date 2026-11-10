@@ -23,6 +23,7 @@ MAX_SECONDS = 300
 STATIC = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js',
           '/saved.html': 'saved.html', '/saved.js': 'saved.js',
           '/saved-examples.js': 'saved-examples.js',
+          '/material-results.js': 'material-results.js',
           '/saved.css': 'saved.css',
           '/build-info.json': 'build-info.json',
           '/transport.js': 'transport.js', '/styles.css': 'styles.css',
