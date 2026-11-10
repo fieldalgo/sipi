@@ -440,9 +440,9 @@ function preview() {
 
 function geometryFields() {
   $('top-width-field').hidden = $('profile').value !== 'tapered';
-  $('placement-fields').hidden = !['coupled_stripline', 'offset_stripline'].includes(template);
-  $('placement-mode-field').hidden = template === 'offset_stripline';
-  $('trace-height-field').hidden = template !== 'offset_stripline' && $('placement').value !== 'fixed';
+  $('placement-fields').hidden = !['coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
+  $('placement-mode-field').hidden = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
+  $('trace-height-field').hidden = !['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template) && $('placement').value !== 'fixed';
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
   $('coating-fields').hidden = !isCoated(template);
   const normal = isNormalFilm(template);
@@ -663,8 +663,8 @@ function chooseTemplate(name) {
     resolvedMesh = null; resolvedDomain = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
-    $('placement').value = name === 'offset_stripline' ? 'fixed' : 'centred';
-    if (name === 'offset_stripline') {
+    $('placement').value = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name) ? 'fixed' : 'centred';
+    if (['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name)) {
       lengthSI.trace_height = (lengthSI.height - lengthSI.thickness) / 2;
       $('trace_height').value = String(Number((lengthSI.trace_height / scales[unit]).toPrecision(10)));
     }

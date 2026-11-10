@@ -11,11 +11,12 @@ import sipi
 from sipi.templates import coated_microstrip, coupled_stripline, offset_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
+    'coplanar_stripline', 'coupled_coplanar_stripline',
     'conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'microstrip', 'stripline', 'coupled_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar')}
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
 TEMPLATES['offset_stripline'] = offset_stripline
-PAIR_TEMPLATES = {'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
+PAIR_TEMPLATES = {'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
 
 
 def engine_info():
@@ -126,7 +127,7 @@ def study_documents(request, nominal):
     parameters = request['parameters']
     allowed = {'width', 'top_width', 'substrate_height', 'plane_spacing', 'thickness',
                'gap', 'ground_gap', 'ground_width', 'eps_r', 'coating_thickness', 'coating_height', 'coating_eps_r'}
-    if request['template'] in ('coupled_stripline', 'offset_stripline') and parameters.get('trace_height') is not None:
+    if request['template'] in ('coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline') and parameters.get('trace_height') is not None:
         allowed.add('trace_height')
     names, low, high = [], [], []
     for variable in variables:
@@ -368,15 +369,27 @@ def execute(request, *, record_provider=None):
             # These defaults already resolve finite ground gaps or coating.
             # Keep their edge/growth settings before the mandatory independent
             # refinement; pre-refining both again can exceed the point budget.
-            if request['template'] not in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
+            if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline'):
+                # Resolve buried conductor edges without halving growth twice.
+                # The separate refinement and residual gates still apply.
+                mesh['edge_size'] /= 2
+            elif request['template'] not in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
                 mesh['edge_size'] /= 4
                 mesh['grade'] /= 2
+        search_options = {}
+        if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline'):
+            tolerance = settings.get('tolerance', 0.1)
+            if (isinstance(tolerance, bool) or not isinstance(tolerance, Real)
+                    or not math.isfinite(tolerance) or tolerance <= 0):
+                raise ValueError('tolerance must be a positive finite real number')
+            # Leave room for refinement drift without changing final acceptance.
+            search_options['search_tolerance'] = tolerance / 2
         result, line = sipi.seek_impedance(
             lambda width: factory(**{**params, 'width': width}),
             settings.get('bounds'), settings.get('target'),
             tolerance=settings.get('tolerance', 0.1),
             quantity='z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
-            mesh=mesh, max_evaluations=32, return_line=True)
+            mesh=mesh, max_evaluations=32, return_line=True, **search_options)
         # Matrix output must correspond to the returned design, not the initial width.
         out['document'] = sipi.CrossSectionDocument(
             result.document.section,
@@ -388,6 +401,7 @@ def execute(request, *, record_provider=None):
             'residual': result.residual, 'refined_residual': result.refined_residual,
             'mesh_change': result.mesh_change,
             'history': [vars(row) for row in result.history]}
+        out['design'].update(search_options)
     return out
 
 

@@ -71,7 +71,7 @@ Pass original serialized record text across JavaScript. Parsing and reserializin
 numbers can change their content digest. Artifact declarations remain
 `host-declared`; attaching a record does not audit or authenticate its provenance.
 Invocation IDs, stale-response handling, execution, actual artifact evidence and
-file publication remain host work. The twenty-one-form input-project screen does not
+file publication remain host work. The twenty-three-form input-project screen does not
 attach newly recorded results; use **Saved analysis** for that workflow.
 
 ## Keep analysis variants and recorded runs

@@ -1,5 +1,9 @@
 # Changelog
 
+- Add single and paired buried coplanar forms with explicit bottom-face height,
+  finite side grounds, exact editable projects, height studies and refined width goals.
+  매립 coplanar 단일·차동 폼에 도체 높이·측면 접지·편집 프로젝트·공차·폭 역산을 연결합니다.
+
 - Add an optional tighter direct impedance-search stopping tolerance while retaining
   the final refined acceptance tolerance, default behavior and evaluation budgets.
   직접 임피던스 역산의 탐색 종료 기준을 별도로 지정하고 최종 오차·기본 동작·평가 예산을 보존합니다.
