@@ -9,11 +9,11 @@ if (inBrowser) document.querySelector('.local').lastChild.textContent = ' Browse
 let template = 'microstrip', unit = 'mm', imported = null, latest = null, busy = false;
 let cancelling = false, closed = false, latestNetwork = null, latestStudy = null;
 let runSequence = 0;
-let originalParameters = null, savedMesh = null, resolvedMesh = null;
+let originalParameters = null, savedMesh = null, resolvedMesh = null, resolvedDomain = null;
 let projectText = null, activeDesign = null;
 const changedFields = new Set();
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
-const allFields = [...lengthFields, 'profile', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
+const allFields = [...lengthFields, 'profile', 'box_mode', 'air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
 
 function status(text, error = false) {
@@ -48,6 +48,26 @@ function meshControls() {
   $('mesh-inspect').disabled = busy || closed;
   $('mesh-refine').disabled = busy || closed || !!imported || !mesh;
   $('mesh-auto').disabled = busy || closed || !!imported || !savedMesh;
+}
+
+function domainControls() {
+  $('domain-inputs').hidden = !!imported;
+  $('air-domain-fields').hidden = isStripline(template);
+  $('box-width-field').hidden = $('box_mode').value !== 'fixed';
+  $('air-height-field').hidden = $('air_mode').value !== 'fixed';
+  $('box_mode').disabled = busy || !!imported;
+  $('air_mode').disabled = busy || !!imported || isStripline(template);
+  $('domain-inspect').disabled = busy || closed;
+  $('domain-mode').textContent = imported ? 'Imported geometry · bounds read only' : resolvedDomain ? 'Resolved calculation bounds' : 'Bounds not inspected';
+  const air = resolvedDomain && !imported && !isStripline(template) ? resolvedDomain.layers.at(-1).thickness : null;
+  const total = resolvedDomain?.layers.reduce((sum, layer) => sum + layer.thickness, 0);
+  $('domain-values').replaceChildren();
+  for (const [key, label, value] of [['width', 'Box width', resolvedDomain?.box.width], ['height', 'Total height', total], ['air', 'Air layer height', air]]) {
+    const term = document.createElement('dt'); term.textContent = label;
+    const item = document.createElement('dd'); item.dataset.domainKey = key;
+    item.textContent = value == null ? '—' : `${Number((value / scales[unit]).toPrecision(10))} ${unit}`;
+    $('domain-values').append(term, item);
+  }
 }
 
 function projectControls() {
@@ -144,7 +164,7 @@ function clearResult() {
   $('result').hidden = true;
   $('history').hidden = true;
   latestStudy = null; $('study-result').hidden = true;
-  resolvedMesh = null; meshControls();
+  resolvedMesh = null; resolvedDomain = null; meshControls(); domainControls();
   status('Inputs changed. Calculate to update the results.');
 }
 
@@ -157,6 +177,12 @@ function request(action) {
     network.network = {start_hz: Number($('frequency-start').value)*1e6, stop_hz: Number($('frequency-stop').value)*1e6, points: Number($('frequency-points').value), length: Number($('line-length').value)*1e-3, resistance: Number($('series-r').value), z_ref: Number($('reference-z').value)};
   }
   if (imported) return {action, document_text: imported, ...network};
+  for (const id of ['box_width', 'air_height']) {
+    if (!$(id).disabled && !$(id).checkValidity()) {
+      $('domain-settings').open = true; $(id).reportValidity();
+      throw new Error('Check the domain bounds.');
+    }
+  }
   if (!$('inputs').reportValidity()) throw new Error('Check the highlighted input.');
   const input = {action, template, parameters: currentParameters(), ...(savedMesh ? {mesh: {...savedMesh}} : {}), ...network};
   if (action === 'study') {
@@ -267,8 +293,9 @@ function preview() {
 function geometryFields() {
   $('top-width-field').hidden = $('profile').value !== 'tapered';
   $('coating-fields').hidden = template !== 'coated_microstrip';
+  domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['top_width', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'coating_height', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -319,7 +346,7 @@ function render(result) {
     $('refinement').textContent = `Width ${format(d.width / scales[unit], 6)} ${unit} · initial ${format(d.impedance, 5)} Ω · refined ${format(d.refined_impedance, 5)} Ω · mesh change ${format(d.mesh_change, 5)} Ω. Both meet the requested target tolerance.`;
     history(d.history);
   }
-  resolvedMesh = {...result.document.mesh}; meshControls();
+  resolvedMesh = {...result.document.mesh}; resolvedDomain = result.document; meshControls(); domainControls();
   // Retain a useful schematic rather than squeezing the signal into the full air box.
   preview();
   $('preview-label').textContent = 'Schematic · not to scale';
@@ -427,15 +454,18 @@ async function run(action) {
   if (busy) return;
   const sequence = ++runSequence;
   try {
-    const input = request(action === 'mesh-inspect' ? 'document' : action);
-    if (!['document', 'template-document', 'mesh-inspect'].includes(action)) clearResult();
+    const input = request(['mesh-inspect', 'domain-inspect'].includes(action) ? 'document' : action);
+    if (!['document', 'template-document', 'mesh-inspect', 'domain-inspect'].includes(action)) clearResult();
     setBusy(true);
     status(action === 'study' ? 'Calculating every sampled cross-section…' : action === 'network' ? 'Calculating the cross-section and frequency response…' : action === 'design' ? 'Searching the width range, then checking a finer mesh…' : action === 'analyze' ? (inBrowser ? 'Preparing the browser engine and calculating… The first load can take longer.' : 'Meshing the cross-section and solving locally…') : 'Validating the design file…');
     const result = await transport.run(input);
     if (sequence !== runSequence || closed) return;
-    resolvedMesh = {...result.document.mesh}; meshControls();
+    resolvedMesh = {...result.document.mesh}; resolvedDomain = result.document; meshControls(); domainControls();
     if (action === 'mesh-inspect') {
       status('Mesh settings inspected without solving or changing the design. Refinement is an explicit input change.');
+    }
+    else if (action === 'domain-inspect') {
+      status('Domain bounds inspected without solving or changing inputs. Vary bounds and compare results to check boundary sensitivity.');
     }
     else if (action === 'template-document') {
       downloadText(result.document_text, 'sipi-editable-design.json', 'application/json');
@@ -451,6 +481,7 @@ async function run(action) {
 function chooseTemplate(name) {
     template = name; imported = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
+    $('box_mode').value = 'auto'; $('air_mode').value = 'auto';
     $('import-note').hidden = true;
     $('inputs').hidden = false;
     for (const element of $('inputs').elements) element.disabled = false;
@@ -480,6 +511,9 @@ function restoreEditable(restored) {
     else $(id).value = String(v);
   }
   $('profile').value = originalParameters.top_width == null ? 'rectangular' : 'tapered';
+  $('box_mode').value = originalParameters.box_width == null ? 'auto' : 'fixed';
+  $('air_mode').value = originalParameters.air_height == null ? 'auto' : 'fixed';
+  resolvedDomain = restored.document;
   geometryFields(); refreshStudyOptions(true); studyControls(); preview();
 }
 for (const button of document.querySelectorAll('[data-template]')) {
@@ -487,6 +521,11 @@ for (const button of document.querySelectorAll('[data-template]')) {
 }
 $('inputs').addEventListener('submit', event => event.preventDefault());
 for (const id of allFields) $(id).addEventListener('input', () => {
+  if (['box_mode', 'air_mode'].includes(id) && $(id).value === 'fixed' && resolvedDomain) {
+    const field = id === 'box_mode' ? 'box_width' : 'air_height';
+    const value = id === 'box_mode' ? resolvedDomain.box.width : resolvedDomain.layers.at(-1).thickness;
+    lengthSI[field] = value; $(field).value = String(Number((value / scales[unit]).toPrecision(10)));
+  }
   if (lengthFields.includes(id)) lengthSI[id] = Number($(id).value) * scales[unit];
   changedFields.add(id);
   geometryFields(); refreshStudyOptions(); studyControls(); clearResult(); preview();
@@ -499,9 +538,11 @@ $('unit').addEventListener('change', () => {
   for (const label of document.querySelectorAll('.unit-label')) label.textContent = unit;
   preview();
   if (latest) render(latest);
+  domainControls();
 });
 $('calculate').addEventListener('click', () => run('analyze'));
 $('mesh-inspect').addEventListener('click', () => run('mesh-inspect'));
+$('domain-inspect').addEventListener('click', () => run('domain-inspect'));
 $('mesh-refine').addEventListener('click', () => {
   if (busy || closed || imported) return;
   try {

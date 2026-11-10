@@ -94,6 +94,32 @@ within its job limits, or independently validated. The editable path shares the
 native/Worker adapter; current-platform acceptance must use the exact staged
 engine and assets. Advancing the pin alone is not a Windows or Worker pass.
 
+## Set and inspect the finite domain
+
+Open **Domain bounds** to inspect the actual calculation width and total height
+without solving or changing inputs. Surface templates also show the air layer's
+height; striplines have no air-height control. Imported geometry exposes only
+read-only inspection. The preview remains a cropped schematic, not a drawing of
+the finite computational boundary.
+
+Choose **Set width** or **Set height** to enter an explicit box width or air-layer
+height in the current mm/mil display unit. When inspected values are available,
+selecting an explicit mode starts from that resolved value. Other original
+parameters and a previously fixed mesh stay unchanged. Unit changes do not
+round stored SI values. Use **Automatic** to return that dimension to the
+existing template default; automatic bounds can change when geometry changes.
+Fresh automatic requests omit optional bounds, and the existing template-file
+normalization fills their null defaults. Saved null and exact explicit values
+survive reopening and A/B input projects. These controls do not add domain
+sizes to the manufacturing-tolerance variables.
+
+Inspection preserves a displayed result; editing bounds clears it. Compare
+results for enlarged bounds separately from mesh refinement. A box that cannot
+contain the copper is rejected, and changing size does not certify convergence.
+For planar coatings, air height is the air layer above the coating, not the
+coating height measured from the substrate. Saved mesh settings are retained
+after domain edits, so check their suitability again for the changed region.
+
 ## Inspect and refine the mesh
 
 Open **Mesh settings** and choose **Inspect current mesh** to resolve the current

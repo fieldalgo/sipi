@@ -1,5 +1,5 @@
 export const scales = {mm: 1e-3, mil: 25.4e-6};
-export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'lower', 'upper'];
+export const lengthFields = ['width', 'top_width', 'height', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'box_width', 'air_height', 'lower', 'upper'];
 export const labels = {microstrip: 'Microstrip', stripline: 'Stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip'};
 export const isStripline = template => ['stripline', 'coupled_stripline'].includes(template);
 export const isPair = template => ['coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar'].includes(template);
@@ -17,7 +17,7 @@ export function refinedMesh(mesh) {
 export function parameterFields(template) {
   return {width: 'width', top_width: 'top_width', thickness: 'thickness',
     height: isStripline(template) ? 'plane_spacing' : 'substrate_height',
-    gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', coating_height: 'coating_height',
+    gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', box_width: 'box_width', air_height: 'air_height', coating_height: 'coating_height',
     eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
     coating_tan_delta: 'coating_tan_delta'};
 }
@@ -42,6 +42,9 @@ export function editableParameters(template, values, unit, original, changed, le
     if (Object.hasOwn(entered, key)) out[key] = entered[key];
   }
   if (changed.has('profile')) out.top_width = entered.top_width ?? null;
+  for (const [mode, key] of [['box_mode', 'box_width'], ...(!isStripline(template) ? [['air_mode', 'air_height']] : [])]) {
+    if (changed.has(mode)) out[key] = entered[key] ?? null;
+  }
   return out;
 }
 
@@ -67,6 +70,11 @@ export function parameters(template, values, unit) {
     out.coating_eps_r = positive('coating_eps_r');
     out.coating_tan_delta = positive('coating_tan_delta', true);
     if (out.coating_height <= out.thickness) throw new Error('Coating height must exceed copper thickness.');
+  }
+  for (const [mode, key] of [['box_mode', 'box_width'], ...(!isStripline(template) ? [['air_mode', 'air_height']] : [])]) {
+    const selected = values[mode] ?? 'auto';
+    if (!['auto', 'fixed'].includes(selected)) throw new Error(`Unknown ${key} mode.`);
+    if (selected === 'fixed') out[key] = positive(key) * scales[unit];
   }
   return out;
 }

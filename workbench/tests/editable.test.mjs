@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {editableParameters, parameterFields, scales, studyFields} from '../ui/model.js';
+import {editableParameters, parameterFields, scales, studyFields, isStripline} from '../ui/model.js';
 
 const originals = {
   microstrip: {width: .0005000000000123456, thickness: .0000350000000001, eps_r: 4.123456789012345, tan_delta: .0123456789012345, substrate_height: .0010000000000123, top_width: null, air_height: .0067, box_width: .023},
@@ -57,4 +57,39 @@ test('coplanar ground controls preserve the other exact inputs and expose studie
   const fields=studyFields('coupled_grounded_coplanar',p);
   assert.equal(fields.ground_gap,'Signal–ground gap');assert.equal(fields.ground_width,'Ground width');
   assert.equal(studyFields('microstrip',originals.microstrip).ground_gap,undefined);
+});
+
+
+for (const [name, original] of Object.entries(originals)) {
+  test(`${name}: domain controls retain omitted/null/exact inputs and explicitly reset`, () => {
+    const keys=isStripline(name) ? ['box_width'] : ['box_width','air_height'];
+    for (const shape of ['original','omitted','null']) for (const unit of ['mm','mil']) {
+      const p={...original};
+      if(shape==='omitted')for(const key of keys)delete p[key];
+      if(shape==='null')for(const key of keys)p[key]=null;
+      const {values,si}=form(name,p,unit);
+      values.box_mode=p.box_width==null?'auto':'fixed';values.air_mode=p.air_height==null?'auto':'fixed';
+      assert.deepEqual(editableParameters(name,values,unit,p,new Set(),si),p);
+      const changed=new Set();
+      for(const key of keys){const mode=key==='box_width'?'box_mode':'air_mode';values[mode]='fixed';
+        si[key]=key==='box_width'?.02400000000012345:.00800000000012345;values[key]=String(Number((si[key]/scales[unit]).toPrecision(10)));changed.add(mode);}
+      const edited=editableParameters(name,values,unit,p,changed,si);
+      assert.deepEqual(edited,{...p,...Object.fromEntries(keys.map(k=>[k,si[k]]))});
+      for(const key of keys)values[key==='box_width'?'box_mode':'air_mode']='auto';
+      assert.deepEqual(editableParameters(name,values,unit,edited,changed,si),{...p,...Object.fromEntries(keys.map(k=>[k,null]))});
+    }
+  });
+}
+
+test('inactive domain fields cannot add air to stripline or block automatic bounds', () => {
+  const p=originals.microstrip,{values,si}=form('microstrip',p,'mm');
+  Object.assign(values,{box_mode:'auto',air_mode:'auto',box_width:'',air_height:'-1'});
+  assert.deepEqual(editableParameters('microstrip',values,'mm',p,new Set(),si),p);
+  for(const key of ['box_width','air_height']) {
+    const mode=key==='box_width'?'box_mode':'air_mode';values[mode]='fixed';
+    assert.throws(()=>editableParameters('microstrip',values,'mm',p,new Set([mode]),si),/positive/);values[mode]='auto';
+  }
+  const st=form('stripline',originals.stripline,'mm');
+  Object.assign(st.values,{box_mode:'auto',air_mode:'fixed',air_height:'-1'});
+  assert.deepEqual(editableParameters('stripline',st.values,'mm',originals.stripline,new Set(['air_mode']),st.si),originals.stripline);
 });

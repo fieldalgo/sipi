@@ -34,8 +34,8 @@ h3{font-size:11px;font-weight:650;margin:0}
 .section-label>span{font-size:9px;color:#8a98a0}
 select{font:inherit;font-size:11px;color:#5a707b;background:#f6f8f9;border:1px solid #e4e9ec;border-radius:4px;padding:3px}
 .fields{display:grid;gap:15px}
-.mesh-settings{margin-top:24px;border-top:1px solid #edf0f2;padding-top:18px}
-.mesh-settings summary{cursor:pointer;font-size:12px;font-weight:600}
+.mesh-settings,.domain-settings{margin-top:24px;border-top:1px solid #edf0f2;padding-top:18px}
+.mesh-settings summary,.domain-settings summary{cursor:pointer;font-size:12px;font-weight:600}
 .mesh-values{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:#627580}
 .mesh-values dd{margin:0;text-align:right;overflow-wrap:anywhere}
 .mesh-actions{display:grid;gap:8px}
@@ -133,3 +133,7 @@ footer a{color:inherit;text-underline-offset:3px}
 .project-fields input, .project-fields select { width: 100%; box-sizing: border-box; margin-top: 8px; height: 36px; padding: 8px 10px; border: 1px solid #dfe6e9; border-radius: 5px; font: inherit; color: #263f4d; background: #fcfdfd; }
 .project-fields button { flex: 0 1 auto; }
 @media(max-width: 700px) { .project-panel { padding: 20px; } }
+
+#domain-inputs, #air-domain-fields { display: grid; gap: 12px; }
+#domain-inputs select { display: block; width: 100%; min-height: 44px; margin-top: 7px; padding: 8px 10px; }
+#domain-inputs .number { height: 46px; }

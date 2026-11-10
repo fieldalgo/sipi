@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add explicit or automatic box-width and surface air-height controls, with non-solving inspection of resolved bounds. Preserve canonical nullable inputs, exact SI values, fixed mesh and A/B files; keep imported bounds read-only and domain convergence separate from mesh refinement.
+
 - Add an editable coupled grounded-coplanar form with distinct signal and ground gaps, finite ground width, differential targeting, four-port response and ground-dimension studies. Preserve exact project inputs and mesh, and keep inactive geometry controls from blocking other forms. Validate the zero-thickness vacuum limit against independent image panels and retain separate mesh/domain checks. Avoid redundant automatic edge/growth pre-refinement for this pair while retaining the mandatory target refinement and existing point limit.
 
 - Select an extracted executable explicitly for Windows onefile recording, retain normalized same-root checks, and preserve the original smoke failure while gracefully stopping the candidate or its owned process tree. Keep the actual Windows recording and cleanup gate required.
