@@ -1,5 +1,7 @@
 # Installed local workbench
 
+Conductor labels move to free rows when their text overlaps; leader lines identify moved labels. The conductor geometry and saved dimensions stay unchanged.
+
 [한국어](../../locales/ko/pages/packages/sipi/local_ui.md)
 
 After installing a validated development SIPI wheel and its matching dependencies,

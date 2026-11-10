@@ -172,6 +172,7 @@ function svgNode(name, attrs, text) {
 function draw(model) {
   const svg = $('cross-section');
   svg.replaceChildren();
+  svg.setAttribute('viewBox', '0 0 760 300');
   if (!model || !Array.isArray(model.layers) || !Array.isArray(model.traces) || model.layers.length > 64 || model.traces.length > 64) return;
   const height = model.layers.reduce((a, layer) => a + layer.thickness, 0);
   const width = model.box?.width;
@@ -187,6 +188,7 @@ function draw(model) {
     svg.append(svgNode('text', {x: 77, y: y((top + base) / 2) + 4, fill: '#72928e', 'font-size': 11}, `${String(layer.name).slice(0, 30)} · εr ${format(layer.eps_r, 2)}`));
     base = top;
   });
+  const traceLabels = [];
   for (const trace of model.traces) {
     if (![trace.x, trace.y, trace.width, trace.thickness].every(Number.isFinite) || trace.width <= 0 || trace.thickness < 0) continue;
     const h = trace.thickness === 0 ? 4 : trace.thickness / height * 210;
@@ -195,7 +197,8 @@ function draw(model) {
     const points = [[trace.x - trace.width/2, trace.y], [trace.x + trace.width/2, trace.y], [trace.x + topWidth/2, trace.y + trace.thickness], [trace.x - topWidth/2, trace.y + trace.thickness]];
     if (topWidth !== trace.width && trace.thickness > 0) svg.append(svgNode('polygon', {points: points.map(([px, py]) => `${x(px)},${y(py)}`).join(' '), fill:'#b58b51', 'data-trace':trace.name}));
     else svg.append(svgNode('rect', {x: x(trace.x - trace.width / 2), y: y(trace.y) - h, width: trace.width / width * 630, height: h, fill: '#b58b51', rx: 0.5}));
-    svg.append(svgNode('text', {x: x(trace.x), y: y(trace.y) - h - 13, fill: '#8f714e', 'font-size': 11, 'text-anchor': 'middle'}, `${trace.ground ? 'GND' : String(trace.name).slice(0, 20)} · ${format(trace.width / scales[unit])} ${unit}`));
+    traceLabels.push({x: x(trace.x), y: y(trace.y) - h - 13, tip: y(trace.y) - h,
+      text: `${trace.ground ? 'GND' : String(trace.name).slice(0, 20)} · ${format(trace.width / scales[unit])} ${unit}`});
   }
   for (const [boundary, py] of [['bottom', 245], ['top', 35]]) {
     if (model.box[boundary] === 'ground') {
@@ -203,6 +206,38 @@ function draw(model) {
       svg.append(svgNode('text', {x: 695, y: py + (boundary === 'bottom' ? 22 : -10), fill: '#a0825c', 'font-size': 10, 'text-anchor': 'end'}, 'GROUND PLANE'));
     }
   }
+  // Measure rendered text rather than estimating character widths. Keep the
+  // geometry fixed and move crowded labels to a free row, with a leader back
+  // to the conductor. Dense imported sections can extend below the drawing.
+  const occupied = [...svg.querySelectorAll('text, rect[fill="#b58b51"], polygon')].map(node => node.getBBox());
+  let bottom = 300;
+  for (const label of traceLabels) {
+    const node = svgNode('text', {x: label.x, y: label.y, fill: '#8f714e', 'font-size': 11, 'text-anchor': 'middle'}, label.text);
+    svg.append(node);
+    const size = node.getBBox();
+    const px = Math.max(8 + size.width / 2, Math.min(752 - size.width / 2, label.x));
+    node.setAttribute('x', px);
+    let box;
+    for (let attempt = 0; ; attempt++) {
+      const offset = attempt === 0 ? 0 : Math.ceil(attempt / 2) * 18 * (attempt % 2 ? -1 : 1);
+      const py = attempt < 32 ? label.y + offset : bottom + 18;
+      node.setAttribute('y', py);
+      box = node.getBBox();
+      if (box.y < 8 || (attempt < 32 && box.y + box.height > 280)) continue;
+      if (occupied.some(b => box.x < b.x + b.width + 4 && b.x < box.x + box.width + 4 && box.y < b.y + b.height + 4 && b.y < box.y + box.height + 4)) continue;
+      break;
+    }
+    bottom = Math.max(bottom, box.y + box.height + 12);
+    occupied.push(box);
+    if (Math.abs(px - label.x) > 1 || Math.abs(Number(node.getAttribute('y')) - label.y) > 1) {
+      svg.insertBefore(svgNode('line', {x1: label.x, y1: label.tip, x2: px,
+        y2: label.tip < box.y ? box.y - 3 : box.y + box.height + 3,
+        stroke: '#a0825c', 'stroke-width': 0.7}), node);
+    }
+    svg.insertBefore(svgNode('rect', {x: box.x - 3, y: box.y - 2, width: box.width + 6,
+      height: box.height + 4, fill: '#ffffff', 'fill-opacity': 0.88, rx: 2}), node);
+  }
+  svg.setAttribute('viewBox', `0 0 760 ${bottom}`);
 }
 
 function preview() {

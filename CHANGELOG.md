@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Separate crowded conductor labels in the cross-section preview using measured text bounds and leader lines, without changing conductor geometry or saved inputs.
+
 - Add a coupled-stripline form with full ground-plane spacing, edge gap, differential width targeting, four-port response and differential studies. Preserve exact editable/project inputs, nullable offset/taper values and mesh through unit changes and reopen; retain coarse-mesh target failures and their refinement history.
 
 - Add a bounded recording provider for the reviewed Windows onefile candidate: identify the extracted executable and complete bundle before/after a saved run, retain raw record/project contracts and refuse changing or invalid payloads. Extend the real Windows smoke to independently verify extracted files and recorded history; platform acceptance still requires that exact build to pass.
