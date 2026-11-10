@@ -445,7 +445,7 @@ The catalog includes an RLC network, constant or Debye material targets, paired
 differential/common targets, a dielectric sweep and a correlated dielectric
 study. Choosing an item only changes its description; loading it replaces the
 input, clears stale results and leaves existing project history intact. Edit
-the values in JSON, check them, run the analysis and save the input/result or
+the values, check them, run the analysis and save the input/result or
 project to continue later. Loading is disabled during a calculation or after
 shutdown. These are bounded starting inputs, not a visual editor for every
 engine model or a guarantee of accuracy for edited geometries and materials.
@@ -465,3 +465,25 @@ that record's execution, even when the current input differs. Editing input,
 cancelling or starting another run clears the old table. Unsupported schemas,
 failed goals and unavailable display shapes retain the raw JSON view. Tables
 are a read-only presentation, with no additional solver or statistics step.
+
+## Edit a material target
+
+Load the constant or Debye material target example to open **Material target
+settings**. Change the target and allowed error in ohms, positive ordered
+search bounds, evaluation frequency in Hz and evaluation budget (3–128).
+The form supports a single constant relative-permittivity or Debye-strength
+binding in `sipi.impedance-design/3`; other inputs retain the JSON workflow.
+The quantity, material region and searched parameter are identified above the
+fields. Geometry, material poles, mesh and fixed dimensions remain unchanged.
+
+Edits are drafts until **Apply settings**. Checking, running and saving the
+current design are disabled while a draft exists; **Reset form** restores the
+current input's values. Applying checks the original and proposed documents
+with the existing engine validator, without solving. Invalid settings leave
+the input unchanged. A successful apply updates the JSON and clears previous
+results, while project history remains available. You can then run, record,
+save the project and reopen it. Loading another input replaces any unapplied
+draft; it does not modify a historical record. The form is disabled while busy
+or closed. Editing JSON remains available, and cancels acceptance of a pending
+form update. Material model validity and requested/refined target checks still
+apply; this is not a new optimization or accuracy guarantee.

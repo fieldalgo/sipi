@@ -35,7 +35,7 @@ def test_saved_actions_reuse_engine_and_strict_raw_text():
 
 
 def test_saved_pages_and_spawned_result_roundtrip(server):
-    for path in ('/saved.html', '/saved.js', '/saved.css', '/saved-examples.js', '/material-results.js'):
+    for path in ('/saved.html', '/saved.js', '/saved.css', '/saved-examples.js', '/material-results.js', '/material-goal-form.js'):
         assert call(server, 'GET', path, authenticated=False)[0] == 200
     assert call(server, 'POST', '/api/job', dict(action='saved-analyze', text=text()))[0] == 202
     got = finish(server)

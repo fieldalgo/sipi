@@ -2,6 +2,7 @@ import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 import {SAVED_EXAMPLES} from './saved-examples.js';
 import {renderMaterialResults, clearMaterialResults} from './material-results.js';
+import {createMaterialGoalEditor, applyMaterialGoalSettings} from './material-goal-form.js';
 
 const $ = id => document.getElementById(id);
 const browser = document.documentElement.dataset.runtime === 'browser';
@@ -14,12 +15,14 @@ let generation = 0, activeRun = null, busy = false, closed = false, checked = nu
 let recorded = null;
 let projectText = null, activeDesign = null, projectDirty = false;
 const bytes = value => new TextEncoder().encode(value).length;
+const materialEditor = createMaterialGoalEditor($('material-goal-editor'), {onDraft:invalidate, onApply:applyMaterialSettings});
 
 function state(message, error = false) {
   $('status').textContent = message;
   $('status').classList.toggle('error', error);
 }
 function controls() {
+  materialEditor.sync($('input-text').value, busy || closed);
   for (const id of ['open', 'example', 'example-choice', 'check', 'run', 'record']) $(id).disabled = busy || closed;
   $('save-input').disabled = busy || closed || checked === null;
   $('save-result').disabled = busy || closed || report === null;
@@ -32,6 +35,10 @@ function controls() {
   for (const id of ['project-view', 'project-select', 'project-remove']) $(id).disabled = busy || closed || !$('project-record').value;
   $('project-clear').disabled = busy || closed || projectText === null;
   $('cancel').disabled = closed;
+  if (materialEditor.dirty) {
+    for (const id of ['check','run','record','save-input','project-start','project-save','project-duplicate',
+      'project-design','project-select','project-clear','project-remove']) $(id).disabled = true;
+  }
 }
 function invalidate() {
   ++generation; checked = report = recorded = null;
@@ -84,6 +91,7 @@ async function projectCall(input, current) {
   return result;
 }
 async function snapshot(current, text = $('input-text').value, settings = executionControls()) {
+  if (materialEditor.dirty) throw new Error('Apply or reset the material settings before saving the input.');
   const label = $('project-label').value;
   if (!label.trim()) throw new Error('Enter a design name.');
   if (bytes(text) > 200*1024) throw new Error('Input exceeds 200 KiB.');
@@ -146,6 +154,7 @@ async function projectOperation(operation, target) {
   finally { if (activeRun === current) { activeRun = null; busy = false; controls(); } }
 }
 function request(action) {
+  if (materialEditor.dirty) throw new Error('Apply or reset the material settings before checking or running.');
   const text = $('input-text').value;
   if (!text.trim()) throw new Error('Open or enter an analysis input first.');
   if (bytes(text) > 200 * 1024) throw new Error('Input exceeds 200 KiB.');
@@ -157,6 +166,23 @@ function request(action) {
   }
   if (bytes(JSON.stringify(input)) > 256 * 1024) throw new Error('Encoded input exceeds the 256 KiB request limit.');
   return input;
+}
+async function applyMaterialSettings(source, drafts) {
+  if (busy || closed || source !== $('input-text').value) return;
+  try { applyMaterialGoalSettings(JSON.parse(source), drafts); }
+  catch (error) { state(error.message, true); return; }
+  const current = ++generation; activeRun = current; busy = true; controls(); state('Checking material settings…');
+  try {
+    // Validate the original text first: parsing in JavaScript must not silently
+    // accept duplicate keys or repair a malformed saved input during editing.
+    const original = await projectCall({action:'saved-normalize',text:source},current);
+    const candidate = applyMaterialGoalSettings(JSON.parse(original.document_text),drafts);
+    const result = await projectCall({action:'saved-normalize',text:JSON.stringify(candidate)},current);
+    if (source !== $('input-text').value || current !== generation || closed) return;
+    $('input-text').value = result.document_text; materialEditor.clearDraft(); invalidate(); checked = result.document_text;
+    state('Material settings applied and checked. Run the analysis to calculate the new target.');
+  } catch (error) { if(current === generation && !closed) state(error.message,error.name !== 'AbortError'); }
+  finally { if(activeRun === current){activeRun=null;busy=false;controls();} }
 }
 async function run(action) {
   if (busy || closed) return;
@@ -227,7 +253,7 @@ $('file').onchange = async () => {
     if (file.size > 200 * 1024) throw new Error('Input exceeds 200 KiB.');
     const text = await file.text();
     if (current !== generation || closed) return;
-    $('input-text').value = text; state('File opened. Check or run its saved settings.');
+    $('input-text').value = text; controls(); state('File opened. Check or run its saved settings.');
   } catch (error) { if (current === generation) state(error.message, true); }
 };
 $('example-choice').onchange = () => {
@@ -239,6 +265,7 @@ $('example').onclick = () => {
   if (!example) { state('Choose an example before loading it.', true); return; }
   invalidate(); $('input-text').value = JSON.stringify(example.document, null, 2);
   $('characteristic').checked = $('modes').checked = false;
+  controls();
   state(`${example.label} example loaded. Edit its values, check the input or run the analysis.`);
 };
 $('check').onclick = () => run('saved-normalize');

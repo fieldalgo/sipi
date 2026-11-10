@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Edit constant-permittivity and Debye-strength scalar target settings in saved analysis. Apply explicitly through the existing input validator, retain geometry/material poles/mesh, and block calculations using unapplied settings. Unsupported documents remain in the JSON workflow.
+
 - Show readable material target and study tables in saved analysis, retaining separate requested/refined results, every failed row and exact JSON exports. Historical tables use their saved run and clear when input changes; unsupported display shapes keep the raw JSON view.
 
 - Add a saved-analysis example selector for validated material targets and studies alongside the default RLC network. Load inputs explicitly, preserve project history, and disable loading during calculations or after shutdown.

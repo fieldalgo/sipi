@@ -9,6 +9,7 @@ from sipi import CrossSection, LumpedNetworkDocument
 from sipi.execution import normalize_saved
 from material_goal_cases import material_goal
 from paired_material_cases import pair_material_goal, material_study
+from material_goal_form_cases import edited_goal
 from test_desktop import server
 
 
@@ -32,7 +33,7 @@ def test_catalog_documents_are_exact_validated_inputs_without_solving(monkeypatc
         assert row['label'] and row['description']
 
 
-@pytest.mark.parametrize('module', ['saved-examples.js', 'material-results.js'])
+@pytest.mark.parametrize('module', ['saved-examples.js', 'material-results.js', 'material-goal-form.js'])
 def test_ui_module_is_served_as_javascript_without_authentication(server, module):
     connection = http.client.HTTPConnection('127.0.0.1', server.server_port, timeout=10)
     try:
@@ -43,3 +44,20 @@ def test_ui_module_is_served_as_javascript_without_authentication(server, module
         assert response.read() == (Path(__file__).resolve().parents[1] / 'ui' / module).read_bytes()
     finally:
         connection.close()
+
+
+@pytest.mark.parametrize('kind', ['constant', 'debye'])
+def test_edited_material_goal_validates_without_meshing(kind, monkeypatch):
+    original = material_goal(kind).to_dict()
+    def forbidden(*args, **kwargs):
+        raise AssertionError('editing or normalizing must not solve')
+    monkeypatch.setattr(CrossSection, 'mesh', forbidden)
+    edited = edited_goal(kind).to_dict()
+    assert json.loads(normalize_saved(json.dumps(edited))) == edited
+    assert edited['target_ohm'] == 51 and edited['bounds'] == [2.5, 7.5]
+    assert edited['material_evaluation']['frequency_hz'] == 2e8
+    assert edited['max_evaluations'] == 48
+    edited.update(target_ohm=original['target_ohm'], bounds=original['bounds'],
+                  max_evaluations=original['max_evaluations'])
+    edited['material_evaluation']['frequency_hz'] = original['material_evaluation']['frequency_hz']
+    assert edited == original

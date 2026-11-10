@@ -5,7 +5,7 @@ from setuptools.command.build_py import build_py
 
 ROOT = Path(__file__).resolve().parent
 UI_FILES = ('app.js', 'browser-transport.js', 'index.html', 'model.js',
-            'saved.css', 'saved.html', 'saved.js', 'saved-examples.js', 'material-results.js',
+            'saved.css', 'saved.html', 'saved.js', 'saved-examples.js', 'material-results.js', 'material-goal-form.js',
             'styles.css', 'transport.js', 'worker.js')
 
 
