@@ -118,7 +118,7 @@ try {
       {encoding:'utf8',env:{...process.env,OPENBLAS_NUM_THREADS:'1'}});
     assert.equal(casesResult.status,0,casesResult.stderr);const cases=JSON.parse(casesResult.stdout);
 
-    for(const [name,status] of [['study','incomplete'],['goal','failed']]) {
+    for(const [name,status] of [['study','incomplete'],['goal','failed'],['mesh_goal','failed']]) {
       const recordedOutput=await run({action:'saved-record',text:cases[name]});
       const saved=JSON.parse(recordedOutput.record_text);assert.equal(saved.receipt.execution.status,status);
       const checked=await run({action:'project-create',text:cases[name],project_id:'p:'+name,design_id:'a',title:name,label:'A'});
@@ -128,7 +128,19 @@ try {
       assert.equal(lookup.record_text,recordedOutput.record_text);assert.equal(lookup.selected,true);assert.equal(lookup.matches_current,true);
       assert.deepEqual(stored,saved);
       if(name==='study') assert.ok(saved.receipt.execution.result.failed>0);
-      else assert.equal(saved.receipt.execution.error.history.at(-1).stage,'refinement');
+      else if(name==='goal') assert.equal(saved.receipt.execution.error.history.at(-1).stage,'refinement');
+      else {
+        const failure=saved.receipt.execution.error;
+        assert.equal(saved.receipt.execution.result,null);
+        assert.equal(failure.type,'GoalMeshSizeLimitError');
+        assert.equal(failure.cause_type,'MeshSizeLimitError');
+        assert.equal(failure.stage,'search');assert.equal(failure.attempts,1);
+        assert.deepEqual(failure.history,[]);assert.equal(failure.parameter,.0002);
+        assert.deepEqual(failure.input.mesh,{edge_size:1e-12,far_size:.0002,grade:.2,min_angle:28});
+        assert.equal(failure.input.traces[0].width,.0002);
+        assert.equal(failure.material_evaluation,null);
+        assert.match(failure.message,/300000 points/);
+      }
       await writeFile(join(output,'record-'+name+'.json'),recordedOutput.record_text);
     }
     const cancelled=await cdp.evaluate(`(async()=>{const pending=window.recordTransport.run(${JSON.stringify(input)}).then(()=>({accepted:true}),e=>({accepted:false,name:e.name}));await window.recordTransport.cancel();return pending;})()`);
@@ -140,6 +152,7 @@ try {
     checks=['real recorded calculation','same semantic receipt with unique run IDs','exact old saved execution',
       'raw project attachment','numeric reserialization rejected','history retained on edit','stale selection rejected',
       'caller provenance rejected','incomplete-study record/project history','failed refined-goal record/project history',
+      'actual mesh-budget failure retained with exact failed input in record and project',
       'raw current and historical project lookup','missing record rejected','pending cancellation and restart'];
   }
   await cdp.evaluate('window.recordTransport.close()');

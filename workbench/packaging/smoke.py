@@ -238,6 +238,30 @@ def exercise(source, report):
             report['recorded_execution'] = dict(record_text=first['record_text'],
                 runtime_manifest_text=first['runtime_manifest_text'], second_run_id=b.run_id,
                 **checked, project_roundtrip=True)
+            report['phase'] = 'recorded goal mesh-budget failure'
+            from sipi import ImpedanceDesignDocument
+            goal = ImpedanceDesignDocument('stripline',
+                dict(width=.3e-3, plane_spacing=1e-3, eps_r=4, box_width=6e-3),
+                variable='width', bounds=[.2e-3, .4e-3], target=50., tolerance=.1,
+                mesh=dict(edge_size=1e-12, far_size=.2e-3, grade=.2))
+            failed = job(dict(action='saved-record', text=goal.dumps()))
+            record = SavedExecutionRecord.loads(failed['record_text'])
+            result = record.receipt['execution']; error = result['error']
+            assert result['status'] == 'failed' and result['result'] is None
+            assert error['type'] == 'GoalMeshSizeLimitError' and error['cause_type'] == 'MeshSizeLimitError'
+            assert error['stage'] == 'search' and error['attempts'] == 1 and error['history'] == []
+            assert error['parameter'] == .0002 and error['input']['traces'][0]['width'] == .0002
+            assert error['input']['mesh'] == dict(edge_size=1e-12, far_size=.0002, grade=.2, min_angle=28.)
+            assert error['material_evaluation'] is None and '300000 points' in error['message']
+            verify_recording(failed, bundle, report['build'], result)
+            project = job(dict(action='project-create', text=goal.dumps(), project_id='failed-goal',
+                               design_id='a', title='Failed goal', label='A'))
+            attached = job(dict(action='project-attach', project_text=project['project_text'],
+                                design_id='a', record_text=failed['record_text'], select=True))
+            assert SavedProject.loads(attached['project_text']).current_record('a').dumps() == record.dumps()
+            report['goal_mesh_failure'] = dict(record_text=failed['record_text'], project_roundtrip=True)
+            # The failed result must not poison the next valid calculation.
+            assert job(dict(action='saved-analyze', text=raw))['execution'] == report['saved_analysis']
             report['phase'] = 'shutdown'
             request('/api/shutdown', {})
             process.wait(timeout=20)

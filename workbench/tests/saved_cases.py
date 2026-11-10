@@ -2,7 +2,7 @@
 import json
 from sipi import (LumpedNetworkDocument, EllipticalAperture, RoundConductor,
     ApertureSectionDocument, ApertureStudyDocument, ApertureDesignDocument,
-    CrossSectionDocument, microstrip)
+    CrossSectionDocument, ImpedanceDesignDocument, microstrip)
 from sipi.line_model import TransmissionLineDocument
 from sipi.execution import execute_saved
 
@@ -13,6 +13,12 @@ study = ApertureStudyDocument(aperture, sampling=dict(kind='normal', count=3, se
     variables=[dict(name='width', mean=.8e-3, std=1e-3)], correlation=[[1.]]))
 goal = ApertureDesignDocument(aperture, variable='conductor_0_diameter',
     bounds=[.2e-3, .35e-3], target=200e-12, tolerance=1e-14)
+# Deliberately overfine input reaches the original point budget. No patched
+# mesher limit or fabricated numerical failure is used by either runtime.
+mesh_goal = ImpedanceDesignDocument('stripline',
+    dict(width=.3e-3, plane_spacing=1e-3, eps_r=4, box_width=6e-3),
+    variable='width', bounds=[.2e-3, .4e-3], target=50., tolerance=.1,
+    mesh=dict(edge_size=1e-12, far_size=.2e-3, grade=.2))
 line = TransmissionLineDocument(CrossSectionDocument(microstrip(width=.4e-3,
     substrate_height=.5e-3, eps_r=4, air_height=.5e-3, box_width=2e-3),
     mesh=dict(edge_size=20e-6, far_size=.2e-3, grade=.2)), [0, 1e3],
@@ -36,5 +42,6 @@ doc = Capacitance3DDocument(mesh, eps_r=3.8, conductors=signals,
 text = json.dumps(doc.to_dict(), separators=(',', ':'))
 capacitance3d.append(dict(name='two-internal-nodal-electrodes', text=text, expected=execute_saved(text)))
 print(json.dumps(dict(lumped=lumped.dumps(), study=study.dumps(), goal=goal.dumps(),
+                     mesh_goal=mesh_goal.dumps(),
                      line=line.dumps(), expected=execute_saved(lumped.dumps()),
                      capacitance3d=capacitance3d), allow_nan=False))

@@ -348,3 +348,16 @@ signing and complete native/static redistribution review remain separate gates.
 No ZIP or online launcher replaces the one-EXE target.
 
 See [dependency versions and terms](THIRD_PARTY.md).
+
+## Saved goal mesh limits
+
+The browser and portable candidates use the exact engine in
+`packaging/engine-ref.txt`. A saved impedance goal that exceeds the mesher's
+point budget produces a failed result with the completed history, failed
+parameter, search/refinement stage, resolved geometry/mesh and selected
+material context. The Saved analysis view can export that failed result;
+recorded executions and projects retain it without rerunning the failed solve.
+It is not a successful design. No automatic retry or relaxed mesh is applied.
+Other solver errors, cancellation and timeouts keep their existing behavior.
+Actual platform build and execution evidence is required for each candidate;
+changing the pin alone does not establish Windows or release acceptance.
