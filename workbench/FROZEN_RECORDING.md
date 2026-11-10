@@ -6,8 +6,10 @@ provider. It shares the input, receipt, record and project contracts with the
 path, artifact declaration or provider. Other calculations keep their behavior.
 
 This provider requires Windows x64, CPython 3.13.17, Nuitka 2.8.10 standalone
-onefile markers, and a helper beside the executing payload. In this reviewed
-Nuitka mode, `sys.executable` identifies the extracted executable; `argv[0]` and
+onefile markers, an explicit `--onefile-no-dll` build, and a helper beside the
+executing payload. Windows temporary onefile builds otherwise default to a DLL
+payload while the process executable remains the outer launcher; that mode does
+not meet this recording contract. With the reviewed executable payload mode, `sys.executable` identifies the extracted executable; `argv[0]` and
 `__compiled__.containing_dir` can identify the outer launcher and are not used.
 The helper is compiled into the payload, so an inspectable Python source file
 or installed wheel inventory is not required.
@@ -47,7 +49,10 @@ Synthetic files do not establish Windows execution. The real Windows build must
 also run `workbench/packaging/smoke.py`: two recorded executions through spawned
 calculation workers, identical request/receipt but distinct run IDs, independent
 hashing of the live extracted files, raw project attachment/lookup, normal exit
-and empty extraction directory. Failures retain a failed report. A candidate is
+and empty extraction directory. Failures retain a failed report. The smoke first
+requests graceful shutdown on failure, then stops only its owned process tree
+if needed. A cleanup error is recorded alongside the original failure instead
+of replacing it; cleanup failure after an otherwise successful run still fails. A candidate is
 accepted on Windows only after those checks pass for its exact commit and EXE.
 
 The build retains the reviewed packaging/runtime pins and notices. This feature

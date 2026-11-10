@@ -104,7 +104,9 @@ def main():
     build_info = OUTPUT / 'build-info.json'
     build_info.write_text(json.dumps({key: inventory[key] for key in
         ('engine_commit', 'workbench_commit', 'shared_commit', 'source_wheels')}, indent=2), encoding='utf-8')
-    command = [sys.executable, '-m', 'nuitka', '--mode=onefile', '--msvc=latest',
+    # Temporary Windows onefile builds otherwise default to a DLL payload.
+    # Recording identifies an extracted executable, so select that mode explicitly.
+    command = [sys.executable, '-m', 'nuitka', '--mode=onefile', '--onefile-no-dll', '--msvc=latest',
         '--experimental=force-dependencies-pefile', '--lto=no', '--jobs=2',
         '--windows-console-mode=force', '--output-filename=FieldAlgo-SIPI.exe',
         '--company-name=FieldAlgo', '--product-name=SIPI', '--file-version=0.1.0.0',

@@ -1,6 +1,7 @@
 """Exercise the built executable from a Unicode/space path and record startup/cleanup."""
 
 import argparse
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -16,6 +17,47 @@ import time
 from urllib.request import Request, urlopen
 
 STARTUP_URL = re.compile(r'(http://127\.0\.0\.1:\d+)/#token=([\w-]+)')
+
+
+@contextmanager
+def candidate_directory(report):
+    """Keep a secondary cleanup error from replacing the actual smoke failure."""
+    folder = tempfile.TemporaryDirectory(prefix='SIPI 한글 path ')
+    try:
+        yield folder.name
+    except BaseException:
+        try:
+            folder.cleanup()
+        except Exception as exc:
+            report['directory_cleanup_error'] = {'type': type(exc).__name__, 'message': str(exc)}
+        raise
+    else:
+        # A cleanup error after an otherwise successful smoke must still fail.
+        folder.cleanup()
+
+
+def stop_candidate(process, request, report):
+    """Stop the owned candidate gracefully before terminating its process tree."""
+    if process.poll() is not None:
+        return
+    if request is not None:
+        try:
+            request('/api/shutdown', {})
+            process.wait(timeout=20)
+            report['failure_shutdown'] = 'graceful'
+            return
+        except Exception as exc:
+            report['shutdown_error'] = {'type': type(exc).__name__, 'message': str(exc)}
+    if process.poll() is None:
+        if sys.platform == 'win32':
+            # Killing just the outer onefile process can leave its child holding
+            # extracted DLLs open. Target only this Popen-owned process tree.
+            result = subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
+                                    capture_output=True, timeout=20)
+            report['failure_tree_stop_returncode'] = result.returncode
+        else:
+            process.kill()
+        process.wait(timeout=10)
 
 
 def verify_recording(result, bundle, build, execution):
@@ -56,7 +98,7 @@ def capture_output(stream, ready, report):
 
 def exercise(source, report):
     report['phase'] = 'prepare temporary directory'
-    with tempfile.TemporaryDirectory(prefix='SIPI 한글 path ') as folder:
+    with candidate_directory(report) as folder:
         directory = Path(folder)
         exe = directory / source.name
         shutil.copy2(source, exe)
@@ -72,6 +114,7 @@ def exercise(source, report):
         lines = queue.Queue()
         collector = threading.Thread(target=capture_output, args=(process.stdout, lines, report), daemon=True)
         collector.start()
+        request = None
         try:
             deadline = started + 120
             url = None
@@ -203,8 +246,13 @@ def exercise(source, report):
             report['temporary_entries_after_exit'] = [str(path.relative_to(temp)) for path in temp.rglob('*')]
             assert not report['temporary_entries_after_exit'], report['temporary_entries_after_exit']
         finally:
-            if process.poll() is None:
-                process.kill(); process.wait(timeout=10)
+            unwinding = sys.exc_info()[0] is not None
+            try:
+                stop_candidate(process, request, report)
+            except Exception as exc:
+                report['process_cleanup_error'] = {'type': type(exc).__name__, 'message': str(exc)}
+                if not unwinding:
+                    raise
             report['process_returncode'] = process.returncode
             collector.join(timeout=5)
             report['process_output_complete'] = not collector.is_alive()

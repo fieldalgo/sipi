@@ -8,6 +8,69 @@ import sys
 import importlib.util
 import queue
 import threading
+from types import SimpleNamespace
+
+import pytest
+
+
+def smoke_module():
+    path = Path(__file__).resolve().parents[1] / 'packaging' / 'smoke.py'
+    spec = importlib.util.spec_from_file_location('sipi_candidate_smoke_cleanup', path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def test_cleanup_preserves_primary_failure_but_fails_an_otherwise_successful_run(monkeypatch):
+    module = smoke_module()
+    def cleanup():
+        raise PermissionError('locked synthetic payload')
+    monkeypatch.setattr(module.tempfile, 'TemporaryDirectory', lambda **kw: SimpleNamespace(name='synthetic', cleanup=cleanup))
+    report = {}
+    with pytest.raises(AssertionError, match='original recording failure'):
+        with module.candidate_directory(report):
+            raise AssertionError('original recording failure')
+    assert report['directory_cleanup_error'] == {'type':'PermissionError', 'message':'locked synthetic payload'}
+    with pytest.raises(PermissionError, match='locked synthetic payload'):
+        with module.candidate_directory({}):
+            pass
+
+
+def test_failure_teardown_requests_shutdown_before_any_process_kill(monkeypatch):
+    module = smoke_module(); calls=[]
+    process = SimpleNamespace(returncode=None, pid=123)
+    process.poll = lambda: process.returncode
+    def wait(timeout):
+        assert calls == [('/api/shutdown', {})]
+        process.returncode=0
+    process.wait=wait
+    process.kill=lambda: pytest.fail('graceful shutdown must not kill')
+    monkeypatch.setattr(module.subprocess, 'run', lambda *a, **k: pytest.fail('must not kill process tree'))
+    report={};module.stop_candidate(process, lambda *a: calls.append(a), report)
+    assert report == {'failure_shutdown':'graceful'} and process.returncode == 0
+
+
+@pytest.mark.parametrize('available', [True, False])
+def test_unresponsive_windows_candidate_stops_only_its_owned_tree(monkeypatch, available):
+    module=smoke_module();calls=[];process=SimpleNamespace(returncode=None,pid=456)
+    process.poll=lambda: process.returncode
+    process.kill=lambda: pytest.fail('outer-only kill leaves child DLL locks')
+    def request(*args):
+        raise OSError('shutdown unavailable')
+    def run(command, **kwargs):
+        calls.append((command,kwargs));process.returncode=1
+        return SimpleNamespace(returncode=0)
+    process.wait=lambda timeout: 1
+    monkeypatch.setattr(module,'sys',SimpleNamespace(platform='win32'))
+    monkeypatch.setattr(module.subprocess,'run',run)
+    report={};module.stop_candidate(process,request if available else None,report)
+    assert calls == [(['taskkill','/PID','456','/T','/F'], {'capture_output':True,'timeout':20})]
+    assert report['failure_tree_stop_returncode'] == 0
+    assert ('shutdown_error' in report) is available
+
+
+def test_already_exited_candidate_does_not_target_a_reused_pid():
+    module=smoke_module()
+    module.stop_candidate(SimpleNamespace(poll=lambda: 0), lambda *a: pytest.fail('already exited'), {})
 
 
 def test_rejected_executable_writes_failed_report(tmp_path):

@@ -78,6 +78,14 @@ def test_runtime_boundary_refuses(bundle, monkeypatch, problem):
     with pytest.raises(ValueError): candidate.capture_frozen_artifacts()
 
 
+def test_same_resolved_payload_parent_accepts_a_lexical_alias(bundle):
+    root, _, _ = bundle
+    expected = candidate.capture_frozen_artifacts()
+    (root/'nested').mkdir()
+    candidate.sys.executable = str(root/'nested'/'..'/'program.exe')
+    assert candidate.capture_frozen_artifacts() == expected
+
+
 @pytest.mark.parametrize('name', ['program.exe', 'ui/build-info.json', 'ui/notices.txt'])
 def test_required_payloads(bundle, name):
     (bundle[0]/name).unlink()

@@ -42,12 +42,13 @@ def _context():
             or getattr(compiled, 'onefile', False) is not True):
         raise ValueError('Frozen recording requires the reviewed Windows x64 onefile runtime.')
     executable = Path(sys.executable)
-    # Nuitka's standalone sys.executable identifies the unpacked binary. Its
+    # The reviewed --onefile-no-dll build makes sys.executable identify the
+    # unpacked binary. Default Windows DLL mode is deliberately not accepted.
     # containing_dir/argv[0] may identify the outer launcher and are not used.
     root = Path(__file__).parent
     if (not executable.is_absolute() or not root.is_absolute()
             or executable.suffix.lower() != '.exe'
-            or executable.parent != root or executable.resolve().parent != root.resolve()):
+            or executable.resolve().parent != root.resolve()):
         raise ValueError('Frozen helper and executing payload must share the bundle root.')
     return root, executable.name
 

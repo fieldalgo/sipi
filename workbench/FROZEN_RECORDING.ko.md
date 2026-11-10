@@ -5,8 +5,10 @@
 사용한다. 클라이언트 JSON에서 runtime 경로, 배포물 선언, provider를 지정할 수 없다.
 다른 계산의 동작은 유지한다.
 
-Windows x64, CPython 3.13.17, Nuitka 2.8.10 standalone/onefile 표시와 실제 실행
-payload 옆의 helper가 필요하다. 이 Nuitka 방식의 `sys.executable`은 풀린 실행파일을
+Windows x64, CPython 3.13.17, Nuitka 2.8.10 standalone/onefile 표시, 명시적인
+`--onefile-no-dll` 빌드와 실제 실행 payload 옆의 helper가 필요하다. Windows의
+임시 onefile은 기본적으로 DLL payload를 쓰며 프로세스 실행파일은 외부 launcher다.
+그 모드는 이 기록 계약을 충족하지 않는다. 검토한 EXE payload 모드의 `sys.executable`은 풀린 실행파일을
 가리킨다. 외부 launcher를 가리킬 수 있는 `argv[0]`, `__compiled__.containing_dir`는
 사용하지 않는다. helper는 payload 안에 컴파일되므로 검사 가능한 Python 원본 파일이나
 설치 wheel 목록은 요구하지 않는다.
@@ -42,6 +44,10 @@ spawn 계산 worker에서 기록을 두 번 실행하여 같은 요청/receipt�
 살아 있는 추출 파일의 독립 hash 대조, 원문 프로젝트 추가/조회, 정상 종료,
 추출 디렉터리 비움을 확인한다. 실패 보고서를 보존하며 해당 정확 커밋과 EXE의
 시험을 통과한 뒤에만 Windows 수락으로 표시한다.
+
+실패 시 smoke는 먼저 정상 종료를 요청하고 필요하면 자신이 시작한 프로세스 트리만
+종료한다. 정리 오류가 최초 실패를 덮어쓰지 않도록 둘 다 기록한다. 나머지 검증이
+성공했더라도 정리에서 오류가 나면 전체 smoke는 실패다.
 
 검토된 패키징/runtime 버전과 고지는 유지한다. 이 기능은 별도의 native/static
 재배포, Windows 10/11 대화형 실행, 망 차단, 서명 관문을 해소하지 않는다.

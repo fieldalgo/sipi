@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Select an extracted executable explicitly for Windows onefile recording, retain normalized same-root checks, and preserve the original smoke failure while gracefully stopping the candidate or its owned process tree. Keep the actual Windows recording and cleanup gate required.
+
 - Expose current mesh inspection, explicit twofold refinement and automatic reset in the six-form workbench. Preserve fixed settings through edits, unit changes and project files; keep inspection separate from solving or freezing automatic inputs.
 
 - Separate crowded conductor labels in the cross-section preview using measured text bounds and leader lines, without changing conductor geometry or saved inputs.
