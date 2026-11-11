@@ -1,5 +1,8 @@
 # Changelog
 
+- Evaluate P1 capacitance with compensated element-gradient bilinear energy while retaining the field solve, material contracts and target tolerances.
+  필드 해·재료 계약·목표 허용오차를 유지하면서 P1 정전용량을 요소 기울기의 쌍선형 에너지와 보상 합산으로 계산합니다.
+
 - Keep geometry previews responsive when an invalid conductor extends beyond the drawing; preserve engine rejection and input recovery.
   잘못된 도체 치수가 그림 범위를 벗어나도 미리보기가 멈추지 않고 엔진 오류 표시와 입력 복구를 유지합니다.
 

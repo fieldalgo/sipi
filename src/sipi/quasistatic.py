@@ -25,18 +25,21 @@ the conductor surfaces and the skin depth, a separate formulation.
 
 The capacitance entries come from the discrete energy, C_ij = eps0 V_i^T K V_j,
 where V_j is the solved potential with conductor j at 1 V and every other
-conductor (and the ground) at 0 V. The matrix is symmetric by construction and
-equal to the charge read from the residual K V on each conductor.
+conductor (and the ground) at 0 V. Evaluate its equivalent element-gradient
+integral with compensated sums to avoid cancellation in the global K V
+product. The reciprocal bilinear form uses no complex conjugation. The matrix
+is symmetric by construction and equals the conductor charge in exact arithmetic.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 import numpy as np
 from .constants import SPEED_OF_LIGHT, epsilon_0, mu_0
 
-from galerkin import Mesh, assemble_stiffness, solve_dirichlet
+from galerkin import Mesh, assemble_stiffness, solve_dirichlet, element_gradient
 
 __all__ = ["LineParameters", "capacitance_matrix", "line_parameters"]
 
@@ -91,6 +94,29 @@ def _permittivity(eps_r, triangles):
     return eps
 
 
+def _capacitance_energy(mesh, eps_r, potentials):
+    """Equivalent P1 bilinear energy for already validated material and fields."""
+    areas = mesh.areas()
+    gradients = [element_gradient(mesh, potentials[:, i])
+                 for i in range(potentials.shape[1])]
+    count = len(gradients)
+    result = np.empty((count, count), dtype=np.result_type(potentials.dtype, eps_r))
+    for i, a in enumerate(gradients):
+        for j in range(i, count):
+            b = gradients[j]
+            if np.ndim(eps_r) < 2:
+                values = areas * eps_r * (a[:, 0]*b[:, 0] + a[:, 1]*b[:, 1])
+            else:
+                values = areas * (
+                    a[:, 0]*(eps_r[:, 0, 0]*b[:, 0] + eps_r[:, 0, 1]*b[:, 1])
+                    + a[:, 1]*(eps_r[:, 1, 0]*b[:, 0] + eps_r[:, 1, 1]*b[:, 1]))
+            value = math.fsum(values.real)
+            if np.iscomplexobj(values):
+                value = complex(value, math.fsum(values.imag))
+            result[i, j] = result[j, i] = epsilon_0 * value
+    return result
+
+
 def capacitance_matrix(mesh: Mesh, eps_r, signals: dict, ground) -> np.ndarray:
     """Maxwell capacitance matrix (F/m) of the signal conductors.
 
@@ -127,8 +153,7 @@ def capacitance_matrix(mesh: Mesh, eps_r, signals: dict, ground) -> np.ndarray:
             bc[tuple(idx)] = 1.0 if k == j else 0.0
         potentials.append(solve_dirichlet(K, zero, bc))
     V = np.stack(potentials, axis=1)
-    C = epsilon_0 * (V.T @ (K @ V))
-    return 0.5 * (C + C.T)
+    return _capacitance_energy(mesh, eps_r, V)
 
 
 @dataclass(frozen=True)

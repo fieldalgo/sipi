@@ -1,5 +1,7 @@
 # sipi — PCB 단면의 신호·전원 무결성
 
+[요소 에너지 추출](element_energy.md)은 필드 해를 바꾸지 않고 P1 정전용량 적분의 상쇄 오차를 줄입니다.
+
 [접지 도체의 면별 표면 법칙](ground_faces.md)은 Python API에서 유한 ground trace의 네 면을 분리합니다.
 
 [두 유전체 매립 coplanar 선로](layered_coplanar_stripline.md)는 층별 재료와 고정 pitch·전체 높이 공차를 함께 지원합니다.
