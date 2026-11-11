@@ -1,5 +1,7 @@
 """Fixed editable inputs for the real browser save/reopen acceptance."""
 import json
+from pathlib import Path
+import sys
 from sipi.template_document import TemplateSectionDocument
 from sipi.execution_request import SavedExecutionRequest
 from sipi.execution_record import SavedExecutionRecord
@@ -19,7 +21,15 @@ for name in ('microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip'
         coating_height=.0002, coating_eps_r=3, coating_tan_delta=.02)
     doc = TemplateSectionDocument(name, p, mesh=dict(edge_size=8e-6, far_size=.00025, grade=.3))
     cases.append(doc.to_dict())
-unsupported = TemplateSectionDocument('broadside_stripline', dict(width=.0005, gap=.0002, thickness=.000035, plane_spacing=.001, eps_r=4))
+# Keep a valid engine document whose editable form is not yet implemented.
+# Fail while generating fixtures if the workspace gains that form; otherwise
+# a negative browser assertion can silently test a now-supported input.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'desktop'))
+from engine import TEMPLATES
+unsupported = TemplateSectionDocument('layered_broadside_stripline', dict(
+    width=.0005, gap=.0002, thickness=.000035, lower_height=.0003,
+    upper_height=.0004, lower_eps_r=3, gap_eps_r=4, upper_eps_r=5))
+assert unsupported.template not in TEMPLATES, 'Choose a still-unsupported editable form fixture.'
 unsupported_project = SavedProject(SavedExecutionRequest(unsupported.dumps()),
     project_id='unsupported', design_id='a', title='Unsupported form', label='A')
 base = TemplateSectionDocument('stripline',dict(width=.0005,plane_spacing=.001,eps_r=4),

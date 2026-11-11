@@ -651,6 +651,20 @@ No ZIP or online launcher replaces the one-EXE target.
 
 See [dependency versions and terms](THIRD_PARTY.md).
 
+## Numerical evaluation in the runtime
+
+The pinned engine evaluates P1 capacitance using the element-gradient
+bilinear energy integral with compensated sums. It retains the field solve,
+material inputs and target tolerances; complex material energy does not use
+complex conjugation. Native and browser results may differ in their last
+floating-point digits. See the [numerical contract](../docs/packages/sipi/element_energy.md).
+The same pin uses stable candidate ordering for aperture meshes and compensated
+symmetric modal projections. See the [aperture mesh contract](../docs/packages/sipi/elliptical_aperture.md)
+and [modal arithmetic contract](../docs/packages/sipi/modal_projection.md).
+These changes do not certify general inverse-design or outer-domain convergence.
+An engine pin identifies source; each runtime still requires artifact and
+execution validation.
+
 ## Saved goal mesh limits
 
 The browser and portable candidates use the exact engine in

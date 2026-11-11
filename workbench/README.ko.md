@@ -564,6 +564,18 @@ python workbench/packaging/smoke.py .validation/sipi-windows/FieldAlgo-SIPI.exe
 
 [의존성 버전·조건](THIRD_PARTY.ko.md)을 참고하세요.
 
+## 실행 엔진의 수치 계산
+
+고정 엔진은 P1 정전용량을 요소 기울기의 쌍선형 에너지 적분과 보상 합산으로
+계산합니다. 필드 해·재료 입력·목표 허용오차는 유지하고 복소 재료 에너지에
+복소 켤레를 적용하지 않습니다. native와 브라우저 결과는 부동소수점 끝자리에서
+차이가 날 수 있습니다. [수치 계약](../docs/locales/ko/pages/packages/sipi/element_energy.md)을
+참고하세요. 같은 엔진은 원형 메시의 안정적인 후보 순서와 대칭 모드의 보상 합산도
+사용합니다. [원형 메시 계약](../docs/locales/ko/pages/packages/sipi/elliptical_aperture.md)과
+[모드 계산 계약](../docs/locales/ko/pages/packages/sipi/modal_projection.md)을 참고하세요.
+이 변경이 일반적인 역산이나 외곽 영역 수렴을 보증하지는 않습니다.
+엔진 고정값은 소스를 식별하며 실행 환경마다 산출물과 실제 실행을 별도로 검증해야 합니다.
+
 ## 저장 목표의 메시 한도
 
 브라우저와 무설치 후보는 `packaging/engine-ref.txt`의 정확한 엔진을 사용합니다.

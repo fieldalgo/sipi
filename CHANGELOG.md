@@ -1,5 +1,10 @@
 # Changelog
 
+- Bind browser and portable candidates to the committed element-energy, stable aperture-mesh and compensated modal-projection engine.
+  브라우저·무설치 후보를 요소 에너지·안정적인 원형 메시·모드 보상 합산 엔진 커밋에 연결합니다.
+  Keep inputs and tolerances unchanged; verify that the unsupported-form browser fixture remains outside the editable registry before replay.
+  입력·허용오차를 유지하고 브라우저의 미지원 단면 시험 데이터가 편집 지원 목록 밖에 있는지 재현 전에 검사합니다.
+
 - Sum symmetric-pair modal projections with compensation to reduce cancellation after diagonal averaging, retaining symmetry checks and inverse-design tolerances.
   대칭성 검사와 역산 허용오차를 유지하면서 대칭 쌍의 모드 투영을 보상 합산하여 대각항 평균 뒤의 상쇄 오차를 줄입니다.
 
