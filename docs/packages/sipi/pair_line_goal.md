@@ -121,10 +121,19 @@ The 1 GHz asymmetric section above is searched from (.7,.35) mm toward
 (110,40) ohms with tolerances (.25,.125) ohms. Requested and halved meshes
 must satisfy both targets and change each target by at most 0.5%. On the
 refined mesh, box/air dimensions 24/10, 36/15 and 48/20 mm must stay within
-the same target tolerances, within 0.5% of the smallest-domain result, and
-have decreasing successive absolute changes for each target. These are
-separate finite-case checks, not automatic outer-domain checks in the API,
-monotonic convergence or an infinite-domain error bound.
+the same target tolerances and within 0.5% of the smallest-domain result.
+The common-current successive absolute changes must decrease. For the
+differential-current target, each adjacent-domain absolute change divided
+by the absolute 24/10 mm result must be at most 1e-4. The tests explicitly
+require the fixture frequency to remain 1 GHz.
+
+This differential bound is a finite-case sensitivity criterion, not an API
+default, a monotonic-convergence claim or a physical/infinite-domain error
+bound. Non-nested remeshing can change the order of small differential
+increments. Exploratory 0.5 GHz samples exceed 1e-4, so the criterion must
+not be generalized to other frequencies or unqualified geometry/mesh
+settings. The API still accepts its existing positive-frequency inputs;
+these tests do not add a runtime frequency restriction.
 
 Strict controls, fixed identities, cache/budget accounting, original errors,
 stationary misses, refinement misses and saved-input replay are regression

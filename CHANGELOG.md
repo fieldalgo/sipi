@@ -1,5 +1,8 @@
 # Changelog
 
+- Qualify the two fixed 1 GHz forward-pair outer checks with separate common-current monotonic and differential finite-sensitivity criteria; retain target tolerances, fixtures and independent references.
+  고정 1 GHz 전방 쌍 외곽 시험 두 개에 공통 전류 단조 조건과 차동 유한 민감도 조건을 구분하며 목표 허용치·시험 입력·독립 기준을 유지합니다.
+
 - Exercise unequal surface/buried pairs and selected left/right width targets in the actual executable smoke, retaining exact selected-matrix replay and existing limits.
   실제 실행 파일 smoke에서 비대칭 표면·매립 쌍과 좌우 선택 폭 목표를 확인하며 선택된 행렬의 정확한 재해석과 기존 한도를 유지합니다.
 

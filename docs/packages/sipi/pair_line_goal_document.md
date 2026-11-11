@@ -119,8 +119,12 @@ The asymmetric 1 GHz width/gap example matches the direct full search's
 inputs and history exactly, and full requested/refined RLGC within 1e-10.
 Both targets satisfy (.25,.125) ohm on both meshes, with each mesh change
 at most 0.5%. Refined 36/15 and 48/20 mm box/air domains meet the same
-target tolerances and 0.5% relative gates, with decreasing successive absolute
-changes. Independent balanced 2N eigenspaces compare Zc/Zdd/Zcc within 1e-10.
+target tolerances and 0.5% relative gates. At this explicitly checked 1 GHz,
+common-current successive absolute changes decrease; both differential-current
+adjacent changes stay within 1e-4 of the absolute smallest-domain result.
+This is the [direct fixture sensitivity criterion](pair_line_goal.md), not
+a general frequency or infinite-domain error bound. Independent balanced 2N
+eigenspaces compare Zc/Zdd/Zcc within 1e-10.
 A uniform PEC pair with two material leaves checks complex dielectric scaling
 against an independent SPD vacuum characteristic on both meshes within 1e-10.
 The latter starts at a matching point and does not establish a unique two-leaf
