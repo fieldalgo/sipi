@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the twenty-eight-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the thirty-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers twenty-eight cross-section forms, impedance targeting,
+The basic workspace offers thirty cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -32,10 +32,54 @@ capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
 
+
 The geometry preview remains responsive while dimensions are being edited, including
 invalid copper that extends beyond the planes. The engine still rejects invalid
 geometry; correct the dimensions and calculate again. Labels may move below the
 drawing so that they remain visible.
+
+## Unequal surface and buried pairs
+
+**Unequal surface pair** and **Unequal buried pair** keep separate left/right
+bottom widths, copper thicknesses and rectangular or centred-trapezoid profiles.
+The positive signal is left and the negative signal is right. The gap separates
+bottom edges; the total bottom-width span is centred at x=0. A taper needs
+positive thickness, and invalid overlaps or boundary contact are refused.
+
+Surface conductors start at the same substrate surface. Buried conductors each
+have their vertical midpoint halfway between the planes: unequal thicknesses
+therefore have different bottom heights. Changing one dimension does not copy
+it to the other signal or hold the centre pitch fixed.
+
+The scalar result is **Forward differential (Ic=0)**: real lossless Vdiff/Idiff
+for a forward launch with I=[Idiff,-Idiff] and zero common current at that launch
+plane. It uses L and Re(C), excluding conductor resistance and C_loss from this
+diagnostic. The calculation retains asymmetric coupling; it does not infer
+independent differential/common eigenmodes, one effective permittivity or one
+delay. Complete matrices remain available, and the four-port frequency response
+uses its supplied losses. Existing symmetric forms retain their original modal
+summaries.
+
+For a width target, explicitly choose **Left bottom width** or **Right bottom
+width**. Only that width changes; the other width, both thicknesses, any top
+widths and the bottom-edge gap stay fixed. The centred span and conductor
+positions are regenerated from the resulting dimensions. Automatic targets use
+half the factory edge size, quarter far size and unchanged growth. The search
+threshold is half the requested final tolerance; a separate refined solve must
+still meet the requested tolerance. Explicit initial meshes and the existing
+32-evaluation/300,000-point/five-minute limits remain effective.
+
+Studies use the same explicit forward quantity and fixed nominal mesh for
+left/right dimensions and material inputs. Invalid samples remain visible;
+independent uniform samples do not certify manufacturing yield. Check the mesh,
+side boundaries and surface air separately across the range.
+
+Editable JSON and A/B projects preserve the exact dimensions, profiles and mesh
+through unit changes. These are input projects: choose the target variable again
+after opening a geometry. To save the full target operation, use an explicit
+saved design document through **Saved analysis**. These bounded quasi-static
+models do not establish measured accuracy or three-dimensional transition
+behaviour.
 
 ## Two-dielectric coplanar stripline
 
@@ -267,7 +311,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The twenty-eight forms include two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The thirty forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -517,7 +561,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the twenty-eight supported editable templates. Other
+All project designs must use the thirty supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace

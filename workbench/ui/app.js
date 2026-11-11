@@ -1,4 +1,4 @@
-import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isLayeredInterface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isAsymmetric, isLayeredInterface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -16,7 +16,7 @@ const changedFields = new Set();
 // Display changes never become physical edits to target or study bounds.
 const studySI = {};
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
-const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
+const allFields = [...lengthFields, 'left_profile', 'right_profile', 'target_variable', 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
 
 function status(text, error = false) {
@@ -249,6 +249,7 @@ function request(action) {
     for (const id of ['target', 'lower', 'upper', 'tolerance']) if (!$(id).reportValidity()) throw new Error('Check the target and width bounds.');
     if (![lengthSI.lower, lengthSI.upper].every(value => Number.isFinite(value) && value > 0)) throw new Error('Check the target width bounds.');
     input.design = {target: Number($('target').value), bounds: [lengthSI.lower, lengthSI.upper], tolerance: Number($('tolerance').value)};
+    if (isAsymmetric(template)) input.design.variable = $('target_variable').value;
   }
   return input;
 }
@@ -447,6 +448,14 @@ function preview() {
 }
 
 function geometryFields() {
+  const asymmetric = isAsymmetric(template);
+  $('asymmetric-fields').hidden = !asymmetric;
+  for (const id of ['uniform-profile-field', 'uniform-width-field', 'uniform-thickness-field']) $(id).hidden = asymmetric;
+  for (const side of ['left', 'right']) $(`${side}-top-width-field`).hidden = $(`${side}_profile`).value !== 'tapered';
+  $('asymmetric-geometry-note').textContent = isStripline(template) ? 'Each copper midpoint is halfway between the planes. Unequal thicknesses have different bottom heights. The total bottom-width span is centred; the gap is between bottom edges.' : 'Both copper bottom faces are at the substrate surface. Widths, thicknesses and top profiles are independent. The total bottom-width span is centred; the gap is between bottom edges.';
+  $('target-variable-field').hidden = !asymmetric;
+  $('target_variable').disabled = busy || !!imported || !asymmetric;
+  $('target-description').textContent = asymmetric ? 'Choose the left or right bottom width. The other width, both thicknesses, any top widths and the gap stay fixed. Target the real lossless forward Vdiff/Idiff with Icommon=0 at launch; this is not an independent differential eigenmode. Both meshes must meet the requested tolerance.' : 'Search varies the bottom width; a tapered profile keeps its top width fixed. Both the initial and finer mesh must meet the target. Failed checks include evaluation history.';
   const layered = isLayeredInterface(template);
   $('uniform-height-field').hidden = layered;
   $('uniform-dielectric-fields').hidden = layered;
@@ -454,9 +463,9 @@ function geometryFields() {
   $('layered-dielectric-fields').hidden = !layered;
   const broadside = template === 'broadside_stripline';
   $('broadside-fields').hidden = !broadside;
-  $('profile').disabled = busy || !!imported || broadside;
+  $('profile').disabled = busy || !!imported || broadside || asymmetric;
   $('gap-label').textContent = broadside ? 'Vertical metal-face gap' : 'Bottom edge gap';
-  $('top-width-field').hidden = $('profile').value !== 'tapered';
+  $('top-width-field').hidden = asymmetric || $('profile').value !== 'tapered';
   $('placement-fields').hidden = !['coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
   $('placement-mode-field').hidden = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
   $('trace-height-field').hidden = !['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template) && $('placement').value !== 'fixed';
@@ -473,14 +482,15 @@ function geometryFields() {
   $('geometry-inspect').hidden = !normal || !!imported;
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['height', 'eps_r', 'tan_delta', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['width', 'thickness', 'left_width', 'right_width', 'left_thickness', 'right_thickness', 'left_top_width', 'right_top_width', 'left_profile', 'right_profile', 'height', 'eps_r', 'tan_delta', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
 
 function history(rows) {
+  const dimension = isAsymmetric(template) ? $('target_variable').value.replace('_', ' ') : 'width';
   $('history').hidden = !rows?.length;
-  $('history-data').textContent = rows?.map((row, i) => `${i + 1}. ${row.stage.padEnd(10)}  width ${format(row.parameter / scales[unit], 6)} ${unit}  ${format(row.impedance, 6)} Ω`).join('\n') || '';
+  $('history-data').textContent = rows?.map((row, i) => `${i + 1}. ${row.stage.padEnd(10)}  ${dimension} ${format(row.parameter / scales[unit], 6)} ${unit}  ${format(row.impedance, 6)} Ω`).join('\n') || '';
 }
 
 function render(result) {
@@ -491,13 +501,15 @@ function render(result) {
   comparisonControls();
   if (!line) return;
   $('result').hidden = false;
+  const forward = !!line.forward_launch;
+  $('eps-metric').hidden = forward; $('delay-metric').hidden = forward;
   const unavailable = line.scalar_summary_unavailable;
   $('scalar-summary').hidden = !!unavailable;
-  $('scalar-note').hidden = !unavailable;
-  $('scalar-note').textContent = unavailable ? `Scalar summary unavailable: ${unavailable}. Full matrices remain available.` : '';
+  $('scalar-note').hidden = !unavailable && !forward;
+  $('scalar-note').textContent = forward ? 'Real lossless forward Vdiff/Idiff with Icommon=0 at launch. This excludes conductor resistance and dielectric loss from the impedance diagnostic. Coupling is retained; independent differential/common eigenmodes, a scalar effective permittivity and a scalar delay are not inferred. Network calculations retain their supplied losses.' : unavailable ? `Scalar summary unavailable: ${unavailable}. Full matrices remain available.` : '';
   const pair = 'z_diff' in line;
-  $('z-label').textContent = pair ? 'Differential impedance' : 'Characteristic impedance';
-  $('z-value').textContent = format(pair ? line.z_diff : line.z0);
+  $('z-label').textContent = forward ? 'Forward differential (Ic=0)' : pair ? 'Differential impedance' : 'Characteristic impedance';
+  $('z-value').textContent = format(forward ? line.z_diff_forward : pair ? line.z_diff : line.z0);
   $('eps-label').textContent = pair ? 'Odd-mode permittivity' : 'Effective permittivity';
   $('eps-value').textContent = format(pair ? line.eps_eff_odd : line.eps_eff);
   $('delay-label').textContent = pair ? 'Common-mode impedance' : 'Propagation delay';
@@ -518,11 +530,13 @@ function render(result) {
   $('refinement').hidden = !result.design;
   if (result.design) {
     const d = result.design;
-    lengthSI.width = d.width;
-    changedFields.add('width');
+    const variable = d.variable ?? 'width', value = d.parameter ?? d.width;
+    lengthSI[variable] = value;
+    changedFields.add(variable);
     savedMesh = {...result.document.mesh};
-    $('width').value = String(Number((d.width / scales[unit]).toPrecision(10)));
-    $('refinement').textContent = `Width ${format(d.width / scales[unit], 6)} ${unit} · initial ${format(d.impedance, 5)} Ω · refined ${format(d.refined_impedance, 5)} Ω · mesh change ${format(d.mesh_change, 5)} Ω. Both meet the requested target tolerance.`;
+    $(variable).value = String(Number((value / scales[unit]).toPrecision(10)));
+    const label = variable === 'width' ? 'Width' : variable === 'left_width' ? 'Left width' : 'Right width';
+    $('refinement').textContent = `${label} ${format(value / scales[unit], 6)} ${unit} · initial ${format(d.impedance, 5)} Ω · refined ${format(d.refined_impedance, 5)} Ω · mesh change ${format(d.mesh_change, 5)} Ω. Both meet the requested target tolerance.`;
     history(d.history);
   }
   resolvedMesh = {...result.document.mesh}; resolvedDomain = result.document; meshControls(); domainControls();
@@ -581,7 +595,7 @@ function refreshStudyOptions(reset=false) {
     const select=$(`study-variable-${i}`), previous=select.value;
     select.replaceChildren();
     for (const [key,label] of Object.entries(choices)) {const option=document.createElement('option');option.value=key;option.textContent=label;select.append(option);}
-    select.value=previous in choices ? previous : i===1 ? 'width' : isLayeredInterface(template) ? 'lower_eps_r' : 'eps_r';
+    select.value=previous in choices ? previous : i===1 ? (isAsymmetric(template) ? 'left_width' : 'width') : isLayeredInterface(template) ? 'lower_eps_r' : 'eps_r';
     if (reset || previous !== select.value) resetStudyBounds(i);
   }
 }
@@ -685,6 +699,15 @@ function chooseTemplate(name) {
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
     $('placement').value = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name) ? 'fixed' : 'centred';
+    if (isAsymmetric(name)) {
+      const buried = isStripline(name);
+      const defaults = {left_width: buried ? .3e-3 : .4e-3, right_width: buried ? .5e-3 : .65e-3,
+        left_thickness: 35e-6, right_thickness: 50e-6, left_top_width: buried ? .25e-3 : .32e-3,
+        right_top_width: buried ? .45e-3 : .55e-3, height: buried ? 1e-3 : .5e-3, gap: buried ? .4e-3 : .25e-3};
+      for (const [id, value] of Object.entries(defaults)) {lengthSI[id] = value; $(id).value = String(Number((value / scales[unit]).toPrecision(10)));}
+      $('eps_r').value = '4'; $('tan_delta').value = '.02';
+      $('left_profile').value = 'rectangular'; $('right_profile').value = 'rectangular'; $('target_variable').value = 'left_width';
+    }
     if (name === 'broadside_stripline') {
       $('profile').value = 'rectangular';
       if (lengthSI.thickness === 0) {
@@ -706,7 +729,7 @@ function chooseTemplate(name) {
     $('gap-field').hidden = !(isPair(template) || isCoplanar(template));
     $('ground-field').hidden = !isCoplanar(template);
     $('ground-gap-field').hidden = !(isPair(template) && isCoplanar(template));
-    $('target-label').firstChild.textContent = isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
+    $('target-label').firstChild.textContent = isAsymmetric(template) ? 'Forward differential, Ic=0 (Ω)' : isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
     $('save-editable').disabled = busy;
     geometryFields(); refreshStudyOptions(true); studyControls(); clearResult(); preview(); projectControls();
@@ -726,6 +749,7 @@ function restoreEditable(restored) {
     else $(id).value = String(v);
   }
   $('profile').value = originalParameters.top_width == null ? 'rectangular' : 'tapered';
+  if (isAsymmetric(template)) for (const side of ['left', 'right']) $(`${side}_profile`).value = originalParameters[`${side}_top_width`] == null ? 'rectangular' : 'tapered';
   $('placement').value = originalParameters.trace_height == null ? 'centred' : 'fixed';
   $('box_mode').value = originalParameters.box_width == null ? 'auto' : 'fixed';
   $('air_mode').value = originalParameters.air_height == null ? 'auto' : 'fixed';

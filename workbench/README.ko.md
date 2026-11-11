@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 28종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 30종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 28종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 30종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -28,9 +28,46 @@ Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 
 정전용량 입력은 저장한 절연 경계·도체 순서를 유지해 전체 C(F)를 반환합니다.
 기하 편집기·비아 전이 L/S·열린 공간 프린징까지 지원한다는 뜻은 아닙니다.
 
+
 치수를 편집하는 동안 도체가 평면 밖으로 나가는 잘못된 입력이어도 미리보기가 응답합니다.
 엔진은 유효하지 않은 기하를 계속 거부하므로 치수를 고친 뒤 다시 계산하세요.
 라벨이 서로 겹치지 않도록 그림 아래로 이동할 수 있습니다.
+## 좌우 치수가 다른 표면·매립 차동쌍
+
+**Unequal surface pair**와 **Unequal buried pair**는 왼쪽·오른쪽 아랫면 폭,
+구리 두께, 직사각형 또는 중앙 사다리꼴 프로필을 따로 유지합니다. 양의
+신호는 왼쪽, 음의 신호는 오른쪽입니다. 간격은 아랫면 사이이며 전체
+아랫면 폭 구간의 중심이 x=0입니다. 사다리꼴은 양수 두께가 필요하고
+도체 겹침이나 경계 접촉은 거부합니다.
+
+표면 선로는 두 구리 아랫면이 기판 표면에 놓입니다. 매립 선로는 각 구리의
+수직 중점이 두 접지면 가운데이므로 두께가 다르면 아랫면 높이도 다릅니다.
+한쪽 치수를 바꿔도 다른 쪽에 복사하거나 중심 간격을 자동 고정하지 않습니다.
+
+요약값 **Forward differential (Ic=0)**은 전진 입력에서 I=[Idiff,-Idiff],
+즉 입력 지점의 공통전류가 0일 때 실수·무손실 Vdiff/Idiff입니다. L과
+Re(C)를 사용하며 이 진단값에는 도체 저항과 C_loss를 포함하지 않습니다.
+비대칭 결합을 유지하고 독립된 차동/공통 고유모드, 하나의 유효 유전율이나
+지연을 추정하지 않습니다. 전체 행렬은 유지하며 4포트 주파수 응답에는
+설정한 손실을 사용합니다. 기존 대칭 폼의 모드 요약값은 바뀌지 않습니다.
+
+폭 역산에서는 **Left bottom width** 또는 **Right bottom width**를 명시적으로
+고릅니다. 선택한 폭만 바뀌며 다른 폭, 두 두께, 상단 폭과 아랫면 간격은
+고정합니다. 전체 폭의 중심 조건에 따라 도체 위치는 다시 계산합니다.
+자동 초기 메시는 기본 경계 크기의 절반, 원거리 크기의 1/4과 기존 성장
+설정을 사용합니다. 탐색 기준은 요청 최종 허용오차의 절반이며 별도 세분
+계산도 요청 허용오차를 만족해야 합니다. 명시 초기 메시와 기존
+32회/300,000점/5분 제한을 유지합니다.
+
+좌우 치수와 재료 공차는 같은 명시 전진 임피던스와 고정된 명목 메시를
+사용합니다. 실패 표본을 숨기지 않으며 독립 균등 표본 통계를 제조 수율로
+해석하지 않습니다. 범위 전체의 메시·측면 외곽·표면 공기를 따로 확인하십시오.
+
+편집 JSON과 A/B 프로젝트는 단위를 바꿔도 정확한 치수·프로필·메시를
+보존합니다. 기하 입력 프로젝트이므로 다시 열면 역산할 쪽을 다시 고르십시오.
+목표 연산 전체를 저장하려면 **Saved analysis**의 명시 saved design 문서를
+사용합니다. 유계 준정적 모델이며 실측 정확도나 3차원 전이를 검증했다는
+뜻은 아닙니다.
 
 ## 두 유전체 사이의 coplanar stripline
 
@@ -232,7 +269,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline, two-dielectric stripline(single/pair), two-dielectric coplanar stripline(single/pair) 28종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline, two-dielectric stripline(single/pair), two-dielectric coplanar stripline(single/pair), unequal surface/buried pair 30종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -443,7 +480,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 28종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 30종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는

@@ -11,6 +11,9 @@ from sipi.template_document import TemplateSectionDocument
 
 
 def parameters(name):
+    if name in ('asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline'):
+        from asymmetric_pair_cases import parameters as unequal_parameters
+        return unequal_parameters(name)
     p = dict(width=.5e-3, thickness=.035e-3, eps_r=4.1, tan_delta=.01,
              box_width=.03, top_width=None)
     p['plane_spacing' if name in ('stripline', 'coupled_stripline', 'offset_stripline') else 'substrate_height'] = 1e-3

@@ -30,6 +30,8 @@
           <button data-template="microstrip" class="selected" aria-pressed="true"><span class="mini">━</span>Microstrip</button>
           <button data-template="stripline" aria-pressed="false"><span class="mini">═</span>Stripline</button>
           <button data-template="offset_stripline" aria-pressed="false"><span class="mini">═</span>Offset stripline</button>
+        <button type="button" data-template="asymmetric_coupled_microstrip" aria-pressed="false">Unequal surface pair</button>
+        <button type="button" data-template="asymmetric_coupled_stripline" aria-pressed="false">Unequal buried pair</button>
         <button type="button" data-template="layered_coplanar_stripline" aria-pressed="false">Two-dielectric coplanar</button>
         <button type="button" data-template="coupled_layered_coplanar_stripline" aria-pressed="false">Two-dielectric coplanar pair</button>
         <button type="button" data-template="layered_stripline" aria-pressed="false">Two-dielectric stripline</button>
@@ -59,15 +61,32 @@
         <p id="import-note" class="notice" hidden>Imported cross-section. Its geometry and mesh are preserved. Choose a template to start a new design.</p>
         <form id="inputs">
           <div class="section-label"><h3>Geometry</h3><select id="unit" aria-label="Length unit"><option value="mm">mm</option><option value="µm">µm</option><option value="mil">mil</option></select></div>
-          <label>Signal profile <select id="profile"><option value="rectangular">Rectangular</option><option value="tapered">Centred trapezoid</option></select></label>
+          <label id="uniform-profile-field">Signal profile <select id="profile"><option value="rectangular">Rectangular</option><option value="tapered">Centred trapezoid</option></select></label>
           <div class="fields">
-            <label>Bottom width <span class="symbol">w</span><div class="number"><input id="width" type="number" value="0.5" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+            <label id="uniform-width-field">Bottom width <span class="symbol">w</span><div class="number"><input id="width" type="number" value="0.5" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="top-width-field" hidden>Top width<div class="number"><input id="top_width" type="number" value="0.4" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="uniform-height-field"><span id="height-label">Substrate height</span> <span class="symbol">h</span><div class="number"><input id="height" type="number" value="1" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
-            <label>Copper thickness <span class="symbol">t</span><div class="number"><input id="thickness" type="number" value="0" min="0" step="any" required><span class="unit-label">mm</span></div></label>
+            <label id="uniform-thickness-field">Copper thickness <span class="symbol">t</span><div class="number"><input id="thickness" type="number" value="0" min="0" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="gap-field" hidden><span id="gap-label">Bottom edge gap</span> <span class="symbol">s</span><div class="number"><input id="gap" type="number" value="0.2" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
             <label id="ground-gap-field" hidden>Signal–ground gap<div class="number"><input id="ground_gap" type="number" value="0.2" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="ground-field" hidden>Ground width<div class="number"><input id="ground_width" type="number" value="1" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
+          </div>
+          <div id="asymmetric-fields" hidden>
+            <h4>Left signal</h4>
+            <label>Left profile<select id="left_profile"><option value="rectangular">Rectangular</option><option value="tapered">Centred trapezoid</option></select></label>
+            <div class="fields">
+              <label>Left bottom width<div class="number"><input id="left_width" type="number" value=".4" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+              <label>Left thickness<div class="number"><input id="left_thickness" type="number" value=".035" min="0" step="any" required><span class="unit-label">mm</span></div></label>
+              <label id="left-top-width-field" hidden>Left top width<div class="number"><input id="left_top_width" type="number" value=".32" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+            </div>
+            <h4>Right signal</h4>
+            <label>Right profile<select id="right_profile"><option value="rectangular">Rectangular</option><option value="tapered">Centred trapezoid</option></select></label>
+            <div class="fields">
+              <label>Right bottom width<div class="number"><input id="right_width" type="number" value=".65" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+              <label>Right thickness<div class="number"><input id="right_thickness" type="number" value=".05" min="0" step="any" required><span class="unit-label">mm</span></div></label>
+              <label id="right-top-width-field" hidden>Right top width<div class="number"><input id="right_top_width" type="number" value=".55" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
+            </div>
+            <p id="asymmetric-geometry-note" class="fine"></p>
           </div>
           <div id="layered-height-fields" hidden>
             <div class="fields">
@@ -141,7 +160,7 @@
       </aside>
       <section class="canvas-column">
         <div class="panel drawing"><div class="panel-heading"><h2>Geometry preview</h2><span id="preview-label" class="tag">Schematic</span></div><button id="geometry-inspect" type="button" hidden>Inspect geometry</button><div id="geometry-view-controls" class="geometry-view-controls" hidden><button id="geometry-full" type="button" aria-pressed="true">Full domain</button><button id="geometry-detail" type="button" aria-pressed="false">Conductor detail</button></div><p id="geometry-detail-note" class="fine" hidden></p><svg id="cross-section" viewBox="0 0 760 300" role="img" aria-label="Cross-section geometry"></svg><div class="legend"><span><i class="copper"></i>Conductor</span><span><i class="dielectric"></i>Dielectric</span><span>Lengths in <b id="drawing-unit">mm</b></span></div></div>
-        <div class="panel results"><div class="panel-heading"><h2>Line parameters</h2><span class="step">02</span></div><div id="status" role="status" aria-live="polite">Ready when you are. Enter a cross-section and calculate.</div><div id="result" hidden><div id="scalar-summary" class="metrics"><div class="main-metric"><span id="z-label">Characteristic impedance</span><strong id="z-value">—</strong><small>Ω</small></div><div><span id="eps-label">Effective permittivity</span><strong id="eps-value">—</strong></div><div><span id="delay-label">Propagation delay</span><strong id="delay-value">—</strong><small id="delay-unit">ns/m</small></div></div><p id="scalar-note" class="notice" hidden></p><div id="matrices" class="matrices"></div><p id="refinement" class="notice" hidden></p><p class="fine">Quasi-static model · Dielectric loss included · Conductor loss and dispersion not included</p></div></div>
+        <div class="panel results"><div class="panel-heading"><h2>Line parameters</h2><span class="step">02</span></div><div id="status" role="status" aria-live="polite">Ready when you are. Enter a cross-section and calculate.</div><div id="result" hidden><div id="scalar-summary" class="metrics"><div class="main-metric"><span id="z-label">Characteristic impedance</span><strong id="z-value">—</strong><small>Ω</small></div><div id="eps-metric"><span id="eps-label">Effective permittivity</span><strong id="eps-value">—</strong></div><div id="delay-metric"><span id="delay-label">Propagation delay</span><strong id="delay-value">—</strong><small id="delay-unit">ns/m</small></div></div><p id="scalar-note" class="notice" hidden></p><div id="matrices" class="matrices"></div><p id="refinement" class="notice" hidden></p><p class="fine">Quasi-static model · Dielectric loss included · Conductor loss and dispersion not included</p></div></div>
         <section class="panel results comparison" aria-label="Result comparison">
           <div class="panel-heading"><h2>Compare results</h2></div>
           <div class="comparison-actions"><button id="comparison-pin" disabled>Keep current as baseline</button><button id="comparison-clear" disabled>Clear baseline</button></div>
@@ -166,7 +185,7 @@
           <button id="study-calculate">Run parameter study →</button>
           <div id="study-result" hidden><p id="study-summary"></p><div class="network-scroll"><table><thead id="study-head"></thead><tbody id="study-table"></tbody></table></div><button id="study-save">Save study JSON ↓</button> <button id="study-csv">Save sample CSV ↓</button></div>
         </div>
-        <div class="panel target"><div class="target-heading"><div><p class="eyebrow">DESIGN TO A TARGET</p><h2>Find the trace width.</h2></div><span class="tag">With mesh refinement check</span></div><div class="target-fields"><label id="target-label">Target impedance (Ω)<input id="target" type="number" value="50" min="0.01" step="any"></label><label>Minimum width (<span class="unit-label">mm</span>)<input id="lower" type="number" value="0.3" min="0.000001" step="any"></label><label>Maximum width (<span class="unit-label">mm</span>)<input id="upper" type="number" value="0.8" min="0.000001" step="any"></label><label>Tolerance (Ω)<input id="tolerance" type="number" value="0.1" min="0.001" step="any"></label></div><div class="target-footer"><p>Search varies the bottom width; a tapered profile keeps its top width fixed. Both the initial and finer mesh must meet the target. Failed checks include evaluation history.</p><button id="design">Find width →</button></div><details id="history" hidden><summary>Evaluation history</summary><pre id="history-data"></pre></details></div>
+        <div class="panel target"><div class="target-heading"><div><p class="eyebrow">DESIGN TO A TARGET</p><h2>Find the trace width.</h2></div><span class="tag">With mesh refinement check</span></div><label id="target-variable-field" hidden>Width to solve<select id="target_variable"><option value="left_width">Left bottom width</option><option value="right_width">Right bottom width</option></select></label><div class="target-fields"><label id="target-label">Target impedance (Ω)<input id="target" type="number" value="50" min="0.01" step="any"></label><label>Minimum width (<span class="unit-label">mm</span>)<input id="lower" type="number" value="0.3" min="0.000001" step="any"></label><label>Maximum width (<span class="unit-label">mm</span>)<input id="upper" type="number" value="0.8" min="0.000001" step="any"></label><label>Tolerance (Ω)<input id="tolerance" type="number" value="0.1" min="0.001" step="any"></label></div><div class="target-footer"><p id="target-description">Search varies the bottom width; a tapered profile keeps its top width fixed. Both the initial and finer mesh must meet the target. Failed checks include evaluation history.</p><button id="design">Find width →</button></div><details id="history" hidden><summary>Evaluation history</summary><pre id="history-data"></pre></details></div>
       </section>
     </div>
     <footer><span>FieldAlgo / SIPI · Preview · <a href="./notices.txt" target="_blank" rel="noreferrer">Third-party notices</a></span><p>Check mesh refinement and domain size before using results in a design. Files stay on this computer.</p></footer>

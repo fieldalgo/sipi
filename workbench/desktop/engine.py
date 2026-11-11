@@ -10,7 +10,10 @@ import numpy as np
 import sipi
 from sipi.templates import broadside_stripline, coated_microstrip, coupled_stripline, offset_stripline
 
+ASYMMETRIC_PAIR_TEMPLATES = {'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline'}
+
 TEMPLATES = {name: getattr(sipi, name) for name in (
+    'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
     'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline',
     'layered_stripline', 'coupled_layered_stripline',
     'coplanar_stripline', 'coupled_coplanar_stripline',
@@ -19,7 +22,7 @@ TEMPLATES['broadside_stripline'] = broadside_stripline
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
 TEMPLATES['offset_stripline'] = offset_stripline
-PAIR_TEMPLATES = {'coupled_layered_coplanar_stripline', 'coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
+PAIR_TEMPLATES = {'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline', 'coupled_layered_coplanar_stripline', 'coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
 
 
 def engine_info():
@@ -49,10 +52,16 @@ def document(request):
     return sipi.CrossSectionDocument(section, mesh=mesh)
 
 
-def serialize_line(line):
+def serialize_line(line, *, forward_pair=False):
     out = {name: getattr(line, name).tolist() for name in ('C', 'C0', 'L', 'C_loss')}
     out.update(names=list(line.names), G_1GHz=line.G(1e9).tolist())
-    if len(line.names) == 1:
+    if forward_pair:
+        if len(line.names) != 2:
+            raise ValueError('A forward differential launch requires exactly two signals.')
+        out.update(z_diff_forward=line.z_diff_forward, forward_launch=dict(
+            quantity='z_diff_forward', condition='Icommon=0; I=[Idiff,-Idiff]',
+            model='real lossless forward diagnostic from L and Re(C); excludes R and C_loss'))
+    elif len(line.names) == 1:
         out.update(z0=line.z0, eps_eff=line.eps_eff, delay=line.delay)
     elif len(line.names) == 2:
         try:
@@ -134,6 +143,9 @@ def study_documents(request, nominal):
         allowed.add('trace_height')
     if request['template'] == 'broadside_stripline':
         allowed.add('offset')
+    if request['template'] in ASYMMETRIC_PAIR_TEMPLATES:
+        allowed.update(('left_width', 'right_width', 'left_thickness', 'right_thickness',
+                        'left_top_width', 'right_top_width'))
     if request['template'] in ('layered_stripline', 'coupled_layered_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
         allowed.update(('lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r'))
     names, low, high = [], [], []
@@ -172,12 +184,12 @@ def study_documents(request, nominal):
 
 def execute_study(request, nominal):
     settings, documents = study_documents(request, nominal)
-    quantity = 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
+    quantity = 'z_diff_forward' if request['template'] in ASYMMETRIC_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
     rows = []
     for values, doc in documents:
         row = dict(parameters=values, document=doc.to_dict())
         try:
-            line = serialize_line(doc.analyze())
+            line = serialize_line(doc.analyze(), forward_pair=request['template'] in ASYMMETRIC_PAIR_TEMPLATES)
             value = line[quantity]
             if not math.isfinite(value) or value <= 0:
                 raise ValueError('Solver returned an invalid study impedance.')
@@ -349,18 +361,28 @@ def execute(request, *, record_provider=None):
     if action == 'network' and sum(not t.ground for t in doc.section.traces) not in (1, 2):
         raise ValueError('The network workbench supports one or two signal conductors.')
     out = {'engine': engine_info(), 'document': doc.to_dict()}
+    forward_pair = (request.get('template') in ASYMMETRIC_PAIR_TEMPLATES
+                    and 'document' not in request and 'document_text' not in request)
     if action == 'study':
         out['study'] = execute_study(request, doc)
     elif action == 'analyze':
-        out['line'] = serialize_line(doc.analyze())
+        out['line'] = serialize_line(doc.analyze(), forward_pair=forward_pair)
     elif action == 'network':
         line = doc.analyze()
-        out['line'] = serialize_line(line)
+        out['line'] = serialize_line(line, forward_pair=forward_pair)
         out['network'] = serialize_network(line, settings)
     elif action == 'design':
         if 'document' in request or 'document_text' in request:
             raise ValueError('Choose a template before searching for a width.')
         settings = request.get('design', {})
+        asymmetric = request['template'] in ASYMMETRIC_PAIR_TEMPLATES
+        variable = 'width'
+        if asymmetric:
+            if not isinstance(settings, dict) or not {'bounds', 'target', 'variable'} <= settings.keys() or not settings.keys() <= {'bounds', 'target', 'variable', 'tolerance'}:
+                raise ValueError('An unequal pair target needs bounds, target and an explicit width variable.')
+            variable = settings['variable']
+            if variable not in ('left_width', 'right_width'):
+                raise ValueError('Select left_width or right_width for an unequal pair target.')
         params = dict(request['parameters'])
         factory = TEMPLATES[request['template']]
         mesh = request.get('mesh')
@@ -376,7 +398,7 @@ def execute(request, *, record_provider=None):
             # These defaults already resolve finite ground gaps or coating.
             # Keep their edge/growth settings before the mandatory independent
             # refinement; pre-refining both again can exceed the point budget.
-            if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
+            if request['template'] in ASYMMETRIC_PAIR_TEMPLATES or request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
                 # Resolve buried conductor edges without halving growth twice.
                 # The separate refinement and residual gates still apply.
                 mesh['edge_size'] /= 2
@@ -384,7 +406,7 @@ def execute(request, *, record_provider=None):
                 mesh['edge_size'] /= 4
                 mesh['grade'] /= 2
         search_options = {}
-        if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
+        if request['template'] in ASYMMETRIC_PAIR_TEMPLATES or request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
             tolerance = settings.get('tolerance', 0.1)
             if (isinstance(tolerance, bool) or not isinstance(tolerance, Real)
                     or not math.isfinite(tolerance) or tolerance <= 0):
@@ -392,18 +414,18 @@ def execute(request, *, record_provider=None):
             # Leave room for refinement drift without changing final acceptance.
             search_options['search_tolerance'] = tolerance / 2
         result, line = sipi.seek_impedance(
-            lambda width: factory(**{**params, 'width': width}),
+            lambda value: factory(**{**params, variable: value}),
             settings.get('bounds'), settings.get('target'),
             tolerance=settings.get('tolerance', 0.1),
-            quantity='z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
+            quantity='z_diff_forward' if asymmetric else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
             mesh=mesh, max_evaluations=32, return_line=True, **search_options)
         # Matrix output must correspond to the returned design, not the initial width.
         out['document'] = sipi.CrossSectionDocument(
             result.document.section,
             mesh=result.document.section.mesh_settings(**result.document.mesh_options)).to_dict()
-        out['line'] = serialize_line(line)
+        out['line'] = serialize_line(line, forward_pair=forward_pair)
         out['design'] = {
-            'width': result.parameter, 'target': result.target,
+            **({'variable': variable, 'parameter': result.parameter, 'quantity': 'z_diff_forward'} if asymmetric else {'width': result.parameter}), 'target': result.target,
             'impedance': result.impedance, 'refined_impedance': result.refined_impedance,
             'residual': result.residual, 'refined_residual': result.refined_residual,
             'mesh_change': result.mesh_change,

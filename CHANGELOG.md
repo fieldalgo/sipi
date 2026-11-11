@@ -1,5 +1,8 @@
 # Changelog
 
+- Add unequal surface and buried pair forms with explicit lossless forward differential results, independent profiles and selected left/right width targets.
+  비대칭 표면·매립 차동쌍에 명시 무손실 전진 임피던스, 독립 프로필과 좌우 선택 폭 역산을 연결합니다.
+
 - Require the pinned test-only independent reference in Windows adapter checks so missing tools fail instead of skipping comparisons.
   Windows adapter 시험에 고정된 독립 비교 도구를 필수로 설치하고 누락 시 비교를 건너뛰지 않고 실패하도록 합니다.
 
