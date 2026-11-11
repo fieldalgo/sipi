@@ -1,5 +1,8 @@
 # Changelog
 
+- Run source and installed regression in separate platform jobs and validate the independent development branch without requiring a pull request; preserve reference gates and per-job limits.
+  플랫폼별 소스·설치본 회귀를 별도 작업으로 실행하고 PR 없이 독립 개발 브랜치를 검증하며 참조 기준과 작업별 시간 제한을 유지합니다.
+
 - Qualify the two fixed 1 GHz forward-pair outer checks with separate common-current monotonic and differential finite-sensitivity criteria; retain target tolerances, fixtures and independent references.
   고정 1 GHz 전방 쌍 외곽 시험 두 개에 공통 전류 단조 조건과 차동 유한 민감도 조건을 구분하며 목표 허용치·시험 입력·독립 기준을 유지합니다.
 

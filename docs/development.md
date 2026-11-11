@@ -58,3 +58,14 @@ for existing SIPI calculations.
 Give large parametrized test inputs short explicit `ids`. Pytest puts the node
 ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 32767 characters. Keep the actual large input and its rejection criterion intact.
+
+## Continuous validation
+
+The validation workflow runs source and installed-artifact regression in separate
+Linux, macOS and Windows jobs. Each job retains a six-hour limit; splitting avoids
+combining both complete suites into one timeout budget. It runs for ready pull
+requests, main pushes and pushes to the current independent-repository development
+branch, so pre-merge validation can run without opening a pull request. Every job
+retains the pinned independent references, wheel/sdist build, validation-tool checks
+and failure reports. The installed suite includes geometry-contract checks. These
+checks do not publish packages, executables or websites.

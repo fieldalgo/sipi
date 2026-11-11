@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches: [main]
+    branches: [main, codex/independent-repository]
   workflow_dispatch:
 permissions:
   contents: read
@@ -13,11 +13,14 @@ concurrency:
   queue: ${{ github.ref == 'refs/heads/main' && 'max' || 'single' }}
 jobs:
   tests:
+    name: ${{ matrix.os }} / ${{ matrix.suite }}
+    timeout-minutes: 360
     if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-15, windows-latest]
+        suite: [source, installed]
     runs-on: ${{ matrix.os }}
     env:
       OPENBLAS_NUM_THREADS: '1'
@@ -62,15 +65,17 @@ jobs:
       - name: Validation tool regression
         run: python -m pytest -q tools/tests --junitxml=.validation/tools.xml
       - name: Source regression
+        if: ${{ matrix.suite == 'source' }}
         env:
           PYTHONPATH: src
         run: python -m pytest -q tests/sipi --junitxml=.validation/source.xml
       - name: Installed regression and geometry contract
+        if: ${{ matrix.suite == 'installed' }}
         run: python tools/check_installed.py --wheels .validation/wheels
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
-          name: validation-${{ matrix.os }}
+          name: validation-${{ matrix.os }}-${{ matrix.suite }}
           path: |
             .validation/*.xml
             .validation/installed.json
