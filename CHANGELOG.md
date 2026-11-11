@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserve equal-radius refinement candidate order in elliptical-aperture meshes, retaining geometry, mesh limits and inverse-goal acceptance checks.
+  타원형 개구 메시에서 같은 반지름의 세분화 후보 순서를 유지하며 형상·메시 상한·역산 수락 검사를 보존합니다.
+
 - Evaluate P1 capacitance with compensated element-gradient bilinear energy while retaining the field solve, material contracts and target tolerances.
   필드 해·재료 계약·목표 허용오차를 유지하면서 P1 정전용량을 요소 기울기의 쌍선형 에너지와 보상 합산으로 계산합니다.
 

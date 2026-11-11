@@ -81,6 +81,13 @@ Swapping the requested conductor order therefore permutes C without selecting a
 different mesh. A separately remeshed reflection need not give exactly equal
 self terms; tests distinguish that discretization error from algebraic symmetry.
 
+Refinement candidates with equal circumradii retain their input order. This
+avoids depending on NumPy's unspecified quicksort order for equal keys, which
+can otherwise change the interior mesh and a bounded inverse-search history
+between runtimes. The geometry, mesh controls, point limit and refinement
+acceptance criteria remain the same. Stable candidate ordering does not promise
+bitwise equality for every platform or replace field/polygon convergence checks.
+
 `ApertureSectionDocument` snapshots `sipi.aperture-section/1`: metre units, full
 axes, named conductor diameters/centres, dielectric and explicit mesh settings.
 It rejects missing/unknown fields, duplicate JSON keys, invalid geometry and

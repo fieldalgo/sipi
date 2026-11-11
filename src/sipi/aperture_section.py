@@ -139,7 +139,7 @@ class EllipticalAperture:
             index = min(range(len(shapes)), key=lambda i: shapes[i].exterior.distance(p))
             return 'ground' if index == 0 else ordered[index-1].name
 
-        mesh = from_mesher(generate(domain, boundary))
+        mesh = from_mesher(generate(domain, boundary, candidate_order='stable'))
         mesh.nodes *= scale
         with np.errstate(over='ignore', under='ignore', invalid='ignore'):
             areas = mesh.areas()
