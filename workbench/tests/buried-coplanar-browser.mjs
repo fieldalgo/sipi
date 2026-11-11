@@ -105,7 +105,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/buried_coplanar_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const precise=JSON.parse(fixtureRun.stdout)[template];
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),24);
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),26);
   await choose(template);
   assert.equal(await cdp.evaluate('document.querySelector("#placement-mode-field").hidden'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#trace_height").disabled'),false);
@@ -158,7 +158,7 @@ try {
   for(const [name,value] of Object.entries({first,firstInput,project,physical,outer,fine,study,goal,network,design}))await writeFile(join(output,name+'.json'),JSON.stringify(value,null,2));
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:24,layouts,errors,externalRequests:remoteRequests,checks:['unmodified first-use calculation','explicit height and no air controls','exact inputs through three units','invalid height and ground clearance refusal','height moves all traces without changing planes','A/B exact project restore','nominal document identity','separate mesh and box checks','height and ground-gap corners','invalid study bounds refusal','bounded width with requested/refined residuals','exact chosen input and mesh export','two/four port export','cancel/restart','four viewport controls','shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:26,layouts,errors,externalRequests:remoteRequests,checks:['unmodified first-use calculation','explicit height and no air controls','exact inputs through three units','invalid height and ground clearance refusal','height moves all traces without changing planes','A/B exact project restore','nominal document identity','separate mesh and box checks','height and ground-gap corners','invalid study bounds refusal','bounded width with requested/refined residuals','exact chosen input and mesh export','two/four port export','cancel/restart','four viewport controls','shutdown']},null,2));
 } catch(error) {
   let application=null;
   try {application=await cdp?.evaluate('({status:document.querySelector("#status")?.textContent,resultHidden:document.querySelector("#result")?.hidden,calculateDisabled:document.querySelector("#calculate")?.disabled})');} catch {}

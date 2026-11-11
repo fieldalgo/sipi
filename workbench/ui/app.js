@@ -1,4 +1,4 @@
-import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isLayeredInterface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -16,7 +16,7 @@ const changedFields = new Set();
 // Display changes never become physical edits to target or study bounds.
 const studySI = {};
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
-const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
+const allFields = [...lengthFields, 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
 
 function status(text, error = false) {
@@ -439,6 +439,11 @@ function preview() {
 }
 
 function geometryFields() {
+  const layered = isLayeredInterface(template);
+  $('uniform-height-field').hidden = layered;
+  $('uniform-dielectric-fields').hidden = layered;
+  $('layered-height-fields').hidden = !layered;
+  $('layered-dielectric-fields').hidden = !layered;
   const broadside = template === 'broadside_stripline';
   $('broadside-fields').hidden = !broadside;
   $('profile').disabled = busy || !!imported || broadside;
@@ -460,7 +465,7 @@ function geometryFields() {
   $('geometry-inspect').hidden = !normal || !!imported;
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['height', 'eps_r', 'tan_delta', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -545,7 +550,7 @@ function resetStudyBounds(i) {
   try {
     const p = currentParameters(), key = $(`study-variable-${i}`).value, value = p[key];
     studySI[i] = {parameter:key,
-      low:['eps_r','coating_eps_r'].includes(key) ? Math.max(1, value*.9) : value*.9,
+      low:['eps_r','coating_eps_r','lower_eps_r','upper_eps_r'].includes(key) ? Math.max(1, value*.9) : value*.9,
       high:value === 0 ? .05*scales.mm : value*1.1};
     if (template === 'broadside_stripline' && key === 'offset') {
       const span = value === 0 ? .05 * scales.mm : Math.abs(value) * .1;
@@ -568,7 +573,7 @@ function refreshStudyOptions(reset=false) {
     const select=$(`study-variable-${i}`), previous=select.value;
     select.replaceChildren();
     for (const [key,label] of Object.entries(choices)) {const option=document.createElement('option');option.value=key;option.textContent=label;select.append(option);}
-    select.value=previous in choices ? previous : i===1 ? 'width' : 'eps_r';
+    select.value=previous in choices ? previous : i===1 ? 'width' : isLayeredInterface(template) ? 'lower_eps_r' : 'eps_r';
     if (reset || previous !== select.value) resetStudyBounds(i);
   }
 }
@@ -591,7 +596,7 @@ function renderStudy(study, runtime) {
 function studyCSV(study) {
   const names=study.settings.variables.map(v=>v.parameter);
   const quote=value=>'"'+String(value ?? '').replaceAll('"','""')+'"';
-  const rows=[['sample',...names.map(n=>n+(['eps_r','coating_eps_r'].includes(n)?'_1':'_m')),study.quantity+'_ohm','status','error']];
+  const rows=[['sample',...names.map(n=>n+(['eps_r','coating_eps_r','lower_eps_r','upper_eps_r'].includes(n)?'_1':'_m')),study.quantity+'_ohm','status','error']];
   study.rows.forEach((row,i)=>rows.push([i+1,...names.map(n=>row.parameters[n]),row.impedance,row.status,row.error]));
   return rows.map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
 }

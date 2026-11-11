@@ -11,13 +11,14 @@ import sipi
 from sipi.templates import broadside_stripline, coated_microstrip, coupled_stripline, offset_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
+    'layered_stripline', 'coupled_layered_stripline',
     'coplanar_stripline', 'coupled_coplanar_stripline',
     'conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'microstrip', 'stripline', 'coupled_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar')}
 TEMPLATES['broadside_stripline'] = broadside_stripline
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
 TEMPLATES['offset_stripline'] = offset_stripline
-PAIR_TEMPLATES = {'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
+PAIR_TEMPLATES = {'coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
 
 
 def engine_info():
@@ -132,6 +133,8 @@ def study_documents(request, nominal):
         allowed.add('trace_height')
     if request['template'] == 'broadside_stripline':
         allowed.add('offset')
+    if request['template'] in ('layered_stripline', 'coupled_layered_stripline'):
+        allowed.update(('lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r'))
     names, low, high = [], [], []
     for variable in variables:
         if not isinstance(variable, dict) or set(variable) != {'parameter', 'lower', 'upper'}:

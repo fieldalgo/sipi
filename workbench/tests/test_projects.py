@@ -142,7 +142,7 @@ def test_growth_tamper_and_invalid_edits_leave_original_intact():
 
 
 def test_readable_core_input_without_a_form_is_preserved():
-    text=TemplateSectionDocument('layered_stripline',dict(width=.0005,thickness=.000035,lower_height=.0004,upper_height=.0006,lower_eps_r=4,upper_eps_r=4)).dumps()
+    text=TemplateSectionDocument('layered_broadside_stripline',dict(width=.0005,thickness=.000035,gap=.0002,lower_height=.0004,upper_height=.0006,lower_eps_r=4,gap_eps_r=3,upper_eps_r=4)).dumps()
     project=saved(create(text))
     assert project.prepare('a').source_text==text
     with pytest.raises(ValueError,match='no editable form'):

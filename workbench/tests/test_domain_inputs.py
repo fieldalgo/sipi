@@ -22,7 +22,7 @@ def forbid_field_solve(monkeypatch):
 @pytest.mark.parametrize('mode', ['omitted', 'null', 'fixed'])
 def test_domain_inspect_and_editable_roundtrip_preserve_parameters_and_mesh(template, mode):
     p=parameters(template)
-    keys=['box_width']+([] if template in ('broadside_stripline','stripline','coupled_stripline','offset_stripline','coplanar_stripline','coupled_coplanar_stripline') else ['air_height'])
+    keys=['box_width']+([] if template in ('layered_stripline','coupled_layered_stripline','broadside_stripline','stripline','coupled_stripline','offset_stripline','coplanar_stripline','coupled_coplanar_stripline') else ['air_height'])
     if template in ('unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar'): keys.append('lower_air_height')
     for key in keys:
         if mode=='omitted': p.pop(key)
@@ -61,13 +61,13 @@ def test_domain_rejects_box_that_cannot_contain_copper_before_solve(template):
         execute(dict(action='document',template=template,parameters=p))
 
 
-@pytest.mark.parametrize('template', [n for n in TEMPLATES if n not in ('broadside_stripline','stripline','coupled_stripline','offset_stripline','coplanar_stripline','coupled_coplanar_stripline')])
+@pytest.mark.parametrize('template', [n for n in TEMPLATES if n not in ('layered_stripline','coupled_layered_stripline','broadside_stripline','stripline','coupled_stripline','offset_stripline','coplanar_stripline','coupled_coplanar_stripline')])
 def test_surface_domain_rejects_nonpositive_air_before_solve(template):
     with pytest.raises(ValueError):
         execute(dict(action='document',template=template,parameters={**parameters(template),'air_height':0}))
 
 
-@pytest.mark.parametrize('template', ['broadside_stripline', 'stripline', 'coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'])
+@pytest.mark.parametrize('template', ['layered_stripline', 'coupled_layered_stripline', 'broadside_stripline', 'stripline', 'coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'])
 def test_buried_templates_reject_an_air_height_argument_before_solve(template):
     with pytest.raises(TypeError, match="unexpected keyword argument 'air_height'"):
         execute(dict(action='document', template=template,

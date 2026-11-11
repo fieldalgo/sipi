@@ -174,3 +174,11 @@ footer a{color:inherit;text-underline-offset:3px}
 /* Keep broadside offset and required copper thickness easy to edit. */
 #broadside-fields .number,
 #inputs:has(#broadside-fields:not([hidden])) .number:has(#thickness) { height: 46px; }
+
+#layered-height-fields .number, #layered-dielectric-fields .number { height: 46px; }
+/* Keep long layer-variable labels inside a narrow study panel. */
+@media (max-width: 420px) {
+  body:has(#layered-height-fields:not([hidden])) .target-fields:has(#study-variable-1),
+  body:has(#layered-height-fields:not([hidden])) #study-second { grid-template-columns: minmax(0, 1fr); }
+  body:has(#layered-height-fields:not([hidden])) :is(#study-variable-1, #study-variable-2) { display: block; width: 100%; min-width: 0; max-width: 100%; }
+}

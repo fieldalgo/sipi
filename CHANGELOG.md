@@ -1,5 +1,8 @@
 # Changelog
 
+- Add single and paired two-dielectric interface forms with independent layer inputs, exact projects and layer studies.
+  두 유전체 경계의 단일·차동 폼에 층별 입력·프로젝트·공차 흐름을 연결합니다.
+
 - Add a rectangular broadside-pair form with vertical metal-face gap, signed horizontal offset, exact projects and offset/gap studies.
   수직 broadside 쌍에 도체 면 사이 간격·부호 있는 수평 오프셋·정확한 프로젝트·공차 흐름을 연결합니다.
 

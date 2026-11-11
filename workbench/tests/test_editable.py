@@ -41,6 +41,12 @@ def parameters(name):
     if name == 'broadside_stripline':
         p.pop('substrate_height', None); p.pop('air_height', None); p.pop('top_width', None)
         p.update(plane_spacing=.001, gap=.0002, offset=-.0001000000000123456)
+    if name in ('layered_stripline', 'coupled_layered_stripline'):
+        p.pop('substrate_height', None); p.pop('air_height', None)
+        p.pop('eps_r'); p.pop('tan_delta')
+        p.update(lower_height=.0004000000000123456, upper_height=.0006000000000123456,
+                 lower_eps_r=3.8, upper_eps_r=4.5, lower_tan_delta=.01, upper_tan_delta=.02)
+        if name.startswith('coupled_'): p['gap'] = .0002
     return p
 
 
@@ -79,7 +85,7 @@ def test_open_rejects_mismatch_and_unknown_options():
 
 def test_no_form_for_valid_unsupported_template():
     # Engine support does not imply a matching editable UI form.
-    doc = TemplateSectionDocument('layered_stripline', dict(width=.0005, thickness=.000035, lower_height=.0004, upper_height=.0006, lower_eps_r=4, upper_eps_r=4))
+    doc = TemplateSectionDocument('layered_broadside_stripline', dict(width=.0005, thickness=.000035, gap=.0002, lower_height=.0004, upper_height=.0006, lower_eps_r=4, gap_eps_r=3, upper_eps_r=4))
     with pytest.raises(ValueError, match='no editable form'):
         execute(dict(action='template-open', text=doc.dumps()))
 

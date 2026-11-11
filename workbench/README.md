@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the twenty-four-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the twenty-six-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers twenty-four cross-section forms, impedance targeting,
+The basic workspace offers twenty-six cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -31,6 +31,38 @@ every saved contract are not implemented. Explicit-mesh bounded static 3D
 capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
+
+## Two dielectrics meeting at the copper bottom face
+
+**Two-dielectric stripline** and **Two-dielectric pair** keep an explicit lower
+and upper dielectric between two grounded planes. The lower height runs from
+the bottom plane to the interface and copper bottom face. The upper height runs
+from that interface to the top plane, **including copper**. Copper extends into
+the upper dielectric, so its thickness must be below the upper height. Zero
+thickness is allowed for rectangular traces; a centred trapezoid needs positive
+thickness. The pair has equal traces and a horizontal bottom-edge gap.
+
+Enter the relative permittivity (at least one) and nonnegative loss tangent of
+each layer independently. The input does not average the two materials. There
+is no uniform-height, uniform-permittivity or air field in these forms. The
+schematic and inspected geometry show the interface explicitly. Changing either
+layer height changes the total plane spacing; no constant-height constraint is
+silently applied.
+
+Editable JSON and A/B projects preserve both layer heights, materials, profile
+and resolved mesh. Unit changes retain exact underlying SI lengths, while
+permittivity and loss tangent remain dimensionless. Sweep or sample layer
+heights/permittivities, width, thickness and pair gap with the fixed resolved
+nominal mesh. Invalid bounds are refused before solving, and failed samples
+remain in the output. Inspect mesh and outer-boundary sensitivity across the
+range before interpreting sample statistics.
+
+Width targets retain the interface heights and material inputs. Automatic
+targets use the existing finer initial mesh and a separate refinement check;
+explicit meshes, the final tolerance and 32-evaluation/300,000-point/five-minute
+limits remain in force. Supply bounds that bracket the target. These bounded
+quasi-static calculations do not certify arbitrary stacks, manufacturing
+accuracy or three-dimensional transitions.
 
 ## Broadside pair between grounded planes
 
@@ -199,7 +231,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The twenty-four forms include broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The twenty-six forms include two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -449,7 +481,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the twenty-four supported editable templates. Other
+All project designs must use the twenty-six supported editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace

@@ -1,8 +1,9 @@
 export const scales = {mm: 1e-3, 'µm': 1e-6, mil: 25.4e-6};
-export const lengthFields = ['width', 'top_width', 'height', 'trace_height', 'offset', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'coating_thickness', 'box_width', 'air_height', 'lower_air_height', 'lower', 'upper'];
-export const labels = {broadside_stripline: 'Broadside pair', coplanar_stripline: 'Coplanar stripline', coupled_coplanar_stripline: 'Coplanar stripline pair', conformal_coated_unbacked_coplanar: 'Normal-film unbacked coplanar', coupled_conformal_coated_unbacked_coplanar: 'Normal-film unbacked pair', conformal_coated_grounded_coplanar: 'Normal-film grounded coplanar', coupled_conformal_coated_grounded_coplanar: 'Normal-film grounded pair', conformal_coated_microstrip: 'Normal-film microstrip', coupled_conformal_coated_microstrip: 'Normal-film pair', coated_unbacked_coplanar: 'Coated unbacked coplanar', coupled_coated_unbacked_coplanar: 'Coated unbacked pair',coupled_unbacked_coplanar: 'Unbacked coplanar pair', unbacked_coplanar: 'Unbacked coplanar', microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip', coupled_coated_microstrip: 'Planar coated pair', coated_grounded_coplanar: 'Planar coated coplanar', coupled_coated_grounded_coplanar: 'Planar coated coplanar pair'};
-export const isStripline = template => ['broadside_stripline', 'stripline', 'coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
-export const isPair = template => ['broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'].includes(template);
+export const lengthFields = ['width', 'top_width', 'height', 'lower_height', 'upper_height', 'trace_height', 'offset', 'thickness', 'gap', 'ground_gap', 'ground_width', 'coating_height', 'coating_thickness', 'box_width', 'air_height', 'lower_air_height', 'lower', 'upper'];
+export const labels = {layered_stripline: 'Two-dielectric stripline', coupled_layered_stripline: 'Two-dielectric pair', broadside_stripline: 'Broadside pair', coplanar_stripline: 'Coplanar stripline', coupled_coplanar_stripline: 'Coplanar stripline pair', conformal_coated_unbacked_coplanar: 'Normal-film unbacked coplanar', coupled_conformal_coated_unbacked_coplanar: 'Normal-film unbacked pair', conformal_coated_grounded_coplanar: 'Normal-film grounded coplanar', coupled_conformal_coated_grounded_coplanar: 'Normal-film grounded pair', conformal_coated_microstrip: 'Normal-film microstrip', coupled_conformal_coated_microstrip: 'Normal-film pair', coated_unbacked_coplanar: 'Coated unbacked coplanar', coupled_coated_unbacked_coplanar: 'Coated unbacked pair',coupled_unbacked_coplanar: 'Unbacked coplanar pair', unbacked_coplanar: 'Unbacked coplanar', microstrip: 'Microstrip', stripline: 'Stripline', offset_stripline: 'Offset stripline', coupled_microstrip: 'Coupled pair', coupled_stripline: 'Coupled stripline', grounded_coplanar: 'Grounded coplanar', coupled_grounded_coplanar: 'Coupled coplanar', coated_microstrip: 'Planar coated microstrip', coupled_coated_microstrip: 'Planar coated pair', coated_grounded_coplanar: 'Planar coated coplanar', coupled_coated_grounded_coplanar: 'Planar coated coplanar pair'};
+export const isLayeredInterface = template => ['layered_stripline', 'coupled_layered_stripline'].includes(template);
+export const isStripline = template => ['layered_stripline', 'coupled_layered_stripline', 'broadside_stripline', 'stripline', 'coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
+export const isPair = template => ['coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'].includes(template);
 export const isUnbacked = template => ['conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'unbacked_coplanar', 'coupled_unbacked_coplanar'].includes(template);
 export const isCoplanar = template => ['coplanar_stripline', 'coupled_coplanar_stripline', 'conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'].includes(template);
 export const isNormalFilm = template => ['conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'].includes(template);
@@ -18,7 +19,7 @@ export function refinedMesh(mesh) {
 }
 
 export function parameterFields(template) {
-  return {...(template === 'broadside_stripline' ? {offset: 'offset'} : {}), width: 'width', top_width: 'top_width', thickness: 'thickness',
+  return {...(isLayeredInterface(template) ? {lower_height: 'lower_height', upper_height: 'upper_height', lower_eps_r: 'lower_eps_r', upper_eps_r: 'upper_eps_r', lower_tan_delta: 'lower_tan_delta', upper_tan_delta: 'upper_tan_delta'} : {}), ...(template === 'broadside_stripline' ? {offset: 'offset'} : {}), width: 'width', top_width: 'top_width', thickness: 'thickness',
     height: isStripline(template) ? 'plane_spacing' : 'substrate_height', trace_height: 'trace_height',
     gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', box_width: 'box_width', air_height: 'air_height', lower_air_height: 'lower_air_height', coating_height: 'coating_height', coating_thickness: 'coating_thickness',
     eps_r: 'eps_r', tan_delta: 'tan_delta', coating_eps_r: 'coating_eps_r',
@@ -60,8 +61,18 @@ export function parameters(template, values, unit) {
     if (!Number.isFinite(v) || (allowZero ? v < 0 : v <= 0)) throw new Error(`${key} must be ${allowZero ? 'nonnegative' : 'positive'} and finite.`);
     return v;
   };
-  const out = {width: positive('width') * scales[unit], thickness: positive('thickness', template !== 'broadside_stripline') * scales[unit], eps_r: positive('eps_r'), tan_delta: positive('tan_delta', true)};
-  out[isStripline(template) ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
+  const out = {width: positive('width') * scales[unit], thickness: positive('thickness', template !== 'broadside_stripline') * scales[unit]};
+  if (isLayeredInterface(template)) {
+    for (const side of ['lower', 'upper']) {
+      out[`${side}_height`] = positive(`${side}_height`) * scales[unit];
+      out[`${side}_eps_r`] = positive(`${side}_eps_r`);
+      if (out[`${side}_eps_r`] < 1) throw new Error(`${side}_eps_r must be at least one.`);
+      out[`${side}_tan_delta`] = positive(`${side}_tan_delta`, true);
+    }
+  } else {
+    out.eps_r = positive('eps_r'); out.tan_delta = positive('tan_delta', true);
+    out[isStripline(template) ? 'plane_spacing' : 'substrate_height'] = positive('height') * scales[unit];
+  }
   if (['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template)) out.trace_height = positive('trace_height') * scales[unit];
   if (template === 'coupled_stripline') {
     const placement = values.placement ?? 'centred';
@@ -109,6 +120,11 @@ export function convert(value, from, to) {
 export function studyFields(template, p) {
   const fields = {width: 'Bottom width', eps_r: 'Substrate permittivity',
     [isStripline(template) ? 'plane_spacing' : 'substrate_height']: isStripline(template) ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
+  if (isLayeredInterface(template)) {
+    delete fields.eps_r; delete fields.plane_spacing;
+    Object.assign(fields, {lower_height: 'Lower layer height', upper_height: 'Upper layer height (includes copper)',
+      lower_eps_r: 'Lower permittivity', upper_eps_r: 'Upper permittivity'});
+  }
   if (p.top_width != null) fields.top_width = 'Top width';
   if (['coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template) && p.trace_height != null) fields.trace_height = 'Bottom-face height';
   if ('gap' in p) fields.gap = template === 'broadside_stripline' ? 'Vertical metal-face gap' : 'Bottom gap';
@@ -121,16 +137,16 @@ export function studyFields(template, p) {
 }
 
 export function studyScale(name, unit) {
-  return ['eps_r', 'coating_eps_r'].includes(name) ? 1 : scales[unit];
+  return ['eps_r', 'coating_eps_r', 'lower_eps_r', 'upper_eps_r'].includes(name) ? 1 : scales[unit];
 }
 
 // This is only a drawing model. The Python template creates all solver inputs.
 export function schematic(template, p) {
   if (isNormalFilm(template)) throw new Error('Inspect the engine geometry for normal films.');
-  const h = p.substrate_height ?? p.plane_spacing;
+  const h = isLayeredInterface(template) ? p.lower_height + p.upper_height : (p.substrate_height ?? p.plane_spacing);
   const strip = isStripline(template);
   const lowerAir = isUnbacked(template) ? (p.lower_air_height ?? 10 * h) : 0;
-  const y = strip ? (p.trace_height ?? (h - p.thickness) / 2) : h + lowerAir;
+  const y = isLayeredInterface(template) ? p.lower_height : strip ? (p.trace_height ?? (h - p.thickness) / 2) : h + lowerAir;
   const signal = {name: 'signal', x: 0, width: p.width, top_width: p.top_width ?? p.width, y, thickness: p.thickness, ground: false};
   let traces = [signal];
   if (template === 'broadside_stripline') {
@@ -144,7 +160,7 @@ export function schematic(template, p) {
     const x = isPair(template) ? p.width + p.gap / 2 + p.ground_gap + p.ground_width / 2 : (p.width + p.ground_width) / 2 + p.gap;
     traces.push({...signal, name: 'ground_left', x: -x, width: p.ground_width, top_width: p.ground_width, ground: true}, {...signal, name: 'ground_right', x, width: p.ground_width, top_width: p.ground_width, ground: true});
   }
-  const layers = [...(isUnbacked(template) ? [{name: 'lower_air', thickness: lowerAir, eps_r: 1}] : []), {name: strip ? 'dielectric' : 'substrate', thickness: h, eps_r: p.eps_r}];
+  const layers = isLayeredInterface(template) ? [{name: 'lower', thickness: p.lower_height, eps_r: p.lower_eps_r}, {name: 'upper', thickness: p.upper_height, eps_r: p.upper_eps_r}] : [...(isUnbacked(template) ? [{name: 'lower_air', thickness: lowerAir, eps_r: 1}] : []), {name: strip ? 'dielectric' : 'substrate', thickness: h, eps_r: p.eps_r}];
   if (isCoated(template)) layers.push({name: 'planar coating', thickness: p.coating_height, eps_r: p.coating_eps_r});
   if (!strip) layers.push({name: 'air', thickness: Math.max(h * 1.1, p.thickness * 1.5), eps_r: 1});
   return {layers, traces, box: {width: Math.max(h * 5, ...traces.map(t => (Math.abs(t.x) + Math.max(t.width, t.top_width) / 2) * 2.5)), bottom: isUnbacked(template) ? 'open' : 'ground', top: strip ? 'ground' : 'open', sides: 'open'}};
