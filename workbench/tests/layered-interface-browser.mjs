@@ -105,7 +105,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/layered_interface_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const precise=JSON.parse(fixtureRun.stdout)[template];
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),26);
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
   await choose(template);
   for(const id of ['height','eps_r','tan_delta','air_mode','offset'])assert.equal(await cdp.evaluate(`document.getElementById('${id}').disabled`),true);
   for(const id of ['lower_height','upper_height','lower_eps_r','upper_eps_r','lower_tan_delta','upper_tan_delta'])assert.equal(await cdp.evaluate(`document.getElementById('${id}').disabled`),false);
@@ -179,7 +179,7 @@ try {
   for(const [name,value] of Object.entries({first,firstInput,layerEdits,project,physical,outer,fine,defaultStudy,study,goal,network,design}))await writeFile(join(output,name+'.json'),JSON.stringify(value,null,2));
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:26,layouts,errors,externalRequests:remoteRequests,checks:['two independent layers first use','inactive uniform fields and valid layer controls','exact three-unit inputs','invalid interface and material refusal','hidden fields ignored','independent layer edits preserve other inputs and mesh','A/B exact project restore','nominal document identity','separate mesh and box checks','dimensionless default material bounds across units','layer height and permittivity corners','CSV dimensionless and length columns','invalid clearance bounds refusal','bounded50/100ohm requested/refined width','exact chosen interface and mesh export','two/four-port export','cancel/restart','four viewport controls','shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:28,layouts,errors,externalRequests:remoteRequests,checks:['two independent layers first use','inactive uniform fields and valid layer controls','exact three-unit inputs','invalid interface and material refusal','hidden fields ignored','independent layer edits preserve other inputs and mesh','A/B exact project restore','nominal document identity','separate mesh and box checks','dimensionless default material bounds across units','layer height and permittivity corners','CSV dimensionless and length columns','invalid clearance bounds refusal','bounded50/100ohm requested/refined width','exact chosen interface and mesh export','two/four-port export','cancel/restart','four viewport controls','shutdown']},null,2));
 } catch(error) {
   let application=null;
   try {application=await cdp?.evaluate('({status:document.querySelector("#status")?.textContent,resultHidden:document.querySelector("#result")?.hidden,calculateDisabled:document.querySelector("#calculate")?.disabled})');} catch {}

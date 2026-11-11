@@ -1,5 +1,8 @@
 # Changelog
 
+- Add two-dielectric coplanar single/pair forms with finite side grounds, exact input projects and layer/ground studies.
+  두 유전체 coplanar 단일·차동 폼에 유한 측면 접지와 정확한 입력 프로젝트·층별/접지 공차를 연결합니다.
+
 - Add single and paired two-dielectric interface forms with independent layer inputs, exact projects and layer studies.
   두 유전체 경계의 단일·차동 폼에 층별 입력·프로젝트·공차 흐름을 연결합니다.
 

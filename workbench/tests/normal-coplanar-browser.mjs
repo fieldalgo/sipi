@@ -105,7 +105,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/normal_coplanar_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout),precise=fixtures[template];
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),26);
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
   await choose(template);
   assert.equal(await cdp.evaluate('document.querySelector("#coating-height-field").hidden'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#coating-thickness-field").hidden'),false);
@@ -177,7 +177,7 @@ try {
   for(const [name,value] of Object.entries({project:projectB,physical,outer,air,vacuum:vacuumResult,goal,network,study,design:designed}))await writeFile(join(output,name+'.json'),JSON.stringify(value,null,2));
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:26,layouts,errors,externalRequests:remoteRequests,checks:['normal and planar fields separate','engine vertices displayed without JS geometry inference','exact normal thickness through three units','edit invalidates old geometry','invalid input keeps preview uninspected','A/B exact project restore','mesh and domain checks','film air limit ordering','normal thickness/material corners','invalid film study and overhang refusal','air clearance auto/fixed transport','inactive field isolation','independent vacuum panel target and both mesh residuals','two/four port export','cancel/restart','four viewport controls','shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:28,layouts,errors,externalRequests:remoteRequests,checks:['normal and planar fields separate','engine vertices displayed without JS geometry inference','exact normal thickness through three units','edit invalidates old geometry','invalid input keeps preview uninspected','A/B exact project restore','mesh and domain checks','film air limit ordering','normal thickness/material corners','invalid film study and overhang refusal','air clearance auto/fixed transport','inactive field isolation','independent vacuum panel target and both mesh residuals','two/four port export','cancel/restart','four viewport controls','shutdown']},null,2));
   console.log('Normal film form acceptance passed.');
 } catch(error) {
   let application=null;

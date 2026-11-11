@@ -11,6 +11,7 @@ import sipi
 from sipi.templates import broadside_stripline, coated_microstrip, coupled_stripline, offset_stripline
 
 TEMPLATES = {name: getattr(sipi, name) for name in (
+    'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline',
     'layered_stripline', 'coupled_layered_stripline',
     'coplanar_stripline', 'coupled_coplanar_stripline',
     'conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'microstrip', 'stripline', 'coupled_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'grounded_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar')}
@@ -18,7 +19,7 @@ TEMPLATES['broadside_stripline'] = broadside_stripline
 TEMPLATES['coated_microstrip'] = coated_microstrip
 TEMPLATES['coupled_stripline'] = coupled_stripline
 TEMPLATES['offset_stripline'] = offset_stripline
-PAIR_TEMPLATES = {'coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
+PAIR_TEMPLATES = {'coupled_layered_coplanar_stripline', 'coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
 
 
 def engine_info():
@@ -133,7 +134,7 @@ def study_documents(request, nominal):
         allowed.add('trace_height')
     if request['template'] == 'broadside_stripline':
         allowed.add('offset')
-    if request['template'] in ('layered_stripline', 'coupled_layered_stripline'):
+    if request['template'] in ('layered_stripline', 'coupled_layered_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
         allowed.update(('lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r'))
     names, low, high = [], [], []
     for variable in variables:
@@ -375,7 +376,7 @@ def execute(request, *, record_provider=None):
             # These defaults already resolve finite ground gaps or coating.
             # Keep their edge/growth settings before the mandatory independent
             # refinement; pre-refining both again can exceed the point budget.
-            if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline'):
+            if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
                 # Resolve buried conductor edges without halving growth twice.
                 # The separate refinement and residual gates still apply.
                 mesh['edge_size'] /= 2
@@ -383,7 +384,7 @@ def execute(request, *, record_provider=None):
                 mesh['edge_size'] /= 4
                 mesh['grade'] /= 2
         search_options = {}
-        if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline'):
+        if request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
             tolerance = settings.get('tolerance', 0.1)
             if (isinstance(tolerance, bool) or not isinstance(tolerance, Real)
                     or not math.isfinite(tolerance) or tolerance <= 0):

@@ -105,7 +105,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/broadside_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const precise=JSON.parse(fixtureRun.stdout);
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),26);
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
   await choose(template);
   assert.equal(await cdp.evaluate('document.querySelector("#profile").disabled'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#profile").value'),'rectangular');
@@ -169,7 +169,7 @@ try {
   for(const [name,value] of Object.entries({first,firstInput,offsetEdits,project,physical,outer,fine,defaultStudy,study,goal,network,design}))await writeFile(join(output,name+'.json'),JSON.stringify(value,null,2));
   await cdp.evaluate('document.querySelector("#exit").click()');await until(()=>cdp.evaluate('document.querySelector("#status").textContent.includes("Application closed")'),'shutdown');if(!webRoot)await until(()=>server.exitCode===0,'host exit');
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);if(webRoot)assert.deepEqual(apiRequests,[]);
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:26,layouts,errors,externalRequests:remoteRequests,checks:['positive rectangular first use','vertical gap and signed offset labels','exact three-unit inputs','invalid thickness/gap/offset refusal','zero/positive/negative offset preserves exact geometry','A/B exact project restore','nominal document identity','separate mesh and box checks','negative nominal default bounds','offset and vertical-gap corners','invalid study bounds refusal','bounded100ohm requested/refined width','exact chosen input and mesh export','four-port export','cancel/restart','four viewport controls','shutdown']},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'installed-native',actions,editableForms:28,layouts,errors,externalRequests:remoteRequests,checks:['positive rectangular first use','vertical gap and signed offset labels','exact three-unit inputs','invalid thickness/gap/offset refusal','zero/positive/negative offset preserves exact geometry','A/B exact project restore','nominal document identity','separate mesh and box checks','negative nominal default bounds','offset and vertical-gap corners','invalid study bounds refusal','bounded100ohm requested/refined width','exact chosen input and mesh export','four-port export','cancel/restart','four viewport controls','shutdown']},null,2));
 } catch(error) {
   let application=null;
   try {application=await cdp?.evaluate('({status:document.querySelector("#status")?.textContent,resultHidden:document.querySelector("#result")?.hidden,calculateDisabled:document.querySelector("#calculate")?.disabled})');} catch {}

@@ -101,7 +101,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/editable_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout);
-  assert.equal(fixtures.cases.length,11);assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),26);
+  assert.equal(fixtures.cases.length,11);assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
   for(const input of fixtures.cases){await open(input);for(const unit of ['µm','mil','mm']){await cdp.evaluate(`document.querySelector('#unit').value='${unit}';document.querySelector('#unit').dispatchEvent(new Event('change'))`);assert.deepEqual(await save(),input);}}
   await choose('microstrip');for(const key of ['coating_height','coating_eps_r','coating_tan_delta'])await set(key,'-1');
   assert.equal(await cdp.evaluate('document.querySelector("#coating-fields").hidden'),true);await save();

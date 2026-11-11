@@ -47,6 +47,13 @@ def parameters(name):
         p.update(lower_height=.0004000000000123456, upper_height=.0006000000000123456,
                  lower_eps_r=3.8, upper_eps_r=4.5, lower_tan_delta=.01, upper_tan_delta=.02)
         if name.startswith('coupled_'): p['gap'] = .0002
+    if name in ('layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
+        p.pop('substrate_height', None); p.pop('air_height', None)
+        p.pop('eps_r'); p.pop('tan_delta')
+        p.update(lower_height=.0004000000000123456, upper_height=.0006000000000123456,
+                 lower_eps_r=3.8, upper_eps_r=4.5, lower_tan_delta=.01, upper_tan_delta=.02,
+                 gap=.0002, ground_width=.001)
+        if name.startswith('coupled_'): p['ground_gap'] = .0002
     return p
 
 
