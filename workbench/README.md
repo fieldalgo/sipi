@@ -32,6 +32,11 @@ capacitance inputs return total C in farads, with their saved insulating
 boundary and conductor order. They do not imply a geometry editor, via
 transition L/S or open-space fringing.
 
+The geometry preview remains responsive while dimensions are being edited, including
+invalid copper that extends beyond the planes. The engine still rejects invalid
+geometry; correct the dimensions and calculate again. Labels may move below the
+drawing so that they remain visible.
+
 ## Two-dielectric coplanar stripline
 
 **Two-dielectric coplanar** and **Two-dielectric coplanar pair** add finite

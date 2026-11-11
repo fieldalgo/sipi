@@ -374,13 +374,21 @@ function draw(model) {
     node.setAttribute('x', px);
     for (const span of node.querySelectorAll('tspan')) span.setAttribute('x', px);
     let box;
-    for (let attempt = 0; ; attempt++) {
+    for (let attempt = 0; attempt <= 32; attempt++) {
       const offset = attempt === 0 ? 0 : Math.ceil(attempt / 2) * labelStep * (attempt % 2 ? -1 : 1);
-      const py = attempt < 32 ? label.y + offset : bottom + (geometryDetail ? labelSize + 12 : 18);
+      // An invalid edit can draw copper beyond the nominal viewport. Place
+      // the fallback below every occupied shape, not at the same blocked row.
+      const floor = attempt < 32 ? bottom : occupied.reduce((low, b) => Math.max(low, b.y + b.height + 4), bottom);
+      const py = attempt < 32 ? label.y + offset : floor + (geometryDetail ? labelSize + 12 : 18);
       node.setAttribute('y', py);
       box = node.getBBox();
-      if (box.y < 8 || (attempt < 32 && box.y + box.height > 280)) continue;
-      if (occupied.some(b => box.x < b.x + b.width + 4 && b.x < box.x + box.width + 4 && box.y < b.y + b.height + 4 && b.y < box.y + box.height + 4)) continue;
+      if (![box.x, box.y, box.width, box.height].every(Number.isFinite)) throw new Error('The geometry labels need finite display bounds.');
+      const collision = box.y < 8 || (attempt < 32 && box.y + box.height > 280) ||
+        occupied.some(b => box.x < b.x + b.width + 4 && b.x < box.x + box.width + 4 && box.y < b.y + b.height + 4 && b.y < box.y + box.height + 4);
+      if (collision) {
+        if (attempt === 32) throw new Error('The geometry labels could not be placed in finite display bounds.');
+        continue;
+      }
       break;
     }
     bottom = Math.max(bottom, box.y + box.height + 12);

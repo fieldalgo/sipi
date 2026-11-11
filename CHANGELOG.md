@@ -1,5 +1,8 @@
 # Changelog
 
+- Keep geometry previews responsive when an invalid conductor extends beyond the drawing; preserve engine rejection and input recovery.
+  잘못된 도체 치수가 그림 범위를 벗어나도 미리보기가 멈추지 않고 엔진 오류 표시와 입력 복구를 유지합니다.
+
 - Add two-dielectric coplanar single/pair forms with finite side grounds, exact input projects and layer/ground studies.
   두 유전체 coplanar 단일·차동 폼에 유한 측면 접지와 정확한 입력 프로젝트·층별/접지 공차를 연결합니다.
 
