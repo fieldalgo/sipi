@@ -2,6 +2,8 @@
 
 [Element energy extraction](element_energy.md) reduces cancellation in the P1 capacitance integral without changing the field solve.
 
+[Symmetric-pair modal projection](modal_projection.md) reduces intermediate rounding in even/odd parameters while preserving the symmetry checks.
+
 [Ground-trace face laws](ground_faces.md) separate four finite ground surfaces in the Python API.
 
 [Two-dielectric buried coplanar lines](layered_coplanar_stripline.md) retain layer materials and compose fixed pitch with stack-height tolerances.

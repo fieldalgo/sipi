@@ -1,5 +1,8 @@
 # Changelog
 
+- Sum symmetric-pair modal projections with compensation to reduce cancellation after diagonal averaging, retaining symmetry checks and inverse-design tolerances.
+  대칭성 검사와 역산 허용오차를 유지하면서 대칭 쌍의 모드 투영을 보상 합산하여 대각항 평균 뒤의 상쇄 오차를 줄입니다.
+
 - Preserve equal-radius refinement candidate order in elliptical-aperture meshes, retaining geometry, mesh limits and inverse-goal acceptance checks.
   타원형 개구 메시에서 같은 반지름의 세분화 후보 순서를 유지하며 형상·메시 상한·역산 수락 검사를 보존합니다.
 

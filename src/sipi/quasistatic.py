@@ -269,14 +269,13 @@ class LineParameters:
         for M, label in ((self.C, "C"), (self.C0, "C0")):
             if not np.isclose(M[0, 0], M[1, 1], rtol=rtol, atol=0.0):
                 raise ValueError(f"the pair is not symmetric: {label}[0,0] != {label}[1,1]")
-        def self_term(M):
-            return 0.5 * (M[0, 0] + M[1, 1])
-
         out = {}
         for mode, sign in (("even", 1.0), ("odd", -1.0)):
-            Cm = self_term(self.C) + sign * self.C[0, 1]
-            C0m = self_term(self.C0) + sign * self.C0[0, 1]
-            Lm = self_term(self.L) + sign * self.L[0, 1]
+            # Sum the projection together: rounding the diagonal mean first
+            # can lose a term that matters when the mutual term cancels it.
+            Cm = math.fsum((0.5 * self.C[0, 0], 0.5 * self.C[1, 1], sign * self.C[0, 1]))
+            C0m = math.fsum((0.5 * self.C0[0, 0], 0.5 * self.C0[1, 1], sign * self.C0[0, 1]))
+            Lm = math.fsum((0.5 * self.L[0, 0], 0.5 * self.L[1, 1], sign * self.L[0, 1]))
             out[f"z_{mode}"] = float(np.sqrt(Lm / Cm))
             out[f"eps_eff_{mode}"] = float(Cm / C0m)
         out["z_diff"] = 2.0 * out["z_odd"]
