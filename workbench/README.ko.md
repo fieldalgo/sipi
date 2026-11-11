@@ -543,6 +543,23 @@ topic 전용 `workbench-candidate.yml`은 정확한 자체 wheel 설치·adapter
 독립 및 SciPy 내부의 NumPy 호환 계층은 FFT·선형대수 모듈을 동적으로 불러옵니다.
 고정 빌드는 이 4개 모듈을 명시적으로 포함하고 설치본 동작과 완료된 컴파일 보고서의
 실제 포함 여부를 검사합니다. 포함 검사만으로 EXE 실행을 통과했다고 판단하지 않습니다.
+adapter 검증은 별도의 [시험 전용 고정 목록](packaging/requirements-windows-test.txt)에서
+`scikit-fem==12.0.2`를 설치합니다. BSD-3-Clause인 이 독립 비교 도구는 시험에서만
+사용하며 앱 의존성이나 EXE에 포함하도록 지정한 항목이 아닙니다. 바이너리 wheel만
+설치하고 의존성을 다시 선택하지 않아 검토된 런타임 고정값을 유지합니다.
+adapter 단계는 `OPENPHYSICS_REQUIRE_CROSSCHECK=1`을 지정하므로 도구가 없으면
+독립 에너지·수렴 비교를 건너뛰지 않고 실패합니다. 비교를 건너뛴 이전 빌드 성공은
+전체 adapter 검증 통과로 간주하지 않습니다.
+
+준비된 Windows 환경의 시험 명령은 다음과 같습니다(PowerShell).
+
+```powershell
+python -m pip install --only-binary=:all: --no-deps -r workbench/packaging/requirements-windows-test.txt
+python -m pip check
+$env:OPENPHYSICS_REQUIRE_CROSSCHECK = '1'
+python -m pytest -q workbench/tests --junitxml=.validation/windows-adapter.xml
+```
+
 같은 준비를 마친 Windows 환경의 명령은 다음과 같습니다.
 
 ```sh

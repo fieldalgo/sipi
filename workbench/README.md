@@ -629,6 +629,24 @@ Both the standalone and SciPy-vendored NumPy compatibility namespaces load
 FFT/linear-algebra modules dynamically. The pinned build explicitly includes
 those four modules, exercises the installed sources and requires them in the
 completed compiler report. This inclusion check does not replace EXE execution.
+The adapter checks install `scikit-fem==12.0.2` from the separate
+[test-only pins](packaging/requirements-windows-test.txt). This BSD-3-Clause
+reference is used only by tests; it is not an application dependency or a
+requested EXE payload. Installation uses a binary wheel without dependency
+resolution, preserving the reviewed runtime pins. The adapter step sets
+`OPENPHYSICS_REQUIRE_CROSSCHECK=1`: a missing reference fails the checks instead
+of skipping the independent energy and convergence comparisons. An earlier
+successful build with skipped comparisons is not full adapter acceptance.
+
+To run those checks in the prepared Windows environment (PowerShell):
+
+```powershell
+python -m pip install --only-binary=:all: --no-deps -r workbench/packaging/requirements-windows-test.txt
+python -m pip check
+$env:OPENPHYSICS_REQUIRE_CROSSCHECK = '1'
+python -m pytest -q workbench/tests --junitxml=.validation/windows-adapter.xml
+```
+
 For a matching prepared Windows environment:
 
 ```sh

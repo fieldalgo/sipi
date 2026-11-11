@@ -1,5 +1,8 @@
 # Changelog
 
+- Require the pinned test-only independent reference in Windows adapter checks so missing tools fail instead of skipping comparisons.
+  Windows adapter 시험에 고정된 독립 비교 도구를 필수로 설치하고 누락 시 비교를 건너뛰지 않고 실패하도록 합니다.
+
 - Bind browser and portable candidates to the committed element-energy, stable aperture-mesh and compensated modal-projection engine.
   브라우저·무설치 후보를 요소 에너지·안정적인 원형 메시·모드 보상 합산 엔진 커밋에 연결합니다.
   Keep inputs and tolerances unchanged; verify that the unsupported-form browser fixture remains outside the editable registry before replay.

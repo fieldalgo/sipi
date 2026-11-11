@@ -61,7 +61,13 @@ jobs:
               subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), str(source)], check=True)
           subprocess.run([sys.executable, '-m', 'pip', 'install', '--no-deps', *map(str, wheels.glob('*.whl'))], check=True)
           subprocess.run([sys.executable, '-m', 'pip', 'check'], check=True)
+      - name: Install the reviewed test-only independent reference
+        run: |
+          python -m pip install --only-binary=:all: --no-deps -r workbench/packaging/requirements-windows-test.txt
+          python -m pip check
       - name: Windows adapter acceptance
+        env:
+          OPENPHYSICS_REQUIRE_CROSSCHECK: '1'
         run: python -m pytest -q workbench/tests --junitxml=.validation/windows-adapter.xml
       - name: Build the single executable
         run: python workbench/packaging/windows.py

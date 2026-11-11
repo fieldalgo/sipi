@@ -1,0 +1,3 @@
+# Test-only independent reference; not a runtime or one-file bundle dependency.
+# BSD-3-Clause; exact version matches the reviewed sipi[test] extra.
+scikit-fem==12.0.2
