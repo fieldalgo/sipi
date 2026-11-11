@@ -145,3 +145,35 @@ def test_width_goal_helper_uses_real_host_and_retains_refinement():
         server.shutdown()
         server.server_close()
         thread.join(timeout=3)
+
+
+def test_unequal_pair_helper_uses_real_host_and_preserves_selected_geometry():
+    import http.client
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'desktop'))
+    from main import Server
+    module = smoke_module()
+    server = Server(Path(__file__).resolve().parents[1] / 'ui')
+    thread = threading.Thread(target=server.serve_forever, kwargs={'poll_interval': .05}, daemon=True)
+    thread.start()
+    def request(path, data=None):
+        conn = http.client.HTTPConnection('127.0.0.1', server.server_port, timeout=30)
+        try:
+            conn.request('GET' if data is None else 'POST', path,
+                None if data is None else json.dumps(data),
+                {'Authorization': 'Bearer '+server.token, 'Content-Type': 'application/json'})
+            response = conn.getresponse()
+            assert response.status == (200 if data is None else 202)
+            return response.read()
+        finally:
+            conn.close()
+    try:
+        cases = module.check_unequal_pair_goals(request)
+        assert [(x['template'], x['variable']) for x in cases] == [
+            ('asymmetric_coupled_microstrip', 'left_width'),
+            ('asymmetric_coupled_stripline', 'right_width')]
+        assert all(x['selected_reanalysis_exact'] for x in cases)
+    finally:
+        server.job.cancel()
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=3)

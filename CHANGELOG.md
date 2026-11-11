@@ -1,5 +1,8 @@
 # Changelog
 
+- Exercise unequal surface/buried pairs and selected left/right width targets in the actual executable smoke, retaining exact selected-matrix replay and existing limits.
+  실제 실행 파일 smoke에서 비대칭 표면·매립 쌍과 좌우 선택 폭 목표를 확인하며 선택된 행렬의 정확한 재해석과 기존 한도를 유지합니다.
+
 - Add unequal surface and buried pair forms with explicit lossless forward differential results, independent profiles and selected left/right width targets.
   비대칭 표면·매립 차동쌍에 명시 무손실 전진 임피던스, 독립 프로필과 좌우 선택 폭 역산을 연결합니다.
 

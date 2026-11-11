@@ -703,6 +703,13 @@ hashes, bundled native files and actual EXE size/hash. `build-info.json` is
 embedded and included in calculation exports. `smoke.json` records measured
 startup, calculation, exit and temporary-file cleanup from a Unicode/space path;
 failed launches retain a failed report.
+The smoke exercises unequal surface/buried pairs through the executable's HTTP
+API, including a left/right width target respectively. It preserves the other
+conductor dimensions, the 100-ohm target, 0.25-ohm search and 0.5-ohm refined
+acceptance, and exactly replays the selected geometry and line matrices.
+The existing per-action time, mesh and search limits still apply. Linux host
+checks of this helper do not establish Windows executable acceptance.
+
 The smoke also checks two recorded runs, independently hashes the live unpacked
 bundle and verifies raw project attachment/lookup before shutdown.
 Startup failures also retain bounded stdout/stderr with session tokens redacted,

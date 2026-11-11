@@ -147,6 +147,59 @@ def check_width_goal(request):
     return result
 
 
+def check_unequal_pair_goals(request):
+    """Exercise unequal launch and selected-width contracts inside the candidate."""
+    cases = []
+    def run(payload):
+        started = time.monotonic()
+        request('/api/job', payload)
+        while time.monotonic() - started < 300:
+            value = json.loads(request('/api/job'))
+            if value['status'] != 'running':
+                assert value['status'] == 'complete', value
+                assert time.monotonic() - started < 300
+                return value['result']
+            time.sleep(.2)
+        raise RuntimeError('Unequal-pair smoke action exceeded 300 seconds.')
+    for buried, variable in [(False, 'left_width'), (True, 'right_width')]:
+        template = 'asymmetric_coupled_' + ('stripline' if buried else 'microstrip')
+        parameters = dict(left_width=(.3 if buried else .4)*1e-3,
+            right_width=(.5 if buried else .65)*1e-3,
+            gap=(.4 if buried else .25)*1e-3, eps_r=4,
+            left_thickness=.035*1e-3, right_thickness=.05*1e-3,
+            tan_delta=.02, box_width=.006 if buried else .012)
+        parameters['plane_spacing' if buried else 'substrate_height'] = .001 if buried else .0005
+        if not buried:
+            parameters['air_height'] = .006
+        result = run(dict(action='design', template=template, parameters=parameters,
+            design=dict(variable=variable, bounds=[.1*1e-3, 1.2*1e-3],
+                        target=100, tolerance=.5)))
+        design, line = result['design'], result['line']
+        assert design['variable'] == variable and design['quantity'] == 'z_diff_forward'
+        assert design['target'] == 100 and design['search_tolerance'] == .25
+        assert abs(design['residual']) <= .25 and abs(design['refined_residual']) <= .5
+        assert .1*1e-3 <= design['parameter'] <= 1.2*1e-3
+        assert len(design['history']) <= 32 and design['history'][-1]['stage'] == 'refinement'
+        assert line['z_diff_forward'] == design['impedance'] and 'z_diff' not in line
+        assert line['forward_launch']['condition'] == 'Icommon=0; I=[Idiff,-Idiff]'
+        selected = {**parameters, variable: design['parameter']}
+        traces = result['document']['traces']
+        assert [t['name'] for t in traces] == ['positive', 'negative']
+        for side, trace in zip(['left', 'right'], traces):
+            assert trace['width'] == selected[side+'_width']
+            assert trace['thickness'] == parameters[side+'_thickness']
+            assert trace['y'] == ((parameters['plane_spacing']-trace['thickness'])/2
+                                 if buried else parameters['substrate_height'])
+        assert traces[0]['x'] == -(parameters['gap']+selected['right_width'])/2
+        assert traces[1]['x'] == (parameters['gap']+selected['left_width'])/2
+        replay = run(dict(action='analyze', template=template, parameters=selected,
+                          mesh=result['document']['mesh']))
+        assert replay['document'] == result['document'] and replay['line'] == line
+        cases.append(dict(template=template, variable=variable, result=result,
+                          selected_reanalysis_exact=True))
+    return cases
+
+
 def exercise(source, report):
     report['phase'] = 'prepare temporary directory'
     with candidate_directory(report) as folder:
@@ -218,6 +271,8 @@ def exercise(source, report):
                 report['cases'].append({'template': template, 'line': line})
             report['phase'] = 'width target with selected matrices'
             report['width_goal'] = check_width_goal(request)
+            report['phase'] = 'unequal pairs and selected-width matrices'
+            report['unequal_pair_goals'] = check_unequal_pair_goals(request)
             report['phase'] = 'saved analysis'
             saved = dict(schema='sipi.lumped-network/1', frequency_hz=[0, 1e9],
                 branch=dict(resistance_ohms=10., inductance_h=2e-9, capacitance_f=None),
