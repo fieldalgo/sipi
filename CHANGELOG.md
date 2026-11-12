@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserve output-error exit code 3 when Windows reports a closed stdout pipe as EINVAL.
+  Windows의 닫힌 stdout 파이프가 EINVAL로 보고되어도 출력 오류 종료 코드 3을 유지합니다.
+
 - Run source and installed regression in separate platform jobs and validate the independent development branch without requiring a pull request; preserve reference gates and per-job limits.
   플랫폼별 소스·설치본 회귀를 별도 작업으로 실행하고 PR 없이 독립 개발 브랜치를 검증하며 참조 기준과 작업별 시간 제한을 유지합니다.
 

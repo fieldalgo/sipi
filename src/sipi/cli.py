@@ -148,17 +148,15 @@ def main(argv=None):
                 return 1
         try:
             _write_output(args.output, output)
-        except BrokenPipeError as exc:
-            # Python flushes stdout again during shutdown. Redirect its broken
-            # descriptor so that shutdown cannot replace exit 3 with exit 120.
-            try:
-                with open(os.devnull, 'wb') as sink:
-                    os.dup2(sink.fileno(), sys.stdout.fileno())
-            except (OSError, ValueError):
-                pass
-            print('sipi: output: ' + str(exc), file=sys.stderr)
-            return 3
         except OSError as exc:
+            # Python flushes stdout again at shutdown. Windows can report
+            # EINVAL, not EPIPE, for a closed pipe; both must retain exit 3.
+            if args.output == '-':
+                try:
+                    with open(os.devnull, 'wb') as sink:
+                        os.dup2(sink.fileno(), sys.stdout.fileno())
+                except (OSError, ValueError):
+                    pass
             print('sipi: output: ' + str(exc), file=sys.stderr)
             return 3
         return status

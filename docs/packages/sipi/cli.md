@@ -66,6 +66,10 @@ The following exit codes apply to saved-input commands:
 | 3 | Output error, including existing destinations and closed output pipes. |
 | 130 | Ctrl+C interruption; inspect any output path before retrying. |
 
+After a stdout write or flush error, the command redirects the failed descriptor
+before interpreter shutdown so the documented exit code 3 is retained. This
+also covers Windows closed pipes reported as `EINVAL` rather than `EPIPE`.
+
 Named outputs must be new paths with existing parent directories. The command
 serializes complete finite JSON, writes/fsyncs a sibling temporary file and
 publishes with an exclusive hard link. Concurrent publishers cannot overwrite

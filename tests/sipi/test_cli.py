@@ -1,6 +1,7 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
 import io
+import errno
 import json
 import os
 from pathlib import Path
@@ -205,6 +206,29 @@ def test_closed_output_pipe_keeps_documented_exit_code(tmp_path):
     error = process.stderr.read()
     assert process.wait(timeout=20) == 3, error.decode()
     assert b'sipi: output:' in error
+
+
+@pytest.mark.parametrize('error_number', [errno.EPIPE, errno.EINVAL])
+def test_failed_stdout_flush_redirects_before_interpreter_shutdown(tmp_path, monkeypatch, capsys, error_number):
+    # Windows can report EINVAL for a closed pipe, rather than BrokenPipeError.
+    # Leaving the buffered descriptor intact makes Python exit with 120.
+    source = input_file(tmp_path, lumped().dumps())
+    redirects = []
+    class FailedOutput:
+        def write(self, data):
+            return len(data)
+        def flush(self):
+            raise OSError(error_number, 'closed output')
+    class Stdout:
+        buffer = FailedOutput()
+        def fileno(self):
+            return 123
+    with monkeypatch.context() as patch:
+        patch.setattr(sys, 'stdout', Stdout())
+        patch.setattr(os, 'dup2', lambda source, target: redirects.append(target))
+        assert cli.main(['validate', str(source)]) == 3
+    assert redirects == [123]
+    assert 'sipi: output:' in capsys.readouterr().err
 
 
 def test_complete_fit_retains_separate_rejected_sample_acceptance(tmp_path, capsys):
