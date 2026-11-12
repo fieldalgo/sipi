@@ -360,8 +360,9 @@ def _periodic_circuit(result):
     frequency = solution.frequency_solution
     powers = {key:_array(getattr(frequency, attr)) for key,attr in
               [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]}
+    # Replay the exported scalar lists, rather than a different NumPy reduction.
     with np.errstate(over='ignore', invalid='ignore'):
-        mean = {key:_array(np.sum(value)) for key,value in powers.items()}
+        mean = {key:_array(sum(value)) for key,value in powers.items()}
     return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
         source_network=_network(result.source_network), response=_periodic_time(solution.response),
         source_voltage_v=_array(solution.source_voltages),
@@ -381,7 +382,7 @@ def _periodic_norton_circuit(result):
     powers = {key:_array(getattr(frequency, attr)) for key,attr in
               [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]}
     with np.errstate(over='ignore', invalid='ignore'):
-        mean = {key:_array(np.sum(value)) for key,value in powers.items()}
+        mean = {key:_array(sum(value)) for key,value in powers.items()}
     return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),
         source_network=_network(result.source_network), response=_periodic_time(solution.response),
         source_current_a=_array(solution.source_currents),
@@ -401,7 +402,7 @@ def _periodic_mixed_circuit(result):
     powers = {key:_array(getattr(frequency, attr)) for key,attr in
               [('network','network_power'), ('terminations','termination_power'), ('sources','source_power')]}
     with np.errstate(over='ignore', invalid='ignore'):
-        mean = {key:_array(np.sum(value)) for key,value in powers.items()}
+        mean = {key:_array(sum(value)) for key,value in powers.items()}
     harmonics = _mixed_response(frequency)
     harmonics.update(convention='dc-mean-positive-peak', frequency_power_w=powers)
     return dict(coverage='sampled-periodic-steady-state', network=_network(result.network),

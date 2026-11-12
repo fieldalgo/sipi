@@ -1,5 +1,8 @@
 # Changelog
 
+- Reproduce periodic Thevenin, Norton and mixed-circuit power totals exactly from exported harmonic components.
+  주기 Thevenin·Norton·혼합 회로의 전력 합계를 내보낸 주파수별 성분에서 정확히 재현합니다.
+
 - Preserve output-error exit code 3 when Windows reports a closed stdout pipe as EINVAL.
   Windows의 닫힌 stdout 파이프가 EINVAL로 보고되어도 출력 오류 종료 코드 3을 유지합니다.
 

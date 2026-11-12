@@ -95,3 +95,12 @@ sums agree to `1e-12` W. There is no startup/TDR/eye/BER or measured-accuracy cl
 and the new schema does not update web forms or Windows acceptance.
 
 [Common execution](execution.md) · [한국어](../../locales/ko/pages/packages/sipi/periodic_circuit.md)
+
+## Replaying power totals
+
+`mean_power_w` uses Python `sum` on each exported `frequency_power_w` list.
+Replaying the saved component values therefore reproduces the total exactly
+in the supported Python runtime, without selecting NumPy's different reduction.
+The harmonic solve, time-domain power checks and nonfinite-result rejection
+remain unchanged. This rounding convention is not an accuracy improvement
+to the physical model.

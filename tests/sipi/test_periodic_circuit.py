@@ -82,6 +82,21 @@ def test_exact_api_json_diagnostics_and_power_replay(kind):
     json.dumps(output,allow_nan=False)
 
 
+def test_dc_and_two_harmonic_power_totals_replay_from_saved_components():
+    data = document('lumped-network').to_dict()
+    phase = 2*np.pi*np.arange(5)/5
+    for i, name in enumerate(data['source_voltages']):
+        data['source_voltages'][name] = (100*(i+1) + np.cos(phase+i) + np.cos(2*phase-i)).tolist()
+    doc = PeriodicCircuitDocument.from_dict(data)
+    result = execute_saved(doc.dumps())['result']
+    restored = json.loads(json.dumps(result, allow_nan=False))
+    for name, values in restored['harmonics']['frequency_power_w'].items():
+        assert restored['mean_power_w'][name] == sum(values)
+    response = restored['response']
+    time_mean = np.mean(np.sum(np.array(response['voltage_v'])*response['current_a'], axis=1))
+    np.testing.assert_allclose(restored['mean_power_w']['network'], time_mean, rtol=1e-14, atol=0)
+
+
 @pytest.mark.parametrize('pair',[False,True])
 def test_actual_pec_field_and_mixed_mode_once(pair,monkeypatch):
     doc=document('transmission-line',pair=pair,basis='mixed-mode' if pair else 'single-ended')

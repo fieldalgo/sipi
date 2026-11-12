@@ -87,3 +87,10 @@ Y(f)V(f)를 합성하며 시간 표본을 점별로 곱하지 않습니다. 시�
 44번째 스키마 추가가 앱 입력 화면이나 Windows 지원 갱신을 뜻하지 않습니다.
 
 [공통 실행](execution.md) · [English](../../../../../packages/sipi/periodic_norton_circuit.md)
+
+## 전력 합계 재현
+
+`mean_power_w`는 내보낸 각 `frequency_power_w` 목록에 Python `sum`을 적용합니다.
+지원 Python 런타임에서 저장된 성분을 합산하면 동일한 합계를 재현하며,
+NumPy의 다른 합산 경로를 사용하지 않습니다. 주파수별 해, 시간 영역 전력 검사,
+비유한 결과 거부는 그대로입니다. 물리 모델의 정확도 개선을 뜻하지 않습니다.
