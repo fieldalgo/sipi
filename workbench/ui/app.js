@@ -15,6 +15,10 @@ let projectText = null, activeDesign = null, baseline = null;
 const changedFields = new Set();
 // Display changes never become physical edits to target or study bounds.
 const studySI = {};
+let savedSearchTolerance = null, networkOriginal = null;
+const networkChanged = new Set();
+const networkKeys = ['start_hz','stop_hz','points','length','z_ref','resistance'];
+const networkFactors = [1e6,1e6,1,1e-3,1,1];
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
 const allFields = [...lengthFields, 'left_profile', 'right_profile', 'target_variable', 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
@@ -34,6 +38,7 @@ function setBusy(value) {
   if (imported) for (const element of $('inputs').elements) element.disabled = true;
   $('design').disabled = value || !!imported;
   $('save-editable').disabled = value || !!imported;
+  for (const kind of ['design','study','network']) $(`${kind}-input-save`).disabled = value || !!imported;
   geometryFields(); studyControls();
   projectControls(); meshControls(); comparisonControls();
 }
@@ -218,10 +223,12 @@ function clearResult() {
 function values() { return Object.fromEntries(allFields.map(id => [id, $(id).value])); }
 function currentParameters() { return editableParameters(template, values(), unit, originalParameters, changedFields, lengthSI); }
 function request(action) {
+  const mode = action.replace(/-document$/, '');
   const network = {};
-  if (action === 'network') {
+  if (mode === 'network') {
     for (const id of networkFields) if (!$(id).reportValidity()) throw new Error('Check the frequency response inputs.');
     network.network = {start_hz: Number($('frequency-start').value)*1e6, stop_hz: Number($('frequency-stop').value)*1e6, points: Number($('frequency-points').value), length: Number($('line-length').value)*1e-3, resistance: Number($('series-r').value), z_ref: Number($('reference-z').value)};
+    if (networkOriginal) networkFields.forEach((id,i) => { if (!networkChanged.has(id)) network.network[networkKeys[i]] = networkOriginal[networkKeys[i]]; });
   }
   if (imported) return {action, document_text: imported, ...network};
   for (const id of ['box_width', 'air_height']) {
@@ -232,7 +239,7 @@ function request(action) {
   }
   if (!$('inputs').reportValidity()) throw new Error('Check the highlighted input.');
   const input = {action, template, parameters: currentParameters(), ...(savedMesh ? {mesh: {...savedMesh}} : {}), ...network};
-  if (action === 'study') {
+  if (mode === 'study') {
     const mode = $('study-mode').value;
     const count = mode === 'sweep' ? 1 : Number($('study-count').value);
     const variables = [];
@@ -245,11 +252,12 @@ function request(action) {
     for (const id of ['study-points','study-seed']) if (!$(id).reportValidity()) throw new Error('Check study samples and seed.');
     input.study = {mode, variables, points:Number($('study-points').value), seed:Number($('study-seed').value)};
   }
-  if (action === 'design') {
+  if (mode === 'design') {
     for (const id of ['target', 'lower', 'upper', 'tolerance']) if (!$(id).reportValidity()) throw new Error('Check the target and width bounds.');
     if (![lengthSI.lower, lengthSI.upper].every(value => Number.isFinite(value) && value > 0)) throw new Error('Check the target width bounds.');
     input.design = {target: Number($('target').value), bounds: [lengthSI.lower, lengthSI.upper], tolerance: Number($('tolerance').value)};
     if (isAsymmetric(template)) input.design.variable = $('target_variable').value;
+    if (savedSearchTolerance !== null) input.design.search_tolerance = savedSearchTolerance;
   }
   return input;
 }
@@ -666,7 +674,7 @@ async function run(action) {
   const sequence = ++runSequence;
   try {
     const input = request(['mesh-inspect', 'domain-inspect', 'geometry-inspect'].includes(action) ? 'document' : action);
-    if (!['document', 'template-document', 'mesh-inspect', 'domain-inspect', 'geometry-inspect'].includes(action)) clearResult();
+    if (!['document', 'template-document', 'design-document', 'study-document', 'network-document', 'mesh-inspect', 'domain-inspect', 'geometry-inspect'].includes(action)) clearResult();
     setBusy(true);
     status(action === 'study' ? 'Calculating every sampled cross-section…' : action === 'network' ? 'Calculating the cross-section and frequency response…' : action === 'design' ? 'Searching the width range, then checking a finer mesh…' : action === 'analyze' ? (inBrowser ? 'Preparing the browser engine and calculating… The first load can take longer.' : 'Meshing the cross-section and solving locally…') : 'Validating the design file…');
     const result = await transport.run(input);
@@ -682,6 +690,10 @@ async function run(action) {
     else if (action === 'domain-inspect') {
       status('Domain bounds inspected without solving or changing inputs. Vary bounds and compare results to check boundary sensitivity.');
     }
+    else if (['design-document','study-document','network-document'].includes(action)) {
+      downloadText(result.document_text, `sipi-${action.split('-')[0]}-input.json`, 'application/json');
+      status('Analysis input saved. Open this file to restore the section and settings, or run it in Saved analysis.');
+    }
     else if (action === 'template-document') {
       downloadText(result.document_text, 'sipi-editable-design.json', 'application/json');
       status('Editable design saved with its parameters and resolved mesh.');
@@ -694,6 +706,7 @@ async function run(action) {
 }
 
 function chooseTemplate(name) {
+    savedSearchTolerance = null; networkOriginal = null; networkChanged.clear();
     template = name; imported = null; geometryDetail = false;
     resolvedMesh = null; resolvedDomain = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
@@ -830,8 +843,10 @@ $('mesh-auto').addEventListener('click', () => {
   status('Automatic mesh restored. Width targets use their finer initial mesh; saved designs resolve and retain actual settings.');
 });
 $('network-calculate').addEventListener('click', () => run('network'));
+for (const kind of ['design','study','network']) $(`${kind}-input-save`).addEventListener('click', () => run(kind+'-document'));
+$('tolerance').addEventListener('input', () => { savedSearchTolerance = null; });
 $('touchstone-save').addEventListener('click', () => { if (latestNetwork) downloadText(latestNetwork.touchstone, `sipi-line.${latestNetwork.extension}`, 'text/plain'); });
-for (const id of networkFields) $(id).addEventListener('input', () => { latestNetwork = null; if (latest) latest = {...latest, network: undefined}; $('network-result').hidden = true; status('Frequency inputs changed. Recalculate the response.'); });
+for (const id of networkFields) $(id).addEventListener('input', () => { networkChanged.add(id); latestNetwork = null; if (latest) latest = {...latest, network: undefined}; $('network-result').hidden = true; status('Frequency inputs changed. Recalculate the response.'); });
 $('study-calculate').addEventListener('click', () => run('study'));
 $('study-save').addEventListener('click', () => { if(latestStudy) downloadText(JSON.stringify(latestStudy,null,2)+'\n','sipi-parameter-study.json','application/json'); });
 $('study-csv').addEventListener('click', () => { if(latestStudy) downloadText(studyCSV(latestStudy),'sipi-parameter-study.csv','text/csv'); });
@@ -855,6 +870,29 @@ $('file').addEventListener('change', async () => {
     if (file.size > 200 * 1024) throw new Error('Design files must be smaller than 200 KiB.');
     const text = await file.text(); const value = JSON.parse(text);
     if (sequence !== runSequence || closed) return;
+    const analysisKind = /^sipi\.impedance-design\//.test(value?.schema) ? 'design' : /^sipi\.impedance-study\//.test(value?.schema) ? 'study' : value?.schema === 'sipi.quasistatic-line/1' ? 'network' : null;
+    if (analysisKind) {
+      if (projectText) throw new Error('Analysis settings cannot replace a section-only project. Use a separate workspace or Saved analysis.');
+      const restored = await transport.run({action: analysisKind+'-open', text});
+      if (sequence !== runSequence || closed) return;
+      restoreEditable(restored);
+      if (analysisKind === 'design') {
+        const d=restored.design; $('target').value=String(d.target); $('tolerance').value=String(d.tolerance);
+        savedSearchTolerance=d.search_tolerance;
+        if (d.variable) $('target_variable').value=d.variable;
+        for (const [i,id] of ['lower','upper'].entries()) {lengthSI[id]=d.bounds[i]; $(id).value=String(d.bounds[i]/scales[unit]);}
+      } else if (analysisKind === 'study') {
+        const d=restored.study; $('study-mode').value=d.mode; $('study-count').value=String(d.variables.length);
+        $('study-points').value=String(d.points); $('study-seed').value=String(d.seed);
+        d.variables.forEach((v,index) => {const i=index+1; $(`study-variable-${i}`).value=v.parameter; studySI[i]={parameter:v.parameter,low:v.lower,high:v.upper}; $(`study-low-${i}`).value=String(v.lower/studyScale(v.parameter,unit)); $(`study-high-${i}`).value=String(v.upper/studyScale(v.parameter,unit));});
+        studyControls();
+      } else {
+        networkOriginal={...restored.network}; networkChanged.clear();
+        networkFields.forEach((id,i) => {$(id).value=String(restored.network[networkKeys[i]]/networkFactors[i]);});
+      }
+      status(`Loaded ${file.name}. Section, mesh and ${analysisKind} settings restored without calculating.`);
+      return;
+    }
     if (value?.schema === 'sipi.template-section/1') {
       status('Validating the editable design…');
       const restored = await transport.run({action: 'template-open', text});

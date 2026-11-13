@@ -951,3 +951,29 @@ P1 조립, 무손실 회로 불변식, 정확한 하부 공기·코팅 전달을
 `node workbench/tests/geometry-view.test.mjs`는 입력을 바꾸지 않는 표시 범위를,
 `workbench/tests/geometry-view-browser.mjs`는 native/Worker 계산·정확한 저장값과
 기하·표시 전환·좁은 화면 라벨을 확인합니다.
+
+## 목표·공차·주파수 입력 저장
+
+각 계산 버튼 옆의 **Save target input**, **Save study input**,
+**Save frequency input**은 계산하지 않고 입력을 검증·저장합니다.
+**Open design**으로 단면·해결된 메시·해석 설정을 복원합니다.
+같은 파일을 **Saved analysis** 또는 CLI로 실행할 수 있습니다.
+단면만 담는 프로젝트와 결과 내보내기는 별도입니다.
+
+목표는 `sipi.impedance-design/4`에 폭 변수·범위·목표·요청 메시 탐색 기준·
+최종 허용오차·32회 평가 예산을 보존합니다. 원 메시와 별도 세분 결과는 계속
+기존 최종 기준을 만족해야 합니다. 허용오차를 편집하면 폼의 기본 탐색 정책으로
+돌아가며, 그 전에는 파일에서 읽은 탐색 기준을 유지합니다.
+
+빠른 공차는 `sipi.impedance-study/1`의 sweep·corners·독립 uniform을 사용하고
+변수 1–2개, 최대 32개 표본을 받습니다. 변수 순서·SI 범위·고정 명목 메시·
+활성 표본 수와 PCG64 seed를 보존합니다. 비활성 count/seed는 수학 입력에
+넣지 않습니다. normal·고정 피치/평면·재료 모델을 빠른 공차로 변환하지 않고
+Saved analysis로 안내합니다. 실패 표본은 실패행으로 남기고 부분 성공 통계를
+반환하지 않습니다.
+
+주파수 입력은 [quasistatic-line/1](../docs/locales/ko/pages/packages/sipi/quasistatic_line_document.md)에
+편집 가능한 단면·선형 주파수 표본·명시 상수 대각 R·길이·양의 실수 포트 기준을
+보존합니다. 도체 저항이나 재료 분산을 추정하지 않습니다. 명시 기하·불균일
+주파수·고급 선택량·다른 예산은 Saved analysis로 실행하세요. 지원 범위를 벗어난
+파일을 폼에 열면 현재 입력을 바꾸기 전에 거부합니다. 단위 변경은 원래 SI 값을 보존합니다.

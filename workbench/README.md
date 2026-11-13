@@ -1096,3 +1096,33 @@ above the highest coated conductor; ordinary forms retain **Air layer height**.
 `node workbench/tests/geometry-view.test.mjs` checks display bounds without changing
 input. `workbench/tests/geometry-view-browser.mjs` checks native/Worker calculation,
 exact saved inputs/geometry, display-only toggles and narrow-screen labels.
+
+## Save target, study and frequency inputs
+
+Use **Save target input**, **Save study input** or **Save frequency input**
+beside its calculation button. These operations validate and save inputs without
+calculating. **Open design** restores the editable section, resolved mesh and
+those controls. The same files can be run through **Saved analysis** or the CLI.
+They are separate from cross-section-only project files and result exports.
+
+Targets use `sipi.impedance-design/4`: the width variable, bounds, target,
+requested-mesh search threshold, final tolerance and 32-evaluation budget are
+explicit. The requested and independently refined results must still pass the
+original final tolerance. Editing the final tolerance returns to the form's
+default search policy; reopening a saved threshold retains it until then.
+
+Quick studies use `sipi.impedance-study/1` with sweep, corners or independent
+uniform sampling, one/two variables and at most 32 samples. Variable order,
+SI bounds, nominal resolved mesh and active count/PCG64 seed are retained.
+Inactive count/seed controls do not become mathematical inputs. No normal
+sampling, fixed-pitch/plane constraints or material models are silently
+converted into a quick study. Use Saved analysis for those contracts. Failed
+samples remain failed rows; they do not produce a partial success summary.
+
+Frequency inputs use [quasistatic-line/1](../docs/packages/sipi/quasistatic_line_document.md).
+They retain the editable geometry, linear frequency samples, supplied constant
+diagonal R, length and positive real port reference. They do not calculate
+conductor resistance or infer a dispersive material model. Raw geometry,
+nonuniform frequency grids, advanced quantities and unsupported budgets stay
+available through Saved analysis; opening them in these controls rejects
+before replacing the current form. Unit changes preserve original SI values.

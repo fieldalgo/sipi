@@ -1,5 +1,8 @@
 # Changelog
 
+- Save and reopen quick target, study and frequency inputs through the shared engine contracts, retaining exact SI controls and rejecting unsupported conversions.
+  공통 엔진 계약으로 빠른 목표·공차·주파수 입력을 저장·재개방하며 정확한 SI 설정을 보존하고 미지원 변환을 거부합니다.
+
 - Preserve quasi-static section, frequency grid, supplied diagonal resistance, length and port reference in a strict saved line document with common execution.
   준정적 단면·주파수·명시 대각 저항·길이·포트 기준을 엄격한 선로 문서와 공통 실행으로 보존합니다.
 

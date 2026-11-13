@@ -210,6 +210,146 @@ def execute_study(request, nominal):
                 mesh_policy='fixed resolved nominal mesh; no per-sample refinement check')
 
 
+def design_inputs(request, doc):
+    settings = request.get('design', {})
+    if not isinstance(settings, dict) or not {'bounds', 'target'} <= settings.keys() or not settings.keys() <= {'bounds', 'target', 'variable', 'tolerance', 'search_tolerance'}:
+        raise ValueError('A width target needs bounds, target and supported search options.')
+    asymmetric = request['template'] in ASYMMETRIC_PAIR_TEMPLATES
+    variable = 'width'
+    if asymmetric:
+        if not isinstance(settings, dict) or not {'bounds', 'target', 'variable'} <= settings.keys() or not settings.keys() <= {'bounds', 'target', 'variable', 'tolerance', 'search_tolerance'}:
+            raise ValueError('An unequal pair target needs bounds, target and an explicit width variable.')
+        variable = settings['variable']
+        if variable not in ('left_width', 'right_width'):
+            raise ValueError('Select left_width or right_width for an unequal pair target.')
+    params = dict(request['parameters'])
+    factory = TEMPLATES[request['template']]
+    mesh = request.get('mesh')
+    if mesh is None:
+        mesh = doc.section.mesh_settings()
+        if request['template'] in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar'):
+            mesh['edge_size'] *= 10
+        elif request['template'] in ('conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'):
+            # Start at feature/20 instead of the factory's feature/100.
+            # The separate refined solve and residual gates remain required.
+            mesh['edge_size'] *= 5
+        mesh['far_size'] /= 4
+        # These defaults already resolve finite ground gaps or coating.
+        # Keep their edge/growth settings before the mandatory independent
+        # refinement; pre-refining both again can exceed the point budget.
+        if request['template'] in ASYMMETRIC_PAIR_TEMPLATES or request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
+            # Resolve buried conductor edges without halving growth twice.
+            # The separate refinement and residual gates still apply.
+            mesh['edge_size'] /= 2
+        elif request['template'] not in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
+            mesh['edge_size'] /= 4
+            mesh['grade'] /= 2
+    search_options = {}
+    if request['template'] in ASYMMETRIC_PAIR_TEMPLATES or request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
+        tolerance = settings.get('tolerance', 0.1)
+        if (isinstance(tolerance, bool) or not isinstance(tolerance, Real)
+                or not math.isfinite(tolerance) or tolerance <= 0):
+            raise ValueError('tolerance must be a positive finite real number')
+        # Leave room for refinement drift without changing final acceptance.
+        search_options['search_tolerance'] = tolerance / 2
+    if not asymmetric and 'variable' in settings and settings['variable'] != 'width':
+        raise ValueError('This target searches width only.')
+    if 'search_tolerance' in settings:
+        value = settings['search_tolerance']
+        if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value) or not 0 < value <= settings.get('tolerance', .1):
+            raise ValueError('search_tolerance must be positive and no greater than tolerance')
+        search_options['search_tolerance'] = value
+    return settings, asymmetric, variable, params, factory, mesh, search_options
+
+
+def saved_controls(request):
+    """Save or reopen quick-analysis inputs without performing a field solve."""
+    from sipi.design_document import ImpedanceDesignDocument
+    from sipi.study import ImpedanceStudyDocument
+    from sipi.template_document import TemplateSectionDocument
+    from sipi.quasistatic_line_document import QuasistaticLineDocument
+    action = request['action']
+    kind, operation = action.split('-')
+    classes = dict(design=ImpedanceDesignDocument, study=ImpedanceStudyDocument,
+                   network=QuasistaticLineDocument)
+    if operation == 'open':
+        if set(request) != {'action', 'text'} or not isinstance(request['text'], str) or len(request['text'].encode('utf-8')) > 200*1024:
+            raise ValueError('Opening analysis inputs needs only UTF-8 text up to 200 KiB.')
+        saved = classes[kind].loads(request['text'])
+        data = saved.to_dict()
+        if kind == 'network':
+            editable = saved.section
+            if not isinstance(editable, TemplateSectionDocument):
+                raise ValueError('Use Saved analysis for a network with explicit geometry.')
+            frequency = np.array(data['frequency_hz'])
+            if len(frequency) < 2 or not np.array_equal(frequency, np.linspace(frequency[0], frequency[-1], len(frequency))):
+                raise ValueError('Use Saved analysis for a nonuniform or single frequency grid.')
+            controls = network_settings(dict(start_hz=float(frequency[0]), stop_hz=float(frequency[-1]),
+                points=len(frequency), length=data['length_m'], resistance=data['resistance_ohm_per_m'], z_ref=data['reference_ohms']))
+            template, parameters, mesh = editable.template, editable.parameters, editable.mesh_options
+        else:
+            if data.get('fixed_pitch_m') is not None or data.get('fixed_plane_spacing_m') is not None or 'material_evaluation' in data:
+                raise ValueError('Use Saved analysis for constrained or material-dependent inputs.')
+            template, parameters, mesh = data['template'], data['parameters'], data['mesh']
+            if template not in TEMPLATES:
+                raise ValueError('Use Saved analysis for a template without an editable form.')
+            quantity = 'z_diff_forward' if template in ASYMMETRIC_PAIR_TEMPLATES else 'z_diff' if template in PAIR_TEMPLATES else 'z0'
+            if data['quantity'] != quantity:
+                raise ValueError('Use Saved analysis for this impedance quantity.')
+            if kind == 'design':
+                if data['max_evaluations'] != 32:
+                    raise ValueError('Use Saved analysis for a different target evaluation budget.')
+                controls = dict(bounds=data['bounds'], target=data['target_ohm'], tolerance=data['tolerance_ohm'])
+                variable = data['variable']
+                if template in ASYMMETRIC_PAIR_TEMPLATES:
+                    controls['variable'] = variable
+                elif variable != 'width':
+                    raise ValueError('The quick target searches width only; use Saved analysis.')
+                # Version 1 explicitly restores its original search threshold.
+                controls['search_tolerance'] = data.get('search_tolerance_ohm', data['tolerance_ohm'])
+            else:
+                sampling = data['sampling']; mode = {'sweep':'sweep','corners':'corners','uniform':'monte_carlo'}.get(sampling['kind'])
+                if mode is None:
+                    raise ValueError('Use Saved analysis for this sampling distribution.')
+                controls = dict(mode=mode, points=sampling.get('count', 2), seed=sampling.get('seed', 0),
+                    variables=[dict(parameter=v['name'], lower=v['lower'], upper=v['upper']) for v in sampling['variables']])
+        if template not in TEMPLATES:
+            raise ValueError('Use Saved analysis for a template without an editable form.')
+        candidate = dict(action=kind, template=template, parameters=parameters, mesh=dict(mesh), **{kind:controls})
+        doc = document(candidate)
+        if kind == 'design': design_inputs(candidate, doc)
+        elif kind == 'study': study_documents(candidate, doc)
+        return dict(engine=engine_info(), document_text=saved.dumps(), template=template,
+                    parameters=parameters, document=doc.to_dict(), **{kind:controls})
+
+    required = {'action', 'template', 'parameters', kind}
+    if not required <= request.keys() or not request.keys() <= required | {'mesh'}:
+        raise ValueError('Saving analysis inputs requires a template, parameters and explicit controls.')
+    doc = document(request)
+    quantity = 'z_diff_forward' if request['template'] in ASYMMETRIC_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
+    if kind == 'design':
+        settings, _, variable, params, _, mesh, search = design_inputs(request, doc)
+        saved = ImpedanceDesignDocument(request['template'], params, variable=variable,
+            bounds=settings['bounds'], target=settings['target'], quantity=quantity,
+            tolerance=settings.get('tolerance', .1), max_evaluations=32, mesh=mesh,
+            **{'search_tolerance':settings.get('tolerance', .1), **search})
+    elif kind == 'study':
+        settings, _ = study_documents(request, doc)
+        mode = settings['mode']
+        sampling = dict(kind={'sweep':'sweep','corners':'corners','monte_carlo':'uniform'}[mode],
+            variables=[dict(name=v['parameter'], lower=v['lower'], upper=v['upper']) for v in settings['variables']])
+        if mode != 'corners': sampling['count'] = settings['points']
+        if mode == 'monte_carlo': sampling['seed'] = settings['seed']
+        saved = ImpedanceStudyDocument(request['template'], request['parameters'],
+            sampling=sampling, quantity=quantity, mesh=doc.mesh_options)
+    else:
+        settings = network_settings(request['network'])
+        editable = TemplateSectionDocument(request['template'], request['parameters'], mesh=doc.mesh_options)
+        saved = QuasistaticLineDocument(editable, np.linspace(settings['start_hz'], settings['stop_hz'], settings['points']),
+            resistance=settings['resistance'], length=settings['length'], z_ref=settings['z_ref'])
+    return dict(engine=engine_info(), document=doc.to_dict(), document_text=saved.dumps())
+
+
 def edit_project(request):
     """Transform a bounded project snapshot without running or saving it."""
     from sipi.project import SavedProject
@@ -278,6 +418,8 @@ def edit_project(request):
 
 
 def execute(request, *, record_provider=None):
+    if isinstance(request, dict) and request.get('action') in ('design-document', 'design-open', 'study-document', 'study-open', 'network-document', 'network-open'):
+        return saved_controls(request)
     if not isinstance(request, dict):
         raise ValueError('Request must be a JSON object.')
     action = request.get('action')
@@ -374,45 +516,7 @@ def execute(request, *, record_provider=None):
     elif action == 'design':
         if 'document' in request or 'document_text' in request:
             raise ValueError('Choose a template before searching for a width.')
-        settings = request.get('design', {})
-        asymmetric = request['template'] in ASYMMETRIC_PAIR_TEMPLATES
-        variable = 'width'
-        if asymmetric:
-            if not isinstance(settings, dict) or not {'bounds', 'target', 'variable'} <= settings.keys() or not settings.keys() <= {'bounds', 'target', 'variable', 'tolerance'}:
-                raise ValueError('An unequal pair target needs bounds, target and an explicit width variable.')
-            variable = settings['variable']
-            if variable not in ('left_width', 'right_width'):
-                raise ValueError('Select left_width or right_width for an unequal pair target.')
-        params = dict(request['parameters'])
-        factory = TEMPLATES[request['template']]
-        mesh = request.get('mesh')
-        if mesh is None:
-            mesh = doc.section.mesh_settings()
-            if request['template'] in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar'):
-                mesh['edge_size'] *= 10
-            elif request['template'] in ('conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'):
-                # Start at feature/20 instead of the factory's feature/100.
-                # The separate refined solve and residual gates remain required.
-                mesh['edge_size'] *= 5
-            mesh['far_size'] /= 4
-            # These defaults already resolve finite ground gaps or coating.
-            # Keep their edge/growth settings before the mandatory independent
-            # refinement; pre-refining both again can exceed the point budget.
-            if request['template'] in ASYMMETRIC_PAIR_TEMPLATES or request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
-                # Resolve buried conductor edges without halving growth twice.
-                # The separate refinement and residual gates still apply.
-                mesh['edge_size'] /= 2
-            elif request['template'] not in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_microstrip', 'coupled_conformal_coated_microstrip', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'):
-                mesh['edge_size'] /= 4
-                mesh['grade'] /= 2
-        search_options = {}
-        if request['template'] in ASYMMETRIC_PAIR_TEMPLATES or request['template'] in ('coplanar_stripline', 'coupled_coplanar_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
-            tolerance = settings.get('tolerance', 0.1)
-            if (isinstance(tolerance, bool) or not isinstance(tolerance, Real)
-                    or not math.isfinite(tolerance) or tolerance <= 0):
-                raise ValueError('tolerance must be a positive finite real number')
-            # Leave room for refinement drift without changing final acceptance.
-            search_options['search_tolerance'] = tolerance / 2
+        settings, asymmetric, variable, params, factory, mesh, search_options = design_inputs(request, doc)
         result, line = sipi.seek_impedance(
             lambda value: factory(**{**params, variable: value}),
             settings.get('bounds'), settings.get('target'),
