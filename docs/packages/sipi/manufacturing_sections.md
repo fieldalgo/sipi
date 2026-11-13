@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Two-substrate unbacked coplanar sections](layered_unbacked_coplanar.md) keep finite grounds and independent upper/lower air without a backing plane.
+
 [Two-substrate grounded coplanar sections](layered_grounded_coplanar.md) retain finite side grounds beside single, equal and unequal signals.
 
 [Unequal two-substrate surface pairs](asymmetric_layered_microstrip.md) retain independent copper dimensions over both substrate layers.

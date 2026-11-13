@@ -689,3 +689,6 @@
 
 - Connect the three two-substrate grounded coplanar forms to saved controls, finite-ground studies and native/Worker network calculations.
   두 기판층 grounded coplanar 3종을 저장 제어·유한 접지 공차·native/Worker 네트워크 계산에 연결합니다.
+
+- Add single, equal and unequal coplanar geometry factories over two unbacked substrate layers with explicit finite grounds and independent lower air.
+  하부 접지면 없는 두 기판층 위 단일·대칭·비대칭 coplanar 기하 API에 유한 접지와 독립 하부 공기를 명시합니다.

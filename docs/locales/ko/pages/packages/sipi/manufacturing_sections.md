@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[두 기판층 unbacked coplanar 단면](layered_unbacked_coplanar.md)은 하부 접지면 없이 유한 접지와 독립 상·하부 공기를 둡니다.
+
 [두 기판층 grounded coplanar 단면](layered_grounded_coplanar.md)은 유한 측면 접지와 단일·대칭·비대칭 신호를 명시합니다.
 
 [두 기판층 비대칭 표면선로쌍](asymmetric_layered_microstrip.md)은 좌우 구리 치수를 독립적으로 보존합니다.

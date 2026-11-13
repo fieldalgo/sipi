@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -1235,3 +1235,75 @@ def with_surface_mask(section, *, thickness, eps_r, tan_delta=0.0, gap_fill_heig
     return CrossSection(section.layers, section.traces, section.width,
                         bottom=section.bottom, top=section.top, sides=section.sides,
                         dielectric_regions=(*section.dielectric_regions, *regions))
+
+
+
+def _unbacked_layered_surface(base, lower_air_height):
+    # _unbacked_coplanar's legacy default uses its first substrate layer.
+    # This family has two substrate layers; preserve their total thickness.
+    lower = (10*sum(layer.thickness for layer in base.layers[:2])
+             if lower_air_height is None else lower_air_height)
+    return _unbacked_coplanar(base, lower)
+
+
+def layered_unbacked_coplanar(*, width, gap, ground_width, lower_height, upper_height,
+                             lower_eps_r, upper_eps_r, thickness=0.0,
+                             lower_tan_delta=0.0, upper_tan_delta=0.0,
+                             air_height=None, lower_air_height=None,
+                             box_width=None, top_width=None):
+    """Finite coplanar grounds and one signal above two unbacked substrates.
+
+    Both heights exclude copper. All outer boundaries are open; finite grounds
+    alone define the reference. Lower air defaults to ten total substrate
+    heights and translates the whole substrate/copper stack. Top air includes
+    copper. gap measures signal-to-ground bottom-edge separation.
+    """
+    base = layered_grounded_coplanar(width=width, gap=gap, ground_width=ground_width,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
+    return _unbacked_layered_surface(base, lower_air_height)
+
+
+def coupled_layered_unbacked_coplanar(*, width, gap, ground_gap, ground_width,
+                                     lower_height, upper_height, lower_eps_r, upper_eps_r,
+                                     thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0,
+                                     air_height=None, lower_air_height=None,
+                                     box_width=None, top_width=None):
+    """Equal pair and finite side grounds over two unbacked substrate layers.
+
+    gap separates signals; ground_gap separates outside signal and ground
+    bottom edges. All copper shares thickness and starts above both substrates.
+    Only finite grounds set the reference; upper/lower air need separate checks.
+    """
+    base = coupled_layered_grounded_coplanar(width=width, gap=gap,
+        ground_gap=ground_gap, ground_width=ground_width,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
+    return _unbacked_layered_surface(base, lower_air_height)
+
+
+def asymmetric_coupled_layered_unbacked_coplanar(*, left_width, right_width, gap,
+        ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r,
+        left_thickness=0.0, right_thickness=0.0, ground_thickness=0.0,
+        lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None,
+        lower_air_height=None, box_width=None, left_top_width=None, right_top_width=None):
+    """Unequal signals and independently thick grounds over two unbacked layers.
+
+    Positive is left and negative right; the total bottom signal span is centred.
+    Lower air translates both substrates and all copper. Both substrate heights
+    exclude copper; all outer boundaries are open. The finite side grounds share
+    a reference potential. No independent symmetric modes are assumed.
+    """
+    base = asymmetric_coupled_layered_grounded_coplanar(left_width=left_width,
+        right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        left_thickness=left_thickness, right_thickness=right_thickness,
+        ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta,
+        upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width,
+        left_top_width=left_top_width, right_top_width=right_top_width)
+    return _unbacked_layered_surface(base, lower_air_height)
