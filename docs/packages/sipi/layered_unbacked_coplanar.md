@@ -38,8 +38,8 @@ text = CrossSectionDocument(section).dumps()
 Single-line `z0`, equal-pair even/odd summaries and the unequal pair's real
 lossless `z_diff_forward` launch at Icommon=0 retain their existing meanings.
 Unequal signals do not imply independent symmetric modes. These API factories
-can be saved as cross sections; named study/goal registration and editable forms
-are separate integration steps.
+can be saved as cross sections or named template inputs. Studies and width-goal
+documents use the same factory; dedicated editable forms are a separate step.
 
 The representative pair adds a 0.3 mm signal gap and a 0.2 mm outside ground gap.
 The unequal case uses 0.4/0.7 mm signal widths, 25/45 µm thicknesses,
@@ -51,3 +51,22 @@ geometries. Equal-material comparison against the original unbacked factory is
 bounded by 0.5%. Vacuum identities, reciprocity, positive energy and translation
 checks supplement these gates. They do not qualify every geometry or measured
 board. Existing templates, tolerances and frozen input snapshots stay unchanged.
+
+
+## Saved studies and goals
+
+The single line accepts z0; equal pairs accept z_diff or the explicit forward
+launch diagnostic; unequal pairs accept only z_diff_forward. Fixed pitch derives
+the inter-signal gap from signal widths. Finite grounds follow the outside signal
+edges to preserve ground_gap, while the lower air and substrate heights stay
+explicit. Normal samples with invalid ground widths remain failed rows without
+field solves. Surface stacks do not accept fixed_plane_spacing_m.
+
+Representative saved/direct targets are 60 Ω for the single line and 100 Ω for
+each pair, with width bounds 0.4–0.7 mm or unequal left width 0.32–0.8 mm. They
+start at edge 5 µm, far 0.25 mm and grade 0.2; the separate refinement halves all
+three settings. The search threshold is 0.05 Ω and both final residuals must
+meet 0.5 Ω. These are checks at the selected geometry, independent of the nominal
+section's convergence report. A denser starting mesh also requires its separate
+refinement and can exceed the existing mesh-point budget; that failure does not
+relax the target gate. Saved inputs reuse existing schema versions.

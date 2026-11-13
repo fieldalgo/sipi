@@ -692,3 +692,6 @@
 
 - Add single, equal and unequal coplanar geometry factories over two unbacked substrate layers with explicit finite grounds and independent lower air.
   하부 접지면 없는 두 기판층 위 단일·대칭·비대칭 coplanar 기하 API에 유한 접지와 독립 하부 공기를 명시합니다.
+
+- Register two-substrate unbacked coplanar inputs for finite-ground studies and independently refined width targets.
+  두 기판층 unbacked coplanar 입력을 유한 접지 공차와 별도 세분 폭 목표에 등록합니다.
