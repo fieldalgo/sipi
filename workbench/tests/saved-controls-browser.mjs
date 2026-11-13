@@ -80,6 +80,8 @@ try {
     const status=await cdp.evaluate('document.querySelector("#status").textContent');assert.ok(status.startsWith('Calculation complete'),status);
     if(item.kind==='study'){
       const result=await download('study-save');
+      // Preserve exact inputs and both results before numerical parity assertions.
+      await writeFile(join(output,`study-${checks.length}.json`),JSON.stringify({input:item.input,actual:result,expected:item.direct},null,2));
       assert.deepEqual(result.rows.map(r=>r.parameters),item.direct.rows.map(r=>r.parameters));
       for(let i=0;i<result.rows.length;i++){assert.equal(result.rows[i].status,'complete');assert.ok(Math.abs(result.rows[i].impedance/item.direct.rows[i].impedance-1)<1e-9);}
     }

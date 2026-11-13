@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserve complete saved-study comparison inputs and results before browser parity assertions.
+  브라우저 공차 일치 검사 전에 비교 입력과 양쪽 결과를 보존합니다.
+
 - Register the two-substrate surface lines for editable JSON, reproducible studies and refined width targets, preserving existing input schemas.
   두 기판층 표면선로를 편집 JSON·재현 가능한 공차·세분 폭 목표에 등록하고 기존 입력 규격을 보존합니다.
 

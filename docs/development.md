@@ -90,3 +90,9 @@ current integrals and numerical-library versions. It serializes existing results
 without extra field solves. Retain failed XML when comparing platforms: a small
 flux mismatch does not by itself bound resistance error. The original mesh
 fixtures, 5% resistance-change gate and current-return checks remain unchanged.
+
+Browser saved-study checks write `study-N.json` before numerical parity assertions.
+Each record preserves the exact input, actual downloaded result and native
+reference, including failed rows. Preserve a failing run in its own directory;
+reruns use a new directory. These records diagnose differences without changing
+the parity gate or accepting a failed runtime.
