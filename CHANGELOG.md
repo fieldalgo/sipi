@@ -1,5 +1,8 @@
 # Changelog
 
+- Normalize derived PSD Debye conductances for the strict eigenvalue sign check, preserving propagation arithmetic, negative-input rejection and power-balance limits.
+  PSD Debye 셀 컨덕턴스를 정규화한 뒤 고유값 부호를 검사하며 전파 연산·음의 입력 거부·전력 균형 한도를 유지합니다.
+
 - Reproduce periodic Thevenin, Norton and mixed-circuit power totals exactly from exported harmonic components.
   주기 Thevenin·Norton·혼합 회로의 전력 합계를 내보낸 주파수별 성분에서 정확히 재현합니다.
 

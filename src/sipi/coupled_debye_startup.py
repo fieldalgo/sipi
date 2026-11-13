@@ -131,7 +131,11 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
     if (dx <= 0 or np.any(tau <= 0)
             or not all(np.all(np.isfinite(x)) for x in [tau, slopes, *storage, *conductance])
             or any(np.linalg.eigvalsh(x)[0] <= 0 for x in storage)
-            or (any(not np.any(x) or np.linalg.eigvalsh(x)[0] < 0 for x in conductance)
+            # Match input PSD validation in dimensionless units. A positive
+            # cell/pole scale cannot change passivity, but an unscaled null
+            # eigenvalue can acquire a backend-dependent roundoff sign.
+            # Keep the strict sign test: no tolerance or eigenvalue clipping.
+            or (any(not np.any(x) or np.linalg.eigvalsh(x/np.max(abs(x)))[0] < 0 for x in conductance)
                 if psd_strength else any(np.linalg.eigvalsh(x)[0] <= 0 for x in conductance))):
         raise ValueError('Debye cell matrices or source slopes exceed finite scales')
     mass = np.zeros((size, size)); k = np.zeros_like(mass); b = np.zeros((size, signals))

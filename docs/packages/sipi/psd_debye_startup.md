@@ -13,6 +13,12 @@ strengths must be PSD. Negative computed eigenvalues reject without clipping
 or symmetry repair. L and C_inf remain positive definite with normalized
 eigenvalue ratio above1e-12. DeltaC has no positive-rank threshold: a small
 positive eigenvalue stays positive, while an exact zero is permitted.
+Derived nonzero cell relaxation conductances use the same dimensionless
+PSD sign check as the input strengths: divide by their largest absolute
+entry before computing eigenvalues. This avoids a scale-dependent sign of
+a null eigenvalue; negative normalized eigenvalues still reject with no
+tolerance or clipping. Zero underflow and nonfinite coefficients still reject.
+The stored matrices and propagation arithmetic are unchanged.
 The declared capacitance is C_inf+sum(DeltaC/(1+j*f/relaxation_hz)).
 Inputs use ohm/m,H/m,S/m,F/m,Hz,m; each source/load has two finite positive
 ohms. Ideal/open/short, reactive and current-source boundaries are unsupported.
