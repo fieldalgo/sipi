@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Unequal two-substrate surface pairs](asymmetric_layered_microstrip.md) retain independent copper dimensions over both substrate layers.
+
 [Two-substrate surface lines](layered_microstrip.md) place single or equal paired copper above two independently specified dielectric layers.
 
 [Two-dielectric buried coplanar lines](layered_coplanar_stripline.md) retain layer materials and compose fixed pitch with stack-height tolerances.

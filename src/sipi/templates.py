@@ -11,7 +11,7 @@ from numbers import Real
 from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
-           'layered_microstrip', 'coupled_layered_microstrip',
+           'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
            'asymmetric_coupled_grounded_coplanar',
@@ -137,6 +137,30 @@ def coupled_layered_microstrip(*, width, gap, lower_height, upper_height,
         lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
         lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
         air_height=air_height, box_width=box_width, top_width=top_width)
+
+
+def asymmetric_coupled_layered_microstrip(*, left_width, right_width, gap,
+                                        lower_height, upper_height, lower_eps_r, upper_eps_r,
+                                        left_thickness=0.0, right_thickness=0.0,
+                                        lower_tan_delta=0.0, upper_tan_delta=0.0,
+                                        air_height=None, box_width=None,
+                                        left_top_width=None, right_top_width=None):
+    """Unequal surface pair above two independently specified substrate layers.
+
+    Both substrate heights exclude copper. Signal bottoms meet the top substrate
+    surface; widths, thicknesses and optional centred tapers are independent.
+    The complete bottom span is centred, positive left and negative right.
+    Gap is between bottom edges. Only the lower plane is grounded; air height
+    includes both signals. No exchange symmetry or independent modes are assumed.
+    """
+    return _layered_surface(asymmetric_coupled_microstrip,
+        left_width=left_width, right_width=right_width, gap=gap,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        left_thickness=left_thickness, right_thickness=right_thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        air_height=air_height, box_width=box_width,
+        left_top_width=left_top_width, right_top_width=right_top_width)
 
 
 def asymmetric_coupled_microstrip(*, left_width, right_width, gap, substrate_height, eps_r,

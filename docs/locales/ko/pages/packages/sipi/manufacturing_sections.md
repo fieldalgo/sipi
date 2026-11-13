@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[두 기판층 비대칭 표면선로쌍](asymmetric_layered_microstrip.md)은 좌우 구리 치수를 독립적으로 보존합니다.
+
 [두 기판층 표면 선로](layered_microstrip.md)는 각각 명시한 두 유전체 위에 단일 또는 같은 폭의 쌍을 놓습니다.
 
 [두 유전체 매립 coplanar 선로](layered_coplanar_stripline.md)는 층별 재료와 고정 pitch·전체 높이 공차를 함께 지원합니다.

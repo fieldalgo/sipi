@@ -671,3 +671,6 @@
 
 - Added editable two-layer surface line/pair forms using the shared saved-input, study, target and network paths; preserved the original 42-case reference.
 - 두 기판층 표면선로·쌍의 전용 편집 폼을 공통 저장·공차·역산·네트워크 경로에 연결하고 기존 42종 기준을 보존했습니다.
+
+- Added an unequal surface-pair factory over two independent substrate layers, retaining explicit copper dimensions and real forward-launch semantics.
+- 두 기판층 위 비대칭 표면선로쌍 API를 추가하고 구리 치수와 실수 순방향 여기 의미를 명시했습니다.
