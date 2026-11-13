@@ -21,7 +21,8 @@ from .impedance_material import (_material_input, _validate_material_input,
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
 _TEMPLATES = {name: getattr(templates, name) for name in
-              ('layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar',
+              ('layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip',
+               'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar',
                'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip',
                'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar',
                'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar',
@@ -51,7 +52,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'coupled_conformal_coated_microstrip', 'conformal_coated_grounded_coplanar',
                'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_unbacked_coplanar',
                'coupled_conformal_coated_unbacked_coplanar')}
-_ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_microstrip', 'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
+_ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_microstrip', 'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
                                         'asymmetric_coupled_layered_stripline',
                'asymmetric_coupled_layered_coplanar_stripline',
                                         'asymmetric_coupled_grounded_coplanar',
@@ -63,7 +64,7 @@ _ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_layered_coated_gro
                'asymmetric_coupled_conformal_coated_grounded_coplanar',
                'asymmetric_coupled_conformal_coated_unbacked_coplanar',
                                         'asymmetric_coupled_coplanar_stripline'))
-_DIFFERENTIAL = frozenset(('coupled_layered_coated_grounded_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'coupled_layered_coated_microstrip', 'coupled_layered_unbacked_coplanar', 'coupled_layered_grounded_coplanar', 'coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
+_DIFFERENTIAL = frozenset(('coupled_layered_conformal_coated_microstrip', 'coupled_layered_coated_grounded_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'coupled_layered_coated_microstrip', 'coupled_layered_unbacked_coplanar', 'coupled_layered_grounded_coplanar', 'coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
                          'coupled_layered_microstrip',
                          'coupled_layered_coplanar_stripline',
                          'coupled_coplanar_stripline',
@@ -71,7 +72,7 @@ _DIFFERENTIAL = frozenset(('coupled_layered_coated_grounded_coplanar', 'coupled_
                          'coupled_coated_grounded_coplanar', 'coupled_unbacked_coplanar',
                          'coupled_coated_unbacked_coplanar', 'coupled_conformal_coated_microstrip',
                          'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_unbacked_coplanar'))
-_HORIZONTAL_PAIRS = frozenset(('coupled_layered_coated_grounded_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'coupled_layered_coated_microstrip', 'coupled_layered_unbacked_coplanar', 'coupled_layered_grounded_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar',
+_HORIZONTAL_PAIRS = frozenset(('coupled_layered_conformal_coated_microstrip', 'coupled_layered_coated_grounded_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'coupled_layered_coated_microstrip', 'coupled_layered_unbacked_coplanar', 'coupled_layered_grounded_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar',
                              'coupled_layered_microstrip',
                              'coupled_layered_coplanar_stripline',
                              'coupled_coplanar_stripline',

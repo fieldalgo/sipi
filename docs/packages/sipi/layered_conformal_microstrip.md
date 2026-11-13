@@ -29,8 +29,8 @@ section = layered_conformal_coated_microstrip(
 text = CrossSectionDocument(section).dumps()
 ```
 
-Direct Python and geometry JSON are supported. Named studies, width goals and
-dedicated forms are separate integration steps. Single-line `z0`, equal-pair
+Direct Python, geometry JSON, named templates, parameter studies and width
+goals share the same section contract. Dedicated forms remain a separate step. Single-line `z0`, equal-pair
 even/odd diagnostics and unequal-pair `z_diff_forward` keep their meanings;
 unequal signals do not imply independent symmetric modes.
 
@@ -49,3 +49,21 @@ zero-metal planar-film limits each require agreement within 0.5%. Normal
 surface distance, vacuum identities, reciprocity, positive energy and JSON
 round trips supplement these selected-geometry checks. They do not qualify
 arbitrary boards or measured accuracy.
+
+
+## Saved studies and width goals
+
+Single/equal/unequal objectives are `z0`, `z_diff` and `z_diff_forward`;
+equal pairs also accept explicit `z_diff_forward`. Fixed-pitch sampling keeps
+signal centers 0.8 mm apart for the equal example and 0.85 mm apart for the
+unequal example. The polygon film is rebuilt with its original 20 µm normal
+thickness. Negative normal-film samples remain failed rows without meshing.
+Coating-permittivity sweeps preserve geometry and replay through common saved
+execution; deterministic PCG64 samples are checked independently.
+
+Representative width goals are 90/105/105 Ω within 0.4–0.7 mm width or
+0.32–0.8 mm unequal left width. A 0.05 Ω search gate precedes a separate
+refinement that halves edge, far and grade; requested and refined residuals
+must both stay within 0.5 Ω. Direct and saved histories/refined results agree
+exactly. This selected-geometry check is separate from nominal outer-domain
+convergence and does not broaden the qualified geometry range.

@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect two-substrate normal-film templates to saved studies and separately refined impedance goals while preserving polygon-film geometry.
+  두 기판 법선 코팅 단면을 저장 공차·별도 세분 임피던스 목표에 연결하고 다각형 코팅을 보존합니다.
+
 - Add single/equal/unequal microstrip factories with two substrate materials and explicit normal-thickness polygon coatings.
   두 기판 재료와 법선 두께 다각형 코팅의 단일·대칭·비대칭 microstrip API를 추가합니다.
 
