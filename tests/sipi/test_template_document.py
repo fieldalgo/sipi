@@ -50,7 +50,9 @@ def test_reference_preserves_exact42_original_factories_and_surface_extensions()
                          'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar',
                          'asymmetric_coupled_layered_grounded_coplanar',
                          'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar',
-                         'asymmetric_coupled_layered_unbacked_coplanar'} == set(_TEMPLATES)
+                         'asymmetric_coupled_layered_unbacked_coplanar',
+                         'layered_coated_microstrip', 'coupled_layered_coated_microstrip',
+                         'asymmetric_coupled_layered_coated_microstrip'} == set(_TEMPLATES)
     assert len(CASES) == 42
     assert REFERENCE['engine_commit'] == '4445d5ce3a0e9e186e33fb8d12354a2339f6e0df'
 

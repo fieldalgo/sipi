@@ -1,5 +1,8 @@
 # Changelog
 
+- Register planar-coated two-substrate lines for versioned inputs, reproducible studies and separately refined width goals.
+  평면 코팅 두 기판층 선로를 버전 입력·재현 가능한 공차·별도 세분 폭 목표에 등록합니다.
+
 - Scale internal states for two-signal PSD Debye reactive propagation, preserving tiny finite-inductor currents and their physical energy limit.
   2신호 PSD Debye reactive 전파의 내부 상태를 스케일링하여 큰 유한 인덕터의 작은 전류와 물리 에너지 극한을 보존합니다.
 

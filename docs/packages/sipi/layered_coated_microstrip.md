@@ -34,8 +34,9 @@ For a pair, `gap` separates bottom copper edges and the complete bottom span is
 centered. Single-line `z0`, equal-pair even/odd summaries and unequal-pair real
 `z_diff_forward` at Icommon=0 retain their existing definitions. Unequal signals
 do not imply independent symmetric modes. These factories support direct Python
-and geometry JSON. Named editable-template inputs, saved parameter studies,
-width-goal registration and dedicated forms are separate integrations.
+and geometry JSON, named template inputs, saved parameter studies and width
+goals using the same factories. Dedicated workbench forms are a separate
+integration.
 
 The representative pair adds a 0.3 mm gap. The unequal case uses 0.4/0.7 mm widths,
 25/45 µm thicknesses and 0.32/0.55 mm top widths. Tests independently assign
@@ -49,3 +50,22 @@ total outer height in the air limit. Vacuum identities, positive energy,
 reciprocity, JSON round trips and invalid-layer rejection supplement these
 checks. This qualifies the recorded representative sections, not every geometry
 or measured PCB. Existing factories and numerical acceptance gates are preserved.
+
+
+## Saved studies and width goals
+
+Single lines use `z0`. Equal pairs accept `z_diff` or the explicit
+`z_diff_forward` launch; unequal pairs accept only `z_diff_forward`.
+Fixed pitch derives the edge gap from the signal widths, while substrate,
+coating and above-film air heights remain explicit. Surface lines do not accept
+fixed plane spacing. Material sweeps may vary coating permittivity; invalid
+normal samples such as negative coating height remain failed rows and do not
+trigger field solves or replacement sampling.
+
+Representative direct/saved goals use 90 Ω for the single line and 100 Ω for
+both pairs. Width bounds are 0.4–0.7 mm, or unequal left width 0.32–0.8 mm.
+The starting edge/far/grade settings are 5 µm/0.25 mm/0.2; refinement halves
+all three at the selected geometry. Search residual must reach 0.05 Ω and both
+requested/refined residuals must meet 0.5 Ω. Direct and saved histories and
+refined results are compared exactly. No new schema version is introduced.
+These gates do not imply that every geometry or requested target converges.
