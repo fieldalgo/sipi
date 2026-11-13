@@ -497,6 +497,8 @@ def documents():
     refined_goal = goals()[0].to_dict()
     refined_goal.update(schema='sipi.impedance-design/4', search_tolerance_ohm=.25)
     base.append(ImpedanceDesignDocument.from_dict(refined_goal))
+    from sipi.quasistatic_line_document import QuasistaticLineDocument
+    base.append(QuasistaticLineDocument(cross(), [0., 1e8], resistance=5., length=.1))
     return base
 
 

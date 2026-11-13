@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserve quasi-static section, frequency grid, supplied diagonal resistance, length and port reference in a strict saved line document with common execution.
+  준정적 단면·주파수·명시 대각 저항·길이·포트 기준을 엄격한 선로 문서와 공통 실행으로 보존합니다.
+
 - Save explicit requested-mesh search thresholds in impedance-design/4, preserving legacy JSON, final refinement gates and common execution failures.
   impedance-design/4에 요청 메시 탐색 기준을 저장하며 기존 JSON·최종 세분 기준·공통 실행 실패 이력을 유지합니다.
 

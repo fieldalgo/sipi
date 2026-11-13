@@ -15,6 +15,7 @@ import numpy as np
 
 from .document import CrossSectionDocument, _unique_object
 from .template_document import TemplateSectionDocument
+from .quasistatic_line_document import QuasistaticLineDocument
 from .study import ImpedanceStudyDocument
 from .design_document import ImpedanceDesignDocument
 from .design import GoalSeekError, GoalMeshSizeLimitError
@@ -111,6 +112,7 @@ _REGISTRY = {
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     'sipi.template-section/1': TemplateSectionDocument,
+    'sipi.quasistatic-line/1': QuasistaticLineDocument,
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
     **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2, 3, 4)},
     'sipi.circular-aperture/1': ApertureDocument,
@@ -608,6 +610,12 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 consistency={key: _array(getattr(result, key)) for key in
                     ('linear_residual', 'power_balance', 'reciprocity',
                      'projected_unitarity', 'unprojected_port_power')})
+        elif isinstance(doc, QuasistaticLineDocument):
+            line = result.line
+            out['result'] = dict(names=list(line.names), C_f_per_m=_array(line.C),
+                C0_f_per_m=_array(line.C0), C_loss_f_per_m=_array(line.C_loss),
+                L_h_per_m=_array(line.L), network=_network(result.network),
+                model='constant diagonal series R; quasi-static C/L and constant-tangent G(f)')
         elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument)):
             out['result'] = dict(names=list(result.names), frequency_hz=_array(result.frequency),
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),
