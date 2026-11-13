@@ -43,7 +43,7 @@ _TEMPLATES = {name: getattr(templates, name) for name in
                'asymmetric_coupled_coplanar_stripline',
                'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
                'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
-               'layered_broadside_stripline',
+               'layered_broadside_stripline', 'asymmetric_layered_broadside_stripline',
                'coplanar_stripline', 'coupled_coplanar_stripline',
                'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline',
                'coupled_coated_microstrip', 'coated_grounded_coplanar',
@@ -201,7 +201,7 @@ class ImpedanceStudyDocument:
             raise ValueError('mesh must be an object')
         doc = CrossSectionDocument(section, mesh=data['mesh'])
         mesh = section.mesh_settings(**doc.mesh_options)
-        allowed = (('z_diff_forward',) if template in _ASYMMETRIC_HORIZONTAL_PAIRS or template == 'layered_broadside_stripline' else
+        allowed = (('z_diff_forward',) if template in _ASYMMETRIC_HORIZONTAL_PAIRS or template in ('layered_broadside_stripline', 'asymmetric_layered_broadside_stripline') else
                    ('z_diff', 'z_diff_forward') if template in _DIFFERENTIAL else ('z0',))
         quantity = data['quantity']
         if not isinstance(quantity, str) or quantity not in allowed:

@@ -1,5 +1,8 @@
 # Changelog
 
+- Register unequal broadside inputs for saved tolerance studies and separately refined forward-impedance width goals without inferring horizontal pitch or symmetry.
+  비대칭 broadside를 저장 공차·별도 세분 전진 임피던스 선폭 목표에 등록하고 가로 pitch·대칭성을 추정하지 않습니다.
+
 - Add a three-dielectric broadside factory with independent lower/upper conductor widths and thicknesses, explicit clearances and signed offset.
   상하 도체의 선폭·두께, 평면 간격과 부호 있는 offset을 명시하는 3유전체 비대칭 broadside API를 추가합니다.
 
