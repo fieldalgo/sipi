@@ -194,7 +194,8 @@ def psd_multiconductor_debye_mixed_reactive_ladder_response(time, sources, *, si
         load_branch_resistance=load_branch_resistance, load_branch_inductance=load_branch_inductance)
     r = _propagate_coupled_debye(data, psd_strength=True,
         result_type=NortonMulticonductorDebyeReactiveLadderResponse, propagator=lsim,
-        load_capacitance=cap, load_branch=(rb, lb), signals=signals, source_conductance=gs)
+        load_capacitance=cap, load_branch=(rb, lb), signals=signals, source_conductance=gs,
+        scale_states=True)
     near_v = r.voltage[:, :signals]; near_i = r.current[:, :signals]
     with np.errstate(over='ignore', under='ignore', invalid='ignore'):
         supplied = np.sum(values[:, vm]*near_i[:, vm], axis=1)+np.sum(values[:, ~vm]*near_v[:, ~vm], axis=1)

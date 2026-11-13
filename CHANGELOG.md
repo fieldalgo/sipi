@@ -1,5 +1,8 @@
 # Changelog
 
+- Balance current-driven and mixed-source multiconductor Debye reactive states, checked against an independent branch-free ODE flux limit.
+  전류·혼합 소스 다신호 Debye reactive 상태 스케일을 독립 분기 없는 ODE 자속 극한으로 검증합니다.
+
 - Balance voltage-driven three/four-signal Debye reactive states to preserve large-inductance flux and energy limits.
   전압 구동 3·4신호 Debye reactive 상태의 스케일을 맞춰 큰 인덕턴스의 자속·에너지 극한을 보존합니다.
 

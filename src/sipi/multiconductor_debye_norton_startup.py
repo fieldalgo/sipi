@@ -169,4 +169,5 @@ def psd_multiconductor_debye_norton_reactive_ladder_response(time, source_curren
         load_branch_inductance=load_branch_inductance)
     return _propagate_coupled_debye(data, psd_strength=True,
         result_type=NortonMulticonductorDebyeReactiveLadderResponse, propagator=lsim,
-        load_capacitance=cap, load_branch=(rb, lb), signals=signals, source_conductance=gs)
+        load_capacitance=cap, load_branch=(rb, lb), signals=signals, source_conductance=gs,
+        scale_states=True)

@@ -108,3 +108,27 @@ contract; its ideal voltage/short options are not inferred here.
 
 
 [Typed-source multiconductor port waves](multiconductor_debye_mixed_startup_waves.md) preserve terminal currents and exclude both source series and shunt losses.
+
+
+## Numerical state scaling and branch-free limit
+
+Storage-based diagonal state scaling is applied before propagation and all
+outputs are restored to physical units. Polarization voltages share the
+corresponding node-voltage scale. This preserves tiny branch currents for
+large finite branch inductance without changing source types, physical
+matrices, JSON versions or power checks.
+
+The large-inductance regression independently assembles a branch-free finite-pi
+circuit from charge KCL, series RL and Debye polarization equations. DOP853
+integrates its far-end voltage, with waveform breakpoints handled explicitly.
+Two reference tolerances (1e-9 and 1e-11) must agree on flux within relative
+1e-7. Positive source conductance also permits a separate capacitive-circuit
+Thevenin check whose Simpson-integrated flux must agree within 1e-5.
+
+Three/four signals, ramp/pulse input, positive or zero current-source shunts,
+and alternating voltage/current sources are tested at 1e6, 1e7 and 1e8 H,
+zero branch resistance and zero load capacitance. `Lbranch * Ibranch` and the
+predicted 1/L branch energy each require relative error at most 1e-5. Existing
+KCL, power, source-equivalence, permutation and saved-wave gates are retained.
+These numerical stress values do not prescribe PCB components or qualify
+arbitrary circuits or measured accuracy.
