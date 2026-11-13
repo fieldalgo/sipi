@@ -45,8 +45,9 @@ def test_every_existing_template_matches_frozen_geometry_and_resolved_inputs(nam
     assert set(doc.mesh_options) == {'edge_size', 'far_size', 'grade', 'min_angle'}
 
 
-def test_reference_covers_exact42_existing_factories():
-    assert set(CASES) == set(_TEMPLATES) and len(CASES) == 42
+def test_reference_preserves_exact42_original_factories_and_surface_extensions():
+    assert set(CASES) | {'layered_microstrip', 'coupled_layered_microstrip'} == set(_TEMPLATES)
+    assert len(CASES) == 42
     assert REFERENCE['engine_commit'] == '4445d5ce3a0e9e186e33fb8d12354a2339f6e0df'
 
 

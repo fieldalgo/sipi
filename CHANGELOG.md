@@ -1,5 +1,8 @@
 # Changelog
 
+- Register the two-substrate surface lines for editable JSON, reproducible studies and refined width targets, preserving existing input schemas.
+  두 기판층 표면선로를 편집 JSON·재현 가능한 공차·세분 폭 목표에 등록하고 기존 입력 규격을 보존합니다.
+
 - Verify all 111 registered input schemas in saved projects and execution records, including exact fixture coverage.
   저장 프로젝트와 실행 기록에서 등록 입력 111종 전체와 기준 입력의 정확한 대응을 검사합니다.
 

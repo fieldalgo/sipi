@@ -22,6 +22,7 @@ __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
 _TEMPLATES = {name: getattr(templates, name) for name in
               ('microstrip', 'stripline', 'coupled_microstrip', 'asymmetric_coupled_microstrip', 'grounded_coplanar',
+               'layered_microstrip', 'coupled_layered_microstrip',
                'asymmetric_coupled_stripline',
                'asymmetric_coupled_layered_stripline',
                'asymmetric_coupled_layered_coplanar_stripline',
@@ -59,6 +60,7 @@ _ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_microstrip', 'asym
                'asymmetric_coupled_conformal_coated_unbacked_coplanar',
                                         'asymmetric_coupled_coplanar_stripline'))
 _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside_stripline',
+                         'coupled_layered_microstrip',
                          'coupled_layered_coplanar_stripline',
                          'coupled_coplanar_stripline',
                          'coupled_grounded_coplanar', 'coupled_layered_stripline', 'coupled_coated_microstrip',
@@ -66,6 +68,7 @@ _DIFFERENTIAL = frozenset(('coupled_microstrip', 'coupled_stripline', 'broadside
                          'coupled_coated_unbacked_coplanar', 'coupled_conformal_coated_microstrip',
                          'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_unbacked_coplanar'))
 _HORIZONTAL_PAIRS = frozenset(('coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar',
+                             'coupled_layered_microstrip',
                              'coupled_layered_coplanar_stripline',
                              'coupled_coplanar_stripline',
                              'coupled_layered_stripline', 'coupled_coated_microstrip',

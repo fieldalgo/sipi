@@ -42,8 +42,9 @@ print(line.z0)
 기존 정전계·복소 유전체 추출을 사용하며 주파수 분산·도체 저항·거칠기 모델을
 추정하지 않습니다. 반환값은 일반 `CrossSection`이므로 `CrossSectionDocument`로
 저장하고, 폭을 바꾸는 함수를 `seek_impedance`에 전달할 수 있습니다. 목표
-역산의 별도 세분 검사는 유지합니다. 편집 템플릿 등록·저장 공차/목표·전용
-workbench 폼은 후속 연결 단계이며 기존 등록 입력은 이번 API에서 바꾸지 않습니다.
+역산의 별도 세분 검사는 유지합니다. 두 함수 모두 기존 버전 규격의 `TemplateSectionDocument`,
+`ImpedanceStudyDocument`, `ImpedanceDesignDocument`에 등록됩니다. 전용 workbench
+폼은 후속 단계이며 Saved analysis에서는 이 저장 입력을 실행할 수 있습니다.
 
 검증은 scikit-fem 12.0.2의 독립 재료 배치와 복소·진공 에너지 조립을 사용합니다.
 `tests/sipi/test_layered_microstrip.py`의 명시 단일/쌍 조건에서 C/C_loss/C0의
@@ -53,3 +54,42 @@ workbench 폼은 후속 연결 단계이며 기존 등록 입력은 이번 API�
 0.0147%입니다. 이는 선택한 수치 검증의 범위이며 실측 정확도나 모든 기하의
 보장이 아닙니다. 균일 기판과의 차이는 0.5% 이내이며 독립 조립·외곽 검사를
 대체하지 않습니다.
+
+## 저장 공차와 폭 목표
+
+단일선로는 `z0`, 같은 폭 쌍은 `z_diff` 또는 `z_diff_forward`를 사용합니다.
+쌍의 폭 공차·역산에 `fixed_pitch_m`을 지정하면 명목 폭+간격이 pitch와 같은지
+확인하고, 도체 중심을 고정한 채 각 표본의 간격을 계산합니다.
+`fixed_plane_spacing_m`은 기준면이 두 개인 stripline 전용이므로 표면선로에서
+거부하며 기판 총높이 제약으로 바꾸어 해석하지 않습니다.
+
+각 층의 높이·유전율·손실탄젠트는 독립적으로 보존합니다. Sweep·corner·uniform·
+상관 normal의 기존 표본 규칙을 유지합니다. 무한범위 분포의 잘못된 재료 표본은
+다시 뽑거나 제거하지 않고 실패행으로 남기며 요약을 생성하지 않습니다.
+입력 준비·저장·열기는 전계 계산을 하지 않습니다. 공차는 명시 메시를 유지하고
+폭 목표의 성공에는 별도 세분 검사가 필요합니다.
+
+```python
+from sipi import ImpedanceDesignDocument
+from sipi.study import ImpedanceStudyDocument
+
+parameters = dict(width=0.5e-3, thickness=35e-6,
+    lower_height=0.3e-3, upper_height=0.7e-3,
+    lower_eps_r=3.0, upper_eps_r=5.0,
+    air_height=10e-3, box_width=20e-3)
+study = ImpedanceStudyDocument('layered_microstrip', parameters, quantity='z0',
+    sampling=dict(kind='sweep', count=3,
+        variables=[dict(name='upper_eps_r', lower=4.8, upper=5.2)]),
+    mesh=document.mesh_options)
+goal = ImpedanceDesignDocument('layered_microstrip', parameters,
+    variable='width', bounds=[0.2e-3, 1.5e-3], target=75.0,
+    tolerance=0.5, search_tolerance=0.25, mesh=document.mesh_options)
+# Save study.dumps() or goal.dumps(); execute later in Saved analysis or Python.
+```
+
+저장 검증은 원래 42종 템플릿과 기존 111종 정규 입력 문서를 바이트 그대로
+보존하는지 확인합니다. 고정 pitch·정확한 PCG64 표본·실패행·공통실행과 직접/저장
+목표의 원래/세분 이력을 각각 검사합니다. 공정 인증이나 표본 결과의 최악값
+보장을 뜻하지 않습니다.
+
+검증된 reference 환경에서 `PYTHONPATH=src OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_layered_microstrip.py tests/sipi/test_layered_microstrip_documents.py`로 관련 검사를 실행합니다.

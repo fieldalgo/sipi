@@ -43,9 +43,10 @@ These factories use the existing electrostatic/complex dielectric extraction;
 they do not infer frequency dispersion, copper resistance or a roughness model.
 They return ordinary `CrossSection` objects. Save them as `CrossSectionDocument`
 and pass width factories to `seek_impedance`, whose separate refined solve stays
-required. Editable template registration, saved study/goal forms and a dedicated
-workbench form are a subsequent integration step; these two API factories do not
-change the existing registered-template inputs.
+required. Both factories are registered for `TemplateSectionDocument`,
+`ImpedanceStudyDocument` and `ImpedanceDesignDocument`, using their existing
+versioned schemas. The dedicated workbench forms are a subsequent integration
+step; Saved analysis can execute these stored inputs.
 
 Validation uses scikit-fem 12.0.2 with independent material assignment and complex
 and vacuum energy assembly. For the specified single/pair case in
@@ -56,3 +57,43 @@ gates are 0.5%. Observed maxima are about 0.3373%, 0.3105% and 0.0147%, respecti
 These bounds describe the selected numerical checks, not measured-board accuracy
 or all geometries. The uniform-substrate comparison is within 0.5%; it does not
 replace the independent assembly or the domain checks.
+
+## Saved studies and width targets
+
+Use quantity `z0` for the single line and `z_diff` or `z_diff_forward` for the
+equal pair. A paired width study or goal can use `fixed_pitch_m`; the saved
+request requires nominal width + gap to match pitch and derives each sampled
+gap without moving the conductor centres. `fixed_plane_spacing_m` remains a
+two-ground stripline contract and is rejected for these surface lines.
+
+Each substrate's height, permittivity and loss tangent remains independent.
+Sweep, corner, uniform and correlated-normal inputs use the existing sampling
+rules; failed unbounded material samples are retained without a summary or
+resampling. Preparation and save/open do not solve fields. Study evaluations
+retain the explicit mesh; successful width goals retain mandatory refinement.
+
+```python
+from sipi import ImpedanceDesignDocument
+from sipi.study import ImpedanceStudyDocument
+
+parameters = dict(width=0.5e-3, thickness=35e-6,
+    lower_height=0.3e-3, upper_height=0.7e-3,
+    lower_eps_r=3.0, upper_eps_r=5.0,
+    air_height=10e-3, box_width=20e-3)
+study = ImpedanceStudyDocument('layered_microstrip', parameters, quantity='z0',
+    sampling=dict(kind='sweep', count=3,
+        variables=[dict(name='upper_eps_r', lower=4.8, upper=5.2)]),
+    mesh=document.mesh_options)
+goal = ImpedanceDesignDocument('layered_microstrip', parameters,
+    variable='width', bounds=[0.2e-3, 1.5e-3], target=75.0,
+    tolerance=0.5, search_tolerance=0.25, mesh=document.mesh_options)
+# Save study.dumps() or goal.dumps(); execute later in Saved analysis or Python.
+```
+
+The saved-document checks preserve the original 42 template snapshots and all
+111 existing canonical input documents byte-for-byte. They separately check
+fixed pitch, exact PCG64 sampling, failed rows, common execution and direct/saved
+requested/refined goal histories. They do not qualify a manufacturing process
+or turn sampled results into guaranteed worst-case limits.
+
+Run `PYTHONPATH=src OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_layered_microstrip.py tests/sipi/test_layered_microstrip_documents.py` with the qualified reference environment.
