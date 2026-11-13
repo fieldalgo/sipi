@@ -1,5 +1,8 @@
 # Changelog
 
+- Register coated two-substrate coplanar inputs for studies and separately refined width goals while retaining finite-ground clearances and explicit air boundaries.
+  코팅된 두 기판층 coplanar 입력을 공차·별도 세분 폭 목표에 등록하고 유한 접지 간격과 공기 경계를 보존합니다.
+
 - Add two-substrate planar-coated coplanar factories with finite side grounds, explicit backing-plane or lower-air boundaries, and single/equal/unequal signals.
   두 기판층의 평면 코팅 coplanar API에 유한 옆 접지선·하단 접지면 또는 아래 공기 경계·단일/대칭/비대칭 신호를 명시합니다.
 

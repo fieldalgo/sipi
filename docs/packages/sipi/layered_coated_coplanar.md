@@ -45,8 +45,9 @@ section = layered_coated_unbacked_coplanar(
 text = CrossSectionDocument(section).dumps()
 ```
 
-The factories support direct Python and geometry JSON. Named parameter-study,
-width-goal and dedicated form integration is separate. Single-line `z0`,
+The factories support direct Python, geometry JSON, named template inputs,
+reproducible parameter studies and width goals. Dedicated form integration
+is separate. Single-line `z0`,
 equal-pair even/odd diagnostics and unequal-pair real `z_diff_forward` at
 Icommon=0 keep their existing meanings; independent symmetric modes are not
 assumed for unequal signals.
@@ -63,3 +64,26 @@ factories within 0.5%, with the same total upper height in the air-film limit.
 Vacuum identities, reciprocity, positive energy, translation, ground clearances,
 JSON round trips and invalid-layer rejection supplement the field checks.
 These representative bounds do not qualify arbitrary layouts or measured boards.
+
+
+## Saved studies and width targets
+
+Single signals accept `z0`, equal pairs accept `z_diff` or explicit
+`z_diff_forward`, and unequal pairs accept only `z_diff_forward`. Fixed pitch
+preserves the relative signal centers while the outside side grounds follow
+the signal edges to maintain their clearance. The two substrates, full-width
+film, above-film air and optional lower air remain explicit. Fixed plane spacing
+is not a surface-line parameter.
+
+Independent PCG64 samples and saved/common execution are checked. Coating
+permittivity sweeps use the same geometry; invalid normal coating heights remain
+failed rows without field solves or replacement samples. Existing JSON schema
+versions are reused.
+
+Representative targets are 55 Ω for each single line and 90 Ω for each pair.
+Width bounds are 0.4–0.7 mm, or unequal left width 0.32–0.8 mm. The initial mesh
+uses edge 5 µm, far 0.25 mm and grade 0.2; the separate refinement halves all
+three at the selected geometry. The search gate is 0.05 Ω and both requested
+and refined residuals must meet 0.5 Ω. Direct/saved histories and refined values
+must agree exactly. These selected-geometry checks are separate from the
+nominal geometry's outer-domain convergence report.
