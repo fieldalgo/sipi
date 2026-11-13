@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect layered normal-film coplanar inputs to saved studies and width goals with finite-ground and air-boundary preservation.
+  적층 법선 코팅 coplanar 입력을 저장 공차·폭 목표에 연결하고 유한 접지선·공기 경계를 보존합니다.
+
 - Add normal-thickness coated two-substrate coplanar factories with finite grounds and explicit backed or unbacked boundaries.
   유한 접지선과 명시적 하단 접지·열린 경계를 가진 두 기판 법선 코팅 coplanar API를 추가합니다.
 

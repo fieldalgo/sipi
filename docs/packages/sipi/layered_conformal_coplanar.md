@@ -37,8 +37,8 @@ section = layered_conformal_coated_unbacked_coplanar(
 text = CrossSectionDocument(section).dumps()
 ```
 
-Direct Python and geometry JSON are supported; named studies/goals and forms
-are separate integration steps. Single `z0`, equal-pair even/odd diagnostics
+Direct Python, geometry JSON, named inputs, parameter studies and width goals
+share the same section contract. Dedicated forms remain a separate step. Single `z0`, equal-pair even/odd diagnostics
 and unequal-pair `z_diff_forward` retain their existing meanings.
 
 Representative checks use the example stack and film. Equal signals have
@@ -54,3 +54,26 @@ substrate, unit-permittivity-film and zero-metal planar-film limits each
 require 0.5% agreement. Normal distance, translation, finite-ground gaps,
 vacuum identities, positive energy, reciprocity and JSON are checked too.
 These selected bounds do not qualify arbitrary boards or measured accuracy.
+
+
+## Saved studies and width targets
+
+The six templates retain their objective types: `z0` for single signals,
+`z_diff` or explicit `z_diff_forward` for equal pairs, and only
+`z_diff_forward` for unequal pairs. Fixed-pitch studies preserve signal-center
+separation (0.8/0.85 mm in equal/unequal examples), while side grounds follow
+the outer metal edges at their explicit clearance. The 20 µm polygon film
+retains its normal offset, including around finite grounds, and both air
+regions retain their meanings. Fixed plane spacing is not a surface parameter.
+
+Saved/common execution agrees for coating-permittivity sweeps from 3.1 to 3.5.
+Independent PCG64 sampling and negative-film failed rows are checked; invalid
+rows are not meshed or replaced. Existing JSON schema versions are reused.
+
+Grounded examples target 55/95/95 Ω and unbacked examples 60/95/95 Ω for
+single/equal/unequal signals. Width bounds are 0.4–0.7 mm or unequal left width
+0.32–0.8 mm. Search uses 0.05 Ω; requested and separate half-mesh residuals
+must each meet 0.5 Ω. The initial mesh uses edge 5 µm, far 0.25 mm and grade
+0.2; refinement halves all three at the selected geometry. Direct/saved
+histories and refined values agree exactly. This check is distinct from
+nominal-geometry outer-domain convergence and does not qualify arbitrary input.
