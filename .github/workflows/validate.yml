@@ -76,6 +76,7 @@ jobs:
         if: always()
         with:
           name: validation-${{ matrix.os }}-${{ matrix.suite }}
+          include-hidden-files: true
           path: |
             .validation/*.xml
             .validation/installed.json

@@ -69,3 +69,9 @@ branch, so pre-merge validation can run without opening a pull request. Every jo
 retains the pinned independent references, wheel/sdist build, validation-tool checks
 and failure reports. The installed suite includes geometry-contract checks. These
 checks do not publish packages, executables or websites.
+
+Validation uploads explicitly allow the hidden `.validation` directory while
+restricting artifact paths to `.validation/*.xml` and
+`.validation/installed.json`. Without that option, the upload action excludes
+the generated reports even when the tests wrote them successfully. Source
+checkouts, wheels and other hidden files are not artifact inputs.

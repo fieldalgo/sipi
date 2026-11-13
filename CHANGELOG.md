@@ -1,5 +1,8 @@
 # Changelog
 
+- Retain generated CI reports from the hidden validation directory using the existing explicit XML and installed-report paths.
+  기존 XML·설치 보고서 경로만 사용하여 숨김 검증 폴더의 CI 보고서가 누락되지 않도록 합니다.
+
 - Normalize derived PSD Debye conductances for the strict eigenvalue sign check, preserving propagation arithmetic, negative-input rejection and power-balance limits.
   PSD Debye 셀 컨덕턴스를 정규화한 뒤 고유값 부호를 검사하며 전파 연산·음의 입력 거부·전력 균형 한도를 유지합니다.
 
