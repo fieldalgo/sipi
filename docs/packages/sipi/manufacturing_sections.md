@@ -142,3 +142,5 @@ These models do not add arbitrary polygons, offset top faces, curved corners,
 conductor loss, frequency dispersion, manufacturing distributions or website support.
 
 [Subsequent polygon/local-mask and JSON v3 support](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/polygon_sections.md) has a separate contract and validation. The historical manufacturing validation above retains its original scope and measurements.
+
+- [Two-substrate planar-coated surface lines](layered_coated_microstrip.md).

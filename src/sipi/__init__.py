@@ -145,7 +145,7 @@ from .strip_grid_document import StripGridCapacitanceDocument
 from .thick_grid_strip_document import ThickGridStripCapacitanceDocument
 from .volume_grid_strip_document import VolumeGridStripCapacitanceDocument
 
-__all__ = ['layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridPairCell', 'AsymmetricVolumeGridPairCapacitance', 'asymmetric_volume_grid_pair_cell', 'extract_asymmetric_volume_grid_pair_capacitance',
+__all__ = ['layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridPairCell', 'AsymmetricVolumeGridPairCapacitance', 'asymmetric_volume_grid_pair_cell', 'extract_asymmetric_volume_grid_pair_capacitance',
     'MixedBoundaryMulticonductorRLGCLadderDocument',
     'MixedBoundaryMulticonductorRLGCLadderResponse',
     'multiconductor_boundary_ladder_response',
@@ -260,3 +260,6 @@ from .asymmetric_volume_grid_pair import (AsymmetricVolumeGridPairCell, Asymmetr
     asymmetric_volume_grid_pair_cell, extract_asymmetric_volume_grid_pair_capacitance)
 
 from .asymmetric_volume_grid_pair_document import AsymmetricVolumeGridPairCapacitanceDocument
+
+from .templates import (layered_coated_microstrip, coupled_layered_coated_microstrip,
+                        asymmetric_coupled_layered_coated_microstrip)

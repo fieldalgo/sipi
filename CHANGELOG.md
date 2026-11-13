@@ -1,5 +1,8 @@
 # Changelog
 
+- Add planar-coated surface-line factories above two independent substrate layers, with explicit copper, film and air heights.
+  두 독립 기판층 위의 평면 코팅 표면선로 API를 추가하고 도체·코팅·공기 높이를 명시합니다.
+
 - Preserve complete saved-study comparison inputs and results before browser parity assertions.
   브라우저 공차 일치 검사 전에 비교 입력과 양쪽 결과를 보존합니다.
 
