@@ -145,7 +145,7 @@ from .strip_grid_document import StripGridCapacitanceDocument
 from .thick_grid_strip_document import ThickGridStripCapacitanceDocument
 from .volume_grid_strip_document import VolumeGridStripCapacitanceDocument
 
-__all__ = ['layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridPairCell', 'AsymmetricVolumeGridPairCapacitance', 'asymmetric_volume_grid_pair_cell', 'extract_asymmetric_volume_grid_pair_capacitance',
+__all__ = ['layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridPairCell', 'AsymmetricVolumeGridPairCapacitance', 'asymmetric_volume_grid_pair_cell', 'extract_asymmetric_volume_grid_pair_capacitance',
     'MixedBoundaryMulticonductorRLGCLadderDocument',
     'MixedBoundaryMulticonductorRLGCLadderResponse',
     'multiconductor_boundary_ladder_response',
@@ -272,3 +272,5 @@ from .templates import (
     coupled_layered_coated_unbacked_coplanar,
     asymmetric_coupled_layered_coated_unbacked_coplanar,
 )
+
+from .templates import (layered_conformal_coated_microstrip, coupled_layered_conformal_coated_microstrip, asymmetric_coupled_layered_conformal_coated_microstrip)

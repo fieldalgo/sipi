@@ -121,3 +121,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 OPENBLAS_NUM_THREADS=1 \
 - [두 기판층 평면 코팅 표면선로](layered_coated_microstrip.md).
 
 - [두 기판층 평면 코팅 coplanar 단면](layered_coated_coplanar.md).
+
+다각형 코팅의 별도 계약은 [두 기판층 법선 두께 코팅](layered_conformal_microstrip.md)을 참고하세요.

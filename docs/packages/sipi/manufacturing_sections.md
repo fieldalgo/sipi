@@ -146,3 +146,5 @@ conductor loss, frequency dispersion, manufacturing distributions or website sup
 - [Two-substrate planar-coated surface lines](layered_coated_microstrip.md).
 
 - [Two-substrate planar-coated coplanar sections](layered_coated_coplanar.md).
+
+See [normal-thickness coatings above two substrate layers](layered_conformal_microstrip.md) for the separate polygon-film contract.

@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -1466,3 +1466,43 @@ Signal widths, thicknesses and centered tapers are independent. Positive
 is left and negative is right; no independent even/odd modes are assumed."""
     base = asymmetric_coupled_layered_coated_grounded_coplanar(left_width=left_width, right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
     return _unbacked_layered_surface(base, lower_air_height)
+
+
+def _layered_conformal_surface(factory, *, lower_height, upper_height, lower_eps_r, upper_eps_r, lower_tan_delta, upper_tan_delta, **geometry):
+    lower = Layer('lower', _positive('lower_height', lower_height), _positive('lower_eps_r', lower_eps_r), _positive('lower_tan_delta', lower_tan_delta, zero=True))
+    upper = Layer('upper', _positive('upper_height', upper_height), _positive('upper_eps_r', upper_eps_r), _positive('upper_tan_delta', upper_tan_delta, zero=True))
+    base = factory(substrate_height=lower.thickness + upper.thickness, eps_r=upper.eps_r, tan_delta=upper.tan_delta, **geometry)
+    return CrossSection([lower, upper, *base.layers[1:]], base.traces, base.width, bottom=base.bottom, top=base.top, sides=base.sides, dielectric_regions=base.dielectric_regions)
+
+
+def layered_conformal_coated_microstrip(*, width, lower_height, upper_height, lower_eps_r, upper_eps_r, coating_thickness, coating_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, coating_tan_delta=0.0, air_height=None, box_width=None, top_width=None):
+    """Surface signal geometry with a normal-thickness film above two substrates.
+
+Both substrate heights exclude copper. The polygon film is normal to the
+substrate, trace tops and straight sides, with mitered corners. Air height
+starts above the highest coated trace. Bottom ground and open top/sides
+are explicit. Rectangular or narrowing-top copper is supported; no rounded
+corner, meniscus, overhang or measured deposition model is inferred."""
+    return _layered_conformal_surface(conformal_coated_microstrip, width=width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width)
+
+
+def coupled_layered_conformal_coated_microstrip(*, width, gap, lower_height, upper_height, lower_eps_r, upper_eps_r, coating_thickness, coating_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, coating_tan_delta=0.0, air_height=None, box_width=None, top_width=None):
+    """Surface signal geometry with a normal-thickness film above two substrates.
+
+Both substrate heights exclude copper. The polygon film is normal to the
+substrate, trace tops and straight sides, with mitered corners. Air height
+starts above the highest coated trace. Bottom ground and open top/sides
+are explicit. Rectangular or narrowing-top copper is supported; no rounded
+corner, meniscus, overhang or measured deposition model is inferred."""
+    return _layered_conformal_surface(coupled_conformal_coated_microstrip, width=width, gap=gap, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width)
+
+
+def asymmetric_coupled_layered_conformal_coated_microstrip(*, left_width, right_width, gap, lower_height, upper_height, lower_eps_r, upper_eps_r, coating_thickness, coating_eps_r, left_thickness=0.0, right_thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, coating_tan_delta=0.0, air_height=None, box_width=None, left_top_width=None, right_top_width=None):
+    """Surface signal geometry with a normal-thickness film above two substrates.
+
+Both substrate heights exclude copper. The polygon film is normal to the
+substrate, trace tops and straight sides, with mitered corners. Air height
+starts above the highest coated trace. Bottom ground and open top/sides
+are explicit. Rectangular or narrowing-top copper is supported; no rounded
+corner, meniscus, overhang or measured deposition model is inferred."""
+    return _layered_conformal_surface(asymmetric_coupled_conformal_coated_microstrip, left_width=left_width, right_width=right_width, gap=gap, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width)

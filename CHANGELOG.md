@@ -1,5 +1,8 @@
 # Changelog
 
+- Add single/equal/unequal microstrip factories with two substrate materials and explicit normal-thickness polygon coatings.
+  두 기판 재료와 법선 두께 다각형 코팅의 단일·대칭·비대칭 microstrip API를 추가합니다.
+
 - Balance current-driven and mixed-source multiconductor Debye reactive states, checked against an independent branch-free ODE flux limit.
   전류·혼합 소스 다신호 Debye reactive 상태 스케일을 독립 분기 없는 ODE 자속 극한으로 검증합니다.
 
