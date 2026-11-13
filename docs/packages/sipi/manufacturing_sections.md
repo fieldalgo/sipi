@@ -150,3 +150,5 @@ conductor loss, frequency dispersion, manufacturing distributions or website sup
 See [normal-thickness coatings above two substrate layers](layered_conformal_microstrip.md) for the separate polygon-film contract.
 
 See [normal-thickness coated two-substrate coplanar sections](layered_conformal_coplanar.md) for finite side grounds and explicit backing/lower-air boundaries.
+
+See [unequal broadside conductors in three dielectrics](asymmetric_broadside.md) for independent lower/upper widths and copper thicknesses.

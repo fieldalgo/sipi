@@ -1,5 +1,8 @@
 # Changelog
 
+- Add a three-dielectric broadside factory with independent lower/upper conductor widths and thicknesses, explicit clearances and signed offset.
+  상하 도체의 선폭·두께, 평면 간격과 부호 있는 offset을 명시하는 3유전체 비대칭 broadside API를 추가합니다.
+
 - Document three-platform reactive checks and mesh-dependent conductor refinement limits using retained solve inputs and independent discretization observations.
   실제 풀이 입력과 독립 이산화 관측을 바탕으로 3OS reactive 검증과 메시별 도체 세분 한계를 문서화합니다.
 

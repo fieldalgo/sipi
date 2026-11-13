@@ -125,3 +125,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 OPENBLAS_NUM_THREADS=1 \
 다각형 코팅의 별도 계약은 [두 기판층 법선 두께 코팅](layered_conformal_microstrip.md)을 참고하세요.
 
 유한 옆 접지선과 명시적인 하단 접지·공기 경계는 [두 기판 법선 코팅 coplanar](layered_conformal_coplanar.md)을 참고하세요.
+
+[3유전체의 비대칭 broadside 단면](asymmetric_broadside.md)은 상하 도체의 선폭·동박 두께를 독립적으로 지정합니다.
