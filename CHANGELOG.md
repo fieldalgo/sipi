@@ -683,3 +683,6 @@
 
 - Added three grounded coplanar surface factories above two independent substrate layers, retaining explicit finite ground geometry.
 - 두 기판층 위 유한 측면 접지를 명시한 coplanar 단면 API 3종을 추가했습니다.
+
+- Registered the three two-substrate grounded coplanar factories for saved studies and refined width goals, with explicit ground-gap and objective semantics.
+- 두 기판층 grounded coplanar 3종을 저장·공차·세분 폭 역산에 등록하고 접지 간격과 목적값 의미를 명시했습니다.

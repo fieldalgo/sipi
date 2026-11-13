@@ -36,8 +36,8 @@ line = document.analyze()
 ```
 
 These are geometry factories; save their output with `CrossSectionDocument`.
-Named study/design registration and dedicated forms are separate integration
-steps. Scalar `z0` applies to the single line, even/odd summaries to the equal
+The named factories also support TemplateSectionDocument, impedance studies and
+width-goal documents. Dedicated editable forms are a separate integration step. Scalar `z0` applies to the single line, even/odd summaries to the equal
 pair. The unequal pair uses the real lossless `z_diff_forward` launch at Icommon=0;
 it does not assume independent symmetric modes. Copper loss, roughness,
 frequency-dependent materials and 3D ground connectivity are not inferred.
@@ -55,3 +55,22 @@ These checks qualify those geometries, not all ground widths or measured boards.
 Run `PYTHONPATH=src OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_layered_grounded_coplanar.py`
 in the qualified reference environment. Preserve failed trials and use separate
 mesh/outer checks when choosing a different physical range.
+
+## Saved studies and width targets
+
+Stored studies preserve independent substrate and ground dimensions. The single
+line accepts `z0`; equal pairs accept `z_diff` or the explicit `z_diff_forward`
+diagnostic; unequal pairs accept only `z_diff_forward`. Fixed pitch holds relative
+signal-centre spacing and derives the signal gap from widths. Finite side grounds
+move with the outside signal edges to retain the specified `ground_gap`; their
+absolute positions are not fixed. Surface stacks reject `fixed_plane_spacing_m`.
+Invalid normal ground-width samples keep failed rows without field solves.
+
+The representative stored targets use 60 Ω for the single line and 100 Ω for
+each pair. Width bounds are 0.4–0.7 mm for the single/equal forms, or left width
+0.32–0.8 mm for the unequal form. Other dimensions, including top widths and
+ground thicknesses, remain explicit. These targets use edge size 2.5 µm, far
+size 0.125 mm and grade 0.1, a 0.1 Ω search residual and a 0.5 Ω final tolerance.
+The separate half-size/half-grade mesh must also meet the final tolerance.
+Saved and direct executions retain the same evaluation history; input loading
+and normalization do not solve fields. Existing JSON schema versions are reused.
