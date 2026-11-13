@@ -51,6 +51,44 @@ assert section.traces[1].top_width == .55e-3
 진공·균일 재료 불변식, 양정·상반 행렬을 포함합니다. 수직 반사는 도체 순서뿐
 아니라 각 도체의 위아래 선폭도 뒤집습니다. 수평·수직 반사 재메시 결과에는
 각각 0.5% 기준을 적용합니다. 이는 한정된 수치 검증이며 절대 물리 오차나
-임의 식각 각도의 보증이 아닙니다. 저장 템플릿·공차·목표 연결은 별도 단계입니다.
+임의 식각 각도의 보증이 아닙니다.
+
+## 저장 공차와 식각면 선폭 목표
+
+동일한 이름을 편집 템플릿·버전 있는 공차·설계 목표에 등록했습니다.
+`quantity='z_diff_forward'`를 사용해야 하며 대칭 모드 기반 목표는 거부합니다.
+`lower_top_width` 표본을 만들 때 아래 도체의 아랫면 선폭, 위 도체와 수직 간격은
+유지합니다. 위아래 선폭의 상관 표본도 식각 각도로 자동 변환하지 않고 지원합니다.
+잘못된 정규분포 표본은 재추출하지 않고 실패행으로 남깁니다. 가로 고정 pitch와
+기존 2층 높이 합 제약은 이 수직 적층에 적용하지 않습니다.
+
+```python
+from sipi import ImpedanceDesignDocument
+from sipi.template_document import TemplateSectionDocument
+
+parameters = dict(
+    lower_width=.4e-3, lower_top_width=.32e-3,
+    upper_width=.7e-3, upper_top_width=.55e-3,
+    lower_thickness=25e-6, upper_thickness=45e-6,
+    lower_height=.35e-3, upper_height=.55e-3, gap=.25e-3,
+    lower_eps_r=3., gap_eps_r=4., upper_eps_r=5., offset=.15e-3,
+    lower_tan_delta=.01, gap_tan_delta=.02, upper_tan_delta=.03,
+    box_width=.012,
+)
+mesh = dict(edge_size=5e-6, far_size=.15e-3, grade=.15)
+name = 'tapered_layered_broadside_stripline'
+editable = TemplateSectionDocument(name, parameters, mesh=mesh)
+goal = ImpedanceDesignDocument(
+    name, parameters, variable='lower_top_width', bounds=[.2e-3, .6e-3],
+    target=50., quantity='z_diff_forward', mesh=mesh,
+    tolerance=.5, search_tolerance=.05,
+)
+assert ImpedanceDesignDocument.loads(goal.dumps()).dumps() == goal.dumps()
+```
+
+`goal.solve()`는 해당 선폭 하나를 검색하고 별도 half-mesh 검사를 수행합니다.
+한정된 50Ω 사례에서 요청·세분 잔차가 각각 0.5Ω 안에 들고 직접 API의 평가
+이력이 일치하는지 확인합니다. 이는 수치 수락 조건이며 절대 물리 오차 상한은
+아닙니다. PCG64 표본·선폭 상관·재료 공차·공통 실행도 검사합니다.
 
 [English](../../../../../packages/sipi/tapered_broadside.md)
