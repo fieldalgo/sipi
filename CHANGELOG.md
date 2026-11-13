@@ -1,5 +1,8 @@
 # Changelog
 
+- Add two-substrate planar-coated coplanar factories with finite side grounds, explicit backing-plane or lower-air boundaries, and single/equal/unequal signals.
+  두 기판층의 평면 코팅 coplanar API에 유한 옆 접지선·하단 접지면 또는 아래 공기 경계·단일/대칭/비대칭 신호를 명시합니다.
+
 - Register planar-coated two-substrate lines for versioned inputs, reproducible studies and separately refined width goals.
   평면 코팅 두 기판층 선로를 버전 입력·재현 가능한 공차·별도 세분 폭 목표에 등록합니다.
 

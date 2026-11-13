@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -1387,3 +1387,82 @@ def asymmetric_coupled_layered_coated_microstrip(*, left_width, right_width,
         coating_tan_delta=coating_tan_delta, air_height=air_height,
         box_width=box_width, left_top_width=left_top_width,
         right_top_width=right_top_width)
+
+
+def layered_coated_grounded_coplanar(*, coating_height, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, box_width=None, top_width=None):
+    """Finite side grounds and surface signals above two substrates in a planar film.
+
+Substrate heights exclude copper. Full-width coating height starts at their
+surface, includes every conductor and must exceed all copper thicknesses.
+Air height starts above the film. Signal gap uses bottom edges; ground_gap
+(for pairs) separates the outside signals from finite rectangular grounds.
+The bottom plane is ground; top and side boundaries are open."""
+    return _layered_coated_surface(coated_grounded_coplanar, width=width, gap=gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+
+
+def coupled_layered_coated_grounded_coplanar(*, coating_height, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, box_width=None, top_width=None):
+    """Finite side grounds and surface signals above two substrates in a planar film.
+
+Substrate heights exclude copper. Full-width coating height starts at their
+surface, includes every conductor and must exceed all copper thicknesses.
+Air height starts above the film. Signal gap uses bottom edges; ground_gap
+(for pairs) separates the outside signals from finite rectangular grounds.
+The bottom plane is ground; top and side boundaries are open."""
+    return _layered_coated_surface(coupled_coated_grounded_coplanar, width=width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+
+
+def asymmetric_coupled_layered_coated_grounded_coplanar(*, coating_height, coating_eps_r, coating_tan_delta=0.0, left_width, right_width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, left_thickness=0.0, right_thickness=0.0, ground_thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, box_width=None, left_top_width=None, right_top_width=None):
+    """Finite side grounds and surface signals above two substrates in a planar film.
+
+Substrate heights exclude copper. Full-width coating height starts at their
+surface, includes every conductor and must exceed all copper thicknesses.
+Air height starts above the film. Signal gap uses bottom edges; ground_gap
+(for pairs) separates the outside signals from finite rectangular grounds.
+The bottom plane is ground; top and side boundaries are open.
+Signal widths, thicknesses and centered tapers are independent. Positive
+is left and negative is right; no independent even/odd modes are assumed."""
+    return _layered_coated_surface(asymmetric_coupled_coated_grounded_coplanar, left_width=left_width, right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+
+
+def layered_coated_unbacked_coplanar(*, coating_height, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, lower_air_height=None, box_width=None, top_width=None):
+    """Finite side grounds and surface signals above two substrates in a planar film.
+
+Substrate heights exclude copper. Full-width coating height starts at their
+surface, includes every conductor and must exceed all copper thicknesses.
+Air height starts above the film. Signal gap uses bottom edges; ground_gap
+(for pairs) separates the outside signals from finite rectangular grounds.
+All outer boundaries are open; only finite side grounds set the reference.
+Lower air translates both substrates, coating and all copper; its default
+is ten times the sum of the two substrate heights."""
+    base = layered_coated_grounded_coplanar(width=width, gap=gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+    return _unbacked_layered_surface(base, lower_air_height)
+
+
+def coupled_layered_coated_unbacked_coplanar(*, coating_height, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, lower_air_height=None, box_width=None, top_width=None):
+    """Finite side grounds and surface signals above two substrates in a planar film.
+
+Substrate heights exclude copper. Full-width coating height starts at their
+surface, includes every conductor and must exceed all copper thicknesses.
+Air height starts above the film. Signal gap uses bottom edges; ground_gap
+(for pairs) separates the outside signals from finite rectangular grounds.
+All outer boundaries are open; only finite side grounds set the reference.
+Lower air translates both substrates, coating and all copper; its default
+is ten times the sum of the two substrate heights."""
+    base = coupled_layered_coated_grounded_coplanar(width=width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+    return _unbacked_layered_surface(base, lower_air_height)
+
+
+def asymmetric_coupled_layered_coated_unbacked_coplanar(*, coating_height, coating_eps_r, coating_tan_delta=0.0, left_width, right_width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, left_thickness=0.0, right_thickness=0.0, ground_thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, lower_air_height=None, box_width=None, left_top_width=None, right_top_width=None):
+    """Finite side grounds and surface signals above two substrates in a planar film.
+
+Substrate heights exclude copper. Full-width coating height starts at their
+surface, includes every conductor and must exceed all copper thicknesses.
+Air height starts above the film. Signal gap uses bottom edges; ground_gap
+(for pairs) separates the outside signals from finite rectangular grounds.
+All outer boundaries are open; only finite side grounds set the reference.
+Lower air translates both substrates, coating and all copper; its default
+is ten times the sum of the two substrate heights.
+Signal widths, thicknesses and centered tapers are independent. Positive
+is left and negative is right; no independent even/odd modes are assumed."""
+    base = asymmetric_coupled_layered_coated_grounded_coplanar(left_width=left_width, right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width, coating_height=coating_height, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+    return _unbacked_layered_surface(base, lower_air_height)

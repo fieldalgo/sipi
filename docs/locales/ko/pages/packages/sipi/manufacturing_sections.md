@@ -119,3 +119,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 OPENBLAS_NUM_THREADS=1 \
 [후속 다각형·국소 마스크·JSONv3](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/polygon_sections.md)는 별도 계약과 검증을 제공합니다. 위 기존 제조 단면 검증의 범위와 수치는 유지됩니다.
 
 - [두 기판층 평면 코팅 표면선로](layered_coated_microstrip.md).
+
+- [두 기판층 평면 코팅 coplanar 단면](layered_coated_coplanar.md).
