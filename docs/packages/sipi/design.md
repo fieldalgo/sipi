@@ -179,25 +179,15 @@ otherwise a genuine endpoint sign change is still required. This leaves room
 for discretization drift, but does not guarantee success or increase the
 evaluation or mesh budget. A failed refinement still raises an error.
 
-This option currently belongs to the direct Python call only. Saved design
-and execution schemas keep their existing fields and default search behavior;
-they reject an added `search_tolerance` field. Retain the direct-call options
-alongside the selected geometry if you need to reproduce that search.
-
-For a narrower search stopping residual, pass `search_tolerance` in ohms.
-For example, `tolerance=0.5, search_tolerance=0.25` requires the requested-mesh
-search to reach 0.25 Ω, then checks the separately refined result against
-0.5 Ω. The threshold must be positive, finite and no larger than `tolerance`.
-Omitting it, passing `None`, or setting it equal to `tolerance` preserves the
-original behavior. Endpoint acceptance uses the narrower threshold too;
-otherwise a genuine endpoint sign change is still required. This leaves room
-for discretization drift, but does not guarantee success or increase the
-evaluation or mesh budget. A failed refinement still raises an error.
-
-This option currently belongs to the direct Python call only. Saved design
-and execution schemas keep their existing fields and default search behavior;
-they reject an added `search_tolerance` field. Retain the direct-call options
-alongside the selected geometry if you need to reproduce that search.
+Pass `search_tolerance` to `ImpedanceDesignDocument` to save this setting as
+`sipi.impedance-design/4`, using the required `search_tolerance_ohm` field.
+Version 4 retains the same geometry, fixed-pitch/plane constraints, and optional
+material evaluation/binding fields as versions 1–3. `material_variables` requires
+`material_evaluation`. Its positive search threshold must not exceed
+`tolerance_ohm`; null, unknown fields and missing thresholds reject. Loading
+never solves. Common saved execution retains the same refined acceptance and
+failure history. Omitting the constructor option keeps the original version
+and canonical JSON; versions 1–3 still reject extra threshold fields.
 
 `ImpedanceDesign` contains the parameter, target, quantity, requested and refined
 impedances, input document and evaluation history. `residual`,

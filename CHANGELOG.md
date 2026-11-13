@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit requested-mesh search thresholds in impedance-design/4, preserving legacy JSON, final refinement gates and common execution failures.
+  impedance-design/4에 요청 메시 탐색 기준을 저장하며 기존 JSON·최종 세분 기준·공통 실행 실패 이력을 유지합니다.
+
 - Retain generated CI reports from the hidden validation directory using the existing explicit XML and installed-report paths.
   기존 XML·설치 보고서 경로만 사용하여 숨김 검증 폴더의 CI 보고서가 누락되지 않도록 합니다.
 

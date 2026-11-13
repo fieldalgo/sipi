@@ -32,7 +32,8 @@ class ImpedanceDesignDocument:
     """
     def __init__(self, template, parameters, *, variable, bounds, target, quantity='z0',
                  tolerance=.1, max_evaluations=40, mesh=None, fixed_pitch_m=None,
-                 fixed_plane_spacing_m=None, frequency=None, materials=None, material_variables=None):
+                 fixed_plane_spacing_m=None, frequency=None, materials=None, material_variables=None,
+                 search_tolerance=None):
         data = dict(schema=_SCHEMA, template=template, parameters=parameters,
             variable=variable, bounds=bounds, target_ohm=target, quantity=quantity,
             tolerance_ohm=tolerance, max_evaluations=max_evaluations,
@@ -44,6 +45,8 @@ class ImpedanceDesignDocument:
         if material_variables is not None:
             data.update(schema='sipi.impedance-design/3', material_evaluation=evaluation,
                         material_variables=material_variables)
+        if search_tolerance is not None:
+            data.update(schema='sipi.impedance-design/4', search_tolerance_ohm=search_tolerance)
         self._data = self._validate(data)
 
     @staticmethod
@@ -61,13 +64,18 @@ class ImpedanceDesignDocument:
     @classmethod
     def _validate(cls, data):
         data = _copy(data)
-        material_version = isinstance(data, dict) and data.get('schema') in ('sipi.impedance-design/2', 'sipi.impedance-design/3')
-        version3 = isinstance(data, dict) and data.get('schema') == 'sipi.impedance-design/3'
+        version4 = isinstance(data, dict) and data.get('schema') == 'sipi.impedance-design/4'
+        material_version = isinstance(data, dict) and (data.get('schema') in ('sipi.impedance-design/2', 'sipi.impedance-design/3')
+                            or version4 and ('material_evaluation' in data or 'material_variables' in data))
+        version3 = isinstance(data, dict) and (data.get('schema') == 'sipi.impedance-design/3'
+                    or version4 and 'material_variables' in data)
         fields = (*_FIELDS, 'material_evaluation') if material_version else _FIELDS
         if version3:
             fields = (*fields, 'material_variables')
+        if version4:
+            fields = (*fields, 'search_tolerance_ohm')
         _keys(data, fields, where='impedance design')
-        if data['schema'] not in (_SCHEMA, 'sipi.impedance-design/2', 'sipi.impedance-design/3'):
+        if data['schema'] not in (_SCHEMA, 'sipi.impedance-design/2', 'sipi.impedance-design/3', 'sipi.impedance-design/4'):
             raise ValueError('unsupported impedance-design schema')
         if material_version:
             _keys(data['material_evaluation'], ('frequency_hz', 'materials'), where='material evaluation')
@@ -80,6 +88,10 @@ class ImpedanceDesignDocument:
             raise ValueError('lower bound must be below upper bound')
         data['target_ohm'] = _scalar(data['target_ohm'], positive=True)
         data['tolerance_ohm'] = _scalar(data['tolerance_ohm'], positive=True)
+        if version4:
+            data['search_tolerance_ohm'] = _scalar(data['search_tolerance_ohm'], positive=True)
+            if data['search_tolerance_ohm'] > data['tolerance_ohm']:
+                raise ValueError('search_tolerance must not exceed tolerance')
         data['max_evaluations'] = _integer(data['max_evaluations'], 3, 10000)
         if version3:
             bindings = data['material_variables']
@@ -129,5 +141,7 @@ class ImpedanceDesignDocument:
         if 'material_variables' in data:
             kwargs = dict(frequency=evaluation['frequency_hz'],
                           material_factory=lambda value: _models(_sample_material(study, [value])))
+        if 'search_tolerance_ohm' in data:
+            kwargs['search_tolerance'] = data['search_tolerance_ohm']
         return seek_impedance(factory, data['bounds'], data['target_ohm'], quantity=data['quantity'],
             tolerance=data['tolerance_ohm'], max_evaluations=data['max_evaluations'], mesh=data['mesh'], **kwargs)

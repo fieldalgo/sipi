@@ -494,6 +494,9 @@ def documents():
     from sipi.template_document import TemplateSectionDocument
     base.append(TemplateSectionDocument('stripline',
         dict(width=.5e-3, plane_spacing=1e-3, eps_r=4)))
+    refined_goal = goals()[0].to_dict()
+    refined_goal.update(schema='sipi.impedance-design/4', search_tolerance_ohm=.25)
+    base.append(ImpedanceDesignDocument.from_dict(refined_goal))
     return base
 
 

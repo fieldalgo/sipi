@@ -116,8 +116,8 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     preserves the original search. Both endpoint selection and bisection use
     this threshold; the separate refined result still uses tolerance. This
     can leave room for discretization drift, but never guarantees convergence
-    or increases the evaluation/mesh budget. It is a direct-call option, not
-    a field in saved design or execution documents.
+    or increases the evaluation/mesh budget. ImpedanceDesignDocument version 4
+    can preserve this option for saved execution.
 
     Supply frequency (Hz) and materials together to evaluate fixed scalar or
     principal-axis models. Impedance still uses Re(C_complex) and vacuum L,

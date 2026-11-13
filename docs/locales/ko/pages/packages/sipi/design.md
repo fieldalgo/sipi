@@ -162,9 +162,14 @@ print(result.parameter, result.impedance, result.refined_impedance)
 메시 차이를 위한 여유를 둘 수 있지만 성공을 보장하거나 평가·메시 예산을 늘리지
 않습니다. 세분 검사 실패는 계속 오류로 반환합니다.
 
-현재 직접 Python 호출에서만 지원하는 옵션입니다. 저장 설계·실행 스키마는 기존
-필드와 탐색 동작을 유지하며 `search_tolerance` 필드를 추가하면 거부합니다.
-같은 탐색을 재현하려면 선택된 기하와 함께 직접 호출 옵션을 별도로 보관하세요.
+`ImpedanceDesignDocument`에도 `search_tolerance`를 지정하면 필수
+`search_tolerance_ohm` 필드를 갖는 `sipi.impedance-design/4`로 저장합니다.
+v4는 v1–3의 기하·고정 피치/평면 간격·선택 재료 평가/변수 바인딩 계약을
+유지합니다. `material_variables`에는 `material_evaluation`이 필요합니다.
+탐색 기준은 양수이며 `tolerance_ohm` 이하여야 합니다. null·누락·알 수 없는
+필드는 거부합니다. 로드는 계산하지 않으며 공통 실행에서도 최종 세분 기준과
+실패 이력을 유지합니다. 생성자 옵션을 생략하면 기존 버전과 canonical JSON을
+유지하고, v1–3에는 새 필드를 추가할 수 없습니다.
 
 `ImpedanceDesign`은 파라미터·목표·선택량·원/세분 임피던스·입력 문서·평가 이력을 담습니다.
 `residual`, `refined_residual`, `mesh_change`로 목표 오차와 메시 변화를 구분합니다.
