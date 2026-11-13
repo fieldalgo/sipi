@@ -15,10 +15,12 @@ export const extendedLabels = {
   "asymmetric_coupled_conformal_coated_unbacked_coplanar": "Unequal normal-film unbacked pair",
   "layered_broadside_stripline": "Three-dielectric broadside pair"
 };
-Object.assign(labels, extendedLabels);
+export const layeredSurfaceLabels = {layered_microstrip: 'Two-layer surface line', coupled_layered_microstrip: 'Two-layer surface pair'};
+Object.assign(labels, extendedLabels, layeredSurfaceLabels);
+export const isLayeredSurface = t => Object.hasOwn(layeredSurfaceLabels,t);
 export const isLayeredBroadside = t => t === 'layered_broadside_stripline';
 export const isBroadside = t => ['broadside_stripline','layered_broadside_stripline'].includes(t);
-export const isLayeredInterface = t => t.includes('layered_') && !isBroadside(t);
+export const isLayeredInterface = t => t.includes('layered_') && !isBroadside(t) && !isLayeredSurface(t);
 export const isAsymmetric = t => t.startsWith('asymmetric_coupled_');
 export const isForwardPair = t => isAsymmetric(t) || isLayeredBroadside(t);
 export const isStripline = t => t.endsWith('stripline');
@@ -27,7 +29,7 @@ export const isUnbacked = t => t.includes('unbacked_coplanar');
 export const isCoplanar = t => t.includes('coplanar');
 export const isNormalFilm = t => t.includes('conformal_coated');
 export const isCoated = t => t.includes('coated_');
-export const usesEngineGeometry = t => isNormalFilm(t) || Object.hasOwn(extendedLabels,t);
+export const usesEngineGeometry = t => isNormalFilm(t) || isLayeredSurface(t) || Object.hasOwn(extendedLabels,t);
 
 // Explicit refinement of resolved settings; never mutate a saved design.
 export function refinedMesh(mesh) {
@@ -39,7 +41,7 @@ export function refinedMesh(mesh) {
 }
 
 export function parameterFields(template) {
-  return {...(isAsymmetric(template) ? {left_width: 'left_width', right_width: 'right_width', left_thickness: 'left_thickness', right_thickness: 'right_thickness', left_top_width: 'left_top_width', right_top_width: 'right_top_width'} : {}), ...((isLayeredInterface(template) || isLayeredBroadside(template)) ? {lower_height: 'lower_height', upper_height: 'upper_height', lower_eps_r: 'lower_eps_r', upper_eps_r: 'upper_eps_r', lower_tan_delta: 'lower_tan_delta', upper_tan_delta: 'upper_tan_delta'} : {}), ...(isBroadside(template) ? {offset: 'offset'} : {}), width: 'width', top_width: 'top_width', thickness: 'thickness',
+  return {...(isAsymmetric(template) ? {left_width: 'left_width', right_width: 'right_width', left_thickness: 'left_thickness', right_thickness: 'right_thickness', left_top_width: 'left_top_width', right_top_width: 'right_top_width'} : {}), ...((isLayeredInterface(template) || isLayeredBroadside(template) || isLayeredSurface(template)) ? {lower_height: 'lower_height', upper_height: 'upper_height', lower_eps_r: 'lower_eps_r', upper_eps_r: 'upper_eps_r', lower_tan_delta: 'lower_tan_delta', upper_tan_delta: 'upper_tan_delta'} : {}), ...(isBroadside(template) ? {offset: 'offset'} : {}), width: 'width', top_width: 'top_width', thickness: 'thickness',
     height: isStripline(template) ? 'plane_spacing' : 'substrate_height', trace_height: 'trace_height',
     gap: 'gap', ground_gap: 'ground_gap', ground_width: 'ground_width', box_width: 'box_width', air_height: 'air_height', lower_air_height: 'lower_air_height', coating_height: 'coating_height', coating_thickness: 'coating_thickness',
     ground_thickness: 'ground_thickness', gap_eps_r: 'gap_eps_r', gap_tan_delta: 'gap_tan_delta',
@@ -96,7 +98,7 @@ export function parameters(template, values, unit) {
       out[`${side}_top_width`] = positive(`${side}_top_width`) * scales[unit];
     }
   }
-  if (isLayeredInterface(template) || isLayeredBroadside(template)) {
+  if (isLayeredInterface(template) || isLayeredBroadside(template) || isLayeredSurface(template)) {
     for (const side of ['lower', 'upper']) {
       out[`${side}_height`] = positive(`${side}_height`) * scales[unit];
       out[`${side}_eps_r`] = positive(`${side}_eps_r`);
@@ -157,11 +159,12 @@ export function convert(value, from, to) {
 export function studyFields(template, p) {
   const fields = {width: 'Bottom width', eps_r: 'Substrate permittivity',
     [isStripline(template) ? 'plane_spacing' : 'substrate_height']: isStripline(template) ? 'Plane spacing' : 'Substrate height', thickness: 'Copper thickness'};
-  if (isLayeredInterface(template) || isLayeredBroadside(template)) {
-    delete fields.eps_r; delete fields.plane_spacing;
+  if (isLayeredInterface(template) || isLayeredBroadside(template) || isLayeredSurface(template)) {
+    delete fields.eps_r; delete fields.plane_spacing; delete fields.substrate_height;
     Object.assign(fields, {lower_height: 'Lower layer height', upper_height: 'Upper layer height (includes copper)',
       lower_eps_r: 'Lower permittivity', upper_eps_r: 'Upper permittivity'});
   }
+  if (isLayeredSurface(template)) fields.upper_height = 'Upper substrate height (excludes copper)';
   if (isAsymmetric(template)) {
     delete fields.width; delete fields.thickness;
     for (const side of ['left', 'right']) {
@@ -190,7 +193,7 @@ export function studyScale(name, unit) {
 
 // This is only a drawing model. The Python template creates all solver inputs.
 export function schematic(template, p) {
-  if (usesEngineGeometry(template)) throw new Error('Inspect the engine geometry for normal films.');
+  if (usesEngineGeometry(template)) throw new Error('Inspect the engine geometry for this cross-section.');
   const h = isLayeredInterface(template) ? p.lower_height + p.upper_height : (p.substrate_height ?? p.plane_spacing);
   const strip = isStripline(template);
   const lowerAir = isUnbacked(template) ? (p.lower_air_height ?? 10 * h) : 0;

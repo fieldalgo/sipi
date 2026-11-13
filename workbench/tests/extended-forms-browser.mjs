@@ -3,6 +3,7 @@ import {mkdtemp,readFile,writeFile,mkdir,rm} from 'node:fs/promises';
 import {join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import assert from 'node:assert/strict';
+import {assertRegisteredForms} from './registered-forms.mjs';
 const output=resolve(process.argv[2]); await mkdir(output,{recursive:true});
 const webRoot=process.argv[3] ? resolve(process.argv[3]) : null;
 const profile=await mkdtemp(join(tmpdir(),'sipi-extended-'));
@@ -61,7 +62,7 @@ try {
     const observed=new WeakSet(),post=Worker.prototype.postMessage;
     Worker.prototype.postMessage=function(m,...rest){if(!observed.has(this)){observed.add(this);this.addEventListener('message',e=>{if(e.data.status==='complete')window.completedResults.push(e.data.result)})}return post.call(this,m,...rest)};
     const original=window.fetch;window.fetch=(url,options)=>original(url,options).then(async response=>{if(url==='/api/job'&&options?.method==='GET'){const v=await response.clone().json();if(v.status==='complete')window.completedResults.push(v.result)}return response});`);
-  const cases=JSON.parse(await readFile(process.env.SIPI_EXTENDED_CASES,'utf8'));
+  const cases=JSON.parse(await readFile(process.env.SIPI_FORM_CASES || process.env.SIPI_EXTENDED_CASES,'utf8'));
   async function load(path){
     const node=await cdp.call('Runtime.evaluate',{expression:'document.querySelector("#file")'});
     await cdp.call('DOM.setFileInputFiles',{objectId:node.result.objectId,files:[path]});
@@ -84,7 +85,7 @@ try {
     const result=await cdp.evaluate('window.completedResults.at(-1).document');assert.deepEqual(result,JSON.parse(JSON.stringify(doc))); // CDP serializes negative zero as zero.
     assert.equal(await cdp.evaluate('document.querySelectorAll("#cross-section [data-region]").length'),(doc.dielectric_regions??[]).length);
   }
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),42);
+  await assertRegisteredForms(cdp);
   for(const item of cases){
     // Each button must start a valid editable request without a saved file.
     await cdp.evaluate(`document.querySelector('[data-template="${item.name}"]').click()`);
@@ -98,9 +99,17 @@ try {
     await click('geometry-inspect');await geometry(item.input.cross_section);
     await load(item.network_path);assert.deepEqual(await download('network-input-save'),item.network_input);
     await click('network-calculate');const result=await cdp.evaluate('window.completedResults.at(-1)');
-    assert.equal(result.line.forward_launch.quantity,'z_diff_forward');assert.ok(!('z_diff' in result.line));
-    assert.equal(await cdp.evaluate('document.querySelector("#eps-metric").hidden && document.querySelector("#delay-metric").hidden'),true);
-    for(const key of ['C','C0','C_loss','L'])for(let i=0;i<2;i++)for(let j=0;j<2;j++)assert.ok(Math.abs(result.line[key][i][j]-item.direct.line[key][i][j])<=1e-9*Math.max(1e-30,Math.abs(item.direct.line[key][i][j])));
+    if(item.direct.line.forward_launch){
+      assert.equal(result.line.forward_launch.quantity,'z_diff_forward');assert.ok(!('z_diff' in result.line));
+      assert.equal(await cdp.evaluate('document.querySelector("#eps-metric").hidden && document.querySelector("#delay-metric").hidden'),true);
+    } else {
+      const key=item.direct.line.names.length===1?'z0':'z_diff';
+      assert.ok(Math.abs(result.line[key]-item.direct.line[key])<=1e-9*item.direct.line[key]);
+      assert.ok(!('forward_launch' in result.line));
+      assert.equal(await cdp.evaluate('document.querySelector("#uniform-height-field").hidden && !document.querySelector("#layered-height-fields").hidden'),true);
+      assert.match(await cdp.evaluate('document.querySelector("#layered-height-note").textContent'),/Both substrate heights exclude copper/);
+    }
+    for(const key of ['C','C0','C_loss','L'])for(let i=0;i<item.direct.line.names.length;i++)for(let j=0;j<item.direct.line.names.length;j++)assert.ok(Math.abs(result.line[key][i][j]-item.direct.line[key][i][j])<=1e-9*Math.max(1e-30,Math.abs(item.direct.line[key][i][j])));
     const text=await download('touchstone-save',true);
     const numbers=t=>t.split('[Network Data]')[1].split('[End]')[0].trim().split(/\s+/).map(Number);
     const actual=numbers(text),expected=numbers(item.direct.network.touchstone);assert.equal(actual.length,expected.length);assert.ok(actual.every(Number.isFinite));

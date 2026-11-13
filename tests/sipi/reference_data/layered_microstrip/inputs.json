@@ -1,0 +1,164 @@
+{
+  "engine_commit": "8e3b5a59e99dcfd97000cec24258105f72ba856c",
+  "basis": "Canonical editable inputs for API independently tested at 93d3481; not a new physical accuracy reference.",
+  "cases": [
+    {
+      "template": "layered_microstrip",
+      "supplied_parameters": {
+        "width": 0.0005,
+        "lower_height": 0.0003,
+        "upper_height": 0.0007,
+        "lower_eps_r": 3.0,
+        "upper_eps_r": 5.0,
+        "thickness": 3.5e-05,
+        "lower_tan_delta": 0.01,
+        "upper_tan_delta": 0.03,
+        "air_height": 0.01,
+        "box_width": 0.02
+      },
+      "resolved_parameters": {
+        "air_height": 0.01,
+        "box_width": 0.02,
+        "lower_eps_r": 3.0,
+        "lower_height": 0.0003,
+        "lower_tan_delta": 0.01,
+        "thickness": 3.5e-05,
+        "top_width": null,
+        "upper_eps_r": 5.0,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.03,
+        "width": 0.0005
+      },
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.02
+        },
+        "layers": [
+          {
+            "eps_r": 3.0,
+            "name": "lower",
+            "tan_delta": 0.01,
+            "thickness": 0.0003
+          },
+          {
+            "eps_r": 5.0,
+            "name": "upper",
+            "tan_delta": 0.03,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.01
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 5e-06,
+          "far_size": 0.00025,
+          "grade": 0.2,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "ground": false,
+            "name": "signal",
+            "thickness": 3.5e-05,
+            "width": 0.0005,
+            "x": 0.0,
+            "y": 0.001
+          }
+        ]
+      }
+    },
+    {
+      "template": "coupled_layered_microstrip",
+      "supplied_parameters": {
+        "width": 0.0005,
+        "lower_height": 0.0003,
+        "upper_height": 0.0007,
+        "lower_eps_r": 3.0,
+        "upper_eps_r": 5.0,
+        "thickness": 3.5e-05,
+        "lower_tan_delta": 0.01,
+        "upper_tan_delta": 0.03,
+        "air_height": 0.01,
+        "box_width": 0.02,
+        "gap": 0.0003
+      },
+      "resolved_parameters": {
+        "air_height": 0.01,
+        "box_width": 0.02,
+        "gap": 0.0003,
+        "lower_eps_r": 3.0,
+        "lower_height": 0.0003,
+        "lower_tan_delta": 0.01,
+        "thickness": 3.5e-05,
+        "top_width": null,
+        "upper_eps_r": 5.0,
+        "upper_height": 0.0007,
+        "upper_tan_delta": 0.03,
+        "width": 0.0005
+      },
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.02
+        },
+        "layers": [
+          {
+            "eps_r": 3.0,
+            "name": "lower",
+            "tan_delta": 0.01,
+            "thickness": 0.0003
+          },
+          {
+            "eps_r": 5.0,
+            "name": "upper",
+            "tan_delta": 0.03,
+            "thickness": 0.0007
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.01
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 5e-06,
+          "far_size": 0.00025,
+          "grade": 0.2,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 3.5e-05,
+            "width": 0.0005,
+            "x": -0.00039999999999999996,
+            "y": 0.001
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 3.5e-05,
+            "width": 0.0005,
+            "x": 0.00039999999999999996,
+            "y": 0.001
+          }
+        ]
+      }
+    }
+  ]
+}

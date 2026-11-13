@@ -11,7 +11,10 @@ from sipi.template_document import TemplateSectionDocument
 
 
 def parameters(name):
-    from engine import EXTENDED_TEMPLATES
+    from engine import EXTENDED_TEMPLATES, LAYERED_SURFACE_TEMPLATES
+    if name in LAYERED_SURFACE_TEMPLATES:
+        data=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_microstrip/inputs.json').read_text())
+        return next(row['resolved_parameters'] for row in data['cases'] if row['template']==name)
     if name in EXTENDED_TEMPLATES:
         data=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())
         return next(row['resolved_parameters'] for row in data['cases'] if row['template']==name)

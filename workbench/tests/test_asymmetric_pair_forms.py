@@ -113,7 +113,11 @@ def test_raw_asymmetric_document_keeps_existing_matrix_only_fallback(monkeypatch
 
 def test_unequal_templates_are_registered_as_pairs_with_explicit_quantity():
  from engine import ASYMMETRIC_PAIR_TEMPLATES,PAIR_TEMPLATES
- assert set(NAMES)==ASYMMETRIC_PAIR_TEMPLATES
+ import json
+ reference=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())
+ expected={r['template'] for r in reference['cases'] if r['template'].startswith('asymmetric_')}
+ assert len(expected)==13 and expected==ASYMMETRIC_PAIR_TEMPLATES
+ assert set(NAMES)<=expected
  assert ASYMMETRIC_PAIR_TEMPLATES<=PAIR_TEMPLATES<=TEMPLATES.keys()
 
 

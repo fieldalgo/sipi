@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers 42 registered cross-section forms, impedance targeting,
+The basic workspace offers 44 registered cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -311,7 +311,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The 42 forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The 44 forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. The remaining forms cover eleven unequal layered, coplanar and coated pairs and the three-dielectric broadside pair. Other analysis-document types use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -561,7 +561,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the 42 registered editable templates. Other
+All project designs must use the 44 registered editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
@@ -1129,7 +1129,7 @@ before replacing the current form. Unit changes preserve original SI values.
 
 ## All registered cross-section forms
 
-The 42 forms reuse the engine's registered template contracts. The eleven
+The 44 forms reuse the engine's registered template contracts. The eleven
 additional unequal pairs keep independent left/right widths, thicknesses and
 optional top widths. Coplanar forms also expose rectangular ground thickness.
 Buried coplanar copper shares the specified bottom height; layered copper
@@ -1150,7 +1150,7 @@ forms support exact SI save/open, unit changes, width targeting with mandatory
 refinement, fixed-mesh studies, and saved frequency inputs. A successful form
 calculation does not establish arbitrary-geometry accuracy or frequency validity.
 
-Related checks: `test_extended_forms.py` checks all 42 full networks against
+Related checks: `test_extended_forms.py` checks all 44 full networks against
 independent voltage/current boundary equations; `extended-forms.test.mjs`
 checks the twelve added forms in three units. Generate explicit browser inputs
 with `extended_form_cases.py OUTPUT_DIRECTORY` using the checkout's `src` and
@@ -1162,7 +1162,8 @@ host. The generated `controls.json` also runs with `saved-controls-browser.mjs`
 via `SIPI_CONTROL_CASES` for three representative target/study workflows.
 
 Browser regression scripts compare the complete editable template-name list
-against the frozen engine reference in `registered-forms.mjs`, including missing,
+against the frozen original inputs and separately recorded extensions in
+`registered-forms.mjs`, including missing,
 extra and duplicate choices. The polygon flow restores those exact inputs before
 checking all registered drawings; it does not force zero copper thickness onto
 forms that require finite metal. Signed zero is preserved when the fixture is
@@ -1171,3 +1172,27 @@ serialized for the engine's strict geometry comparison. Run
 `polygon-browser.mjs OUTPUT_DIRECTORY [WEB_ROOT]` for the native/Worker flow.
 Set `SIPI_PYTHON` to the qualified interpreter and `SIPI_CONSOLE` to its installed
 `sipi` command for native execution.
+
+## Two substrate layers below surface copper
+
+**Two-layer surface line** and **Two-layer surface pair** retain separate lower
+and upper substrate heights, permittivities and loss tangents. Both heights
+exclude copper: its bottom is at their sum. The lower plane is grounded; the
+top and sides are open. Air height includes copper. This differs from a buried
+interface form, where upper dielectric height includes copper. The equal pair
+uses symmetric even/odd summaries; the single line uses `z0`.
+
+Both forms support engine geometry inspection, exact saved inputs in mm/µm/mil,
+width targeting with the required refined solve, material/geometry studies and
+full frequency-network export. Resistance remains an explicit supplied input.
+No frequency-dependent material, copper loss or 3D discontinuity is inferred.
+The original 42-case reference remains unchanged; the two canonical input cases
+live separately in `tests/sipi/reference_data/layered_microstrip/inputs.json`.
+Their physical basis and convergence limits are documented in the engine's
+[layered surface contract](../docs/packages/sipi/layered_microstrip.md).
+
+Run `layered_surface_cases.py OUTPUT_DIRECTORY` with `src:workbench/desktop`
+on PYTHONPATH. Set `SIPI_FORM_CASES` to the generated `cases.json` for
+`extended-forms-browser.mjs`, and `SIPI_CONTROL_CASES` to `controls.json` for
+`saved-controls-browser.mjs`. Run each against the native interpreter and the
+staged Worker. These are local validation candidates, not a published product.

@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 42종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 44종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 42종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 44종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -269,7 +269,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline, two-dielectric stripline(single/pair), two-dielectric coplanar stripline(single/pair), unequal surface/buried pair 42종입니다. 추가 12종은 비대칭 적층·coplanar·코팅 쌍 11종과 3유전체 broadside 쌍입니다. 다른 해석 문서는 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline, two-dielectric stripline(single/pair), two-dielectric coplanar stripline(single/pair), unequal surface/buried pair 44종입니다. 추가 12종은 비대칭 적층·coplanar·코팅 쌍 11종과 3유전체 broadside 쌍입니다. 다른 해석 문서는 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -480,7 +480,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 42종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 44종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는
@@ -980,7 +980,7 @@ Saved analysis로 안내합니다. 실패 표본은 실패행으로 남기고 �
 
 ## 등록 단면 전체 편집 폼
 
-42종 폼은 엔진의 등록 템플릿 계약을 재사용합니다. 추가 비대칭 쌍 11종은
+44종 폼은 엔진의 등록 템플릿 계약을 재사용합니다. 추가 비대칭 쌍 11종은
 좌우 폭·두께·선택 윗폭을 각각 유지합니다. Coplanar 폼은 직사각형 접지 두께도
 입력합니다. 매립 coplanar의 도체 아랫면은 지정 높이를, 적층 단면은 두 유전체의
 경계를 공유합니다. Normal film은 법선 두께 다각형과 겹침 거부 조건을 유지합니다.
@@ -997,7 +997,7 @@ Saved analysis로 안내합니다. 실패 표본은 실패행으로 남기고 �
 변경, 필수 세분을 포함한 폭 역산, 고정 메시 공차, 주파수 입력 저장을 지원합니다.
 폼의 계산 성공이 임의 기하의 정확도나 주파수 유효성을 보장하지는 않습니다.
 
-`test_extended_forms.py`는 42종 전체 네트워크를 독립 전압/전류 경계식과,
+`test_extended_forms.py`는 44종 전체 네트워크를 독립 전압/전류 경계식과,
 `extended-forms.test.mjs`는 추가 12종을 세 단위로 검사합니다. `src`와
 `workbench/desktop`을 PYTHONPATH에 두고 `extended_form_cases.py 출력폴더`로
 명시 입력을 만듭니다. `SIPI_PYTHON`에 해당 Python, `SIPI_EXTENDED_CASES`에
@@ -1015,3 +1015,22 @@ Saved analysis로 안내합니다. 실패 표본은 실패행으로 남기고 �
 `polygon-browser.mjs 출력폴더 [WEB_ROOT]`로 native/Worker 흐름을 실행합니다.
 `SIPI_PYTHON`은 검증한 Python, native 실행의 `SIPI_CONSOLE`은 해당 설치본의
 `sipi` 명령으로 지정합니다.
+
+## 구리 아래 두 기판층을 둔 표면선로
+
+**Two-layer surface line**과 **Two-layer surface pair**에서 두 기판층의 높이,
+유전율, 손실탄젠트를 각각 편집합니다. 두 높이는 모두 구리를 제외하며 구리
+바닥은 합계 높이에 있습니다. 하부 기준면만 접지하고 상부·측면은 개방합니다.
+공기 높이는 구리를 포함합니다. 구리를 상부층에 포함하는 매립 인터페이스
+단면과 구분합니다. 단일선은 z0, 대칭 쌍은 even/odd 요약을 사용합니다.
+
+엔진 기하 표시, mm/µm/mil 단위 저장·복원, 세분 메시를 포함한 폭 역산,
+재료·기하 공차와 전체 주파수 네트워크 내보내기를 연결합니다. 저항은 명시적
+입력이며 주파수 재료·구리 손실·3D 불연속을 자동 추정하지 않습니다. 기존
+42종 동결 기준은 그대로 두고 새 두 입력만 별도 layered_microstrip/inputs.json에
+둡니다. [물리 계약·수렴 범위](../docs/locales/ko/pages/packages/sipi/layered_microstrip.md)를 확인하세요.
+
+`src:workbench/desktop`을 PYTHONPATH로 지정해 `layered_surface_cases.py OUTPUT_DIRECTORY`를
+실행합니다. 생성된 cases.json은 SIPI_FORM_CASES로 extended-forms-browser.mjs에,
+controls.json은 SIPI_CONTROL_CASES로 saved-controls-browser.mjs에 전달하여 네이티브와
+Worker를 각각 검증합니다. 공개 배포가 아닌 로컬 검증 후보입니다.

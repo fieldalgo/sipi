@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {labels,extendedLabels,scales,lengthFields,parameterFields,editableParameters,studyFields,studyScale,isAsymmetric,isPair,isForwardPair,isBroadside,isLayeredBroadside,usesEngineGeometry} from '../ui/model.js';
 const reference=JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/template_section/reference.json',import.meta.url)));
+reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/layered_microstrip/inputs.json',import.meta.url))).cases);
 const cases=Object.fromEntries(reference.cases.map(c=>[c.template,c.resolved_parameters]));
 assert.deepEqual(Object.keys(labels).sort(),Object.keys(cases).sort());
-assert.equal(Object.keys(labels).length,42);assert.equal(Object.keys(extendedLabels).length,12);
+assert.equal(Object.keys(labels).length,44);assert.equal(Object.keys(extendedLabels).length,12);
 for(const name of Object.keys(extendedLabels)) for(const unit of Object.keys(scales)) test(`${name}: exact ${unit} inputs and active study fields`,()=>{
   const p=cases[name],values={},si={};
   for(const [id,key] of Object.entries(parameterFields(name))) {

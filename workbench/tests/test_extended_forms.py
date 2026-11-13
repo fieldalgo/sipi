@@ -11,6 +11,7 @@ from sipi.template_document import TemplateSectionDocument
 from sipi.design_document import ImpedanceDesignDocument
 
 CASES={r['template']:r['resolved_parameters'] for r in json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())['cases']}
+CASES.update({r['template']:r['resolved_parameters'] for r in json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_microstrip/inputs.json').read_text())['cases']})
 MESH=dict(edge_size=8e-6,far_size=.3e-3,grade=.25)
 SETTINGS=dict(start_hz=0.,stop_hz=2e8,points=3,length=.075,resistance=5.3,z_ref=47.)
 

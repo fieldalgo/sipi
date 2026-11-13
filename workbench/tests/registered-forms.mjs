@@ -1,8 +1,10 @@
-// Read the independent, frozen engine fixture; do not infer choices from the UI.
+// Read the original frozen engine fixture and separately recorded extensions;
+// do not infer choices from the UI. These snapshots check inputs, not accuracy.
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
 const reference=JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/template_section/reference.json',import.meta.url),'utf8'));
+reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/layered_microstrip/inputs.json',import.meta.url),'utf8')).cases);
 export const registeredNames=reference.cases.map(row=>row.template).sort();
 
 export function registeredInput(name) {

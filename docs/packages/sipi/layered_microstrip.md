@@ -45,8 +45,9 @@ They return ordinary `CrossSection` objects. Save them as `CrossSectionDocument`
 and pass width factories to `seek_impedance`, whose separate refined solve stays
 required. Both factories are registered for `TemplateSectionDocument`,
 `ImpedanceStudyDocument` and `ImpedanceDesignDocument`, using their existing
-versioned schemas. The dedicated workbench forms are a subsequent integration
-step; Saved analysis can execute these stored inputs.
+versioned schemas. Dedicated workbench forms provide engine geometry inspection,
+unit-preserving edits, saved studies, refined width goals and network export.
+Saved analysis also executes these stored inputs.
 
 Validation uses scikit-fem 12.0.2 with independent material assignment and complex
 and vacuum energy assembly. For the specified single/pair case in

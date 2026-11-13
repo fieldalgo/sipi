@@ -668,3 +668,6 @@
 - Validate installed first-party files against exact wheels before regression, reject same-version stale or shadowed imports, and preserve failed-run JSON evidence without stale passing XML.
 
 - Extract SIPI as an independent distribution with unchanged numerical implementation, JSON contracts and regression fixtures. Retain galerkin and meshine as external dependencies.
+
+- Added editable two-layer surface line/pair forms using the shared saved-input, study, target and network paths; preserved the original 42-case reference.
+- 두 기판층 표면선로·쌍의 전용 편집 폼을 공통 저장·공차·역산·네트워크 경로에 연결하고 기존 42종 기준을 보존했습니다.

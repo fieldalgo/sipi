@@ -1,4 +1,4 @@
-import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isForwardPair, isBroadside, isLayeredBroadside, usesEngineGeometry, isAsymmetric, isLayeredInterface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isForwardPair, isBroadside, isLayeredBroadside, usesEngineGeometry, isAsymmetric, isLayeredInterface, isLayeredSurface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -460,7 +460,7 @@ function geometryFields() {
   $('asymmetric-fields').hidden = !asymmetric;
   $('ground-thickness-field').hidden = !(asymmetric && isCoplanar(template));
   $('gap-dielectric-fields').hidden = !isLayeredBroadside(template);
-  $('layered-height-note').textContent = isLayeredBroadside(template) ? 'Lower and upper heights are metal-to-outer-plane clearances, excluding copper. The gap is between inner metal faces. Total height includes both copper thicknesses.' : 'Lower height ends at the copper bottom-face interface. Upper height includes the copper; keep it below the top plane.';
+  $('layered-height-note').textContent = isLayeredSurface(template) ? 'Both substrate heights exclude copper. Copper begins above their sum; air height includes copper. Only the bottom plane is grounded.' : isLayeredBroadside(template) ? 'Lower and upper heights are metal-to-outer-plane clearances, excluding copper. The gap is between inner metal faces. Total height includes both copper thicknesses.' : 'Lower height ends at the copper bottom-face interface. Upper height includes the copper; keep it below the top plane.';
   $('broadside-note').textContent = isLayeredBroadside(template) ? 'The upper signal is shifted by this signed distance relative to the lower. Each outer clearance and each of the three dielectric regions stays explicit. No independent differential eigenmode is assumed.' : 'Signed upper-to-lower horizontal offset. The vertical gap separates copper faces; both rectangular traces are centred together between the planes.';
   for (const id of ['uniform-profile-field', 'uniform-width-field', 'uniform-thickness-field']) $(id).hidden = asymmetric;
   for (const side of ['left', 'right']) $(`${side}-top-width-field`).hidden = $(`${side}_profile`).value !== 'tapered';
@@ -471,7 +471,7 @@ function geometryFields() {
   if (asymmetric && isLayeredInterface(template)) $('asymmetric-geometry-note').textContent='All copper bottom faces meet the lower/upper dielectric interface. Thicknesses and widths are independent; the upper layer includes copper.';
   if (template==='asymmetric_coupled_coplanar_stripline') $('asymmetric-geometry-note').textContent='All copper bottom faces use the specified height. Widths, signal thicknesses and rectangular ground thickness are independent.';
   if (isLayeredBroadside(template)) $('target-description').textContent='Vary both rectangular signal widths together; keep clearances, gap, offset, thickness and three materials fixed. Target real lossless Vdiff/Idiff with Icommon=0; both meshes must pass.';
-  const layered = isLayeredInterface(template) || isLayeredBroadside(template);
+  const layered = isLayeredInterface(template) || isLayeredBroadside(template) || isLayeredSurface(template);
   $('uniform-height-field').hidden = layered;
   $('uniform-dielectric-fields').hidden = layered;
   $('layered-height-fields').hidden = !layered;
@@ -610,7 +610,7 @@ function refreshStudyOptions(reset=false) {
     const select=$(`study-variable-${i}`), previous=select.value;
     select.replaceChildren();
     for (const [key,label] of Object.entries(choices)) {const option=document.createElement('option');option.value=key;option.textContent=label;select.append(option);}
-    select.value=previous in choices ? previous : i===1 ? (isAsymmetric(template) ? 'left_width' : 'width') : (isLayeredInterface(template) || isLayeredBroadside(template)) ? 'lower_eps_r' : 'eps_r';
+    select.value=previous in choices ? previous : i===1 ? (isAsymmetric(template) ? 'left_width' : 'width') : (isLayeredInterface(template) || isLayeredBroadside(template) || isLayeredSurface(template)) ? 'lower_eps_r' : 'eps_r';
     if (reset || previous !== select.value) resetStudyBounds(i);
   }
 }

@@ -44,7 +44,8 @@ print(line.z0)
 저장하고, 폭을 바꾸는 함수를 `seek_impedance`에 전달할 수 있습니다. 목표
 역산의 별도 세분 검사는 유지합니다. 두 함수 모두 기존 버전 규격의 `TemplateSectionDocument`,
 `ImpedanceStudyDocument`, `ImpedanceDesignDocument`에 등록됩니다. 전용 workbench
-폼은 후속 단계이며 Saved analysis에서는 이 저장 입력을 실행할 수 있습니다.
+폼에서 엔진 기하 표시, 단위 보존 편집, 공차 저장, 세분 폭 역산과 네트워크
+내보내기를 제공합니다. Saved analysis에서도 저장 입력을 실행합니다.
 
 검증은 scikit-fem 12.0.2의 독립 재료 배치와 복소·진공 에너지 조립을 사용합니다.
 `tests/sipi/test_layered_microstrip.py`의 명시 단일/쌍 조건에서 C/C_loss/C0의
