@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 
 const reference=JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/template_section/reference.json',import.meta.url),'utf8'));
 reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/layered_microstrip/inputs.json',import.meta.url),'utf8')).cases);
+reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/asymmetric_layered_microstrip/inputs.json',import.meta.url),'utf8')).cases);
 export const registeredNames=reference.cases.map(row=>row.template).sort();
 
 export function registeredInput(name) {

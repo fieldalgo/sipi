@@ -39,7 +39,9 @@ complex electrostatic capacitance; the launch diagnostic excludes that loss.
 Save geometry with `CrossSectionDocument` or keep factory parameters in
 `TemplateSectionDocument`. The factory is registered for impedance studies and
 width goals using `quantity="z_diff_forward"`; `z0` and `z_diff` are rejected.
-A dedicated editable form is a separate integration step.
+The dedicated **Unequal two-layer surface pair** workbench form edits both
+substrates and signal profiles, inspects engine geometry and reuses the saved
+study, width-goal and network paths.
 
 Validation separately checks the explicit geometry, independent scikit-fem
 12.0.2 complex and vacuum energy with height-based material assignment, matrix

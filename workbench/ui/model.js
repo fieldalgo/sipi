@@ -15,7 +15,7 @@ export const extendedLabels = {
   "asymmetric_coupled_conformal_coated_unbacked_coplanar": "Unequal normal-film unbacked pair",
   "layered_broadside_stripline": "Three-dielectric broadside pair"
 };
-export const layeredSurfaceLabels = {layered_microstrip: 'Two-layer surface line', coupled_layered_microstrip: 'Two-layer surface pair'};
+export const layeredSurfaceLabels = {asymmetric_coupled_layered_microstrip: 'Unequal two-layer surface pair', layered_microstrip: 'Two-layer surface line', coupled_layered_microstrip: 'Two-layer surface pair'};
 Object.assign(labels, extendedLabels, layeredSurfaceLabels);
 export const isLayeredSurface = t => Object.hasOwn(layeredSurfaceLabels,t);
 export const isLayeredBroadside = t => t === 'layered_broadside_stripline';

@@ -677,3 +677,6 @@
 
 - Registered unequal two-layer surface pairs for saved template, study and width-goal inputs with explicit forward-launch and relative-pitch semantics.
 - 두 기판층 비대칭 표면쌍을 저장·공차·폭 역산에 등록하고 순방향 여기와 상대 피치 의미를 유지했습니다.
+
+- Added the unequal layered surface form with explicit copper profiles, shared saved controls and the pinned 45-template browser engine.
+- 비대칭 적층표면 폼의 구리 형상·공통 저장 경로와 45종 등록 엔진의 브라우저 계산을 연결했습니다.

@@ -116,7 +116,8 @@ def test_unequal_templates_are_registered_as_pairs_with_explicit_quantity():
  import json
  reference=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())
  expected={r['template'] for r in reference['cases'] if r['template'].startswith('asymmetric_')}
- assert len(expected)==13 and expected==ASYMMETRIC_PAIR_TEMPLATES
+ assert len(expected)==13
+ assert expected|{'asymmetric_coupled_layered_microstrip'}==ASYMMETRIC_PAIR_TEMPLATES
  assert set(NAMES)<=expected
  assert ASYMMETRIC_PAIR_TEMPLATES<=PAIR_TEMPLATES<=TEMPLATES.keys()
 

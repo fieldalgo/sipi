@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {assertRegisteredForms,registeredNames,registeredInput,registeredInputText} from './registered-forms.mjs';
 
 test('registry checks the complete names, including multiplicity',async()=>{
-  assert.equal(registeredNames.length,44);
+  assert.equal(registeredNames.length,45);
   assert.deepEqual(await assertRegisteredForms({evaluate:async()=>[...registeredNames].reverse()}),[...registeredNames].reverse());
   for(const names of [registeredNames.slice(1),[...registeredNames,'unknown'],[registeredNames[0],...registeredNames.slice(0,-1)]])
     await assert.rejects(assertRegisteredForms({evaluate:async()=>names}));

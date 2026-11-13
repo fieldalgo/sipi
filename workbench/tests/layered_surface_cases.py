@@ -1,4 +1,4 @@
-"""Create editable requests and references for the two layered surface forms."""
+"""Create editable requests and references for the three layered surface forms."""
 import json
 import sys
 from pathlib import Path
@@ -7,6 +7,7 @@ from sipi.template_document import TemplateSectionDocument
 
 root=Path(sys.argv[1]).resolve();root.mkdir(parents=True,exist_ok=True)
 cases=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_microstrip/inputs.json').read_text())['cases']
+cases.extend(json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/asymmetric_layered_microstrip/inputs.json').read_text())['cases'])
 mesh=dict(edge_size=8e-6,far_size=.3e-3,grade=.25)
 settings=dict(start_hz=0.,stop_hz=2e8,points=3,length=.075,resistance=5.3,z_ref=47.)
 rows=[];controls=[]
@@ -22,7 +23,7 @@ for row in cases:
  if name in LAYERED_SURFACE_TEMPLATES:
   key='left_width' if 'left_width' in p else 'width';lo,hi=p[key]*.99,p[key]*1.01
   line=TEMPLATES[name](**{**p,key:lo}).analyze(**mesh)
-  for kind,options in [('design',dict(bounds=[lo,hi],target=line.even_odd()['z_diff'] if name.startswith('coupled_') else line.z0,tolerance=3.,**({'variable':key} if key!='width' else {}))),
+  for kind,options in [('design',dict(bounds=[lo,hi],target=line.z_diff_forward if name.startswith('asymmetric_') else line.even_odd()['z_diff'] if name.startswith('coupled_') else line.z0,tolerance=3.,**({'variable':key} if key!='width' else {}))),
                        ('study',dict(mode='sweep',points=2,seed=31,variables=[dict(parameter=key,lower=lo,upper=hi)]))]:
    req=dict(**base,action=kind+'-document',**{kind:options});saved=execute(req)['document_text'];control_path=root/(name+'-'+kind+'.json');control_path.write_text(saved)
    direct_control=execute({**req,'action':kind})

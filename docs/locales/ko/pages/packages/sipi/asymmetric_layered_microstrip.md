@@ -19,7 +19,8 @@
 주파수 의존 재료나 3D 전이를 자동 추정하지 않습니다. 상수 손실탄젠트는 복소
 정전용량에 반영되지만 이 진단 임피던스에는 포함되지 않습니다. 기하는
 CrossSectionDocument 또는 TemplateSectionDocument로 저장합니다. 공차·폭 역산 문서에는
-z_diff_forward만 허용하고 z0·z_diff는 거부합니다. 전용 편집 폼은 별도 단계입니다.
+z_diff_forward만 허용하고 z0·z_diff는 거부합니다. 전용 Unequal two-layer surface pair 폼에서 두 기판과 구리 형상을 편집하고
+엔진 기하 표시·저장·공차·역산·네트워크 경로를 재사용합니다.
 
 기하 계약과 높이 기반 독립 재료 배치의 scikit-fem 12.0.2 복소·진공 에너지,
 상반성·양정성, 진공 항등식, 대칭 기하 한계, 균질 기판 한계를 각각 확인합니다.
