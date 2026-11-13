@@ -112,7 +112,8 @@ def coupled_debye_rlgc_ladder_response(time, source_voltages, *, R, L, G, C_inf,
 
 
 def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
-                             load_capacitance=None, load_branch=None, signals=2, source_conductance=None):
+                             load_capacitance=None, load_branch=None, signals=2, source_conductance=None,
+                             scale_states=False):
     """Shared circuit propagation; strict-SPD path preserves original arithmetic."""
     time, drive, r, l, g, c, length, n, rs, rl, delta, poles = data
     dx = length/n; weights = np.ones(n+1); weights[[0, -1]] = .5
@@ -179,10 +180,39 @@ def _propagate_coupled_debye(data, *, psd_strength, result_type, propagator,
         a = np.linalg.solve(mass, k); beta = np.linalg.solve(mass, b)
     if not all(np.all(np.isfinite(x)) for x in (a, beta)):
         raise ValueError('Debye normalized coefficients exceed finite scales')
-    _, _, x = propagator((a, beta, np.zeros((1, size)), np.zeros((1, signals))), drive, time, interp=True)
+    if scale_states:
+        # x = S u, using diagonal storage scales for voltage/current states.
+        # PSD polarization coordinates are auxiliary voltages with identity
+        # mass, not unit-energy states: use the corresponding node-voltage
+        # scale so every voltage coordinate has comparable magnitude.
+        # This similarity transform retains every physical state while
+        # reducing the disparate voltage/current
+        # scales seen by the augmented matrix exponential. In particular,
+        # large finite branch inductances must not create an absolute current
+        # floor whose artificial energy grows with inductance.
+        with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):
+            storage_diagonal = np.diag(mass).copy()
+            for slot in range(len(active)):
+                sl = slice(base+slot*nv, base+(slot+1)*nv)
+                storage_diagonal[sl] = storage_diagonal[:nv]
+            state_scale = 1/np.sqrt(storage_diagonal)
+            scaled_a = (a*state_scale[None, :])/state_scale[:, None]
+            scaled_beta = beta/state_scale[:, None]
+        if (np.any(state_scale <= 0) or not all(np.all(np.isfinite(value))
+                for value in (state_scale, scaled_a, scaled_beta))):
+            raise ValueError('Debye state scaling exceeds finite scales')
+        system = (scaled_a, scaled_beta, np.zeros((1, size)), np.zeros((1, signals)))
+    else:
+        system = (a, beta, np.zeros((1, size)), np.zeros((1, signals)))
+    _, _, x = propagator(system, drive, time, interp=True)
     x = np.asarray(x)
     if x.shape != (len(time), size) or not np.all(np.isfinite(x)):
         raise ValueError('state propagation returned invalid shape or nonfinite values')
+    if scale_states:
+        with np.errstate(over='ignore', invalid='ignore', under='ignore'):
+            x = x*state_scale[None, :]
+        if not np.all(np.isfinite(x)):
+            raise ValueError('restored Debye states exceed finite scales')
     if np.any(x[0] != 0):
         raise ValueError('state propagation must preserve the zero initial state')
     with np.errstate(over='ignore', invalid='ignore', divide='ignore', under='ignore'):

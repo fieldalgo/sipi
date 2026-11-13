@@ -91,3 +91,25 @@ browser/Windows integration is established.
 [Saved external RL inputs](debye_reactive_startup_document.md) distinguish external ohm/H/F from per-length line inputs.
 
 [Terminal waves](startup_waves.md) now explicitly accept this response while separating internal line and external C/L power. Saved wave v1–7 keep their original input kinds.
+
+## State scales during propagation
+
+The two-signal PSD Debye reactive solver propagates `x = S u`, with the diagonal
+`S_ii = 1/sqrt(D_ii)`, then restores physical voltage/current states before
+computing outputs and power diagnostics. Here `D` uses the circuit mass diagonal
+for node voltages, segment currents
+and external branch currents. Auxiliary polarization voltages use their
+corresponding node-voltage scales instead of their algebraic identity mass.
+This is an invertible change of coordinates, not a change to the branch, its inductance,
+input units, time grid or material model. Unrepresentable transformed systems
+are rejected; no states or eigenvalues are clipped. Other propagation entry
+points retain their existing choice of state coordinates.
+
+This prevents tiny branch currents from acquiring an absolute numerical floor
+when the explicit branch inductance is large. With zero branch resistance,
+`Lb I(t) = integral(Vfar dt)` and branch energy approaches a `1/Lb` limit as the
+branch approaches an open circuit. Regression checks use 1e6, 1e7 and 1e8 H,
+ramp/pulse drives and independent quadrature of the no-branch reference, with
+separate time refinement. These extreme values probe numerical conditioning;
+they are not suggested PCB component values. Existing energy, passivity, full
+state and independent charge-equation acceptance gates remain unchanged.

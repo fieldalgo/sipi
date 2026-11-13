@@ -1,5 +1,8 @@
 # Changelog
 
+- Scale internal states for two-signal PSD Debye reactive propagation, preserving tiny finite-inductor currents and their physical energy limit.
+  2신호 PSD Debye reactive 전파의 내부 상태를 스케일링하여 큰 유한 인덕터의 작은 전류와 물리 에너지 극한을 보존합니다.
+
 - Add planar-coated surface-line factories above two independent substrate layers, with explicit copper, film and air heights.
   두 독립 기판층 위의 평면 코팅 표면선로 API를 추가하고 도체·코팅·공기 높이를 명시합니다.
 
