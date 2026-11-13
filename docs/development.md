@@ -81,3 +81,12 @@ pending run. This permits incremental commits to be backed up without
 cancelling their in-flight platform evidence. Pull-request updates still
 cancel obsolete runs; main retains its full queue. A completed older commit
 does not establish validation of a newer branch head.
+
+The paired surface-conductor and Cannonball refinement tests record
+`conductor_refinement` JSON in their JUnit testcase properties before checking
+convergence. The record includes the geometry, resolved coarse/fine meshes,
+frequency samples, R/internal-L/C0 matrices, separate boundary loss factors,
+current integrals and numerical-library versions. It serializes existing results
+without extra field solves. Retain failed XML when comparing platforms: a small
+flux mismatch does not by itself bound resistance error. The original mesh
+fixtures, 5% resistance-change gate and current-return checks remain unchanged.

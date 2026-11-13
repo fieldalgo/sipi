@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from scipy.constants import mu_0
 from crosscheck import Stopwatch, emit, make_record, observable, require_tool
+from conductor_diagnostics import record_conductor_refinement
 from galerkin import annulus_mesh, rectangle_mesh
 from sipi import CrossSection, coupled_microstrip, microstrip
 from sipi.conductor import surface_impedance, surface_current_factors, surface_conductor_loss
@@ -96,8 +97,11 @@ def coupled_results():
     return section, coarse, fine
 
 
-def test_coupled_resistance_refinement_and_return_currents(coupled_results):
-    _, coarse, fine = coupled_results
+def test_coupled_resistance_refinement_and_return_currents(coupled_results, record_property):
+    section, coarse, fine = coupled_results
+    record_conductor_refinement(record_property, section, coarse, fine,
+        dict(edge_size=5e-6,far_size=.2e-3,grade=.1),
+        dict(edge_size=2.5e-6,far_size=.1e-3,grade=.05))
     assert np.max(abs(fine.R-coarse.R))/np.max(abs(fine.R)) < .05
     assert fine.factors.current_error < coarse.factors.current_error < .05
     # Return-plane dissipation must not disappear from differential/coupled cases.

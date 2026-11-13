@@ -10,6 +10,7 @@ from scipy.constants import mu_0
 from scipy.integrate import quad
 from scipy.spatial.distance import pdist
 
+from conductor_diagnostics import record_conductor_refinement
 from galerkin import annulus_mesh
 from sipi import CrossSection, CrossSectionDocument, coupled_microstrip
 from sipi.conductor import surface_impedance, surface_current_factors, surface_conductor_loss
@@ -127,7 +128,7 @@ def line(roughness=None, mesh=None):
         schema='sipi.transmission-line/2')
 
 
-def test_saved_line_replay_equivalent_huray_and_pair_refinement(monkeypatch):
+def test_saved_line_replay_equivalent_huray_and_pair_refinement(monkeypatch, record_property):
     doc = line()
     assert TransmissionLineDocument.loads(doc.dumps()).dumps() == doc.dumps()
     data = doc.to_dict(); data['conductor']['roughness']['rz_10point_m'] = 7
@@ -153,6 +154,8 @@ def test_saved_line_replay_equivalent_huray_and_pair_refinement(monkeypatch):
         **{key: value/2 for key, value in MESH.items()})
     errors = [float(np.max(abs(getattr(coarse, key)-getattr(fine, key)))/np.max(abs(getattr(fine, key))))
               for key in ('R', 'L_internal')]
+    record_conductor_refinement(record_property, doc.cross_section.section, coarse, fine,
+        MESH, {key: value/2 for key, value in MESH.items()})
     print('pair mesh R/internal-L changes', errors)
     assert max(errors) < .05
     assert fine.factors.current_error < coarse.factors.current_error < .05
