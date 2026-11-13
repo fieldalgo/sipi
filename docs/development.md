@@ -75,3 +75,9 @@ restricting artifact paths to `.validation/*.xml` and
 `.validation/installed.json`. Without that option, the upload action excludes
 the generated reports even when the tests wrote them successfully. Source
 checkouts, wheels and other hidden files are not artifact inputs.
+
+Development branch pushes retain the running validation and keep the newest
+pending run. This permits incremental commits to be backed up without
+cancelling their in-flight platform evidence. Pull-request updates still
+cancel obsolete runs; main retains its full queue. A completed older commit
+does not establish validation of a newer branch head.

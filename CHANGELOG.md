@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserve running development-branch validation while keeping the newest pending run, so incremental backups do not cancel platform checks.
+  개발 브랜치의 진행 중 검증과 최신 대기 실행을 보존하여 커밋 백업이 플랫폼 검사를 취소하지 않도록 합니다.
+
 - Save and reopen quick target, study and frequency inputs through the shared engine contracts, retaining exact SI controls and rejecting unsupported conversions.
   공통 엔진 계약으로 빠른 목표·공차·주파수 입력을 저장·재개방하며 정확한 SI 설정을 보존하고 미지원 변환을 거부합니다.
 

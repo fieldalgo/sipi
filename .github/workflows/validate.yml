@@ -9,7 +9,7 @@ permissions:
   contents: read
 concurrency:
   group: validate-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.ref == 'refs/heads/main' && 'max' || 'single' }}
 jobs:
   tests:
