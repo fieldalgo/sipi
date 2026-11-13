@@ -686,3 +686,6 @@
 
 - Registered the three two-substrate grounded coplanar factories for saved studies and refined width goals, with explicit ground-gap and objective semantics.
 - 두 기판층 grounded coplanar 3종을 저장·공차·세분 폭 역산에 등록하고 접지 간격과 목적값 의미를 명시했습니다.
+
+- Connect the three two-substrate grounded coplanar forms to saved controls, finite-ground studies and native/Worker network calculations.
+  두 기판층 grounded coplanar 3종을 저장 제어·유한 접지 공차·native/Worker 네트워크 계산에 연결합니다.

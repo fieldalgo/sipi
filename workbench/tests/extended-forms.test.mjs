@@ -5,9 +5,10 @@ import {labels,extendedLabels,scales,lengthFields,parameterFields,editableParame
 const reference=JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/template_section/reference.json',import.meta.url)));
 reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/layered_microstrip/inputs.json',import.meta.url))).cases);
 reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/asymmetric_layered_microstrip/inputs.json',import.meta.url))).cases);
+reference.cases.push(...JSON.parse(readFileSync(new URL('../../tests/sipi/reference_data/layered_grounded_coplanar/inputs.json',import.meta.url))).cases);
 const cases=Object.fromEntries(reference.cases.map(c=>[c.template,c.resolved_parameters]));
 assert.deepEqual(Object.keys(labels).sort(),Object.keys(cases).sort());
-assert.equal(Object.keys(labels).length,45);assert.equal(Object.keys(extendedLabels).length,12);
+assert.equal(Object.keys(labels).length,48);assert.equal(Object.keys(extendedLabels).length,12);
 for(const name of Object.keys(extendedLabels)) for(const unit of Object.keys(scales)) test(`${name}: exact ${unit} inputs and active study fields`,()=>{
   const p=cases[name],values={},si={};
   for(const [id,key] of Object.entries(parameterFields(name))) {

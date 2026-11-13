@@ -30,9 +30,9 @@ from sipi import templates as _templates
 TEMPLATES.update((name, getattr(_templates, name)) for name in EXTENDED_TEMPLATES)
 ASYMMETRIC_PAIR_TEMPLATES.update(name for name in EXTENDED_TEMPLATES if name.startswith('asymmetric_'))
 PAIR_TEMPLATES.update(EXTENDED_TEMPLATES)
-LAYERED_SURFACE_TEMPLATES = ('layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip')
+LAYERED_SURFACE_TEMPLATES = ('layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip')
 TEMPLATES.update((name, getattr(_templates, name)) for name in LAYERED_SURFACE_TEMPLATES)
-PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name != 'layered_microstrip')
+PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name.startswith(('coupled_', 'asymmetric_')))
 ASYMMETRIC_PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name.startswith('asymmetric_'))
 FORWARD_PAIR_TEMPLATES = ASYMMETRIC_PAIR_TEMPLATES | {'layered_broadside_stripline'}
 
@@ -158,9 +158,9 @@ def study_documents(request, nominal):
     if request['template'] in ASYMMETRIC_PAIR_TEMPLATES:
         allowed.update(('left_width', 'right_width', 'left_thickness', 'right_thickness',
                         'left_top_width', 'right_top_width'))
-    if request['template'] in ('layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip', 'layered_stripline', 'coupled_layered_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
+    if request['template'] in LAYERED_SURFACE_TEMPLATES or request['template'] in ('layered_stripline', 'coupled_layered_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
         allowed.update(('lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r'))
-    if request['template'] in EXTENDED_TEMPLATES:
+    if request['template'] in EXTENDED_TEMPLATES or request['template'] in LAYERED_SURFACE_TEMPLATES:
         allowed.update(('ground_thickness', 'trace_height', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'gap_eps_r'))
     names, low, high = [], [], []
     for variable in variables:

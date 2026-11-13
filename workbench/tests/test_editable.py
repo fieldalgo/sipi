@@ -15,9 +15,11 @@ def parameters(name):
     if name in LAYERED_SURFACE_TEMPLATES:
         data=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_microstrip/inputs.json').read_text())
         data['cases'].extend(json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/asymmetric_layered_microstrip/inputs.json').read_text())['cases'])
+        data['cases'].extend(json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_grounded_coplanar/inputs.json').read_text())['cases'])
         return next(row['resolved_parameters'] for row in data['cases'] if row['template']==name)
     if name in EXTENDED_TEMPLATES:
         data=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())
+        data['cases'].extend(json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_grounded_coplanar/inputs.json').read_text())['cases'])
         return next(row['resolved_parameters'] for row in data['cases'] if row['template']==name)
     if name in ('asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline'):
         from asymmetric_pair_cases import parameters as unequal_parameters

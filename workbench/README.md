@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers 45 registered cross-section forms, impedance targeting,
+The basic workspace offers 48 registered cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -311,7 +311,7 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The 45 forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+The 48 forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
 coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. The remaining forms cover eleven unequal layered, coplanar and coated pairs and the three-dielectric broadside pair. Other analysis-document types use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
@@ -561,7 +561,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the 45 registered editable templates. Other
+All project designs must use the 48 registered editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
@@ -1129,7 +1129,7 @@ before replacing the current form. Unit changes preserve original SI values.
 
 ## All registered cross-section forms
 
-The 45 forms reuse the engine's registered template contracts. The eleven
+The 48 forms reuse the engine's registered template contracts. The eleven
 additional unequal pairs keep independent left/right widths, thicknesses and
 optional top widths. Coplanar forms also expose rectangular ground thickness.
 Buried coplanar copper shares the specified bottom height; layered copper
@@ -1150,7 +1150,7 @@ forms support exact SI save/open, unit changes, width targeting with mandatory
 refinement, fixed-mesh studies, and saved frequency inputs. A successful form
 calculation does not establish arbitrary-geometry accuracy or frequency validity.
 
-Related checks: `test_extended_forms.py` checks all 45 full networks against
+Related checks: `test_extended_forms.py` checks all 48 full networks against
 independent voltage/current boundary equations; `extended-forms.test.mjs`
 checks the twelve added forms in three units. Generate explicit browser inputs
 with `extended_form_cases.py OUTPUT_DIRECTORY` using the checkout's `src` and
@@ -1205,3 +1205,23 @@ The original 42 inputs and later two surface inputs remain frozen separately;
 the unequal input is recorded in `reference_data/asymmetric_layered_microstrip/inputs.json`.
 The layered surface generator now exercises all three forms, including the
 explicit left-width target and saved study/network paths.
+
+## Two-substrate grounded coplanar forms
+
+**Two-layer grounded coplanar**, its equal pair, and **Unequal two-layer grounded
+coplanar pair** retain two substrate layers below every conductor. Both heights
+exclude copper. The bottom plane and the two finite side grounds share ground
+potential; the top and sides remain open. The single-line gap is to each ground;
+a pair has separate inter-signal and outside ground gaps. The unequal form keeps
+independent signal widths, thicknesses and tapers, plus explicit ground thickness.
+It reports the forward Ic=0 diagnostic without assuming symmetric eigenmodes.
+
+These forms reuse editable JSON, saved goals/studies, full networks and engine
+geometry. Ground thickness can be a study variable without changing signal
+copper. Input snapshots for these three forms are stored separately in
+`reference_data/layered_grounded_coplanar/inputs.json`; earlier snapshots remain
+unchanged. The layered-surface browser generator exercises all six forms.
+Core qualification for the 60/100/100 Ω targets uses the exact requested and
+refined meshes in the [physical contract](../docs/packages/sipi/layered_grounded_coplanar.md).
+Adapter tests compare that complete saved contract; browser narrow-width target
+runs check replay and controls, not a new physical accuracy bound.

@@ -37,7 +37,8 @@ line = document.analyze()
 
 These are geometry factories; save their output with `CrossSectionDocument`.
 The named factories also support TemplateSectionDocument, impedance studies and
-width-goal documents. Dedicated editable forms are a separate integration step. Scalar `z0` applies to the single line, even/odd summaries to the equal
+width-goal documents. The local workbench provides dedicated forms for all three
+geometries, saved controls and native/Worker network calculations. Scalar `z0` applies to the single line, even/odd summaries to the equal
 pair. The unequal pair uses the real lossless `z_diff_forward` launch at Icommon=0;
 it does not assume independent symmetric modes. Copper loss, roughness,
 frequency-dependent materials and 3D ground connectivity are not inferred.

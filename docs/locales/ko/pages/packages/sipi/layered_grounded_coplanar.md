@@ -16,7 +16,8 @@ ground_gap은 바깥 신호와 인접 접지 사이 간격입니다. 신호 사�
 중앙 정렬 상부 폭과 접지 두께를 독립적으로 지정하며 접지 두께를 추정하지
 않습니다. 전체 신호 바닥 범위를 중앙에 배치하고 사다리꼴의 상부 폭이 바닥
 간격의 정의를 바꾸지 않습니다. [영문 예제](../../../../../packages/sipi/layered_grounded_coplanar.md)의 반환 기하는 CrossSectionDocument로 저장합니다.
-TemplateSectionDocument와 공차·폭 역산 문서에 등록되며 전용 편집 폼은 별도 단계입니다.
+TemplateSectionDocument와 공차·폭 역산 문서에 등록됩니다. 로컬 workbench의
+세 전용 편집 폼에서 저장 제어와 native/Worker 네트워크 계산을 연결합니다.
 
 단일선은 z0, 대칭쌍은 even/odd 요약, 비대칭쌍은 Icommon=0의 실수 무손실
 z_diff_forward 진단값을 사용합니다. 구리 손실·거칠기·주파수 재료·3D 접지

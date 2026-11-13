@@ -4,7 +4,7 @@ from test_extended_forms import CASES,MESH,execute,TEMPLATES,ImpedanceDesignDocu
 
 NAMES=('layered_microstrip','coupled_layered_microstrip','asymmetric_coupled_layered_microstrip')
 
-@pytest.mark.parametrize('name',NAMES)
+@pytest.mark.parametrize('name',(*NAMES,'layered_grounded_coplanar','coupled_layered_grounded_coplanar','asymmetric_coupled_layered_grounded_coplanar'))
 def test_upper_material_study_preserves_lower_layer_and_nominal_mesh(name):
  p=CASES[name];req=dict(template=name,parameters=p,mesh=MESH,action='study',study=dict(
      mode='sweep',points=2,seed=31,variables=[dict(parameter='upper_eps_r',lower=4.8,upper=5.2)]))
@@ -43,3 +43,29 @@ def test_coarse_pair_goal_keeps_refinement_failure_and_evaluation_history():
  assert history[-2].stage=='search' and history[-1].stage=='refinement'
  assert abs(history[-2].impedance-100.)<=.25
  assert abs(history[-1].impedance-100.)>.5
+
+
+@pytest.mark.parametrize('name',('layered_grounded_coplanar','coupled_layered_grounded_coplanar','asymmetric_coupled_layered_grounded_coplanar'))
+def test_layered_grounded_goal_form_preserves_qualified_saved_contract(name):
+ # Core tests solve these exact standard targets on both requested/refined
+ # meshes. This adapter test checks the complete unchanged input contract;
+ # browser controls separately execute saved/direct narrow width goals.
+ # The UI keeps its existing 32-attempt budget; the core API defaults to 40.
+ p=CASES[name];asymmetric=name.startswith('asymmetric_');pair=asymmetric or name.startswith('coupled_')
+ mesh=dict(edge_size=2.5e-6,far_size=.125e-3,grade=.1)
+ options=dict(bounds=[.32e-3,.8e-3] if asymmetric else [.4e-3,.7e-3],target=100. if pair else 60.,tolerance=.5,search_tolerance=.1)
+ if asymmetric:options['variable']='left_width'
+ saved=execute(dict(template=name,parameters=p,mesh=mesh,action='design-document',design=options))['document_text']
+ expected=ImpedanceDesignDocument(name,p,mesh=mesh,max_evaluations=32,quantity='z_diff_forward' if asymmetric else 'z_diff' if pair else 'z0',variable='left_width' if asymmetric else 'width',**{k:v for k,v in options.items() if k!='variable'})
+ assert saved==expected.dumps()
+
+
+def test_unequal_layered_coplanar_ground_thickness_study_keeps_signal_copper():
+ from engine import study_documents,document
+ name='asymmetric_coupled_layered_grounded_coplanar';p=CASES[name]
+ req=dict(template=name,parameters=p,mesh=MESH,study=dict(mode='sweep',points=2,seed=31,variables=[dict(parameter='ground_thickness',lower=30e-6,upper=40e-6)]))
+ _,rows=study_documents(req,document(req))
+ assert len(rows)==2
+ for values,doc in rows:
+  assert all(t.thickness==values['ground_thickness'] for t in doc.section.traces if t.ground)
+  assert [t.thickness for t in doc.section.traces if not t.ground]==[p['left_thickness'],p['right_thickness']]

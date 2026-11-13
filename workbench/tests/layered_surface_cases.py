@@ -1,4 +1,4 @@
-"""Create editable requests and references for the three layered surface forms."""
+"""Create editable requests and references for the six layered surface forms."""
 import json
 import sys
 from pathlib import Path
@@ -8,6 +8,7 @@ from sipi.template_document import TemplateSectionDocument
 root=Path(sys.argv[1]).resolve();root.mkdir(parents=True,exist_ok=True)
 cases=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_microstrip/inputs.json').read_text())['cases']
 cases.extend(json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/asymmetric_layered_microstrip/inputs.json').read_text())['cases'])
+cases.extend(json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/layered_grounded_coplanar/inputs.json').read_text())['cases'])
 mesh=dict(edge_size=8e-6,far_size=.3e-3,grade=.25)
 settings=dict(start_hz=0.,stop_hz=2e8,points=3,length=.075,resistance=5.3,z_ref=47.)
 rows=[];controls=[]
