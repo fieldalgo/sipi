@@ -128,3 +128,13 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 [공유 메시의 주파수 선로 입력](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/line_model.md)은 이 추출과 재료/도체 모델을 연결하고 전체 입력을 JSON으로 저장합니다.
 
 [명시적 경계 패널 전류와 금속별 손실](panel_conductor.md)은 고정 전위 접지 도체를 다루는 선택적 공유 커널 경로이며 패널·외곽 수렴을 별도로 검증합니다.
+
+## 독립 이차 요소 전계 대조
+
+`test_crosscheck_conductor_p2.py`는 같은 진공 기하와 도체 전위를 scikit-fem
+12.0.2 이차 삼각 요소로 풉니다. 자체 에너지 정전용량 행렬을 계산하고 4차
+경계 구적법으로 법선 미분을 적분합니다. 평행판과 원형 동축 해석 극한으로
+기준 계산을 확인합니다. PCB 대조는 원·세분 메시의 경계별 행렬, 상호 항과
+전류 적분을 그대로 기록합니다. 이 비교는 보고용입니다. 두 이차 메시의
+작은 변화가 정확도를 보증하거나 기존 P1 플럭스·저항·외곽 검사를 대체하지
+않습니다. 이차 요소 도구는 시험 의존성이며 제품에서 선택하는 솔버가 아닙니다.

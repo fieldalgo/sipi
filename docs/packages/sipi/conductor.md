@@ -155,3 +155,15 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 the other material/conductor components and saves the complete input as JSON.
 
 [Explicit boundary-panel currents and per-boundary loss](panel_conductor.md) provide an optional shared-kernel path with fixed grounded traces and separate panel/domain convergence checks.
+
+## Independent quadratic field comparison
+
+`test_crosscheck_conductor_p2.py` solves the same vacuum geometry and conductor
+potentials with scikit-fem 12.0.2 quadratic triangles. It computes its own energy
+capacitance matrix and integrates boundary-normal derivatives with fourth-order
+facet quadrature. Plane and circular-coax analytical limits check the reference
+calculation. PCB comparisons retain each boundary matrix, mutual entry and
+current integral for both coarse and fine meshes. They are report-only: a small
+change between two quadratic meshes is not an accuracy certificate, and does
+not replace the existing P1 flux, resistance or exterior-boundary checks. The
+quadratic tool is a test dependency, not a selectable production solver.
