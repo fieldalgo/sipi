@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -187,6 +187,67 @@ def asymmetric_coupled_microstrip(*, left_width, right_width, gap, substrate_hei
     return CrossSection(layers,
         [Trace('positive', -(gap+right)/2, left, h, lt, top_width=left_top_width),
          Trace('negative', (gap+left)/2, right, h, rt, top_width=right_top_width)], box)
+
+
+def layered_grounded_coplanar(*, width, gap, ground_width, lower_height, upper_height,
+                             lower_eps_r, upper_eps_r, thickness=0.0,
+                             lower_tan_delta=0.0, upper_tan_delta=0.0,
+                             air_height=None, box_width=None, top_width=None):
+    """Surface signal and finite side grounds above two substrate layers.
+
+    Both heights exclude copper. gap separates signal and ground bottom edges.
+    Signal and rectangular grounds share thickness; only the signal can taper.
+    The lower plane is grounded, while the upper and side boundaries are open.
+    """
+    return _layered_surface(grounded_coplanar, width=width, gap=gap,
+        ground_width=ground_width, lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
+
+
+def coupled_layered_grounded_coplanar(*, width, gap, ground_gap, ground_width,
+                                     lower_height, upper_height, lower_eps_r, upper_eps_r,
+                                     thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0,
+                                     air_height=None, box_width=None, top_width=None):
+    """Equal surface pair between finite grounds above two substrate layers.
+
+    gap is between signal bottom edges; ground_gap is the outer signal-ground
+    bottom gap. Both substrate heights exclude all copper. Rectangular grounds
+    share signal thickness; optional centred tapers apply only to signals.
+    """
+    return _layered_surface(coupled_grounded_coplanar, width=width, gap=gap,
+        ground_gap=ground_gap, ground_width=ground_width,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
+
+
+def asymmetric_coupled_layered_grounded_coplanar(*, left_width, right_width, gap,
+                                               ground_gap, ground_width, lower_height,
+                                               upper_height, lower_eps_r, upper_eps_r,
+                                               left_thickness=0.0, right_thickness=0.0,
+                                               ground_thickness=0.0, lower_tan_delta=0.0,
+                                               upper_tan_delta=0.0, air_height=None,
+                                               box_width=None, left_top_width=None,
+                                               right_top_width=None):
+    """Unequal surface pair and independently thick grounds over two substrates.
+
+    All copper bottoms meet the substrate surface, above both dielectric layers.
+    The whole bottom signal span is centred, positive left and negative right.
+    gap and ground_gap measure bottom-edge separations. Ground thickness is
+    explicit; no independent even/odd modes are assumed for the unequal pair.
+    """
+    return _layered_surface(asymmetric_coupled_grounded_coplanar,
+        left_width=left_width, right_width=right_width, gap=gap,
+        ground_gap=ground_gap, ground_width=ground_width,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        left_thickness=left_thickness, right_thickness=right_thickness,
+        ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta,
+        upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width,
+        left_top_width=left_top_width, right_top_width=right_top_width)
 
 
 def grounded_coplanar(*, width, gap, ground_width, substrate_height, eps_r,

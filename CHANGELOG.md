@@ -680,3 +680,6 @@
 
 - Added the unequal layered surface form with explicit copper profiles, shared saved controls and the pinned 45-template browser engine.
 - 비대칭 적층표면 폼의 구리 형상·공통 저장 경로와 45종 등록 엔진의 브라우저 계산을 연결했습니다.
+
+- Added three grounded coplanar surface factories above two independent substrate layers, retaining explicit finite ground geometry.
+- 두 기판층 위 유한 측면 접지를 명시한 coplanar 단면 API 3종을 추가했습니다.

@@ -40,6 +40,8 @@ from .aperture_study import (ApertureStudyDocument, CapacitanceStudy, Capacitanc
 from .polygons import PolygonTrace, DielectricRegion
 from .document import CrossSectionDocument
 from .templates import microstrip, stripline, coupled_microstrip, grounded_coplanar
+from .templates import (layered_grounded_coplanar, coupled_layered_grounded_coplanar,
+                        asymmetric_coupled_layered_grounded_coplanar)
 from .templates import layered_microstrip, coupled_layered_microstrip, asymmetric_coupled_layered_microstrip
 from .conductivity_profile import GaussianConductivityProfile, ConductivityProfileResult
 from .conductivity_profile_document import ConductivityProfileDocument
@@ -141,7 +143,7 @@ from .strip_grid_document import StripGridCapacitanceDocument
 from .thick_grid_strip_document import ThickGridStripCapacitanceDocument
 from .volume_grid_strip_document import VolumeGridStripCapacitanceDocument
 
-__all__ = ['AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridPairCell', 'AsymmetricVolumeGridPairCapacitance', 'asymmetric_volume_grid_pair_cell', 'extract_asymmetric_volume_grid_pair_capacitance',
+__all__ = ['layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridPairCell', 'AsymmetricVolumeGridPairCapacitance', 'asymmetric_volume_grid_pair_cell', 'extract_asymmetric_volume_grid_pair_capacitance',
     'MixedBoundaryMulticonductorRLGCLadderDocument',
     'MixedBoundaryMulticonductorRLGCLadderResponse',
     'multiconductor_boundary_ladder_response',

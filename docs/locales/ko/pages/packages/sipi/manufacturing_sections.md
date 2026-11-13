@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[두 기판층 grounded coplanar 단면](layered_grounded_coplanar.md)은 유한 측면 접지와 단일·대칭·비대칭 신호를 명시합니다.
+
 [두 기판층 비대칭 표면선로쌍](asymmetric_layered_microstrip.md)은 좌우 구리 치수를 독립적으로 보존합니다.
 
 [두 기판층 표면 선로](layered_microstrip.md)는 각각 명시한 두 유전체 위에 단일 또는 같은 폭의 쌍을 놓습니다.
