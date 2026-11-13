@@ -15,7 +15,7 @@ substrate heights plus that thickness; automatic box width is the larger of
 ```python
 from sipi import asymmetric_coupled_layered_microstrip, CrossSectionDocument
 
-section = asymmetric_coupled_layered_microstrip(
+parameters = dict(
     left_width=.4e-3, right_width=.7e-3, gap=.3e-3,
     left_thickness=25e-6, right_thickness=45e-6,
     left_top_width=.32e-3, right_top_width=.55e-3,
@@ -24,6 +24,7 @@ section = asymmetric_coupled_layered_microstrip(
     lower_tan_delta=.01, upper_tan_delta=.03,
     box_width=.02, air_height=.01,
 )
+section = asymmetric_coupled_layered_microstrip(**parameters)
 document = CrossSectionDocument(section,
     mesh=dict(edge_size=5e-6, far_size=.25e-3, grade=.2))
 line = document.analyze()
@@ -35,8 +36,10 @@ print(line.C, line.L, line.z_diff_forward)
 The geometry does not infer conductor resistance, roughness, frequency-dependent
 materials or 3D transitions. Constant loss tangent contributes to the extracted
 complex electrostatic capacitance; the launch diagnostic excludes that loss.
-Save geometry with `CrossSectionDocument`. Template/study/design registration
-and a dedicated editable form are separate integration steps.
+Save geometry with `CrossSectionDocument` or keep factory parameters in
+`TemplateSectionDocument`. The factory is registered for impedance studies and
+width goals using `quantity="z_diff_forward"`; `z0` and `z_diff` are rejected.
+A dedicated editable form is a separate integration step.
 
 Validation separately checks the explicit geometry, independent scikit-fem
 12.0.2 complex and vacuum energy with height-based material assignment, matrix
@@ -51,3 +54,31 @@ also requires both original and refined meshes within the requested tolerance.
 Run `PYTHONPATH=src OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_asymmetric_layered_microstrip.py`
 with the qualified reference environment. Keep failed trials alongside the
 accepted artifact; passing a chosen recipe does not establish universal convergence.
+
+## Stored sampling and width goals
+
+The existing study/design schemas retain independent layer materials and signal
+widths. `fixed_pitch_m` holds the relative centre spacing: the bottom gap is
+`pitch - (left_width + right_width)/2`. The whole bottom span remains centred;
+individual absolute conductor centres can move together as widths change.
+`fixed_plane_spacing_m` is rejected because this is a surface structure with one
+ground plane. Invalid normal samples keep failed rows and do not solve fields.
+
+```python
+from sipi import ImpedanceDesignDocument
+
+goal = ImpedanceDesignDocument(
+    "asymmetric_coupled_layered_microstrip", parameters,
+    variable="left_width", bounds=[.35e-3, .9e-3], target=100.,
+    quantity="z_diff_forward", fixed_pitch_m=.85e-3,
+    tolerance=.5, search_tolerance=.25,
+    mesh=dict(edge_size=5e-6, far_size=.25e-3, grade=.2),
+)
+saved_text = goal.dumps()
+```
+
+Here `parameters` is the explicit keyword dictionary from the section example.
+The right signal, both substrate materials and copper profiles remain explicit.
+Search and refined residuals must both satisfy the requested tolerance. Loading
+and normalizing the stored request do not solve fields. The common saved-input
+executor uses the same registered contracts; no new schema version is needed.

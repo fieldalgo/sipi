@@ -674,3 +674,6 @@
 
 - Added an unequal surface-pair factory over two independent substrate layers, retaining explicit copper dimensions and real forward-launch semantics.
 - 두 기판층 위 비대칭 표면선로쌍 API를 추가하고 구리 치수와 실수 순방향 여기 의미를 명시했습니다.
+
+- Registered unequal two-layer surface pairs for saved template, study and width-goal inputs with explicit forward-launch and relative-pitch semantics.
+- 두 기판층 비대칭 표면쌍을 저장·공차·폭 역산에 등록하고 순방향 여기와 상대 피치 의미를 유지했습니다.
