@@ -106,3 +106,23 @@ See the [two-signal reactive contract](debye_reactive_startup.md).
 
 
 [Explicit injected-current sources](multiconductor_debye_norton_startup.md) use separate source conductance and power partitions.
+
+
+## Numerical state scaling
+
+The voltage-driven three/four-signal reactive path uses a diagonal similarity
+transform before piecewise-linear propagation and restores all physical states
+afterward. The storage diagonal scales node voltages, line currents and branch
+currents. Auxiliary polarization voltages use their corresponding node-voltage
+scale, preserving pole and signal permutations. Input matrices, circuit
+equations, energy diagnostics and JSON versions are unchanged.
+
+An independent large-inductance limit check compares `Lbranch * Ibranch` with
+the Simpson integral of the no-branch capacitive circuit's far-end voltage.
+Three/four signals, ramp/pulse inputs and explicit 1e6, 1e7 and 1e8 H branches
+with zero branch resistance and load capacitance exercise the numerical scale.
+The reference uses 241 and 481 time samples and requires relative change at
+most 1e-5; flux and the predicted 1/L stored energy must each meet 1e-5.
+Existing KCL, power, permutation, waveform and saved-input gates remain in
+force. These extreme values test numerical conditioning, not PCB component
+recommendations or measured-board accuracy.

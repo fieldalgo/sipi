@@ -133,4 +133,5 @@ def psd_multiconductor_debye_reactive_ladder_response(time, source_voltages, *, 
         load_capacitance=load_capacitance,
         load_branch_resistance=load_branch_resistance, load_branch_inductance=load_branch_inductance)
     return _propagate_coupled_debye(data, psd_strength=True,
-        result_type=MulticonductorDebyeReactiveLadderResponse, propagator=lsim, load_capacitance=cap, load_branch=(rb, lb), signals=signals)
+        result_type=MulticonductorDebyeReactiveLadderResponse, propagator=lsim, load_capacitance=cap, load_branch=(rb, lb), signals=signals,
+        scale_states=True)

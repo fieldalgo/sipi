@@ -1,5 +1,8 @@
 # Changelog
 
+- Balance voltage-driven three/four-signal Debye reactive states to preserve large-inductance flux and energy limits.
+  전압 구동 3·4신호 Debye reactive 상태의 스케일을 맞춰 큰 인덕턴스의 자속·에너지 극한을 보존합니다.
+
 - Register coated two-substrate coplanar inputs for studies and separately refined width goals while retaining finite-ground clearances and explicit air boundaries.
   코팅된 두 기판층 coplanar 입력을 공차·별도 세분 폭 목표에 등록하고 유한 접지 간격과 공기 경계를 보존합니다.
 
