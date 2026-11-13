@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -1506,3 +1506,91 @@ starts above the highest coated trace. Bottom ground and open top/sides
 are explicit. Rectangular or narrowing-top copper is supported; no rounded
 corner, meniscus, overhang or measured deposition model is inferred."""
     return _layered_conformal_surface(asymmetric_coupled_conformal_coated_microstrip, left_width=left_width, right_width=right_width, gap=gap, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, coating_tan_delta=coating_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width)
+
+
+def layered_conformal_coated_grounded_coplanar(*, coating_thickness, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, box_width=None, top_width=None):
+    """Finite coplanar grounds and normal-thickness film above two substrates.
+
+Substrate heights exclude copper. The polygon film follows the substrate,
+copper tops and straight sides with normal offsets and mitered corners.
+Air height starts above the highest coated conductor. Signal and ground
+clearances use bottom edges; finite grounds share the reference potential.
+Rectangles or narrowing-top trapezoids are supported; no implicit clipping,
+rounded corners, meniscus or measured deposition model is inferred.
+The backing plane is ground; top and sides are open."""
+    return _layered_conformal_surface(conformal_coated_grounded_coplanar, width=width, gap=gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+
+
+def coupled_layered_conformal_coated_grounded_coplanar(*, coating_thickness, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, box_width=None, top_width=None):
+    """Finite coplanar grounds and normal-thickness film above two substrates.
+
+Substrate heights exclude copper. The polygon film follows the substrate,
+copper tops and straight sides with normal offsets and mitered corners.
+Air height starts above the highest coated conductor. Signal and ground
+clearances use bottom edges; finite grounds share the reference potential.
+Rectangles or narrowing-top trapezoids are supported; no implicit clipping,
+rounded corners, meniscus or measured deposition model is inferred.
+The backing plane is ground; top and sides are open."""
+    return _layered_conformal_surface(coupled_conformal_coated_grounded_coplanar, width=width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+
+
+def asymmetric_coupled_layered_conformal_coated_grounded_coplanar(*, coating_thickness, coating_eps_r, coating_tan_delta=0.0, left_width, right_width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, left_thickness=0.0, right_thickness=0.0, ground_thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, box_width=None, left_top_width=None, right_top_width=None):
+    """Finite coplanar grounds and normal-thickness film above two substrates.
+
+Substrate heights exclude copper. The polygon film follows the substrate,
+copper tops and straight sides with normal offsets and mitered corners.
+Air height starts above the highest coated conductor. Signal and ground
+clearances use bottom edges; finite grounds share the reference potential.
+Rectangles or narrowing-top trapezoids are supported; no implicit clipping,
+rounded corners, meniscus or measured deposition model is inferred.
+The backing plane is ground; top and sides are open.
+Signal widths, thicknesses and tapers are independent; no symmetric modes
+are assumed for the unequal pair."""
+    return _layered_conformal_surface(asymmetric_coupled_conformal_coated_grounded_coplanar, left_width=left_width, right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+
+
+def layered_conformal_coated_unbacked_coplanar(*, coating_thickness, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, lower_air_height=None, box_width=None, top_width=None):
+    """Finite coplanar grounds and normal-thickness film above two substrates.
+
+Substrate heights exclude copper. The polygon film follows the substrate,
+copper tops and straight sides with normal offsets and mitered corners.
+Air height starts above the highest coated conductor. Signal and ground
+clearances use bottom edges; finite grounds share the reference potential.
+Rectangles or narrowing-top trapezoids are supported; no implicit clipping,
+rounded corners, meniscus or measured deposition model is inferred.
+All outer boundaries are open. Lower air translates both substrates, all
+copper and the coating polygon; its default is ten total substrate heights."""
+    base = layered_conformal_coated_grounded_coplanar(width=width, gap=gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+    return _unbacked_layered_surface(base, lower_air_height)
+
+
+def coupled_layered_conformal_coated_unbacked_coplanar(*, coating_thickness, coating_eps_r, coating_tan_delta=0.0, width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, lower_air_height=None, box_width=None, top_width=None):
+    """Finite coplanar grounds and normal-thickness film above two substrates.
+
+Substrate heights exclude copper. The polygon film follows the substrate,
+copper tops and straight sides with normal offsets and mitered corners.
+Air height starts above the highest coated conductor. Signal and ground
+clearances use bottom edges; finite grounds share the reference potential.
+Rectangles or narrowing-top trapezoids are supported; no implicit clipping,
+rounded corners, meniscus or measured deposition model is inferred.
+All outer boundaries are open. Lower air translates both substrates, all
+copper and the coating polygon; its default is ten total substrate heights."""
+    base = coupled_layered_conformal_coated_grounded_coplanar(width=width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, top_width=top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+    return _unbacked_layered_surface(base, lower_air_height)
+
+
+def asymmetric_coupled_layered_conformal_coated_unbacked_coplanar(*, coating_thickness, coating_eps_r, coating_tan_delta=0.0, left_width, right_width, gap, ground_gap, ground_width, lower_height, upper_height, lower_eps_r, upper_eps_r, left_thickness=0.0, right_thickness=0.0, ground_thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0, air_height=None, lower_air_height=None, box_width=None, left_top_width=None, right_top_width=None):
+    """Finite coplanar grounds and normal-thickness film above two substrates.
+
+Substrate heights exclude copper. The polygon film follows the substrate,
+copper tops and straight sides with normal offsets and mitered corners.
+Air height starts above the highest coated conductor. Signal and ground
+clearances use bottom edges; finite grounds share the reference potential.
+Rectangles or narrowing-top trapezoids are supported; no implicit clipping,
+rounded corners, meniscus or measured deposition model is inferred.
+All outer boundaries are open. Lower air translates both substrates, all
+copper and the coating polygon; its default is ten total substrate heights.
+Signal widths, thicknesses and tapers are independent; no symmetric modes
+are assumed for the unequal pair."""
+    base = asymmetric_coupled_layered_conformal_coated_grounded_coplanar(left_width=left_width, right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
+    return _unbacked_layered_surface(base, lower_air_height)

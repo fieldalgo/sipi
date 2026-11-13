@@ -1,5 +1,8 @@
 # Changelog
 
+- Add normal-thickness coated two-substrate coplanar factories with finite grounds and explicit backed or unbacked boundaries.
+  유한 접지선과 명시적 하단 접지·열린 경계를 가진 두 기판 법선 코팅 coplanar API를 추가합니다.
+
 - Connect two-substrate normal-film templates to saved studies and separately refined impedance goals while preserving polygon-film geometry.
   두 기판 법선 코팅 단면을 저장 공차·별도 세분 임피던스 목표에 연결하고 다각형 코팅을 보존합니다.
 
