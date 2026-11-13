@@ -11,6 +11,7 @@ from numbers import Real
 from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+           'layered_microstrip', 'coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
            'asymmetric_coupled_grounded_coplanar',
@@ -90,6 +91,52 @@ def coupled_microstrip(*, width, gap, substrate_height, eps_r, thickness=0.0,
     offset = (w+gap)/2
     return CrossSection(layers, [Trace('positive', -offset, w, h, t, top_width=top_width),
                                 Trace('negative', offset, w, h, t, top_width=top_width)], box)
+
+
+def _layered_surface(factory, *, lower_height, upper_height, lower_eps_r, upper_eps_r,
+                     lower_tan_delta, upper_tan_delta, **geometry):
+    low = Layer('lower', _positive('lower_height', lower_height),
+                _positive('lower_eps_r', lower_eps_r),
+                _positive('lower_tan_delta', lower_tan_delta, zero=True))
+    high = Layer('upper', _positive('upper_height', upper_height),
+                 _positive('upper_eps_r', upper_eps_r),
+                 _positive('upper_tan_delta', upper_tan_delta, zero=True))
+    base = factory(substrate_height=low.thickness+high.thickness,
+                   eps_r=high.eps_r, tan_delta=high.tan_delta, **geometry)
+    return CrossSection([low, high, base.layers[-1]], base.traces, base.width,
+                        top=base.top, bottom=base.bottom, sides=base.sides)
+
+
+def layered_microstrip(*, width, lower_height, upper_height, lower_eps_r, upper_eps_r,
+                       thickness=0.0, lower_tan_delta=0.0, upper_tan_delta=0.0,
+                       air_height=None, box_width=None, top_width=None):
+    """One surface trace above two substrate layers and a bottom ground.
+
+    Both heights exclude copper: the trace bottom is at their sum. Air height
+    is the full layer above that surface, including copper. The top and sides
+    are open. Permittivity and loss tangent are independent in each substrate.
+    """
+    return _layered_surface(microstrip, width=width, lower_height=lower_height,
+        upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r,
+        thickness=thickness, lower_tan_delta=lower_tan_delta,
+        upper_tan_delta=upper_tan_delta, air_height=air_height,
+        box_width=box_width, top_width=top_width)
+
+
+def coupled_layered_microstrip(*, width, gap, lower_height, upper_height,
+                               lower_eps_r, upper_eps_r, thickness=0.0,
+                               lower_tan_delta=0.0, upper_tan_delta=0.0,
+                               air_height=None, box_width=None, top_width=None):
+    """Equal surface pair above two substrate layers; gap is between bottom edges.
+
+    Both traces start at lower_height + upper_height and extend into air.
+    Substrate heights exclude copper. Positive is left, negative is right.
+    """
+    return _layered_surface(coupled_microstrip, width=width, gap=gap,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, thickness=thickness,
+        lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta,
+        air_height=air_height, box_width=box_width, top_width=top_width)
 
 
 def asymmetric_coupled_microstrip(*, left_width, right_width, gap, substrate_height, eps_r,

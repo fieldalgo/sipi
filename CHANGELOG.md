@@ -3,6 +3,9 @@
 - Verify all 111 registered input schemas in saved projects and execution records, including exact fixture coverage.
   저장 프로젝트와 실행 기록에서 등록 입력 111종 전체와 기준 입력의 정확한 대응을 검사합니다.
 
+- Add single and equal-pair surface-line factories above two independently specified substrate layers, retaining explicit copper, air and boundary contracts.
+  두 기판층의 재료를 각각 명시하는 단일·같은 폭 쌍의 표면선로 API를 추가하고 도체·공기·외곽 조건을 명시합니다.
+
 - Check browser template choices against the complete frozen registry and preserve exact geometry inputs in all-form drawing regression.
   브라우저 단면 선택을 동결 등록 목록 전체와 대조하고 전체 단면 그림 회귀에서 정확한 기하 입력을 보존합니다.
 

@@ -1,5 +1,7 @@
 # Tapered conductors and planar coating
 
+[Two-substrate surface lines](layered_microstrip.md) place single or equal paired copper above two independently specified dielectric layers.
+
 [Two-dielectric buried coplanar lines](layered_coplanar_stripline.md) retain layer materials and compose fixed pitch with stack-height tolerances.
 
 [Buried coplanar single and differential lines](coplanar_stripline.md) include finite side grounds, saved studies and fixed-pitch impedance goals.

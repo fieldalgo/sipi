@@ -40,6 +40,7 @@ from .aperture_study import (ApertureStudyDocument, CapacitanceStudy, Capacitanc
 from .polygons import PolygonTrace, DielectricRegion
 from .document import CrossSectionDocument
 from .templates import microstrip, stripline, coupled_microstrip, grounded_coplanar
+from .templates import layered_microstrip, coupled_layered_microstrip
 from .conductivity_profile import GaussianConductivityProfile, ConductivityProfileResult
 from .conductivity_profile_document import ConductivityProfileDocument
 from .templates import asymmetric_coupled_microstrip
@@ -185,6 +186,7 @@ __all__ = ['AsymmetricVolumeGridPairCapacitanceDocument', 'AsymmetricVolumeGridP
            "NetworkAssemblyDocument", "NetworkAssemblyResult",
            "capacitance_matrix", "line_parameters", "CrossSectionDocument",
            "microstrip", "stripline", "coupled_microstrip", "grounded_coplanar",
+           "layered_microstrip", "coupled_layered_microstrip",
            "asymmetric_coupled_microstrip",
            "asymmetric_coupled_stripline",
            "asymmetric_coupled_layered_stripline",

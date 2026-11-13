@@ -1,5 +1,7 @@
 # 사다리꼴 도체와 평탄 코팅
 
+[두 기판층 표면 선로](layered_microstrip.md)는 각각 명시한 두 유전체 위에 단일 또는 같은 폭의 쌍을 놓습니다.
+
 [두 유전체 매립 coplanar 선로](layered_coplanar_stripline.md)는 층별 재료와 고정 pitch·전체 높이 공차를 함께 지원합니다.
 
 [매립 coplanar 단일·차동 선로](coplanar_stripline.md)는 두 접지면 사이의 유한 측면 접지와 공차·고정 pitch 역산을 지원합니다.
