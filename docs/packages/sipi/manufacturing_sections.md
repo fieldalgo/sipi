@@ -152,3 +152,5 @@ See [normal-thickness coatings above two substrate layers](layered_conformal_mic
 See [normal-thickness coated two-substrate coplanar sections](layered_conformal_coplanar.md) for finite side grounds and explicit backing/lower-air boundaries.
 
 See [unequal broadside conductors in three dielectrics](asymmetric_broadside.md) for independent lower/upper widths and copper thicknesses.
+
+See [trapezoidal broadside conductors](tapered_broadside.md) for independent top/bottom widths and etch faces.

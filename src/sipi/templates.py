@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['asymmetric_layered_broadside_stripline', 'layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -1064,6 +1064,37 @@ def asymmetric_layered_broadside_stripline(*, lower_width, upper_width, gap,
     return CrossSection(layers,
         [Trace('positive', -offset/2, lw, lower, lt),
          Trace('negative', offset/2, uw, lower+lt+g, ut)], box, top='ground')
+
+
+def tapered_layered_broadside_stripline(*, lower_width, upper_width,
+                                      lower_top_width, upper_top_width, gap,
+                                      lower_height, upper_height, lower_eps_r,
+                                      gap_eps_r, upper_eps_r, lower_thickness,
+                                      upper_thickness, offset=0.0,
+                                      lower_tan_delta=0.0, gap_tan_delta=0.0,
+                                      upper_tan_delta=0.0, box_width=None):
+    """Two trapezoidal broadside conductors in three explicit dielectrics.
+
+    Each width is measured at its conductor's bottom (-y) face; top_width
+    is measured at its top (+y) face, including for the upper conductor.
+    Both narrowing and widening trapezoids are supported. Clearances, gap,
+    signal order and material interfaces follow the rectangular factory.
+    """
+    low_top = _positive('lower_top_width', lower_top_width)
+    high_top = _positive('upper_top_width', upper_top_width)
+    base = asymmetric_layered_broadside_stripline(
+        lower_width=lower_width, upper_width=upper_width, gap=gap,
+        lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, gap_eps_r=gap_eps_r, upper_eps_r=upper_eps_r,
+        lower_thickness=lower_thickness, upper_thickness=upper_thickness,
+        offset=offset, lower_tan_delta=lower_tan_delta,
+        gap_tan_delta=gap_tan_delta, upper_tan_delta=upper_tan_delta,
+        box_width=box_width)
+    width = (max(base.width, 4*(max(low_top, high_top)+abs(float(offset))))
+             if box_width is None else base.width)
+    traces = [replace(t, top_width=None if top == t.width else top)
+              for t, top in zip(base.traces, (low_top, high_top))]
+    return CrossSection(base.layers, traces, width, top='ground')
 
 
 def layered_stripline(*, width, lower_height, upper_height, lower_eps_r, upper_eps_r,
