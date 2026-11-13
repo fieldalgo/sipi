@@ -116,3 +116,10 @@ generation. Load with `numpy.load(path, allow_pickle=False)`. For replay, constr
 dielectric model. Existing files are never overwritten. JUnit properties contain
 the file SHA-256 and the computed boundary quantities. CI uploads the two groups'
 original XML, environment JSON and mesh snapshots even when a test fails.
+
+At `8694e70`, the focused installed run passed the same 220 reactive-state
+cases on all three platforms. The seven conductor/reference cases passed on
+Linux and Windows; macOS retained three original PCB refinement failures.
+See the [conductor observations](packages/sipi/conductor.md) for the actual-mesh
+replay and its limits. These results describe this selected suite and exact
+commit, not the full regression status of later commits.

@@ -1,5 +1,8 @@
 # Changelog
 
+- Document three-platform reactive checks and mesh-dependent conductor refinement limits using retained solve inputs and independent discretization observations.
+  실제 풀이 입력과 독립 이산화 관측을 바탕으로 3OS reactive 검증과 메시별 도체 세분 한계를 문서화합니다.
+
 - Add focused installed-wheel platform checks for reactive-state limits and original conductor gates, retaining actual vacuum meshes for reproducible diagnostics.
   reactive 상태 극한·기존 도체 기준의 설치 wheel 플랫폼 검사를 추가하고 재현 진단용 실제 진공 메시를 보존합니다.
 

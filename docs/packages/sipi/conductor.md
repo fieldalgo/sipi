@@ -127,8 +127,30 @@ The scikit-rf check is an independent **half-space law** comparison, not a
 whole-PCB field-solver or roughness comparison. It runs only in tests using
 the already inventoried BSD-3-Clause dependency; no runtime dependency or
 third-party binary is added. The plate/coax references independently check the
-geometry integrals. The finite-thickness PCB check demonstrates convergence
+geometry integrals. The finite-thickness PCB check records the mesh change
 for that case, not measured loss accuracy or a universal error bound.
+
+The focused installed-wheel run at `8694e70` (2026-11-13) retained the original
+5% resistance-change gate. Linux and Windows passed all seven conductor/reference
+cases; macOS ARM64 passed four and failed the three related PCB refinement
+checks. The common smooth-metal geometry gave a 4.07962% change on Linux/Windows
+and 5.01444% on macOS. Their respective coarse/fine meshes had 19610/75158 and
+19582/75157 nodes. Replaying the actual macOS meshes on Linux reproduced every
+recorded P1 array within 7.47e-13 maximum-entry-normalized difference and reproduced the
+failed resistance change. This isolates this failure to different generated
+meshes, rather than different solutions on the same mesh; it does not identify
+which meshing operation first diverged. The failing tests remain failing.
+
+Further Linux observations on the same geometry illustrate why a small mesh
+change is not an absolute loss-error estimate. A third P1 mesh (1.25 µm edge,
+50 µm far size, grade .025; 296525 nodes) changed the total current factor by
+3.95719% from the previous fine mesh. Its first diagonal was 1519.646 /m.
+The separate panel path at 64/128/256 panels per edge gave 1747.183, 1745.546
+and 1744.857 /m with degree 14 and 512 ground modes. Degree 16 at the last two
+resolutions retained those values to the displayed precision. These are
+discretization observations, not a measured reference, a certified error bound,
+or replacement acceptance criteria. In particular, the P1/panel difference
+remains much larger than the successive P1 mesh change.
 
 This common-metal adapter does not model DC/low-frequency transition or
 interior skin/proximity diffusion. Those belong to the separate
