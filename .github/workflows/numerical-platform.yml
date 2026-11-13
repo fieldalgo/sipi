@@ -1,0 +1,151 @@
+name: Numerical platform checks
+on:
+  push:
+    branches: [codex/independent-repository]
+    paths:
+      - '.github/workflows/numerical-platform.yml'
+      - 'src/sipi/*startup*.py'
+      - 'src/sipi/conductor.py'
+      - 'src/sipi/roughness.py'
+      - 'src/sipi/cannonball.py'
+      - 'tests/sipi/*startup*.py'
+      - 'tests/sipi/*state_scaling.py'
+      - 'tests/_support/**'
+      - 'tests/sipi/test_crosscheck_conductor_p2.py'
+      - 'tests/sipi/test_conductor.py'
+      - 'tests/sipi/test_cannonball.py'
+      - 'tests/sipi/test_roughness.py'
+      - 'dependencies.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: numerical-platform-${{ github.ref }}
+  cancel-in-progress: false
+  queue: single
+jobs:
+  installed:
+    name: ${{ matrix.os }} / numerical installed
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      OPENPHYSICS_REQUIRE_CROSSCHECK: '1'
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - id: engine
+        shell: python
+        run: |
+          import json, os
+          pin = json.load(open('dependencies.json'))['development_source']['commit']
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('ref=' + pin + '\n')
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          repository: fieldalgo/openphysics
+          ref: ${{ steps.engine.outputs.ref }}
+          path: .validation/engine
+      - name: Install build and reference tools
+        run: python -m pip install setuptools==84.0.0 wheel pytest scikit-rf==2.2.0 scikit-fem==12.0.2
+      - name: Build and audit isolated installed wheels
+        id: prepare
+        shell: python
+        run: |
+          import json, os, pathlib, shutil, subprocess, sys
+          root = pathlib.Path.cwd()
+          report = root / '.validation/numerical'
+          report.mkdir(parents=True)
+          wheels = root / '.validation/numerical-wheels'
+          wheels.mkdir()
+          for name in ('galerkin', 'meshine', 'physmat', 'simcase'):
+              subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), '.'], cwd=root / '.validation/engine/packages' / name, check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), '.'], check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'install', *map(str, wheels.glob('*.whl'))], check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'check'], check=True)
+          isolated = root / '.validation/numerical-installed'
+          shutil.copytree(root / 'tests', isolated / 'tests')
+          shutil.copy2(root / 'pyproject.toml', isolated)
+          shutil.copy2(root / 'tools/verify_install.py', isolated)
+          env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
+          code = '''
+          import hashlib, json, pathlib, platform, sys
+          from importlib import metadata
+          from verify_install import audit
+          wheels, output, commit, tree, engine = sys.argv[1:]
+          result = dict(commit=commit, tree=tree, engine_commit=engine,
+              python=sys.version, platform=platform.platform(), audit=audit(wheels),
+              versions={name: metadata.version(name) for name in ('numpy', 'scipy', 'shapely', 'pytest', 'scikit-fem', 'scikit-rf', 'physmat')},
+              wheel_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in pathlib.Path(wheels).glob('*.whl')})
+          pathlib.Path(output).write_text(json.dumps(result, indent=2), encoding='utf-8')
+          print(json.dumps(result, indent=2))
+          '''
+          import textwrap
+          git = lambda ref: subprocess.check_output(['git', 'rev-parse', ref], text=True).strip()
+          pin = json.loads((root / 'dependencies.json').read_text())['development_source']['commit']
+          subprocess.run([sys.executable, '-c', textwrap.dedent(code), str(wheels), str(report / 'environment.json'), git('HEAD'), git('HEAD^{tree}'), pin], cwd=isolated, env=env, check=True)
+      - name: Reactive state limits and original invariants
+        shell: python
+        run: |
+          import os, pathlib, subprocess, sys
+          root = pathlib.Path.cwd()
+          tests = [
+              'tests/sipi/test_reactive_state_scaling.py',
+              'tests/sipi/test_multiconductor_reactive_state_scaling.py',
+              'tests/sipi/test_source_reactive_state_scaling.py',
+              'tests/sipi/test_debye_reactive_startup.py',
+              'tests/sipi/test_debye_reactive_startup_waves.py',
+              'tests/sipi/test_multiconductor_debye_reactive_startup.py::test_linear_time_impedance_pole_and_signal_permutations',
+              'tests/sipi/test_multiconductor_debye_norton_startup.py::test_linear_time_impedance_pole_and_signal_permutations',
+              'tests/sipi/test_multiconductor_debye_mixed_startup.py::test_linearity_time_impedance_permutation_and_pole_order',
+          ]
+          env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
+          result = subprocess.run([sys.executable, '-m', 'pytest', '-v', *tests, '--junitxml=' + str(root / '.validation/numerical/reactive.xml')], cwd=root / '.validation/numerical-installed', env=env)
+          sys.exit(result.returncode)
+      - name: Original conductor gates and independent quadratic observations
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        shell: python
+        run: |
+          import os, pathlib, subprocess, sys
+          root = pathlib.Path.cwd()
+          tests = [
+              'tests/sipi/test_crosscheck_conductor_p2.py',
+              'tests/sipi/test_conductor.py::test_coupled_resistance_refinement_and_return_currents',
+              'tests/sipi/test_cannonball.py::test_saved_line_replay_equivalent_huray_and_pair_refinement',
+              'tests/sipi/test_roughness.py::test_coupled_r_and_internal_l_refinement',
+          ]
+          env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
+          env['SIPI_NUMERICAL_MESH_OUTPUT'] = str(root / '.validation/numerical/meshes')
+          result = subprocess.run([sys.executable, '-m', 'pytest', '-v', *tests, '--junitxml=' + str(root / '.validation/numerical/conductor.xml')], cwd=root / '.validation/numerical-installed', env=env)
+          sys.exit(result.returncode)
+      - name: Record numerical outcomes including failures
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        shell: python
+        run: |
+          import pathlib, xml.etree.ElementTree as E
+          for path in sorted(pathlib.Path('.validation/numerical').glob('*.xml')):
+              for suite in E.parse(path).getroot().iter('testsuite'):
+                  print(path.name, suite.attrib)
+                  for case in suite.findall('testcase'):
+                      name = case.get('classname') + '::' + case.get('name')
+                      for failure in case.findall('failure') + case.findall('error'):
+                          print(name, (failure.text or '')[:4000])
+                      for prop in case.findall('properties/property'):
+                          print(name, prop.get('name'), prop.get('value'))
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: numerical-${{ matrix.os }}
+          include-hidden-files: true
+          path: |
+            .validation/numerical/*.xml
+            .validation/numerical/*.json
+            .validation/numerical/meshes/*.npz

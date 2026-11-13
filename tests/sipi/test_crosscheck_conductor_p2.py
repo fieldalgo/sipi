@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Same-boundary quadratic reference; PCB differences are observations only."""
 from importlib import metadata
+import hashlib
 import json
+import os
+from pathlib import Path
 import numpy as np
 import pytest
 from galerkin import annulus_mesh, rectangle_mesh
@@ -10,6 +13,26 @@ from sipi import coupled_microstrip
 from sipi.conductor import surface_current_factors
 from quadratic_conductor import quadratic_surface_factors
 from crosscheck import Stopwatch, emit, make_record, observable, relative_difference
+
+
+def _record_vacuum_mesh(field, factor, record_property):
+    """Opt-in snapshot of the actual solve inputs, without remeshing or pickle."""
+    destination = os.environ.get('SIPI_NUMERICAL_MESH_OUTPUT')
+    if destination is None:
+        return
+    output = Path(destination)
+    output.mkdir(parents=True, exist_ok=True)
+    path = output / f'paired-surface-{factor:g}.npz'
+    arrays = dict(nodes=field.mesh.nodes, triangles=field.mesh.triangles,
+                  ground=field.ground, signal_names=np.asarray(list(field.signals)))
+    arrays.update({f'signal_{i}': nodes for i, nodes in enumerate(field.signals.values())})
+    # An explicit output directory must be fresh: never replace a failed run.
+    with path.open('xb') as stream:
+        np.savez_compressed(stream, **arrays)
+    record_property('vacuum_mesh_snapshot', json.dumps(dict(
+        file=path.name, sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        nodes=int(field.mesh.num_nodes), triangles=int(field.mesh.num_triangles),
+        scope='vacuum surface-current inputs; no dielectric or remeshing')))
 
 
 def test_quadratic_reference_parallel_plate_exact_parts_and_charge():
@@ -40,6 +63,7 @@ def test_coupled_surface_against_same_boundary_quadratic_reference(factor, recor
                                  thickness=.05e-3, eps_r=4)
     options = {k: v*factor for k, v in dict(edge_size=5e-6, far_size=.2e-3, grade=.1).items()}
     field = section.mesh(**options)
+    _record_vacuum_mesh(field, factor, record_property)
     clock = Stopwatch()
     with clock('openphysics'):
         ours = surface_current_factors(field.mesh, field.signals, field.ground)

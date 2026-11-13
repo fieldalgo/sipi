@@ -1,5 +1,8 @@
 # Changelog
 
+- Add focused installed-wheel platform checks for reactive-state limits and original conductor gates, retaining actual vacuum meshes for reproducible diagnostics.
+  reactive 상태 극한·기존 도체 기준의 설치 wheel 플랫폼 검사를 추가하고 재현 진단용 실제 진공 메시를 보존합니다.
+
 - Connect layered normal-film coplanar inputs to saved studies and width goals with finite-ground and air-boundary preservation.
   적층 법선 코팅 coplanar 입력을 저장 공차·폭 목표에 연결하고 유한 접지선·공기 경계를 보존합니다.
 

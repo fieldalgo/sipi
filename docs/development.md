@@ -96,3 +96,23 @@ Each record preserves the exact input, actual downloaded result and native
 reference, including failed rows. Preserve a failing run in its own directory;
 reruns use a new directory. These records diagnose differences without changing
 the parity gate or accepting a failed runtime.
+
+The separate `Numerical platform checks` workflow runs a focused installed-wheel
+suite on Linux, macOS and Windows when its selected development-branch paths
+change. It audits imported payloads against four first-party wheels, records all
+built wheel hashes, exact commits/tree and numerical-library versions, then runs
+reactive-state limits/original invariants and original conductor convergence
+checks. Both groups run even if the first group fails; failures still fail the job.
+This focused suite supplements full regression and does not establish release
+or executable support.
+
+Set `SIPI_NUMERICAL_MESH_OUTPUT` to a fresh output directory to retain the actual
+coarse/fine vacuum meshes used by `tests/sipi/test_crosscheck_conductor_p2.py`.
+This opt-in test instrumentation saves nodes, triangles, ordered signal names,
+signal node sets and ground nodes in compressed NPZ files, without another mesh
+generation. Load with `numpy.load(path, allow_pickle=False)`. For replay, construct
+`galerkin.Mesh(nodes, triangles, {})` and pass the saved signal/ground sets to
+`sipi.conductor.surface_current_factors`; these snapshots do not contain a
+dielectric model. Existing files are never overwritten. JUnit properties contain
+the file SHA-256 and the computed boundary quantities. CI uploads the two groups'
+original XML, environment JSON and mesh snapshots even when a test fails.
