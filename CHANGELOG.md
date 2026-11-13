@@ -1,5 +1,8 @@
 # Changelog
 
+- Check browser template choices against the complete frozen registry and preserve exact geometry inputs in all-form drawing regression.
+  브라우저 단면 선택을 동결 등록 목록 전체와 대조하고 전체 단면 그림 회귀에서 정확한 기하 입력을 보존합니다.
+
 - Connect all 42 registered cross-sections to editable forms, saved controls and full network calculations, with explicit forward-launch diagnostics for unequal and layered broadside pairs.
   등록 단면 42종을 편집 폼·설정 저장·전체 네트워크 계산에 연결하고 비대칭 및 적층 broadside 쌍의 forward launch 진단을 명시합니다.
 

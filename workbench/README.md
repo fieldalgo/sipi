@@ -1160,3 +1160,14 @@ that interpreter and generated `cases.json`, then run
 The optional root selects the staged offline Worker; omission selects the native
 host. The generated `controls.json` also runs with `saved-controls-browser.mjs`
 via `SIPI_CONTROL_CASES` for three representative target/study workflows.
+
+Browser regression scripts compare the complete editable template-name list
+against the frozen engine reference in `registered-forms.mjs`, including missing,
+extra and duplicate choices. The polygon flow restores those exact inputs before
+checking all registered drawings; it does not force zero copper thickness onto
+forms that require finite metal. Signed zero is preserved when the fixture is
+serialized for the engine's strict geometry comparison. Run
+`node workbench/tests/registered-forms.test.mjs` for the registry checks and
+`polygon-browser.mjs OUTPUT_DIRECTORY [WEB_ROOT]` for the native/Worker flow.
+Set `SIPI_PYTHON` to the qualified interpreter and `SIPI_CONSOLE` to its installed
+`sipi` command for native execution.

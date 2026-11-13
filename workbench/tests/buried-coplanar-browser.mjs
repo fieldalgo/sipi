@@ -1,3 +1,4 @@
+import {assertRegisteredForms} from './registered-forms.mjs';
 // Real browser acceptance; no browser automation package is required.
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -105,7 +106,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/buried_coplanar_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const precise=JSON.parse(fixtureRun.stdout)[template];
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
+  await assertRegisteredForms(cdp);
   await choose(template);
   assert.equal(await cdp.evaluate('document.querySelector("#placement-mode-field").hidden'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#trace_height").disabled'),false);

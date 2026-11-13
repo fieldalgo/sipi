@@ -1,3 +1,4 @@
+import {assertRegisteredForms} from './registered-forms.mjs';
 // Real browser acceptance; no browser automation package is required.
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -116,7 +117,7 @@ for name in ['unbacked_coplanar','coupled_unbacked_coplanar',sys.argv[1]]:
  out.append(json.loads(TemplateSectionDocument(name,p,mesh=dict(edge_size=4e-6,far_size=.00025,grade=.2)).dumps()))
 print(json.dumps(out))`,paired?'coated_unbacked_coplanar':'coupled_coated_unbacked_coplanar'],{encoding:'utf8'});
   assert.equal(extras.status,0,extras.stderr);fixtures.cases.push(...JSON.parse(extras.stdout));assert.equal(fixtures.cases.length,14);
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
+  await assertRegisteredForms(cdp);
   for(const input of fixtures.cases){await open(input);for(const unit of ['µm','mil','mm']){await cdp.evaluate(`document.querySelector('#unit').value='${unit}';document.querySelector('#unit').dispatchEvent(new Event('change'))`);assert.deepEqual(await save(),input);}}
   await choose(template);
   assert.equal(await cdp.evaluate('document.querySelector("#lower-air-domain-fields").hidden'),false);

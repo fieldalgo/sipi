@@ -1,3 +1,4 @@
+import {assertRegisteredForms} from './registered-forms.mjs';
 // Real browser acceptance; no browser automation package is required.
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -99,7 +100,7 @@ try {
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/editable_cases.py'],{encoding:'utf8',env:{...process.env,OPENBLAS_NUM_THREADS:'1'}});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout);
   assert.equal(fixtures.cases.length,11);
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
+  await assertRegisteredForms(cdp);
   async function changeUnit(unit) {await cdp.evaluate(`document.querySelector('#unit').value=${JSON.stringify(unit)};document.querySelector('#unit').dispatchEvent(new Event('change'))`);}
   for(const input of fixtures.cases) {
     await open(input);

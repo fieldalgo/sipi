@@ -1,3 +1,4 @@
+import {assertRegisteredForms} from './registered-forms.mjs';
 // Real browser acceptance; no browser automation package is required.
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -104,7 +105,7 @@ try {
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const fixtures=JSON.parse(fixtureRun.stdout);
   assert.equal(fixtures.cases.length,11);
   const singleFixture=spawnSync(process.env.SIPI_PYTHON||'python',['-c',"from sipi.template_document import TemplateSectionDocument;print(TemplateSectionDocument('unbacked_coplanar',dict(width=.0005,gap=.0002,ground_width=.001,substrate_height=.0005,eps_r=4,lower_air_height=.006000000000123456),mesh=dict(edge_size=4e-6,far_size=.00025,grade=.2)).dumps())"],{encoding:'utf8'});
-  assert.equal(singleFixture.status,0,singleFixture.stderr);fixtures.cases.push(JSON.parse(singleFixture.stdout));assert.equal(fixtures.cases.length,12);assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
+  assert.equal(singleFixture.status,0,singleFixture.stderr);fixtures.cases.push(JSON.parse(singleFixture.stdout));assert.equal(fixtures.cases.length,12);await assertRegisteredForms(cdp);
   for(const input of fixtures.cases){await open(input);for(const unit of ['µm','mil','mm']){await cdp.evaluate(`document.querySelector('#unit').value='${unit}';document.querySelector('#unit').dispatchEvent(new Event('change'))`);assert.deepEqual(await save(),input);}}
   await choose('coupled_unbacked_coplanar');
   assert.equal(await cdp.evaluate('document.querySelector("#lower-air-domain-fields").hidden'),false);

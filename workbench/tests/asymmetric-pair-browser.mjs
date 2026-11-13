@@ -1,3 +1,4 @@
+import {assertRegisteredForms} from './registered-forms.mjs';
 // Real browser acceptance; no browser automation package is required.
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -105,7 +106,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/asymmetric_pair_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const precise=JSON.parse(fixtureRun.stdout)[template];
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),30);
+  await assertRegisteredForms(cdp);
   const outputs={};
   async function result(key) { const v=await cdp.evaluate('window.completedResults.at(-1)');outputs[key]=v;await writeFile(join(output,key+'.json'),JSON.stringify(v,null,2));return v; }
   function exactGeometry(d) {

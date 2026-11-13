@@ -1,3 +1,4 @@
+import {assertRegisteredForms} from './registered-forms.mjs';
 // Real browser acceptance; no browser automation package is required.
 import {spawn, spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -105,7 +106,7 @@ try {
 
   const fixtureRun=spawnSync(process.env.SIPI_PYTHON||'python',['workbench/tests/layered_interface_cases.py'],{encoding:'utf8'});
   assert.equal(fixtureRun.status,0,fixtureRun.stderr);const precise=JSON.parse(fixtureRun.stdout)[template];
-  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-template]").length'),28);
+  await assertRegisteredForms(cdp);
   await choose(template);
   for(const id of ['height','eps_r','tan_delta','air_mode','offset'])assert.equal(await cdp.evaluate(`document.getElementById('${id}').disabled`),true);
   for(const id of ['lower_height','upper_height','lower_eps_r','upper_eps_r','lower_tan_delta','upper_tan_delta'])assert.equal(await cdp.evaluate(`document.getElementById('${id}').disabled`),false);

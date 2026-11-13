@@ -1006,3 +1006,12 @@ Saved analysis로 안내합니다. 실패 표본은 실패행으로 남기고 �
 선택 경로가 있으면 로컬에 준비한 오프라인 Worker, 없으면 native 호스트를
 검사합니다. 대표 3기하의 목표·공차는 생성한 `controls.json`을
 `SIPI_CONTROL_CASES`에 지정해 `saved-controls-browser.mjs`로 검사합니다.
+
+브라우저 회귀는 `registered-forms.mjs`의 동결 엔진 기준 자료와 편집 단면 이름
+전체를 비교하여 누락·추가·중복을 검사합니다. 다각형 흐름은 유한 도체가 필요한
+단면에 두께 0을 강제하지 않고 기준 입력을 그대로 열어 모든 등록 기하를 확인합니다.
+엄격한 엔진 형상 비교를 위해 기준 JSON의 음의 0도 직렬화에서 보존합니다.
+`node workbench/tests/registered-forms.test.mjs`로 등록 검사를,
+`polygon-browser.mjs 출력폴더 [WEB_ROOT]`로 native/Worker 흐름을 실행합니다.
+`SIPI_PYTHON`은 검증한 Python, native 실행의 `SIPI_CONSOLE`은 해당 설치본의
+`sipi` 명령으로 지정합니다.
