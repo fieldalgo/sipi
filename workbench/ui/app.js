@@ -1,4 +1,4 @@
-import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isAsymmetric, isLayeredInterface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
+import {drawingWindow, checkDrawing, polygonDrawing, scales, lengthFields, labels, isForwardPair, isBroadside, isLayeredBroadside, usesEngineGeometry, isAsymmetric, isLayeredInterface, isStripline, isPair, isCoplanar, isCoated, isNormalFilm, isUnbacked, refinedMesh, compareLines, editableParameters, parameterFields, format, schematic, studyFields, studyScale} from './model.js';
 import {LocalTransport} from './transport.js';
 import {BrowserTransport} from './browser-transport.js';
 
@@ -20,7 +20,7 @@ const networkChanged = new Set();
 const networkKeys = ['start_hz','stop_hz','points','length','z_ref','resistance'];
 const networkFactors = [1e6,1e6,1,1e-3,1,1];
 const networkFields = ["frequency-start", "frequency-stop", "frequency-points", "line-length", "reference-z", "series-r"];
-const allFields = [...lengthFields, 'left_profile', 'right_profile', 'target_variable', 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
+const allFields = [...lengthFields, 'left_profile', 'right_profile', 'target_variable', 'profile', 'placement', 'box_mode', 'air_mode', 'lower_air_mode', 'eps_r', 'tan_delta', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'gap_eps_r', 'gap_tan_delta', 'coating_eps_r', 'coating_tan_delta', 'target', 'tolerance'];
 const lengthSI = Object.fromEntries(lengthFields.map(id => [id, Number($(id).value) * scales[unit]]));
 
 function status(text, error = false) {
@@ -429,7 +429,7 @@ function draw(model) {
 
 
 function geometryViewControls() {
-  const available = !!imported || (isNormalFilm(template) && !!resolvedDomain);
+  const available = !!imported || (usesEngineGeometry(template) && !!resolvedDomain);
   if (!available) geometryDetail = false;
   $('geometry-view-controls').hidden = !available;
   for (const [id, detail] of [['geometry-full', false], ['geometry-detail', true]]) {
@@ -442,15 +442,15 @@ function preview() {
   geometryViewControls();
   $('drawing-unit').textContent = unit;
   try {
-    if (!imported && isNormalFilm(template) && !resolvedDomain) {
-      $('cross-section').replaceChildren(svgNode('text', {x: 65, y: 145, fill: '#4d6984', 'font-size': 15}, 'Inspect geometry to view the current coating.'));
+    if (!imported && usesEngineGeometry(template) && !resolvedDomain) {
+      $('cross-section').replaceChildren(svgNode('text', {x: 65, y: 145, fill: '#4d6984', 'font-size': 15}, 'Inspect geometry to view the current cross-section.'));
       $('cross-section').setAttribute('viewBox', '0 0 760 300');
       $('preview-label').textContent = 'Geometry not inspected';
       $('geometry-detail-note').hidden = true;
       return;
     }
-    const model = imported ? JSON.parse(imported) : isNormalFilm(template) ? resolvedDomain : schematic(template, currentParameters());
-    $('preview-label').textContent = imported || isNormalFilm(template) ? 'Engine geometry · axes scaled separately' : 'Schematic · not to scale';
+    const model = imported ? JSON.parse(imported) : usesEngineGeometry(template) ? resolvedDomain : schematic(template, currentParameters());
+    $('preview-label').textContent = imported || usesEngineGeometry(template) ? 'Engine geometry · axes scaled separately' : 'Schematic · not to scale';
     draw(model);
   } catch { $('cross-section').replaceChildren(); $('geometry-detail-note').hidden = true; }
 }
@@ -458,25 +458,32 @@ function preview() {
 function geometryFields() {
   const asymmetric = isAsymmetric(template);
   $('asymmetric-fields').hidden = !asymmetric;
+  $('ground-thickness-field').hidden = !(asymmetric && isCoplanar(template));
+  $('gap-dielectric-fields').hidden = !isLayeredBroadside(template);
+  $('layered-height-note').textContent = isLayeredBroadside(template) ? 'Lower and upper heights are metal-to-outer-plane clearances, excluding copper. The gap is between inner metal faces. Total height includes both copper thicknesses.' : 'Lower height ends at the copper bottom-face interface. Upper height includes the copper; keep it below the top plane.';
+  $('broadside-note').textContent = isLayeredBroadside(template) ? 'The upper signal is shifted by this signed distance relative to the lower. Each outer clearance and each of the three dielectric regions stays explicit. No independent differential eigenmode is assumed.' : 'Signed upper-to-lower horizontal offset. The vertical gap separates copper faces; both rectangular traces are centred together between the planes.';
   for (const id of ['uniform-profile-field', 'uniform-width-field', 'uniform-thickness-field']) $(id).hidden = asymmetric;
   for (const side of ['left', 'right']) $(`${side}-top-width-field`).hidden = $(`${side}_profile`).value !== 'tapered';
   $('asymmetric-geometry-note').textContent = isStripline(template) ? 'Each copper midpoint is halfway between the planes. Unequal thicknesses have different bottom heights. The total bottom-width span is centred; the gap is between bottom edges.' : 'Both copper bottom faces are at the substrate surface. Widths, thicknesses and top profiles are independent. The total bottom-width span is centred; the gap is between bottom edges.';
   $('target-variable-field').hidden = !asymmetric;
   $('target_variable').disabled = busy || !!imported || !asymmetric;
   $('target-description').textContent = asymmetric ? 'Choose the left or right bottom width. The other width, both thicknesses, any top widths and the gap stay fixed. Target the real lossless forward Vdiff/Idiff with Icommon=0 at launch; this is not an independent differential eigenmode. Both meshes must meet the requested tolerance.' : 'Search varies the bottom width; a tapered profile keeps its top width fixed. Both the initial and finer mesh must meet the target. Failed checks include evaluation history.';
-  const layered = isLayeredInterface(template);
+  if (asymmetric && isLayeredInterface(template)) $('asymmetric-geometry-note').textContent='All copper bottom faces meet the lower/upper dielectric interface. Thicknesses and widths are independent; the upper layer includes copper.';
+  if (template==='asymmetric_coupled_coplanar_stripline') $('asymmetric-geometry-note').textContent='All copper bottom faces use the specified height. Widths, signal thicknesses and rectangular ground thickness are independent.';
+  if (isLayeredBroadside(template)) $('target-description').textContent='Vary both rectangular signal widths together; keep clearances, gap, offset, thickness and three materials fixed. Target real lossless Vdiff/Idiff with Icommon=0; both meshes must pass.';
+  const layered = isLayeredInterface(template) || isLayeredBroadside(template);
   $('uniform-height-field').hidden = layered;
   $('uniform-dielectric-fields').hidden = layered;
   $('layered-height-fields').hidden = !layered;
   $('layered-dielectric-fields').hidden = !layered;
-  const broadside = template === 'broadside_stripline';
+  const broadside = isBroadside(template);
   $('broadside-fields').hidden = !broadside;
   $('profile').disabled = busy || !!imported || broadside || asymmetric;
   $('gap-label').textContent = broadside ? 'Vertical metal-face gap' : 'Bottom edge gap';
   $('top-width-field').hidden = asymmetric || $('profile').value !== 'tapered';
-  $('placement-fields').hidden = !['coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
-  $('placement-mode-field').hidden = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
-  $('trace-height-field').hidden = !['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template) && $('placement').value !== 'fixed';
+  $('placement-fields').hidden = !['asymmetric_coupled_coplanar_stripline', 'coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
+  $('placement-mode-field').hidden = ['asymmetric_coupled_coplanar_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template);
+  $('trace-height-field').hidden = !['asymmetric_coupled_coplanar_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(template) && $('placement').value !== 'fixed';
   $('placement').disabled = busy || !!imported || template !== 'coupled_stripline';
   $('coating-fields').hidden = !isCoated(template);
   const normal = isNormalFilm(template);
@@ -487,10 +494,10 @@ function geometryFields() {
   $('coating-description').textContent = normal ? 'Thickness normal to the substrate and exposed copper tops and sides, including finite side grounds. Corners meet at straight miters. Only signals may taper; top width must not exceed bottom width. Upper air starts above the highest coating.' : 'Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.';
   $('coating-height-field').hidden = normal;
   $('coating-thickness-field').hidden = !normal;
-  $('geometry-inspect').hidden = !normal || !!imported;
+  $('geometry-inspect').hidden = !usesEngineGeometry(template) || !!imported;
   domainControls();
   // Inactive fields must not block validation of a different template/profile.
-  for (const id of ['width', 'thickness', 'left_width', 'right_width', 'left_thickness', 'right_thickness', 'left_top_width', 'right_top_width', 'left_profile', 'right_profile', 'height', 'eps_r', 'tan_delta', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
+  for (const id of ['ground_thickness', 'gap_eps_r', 'gap_tan_delta', 'width', 'thickness', 'left_width', 'right_width', 'left_thickness', 'right_thickness', 'left_top_width', 'right_top_width', 'left_profile', 'right_profile', 'height', 'eps_r', 'tan_delta', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'lower_tan_delta', 'upper_tan_delta', 'top_width', 'trace_height', 'offset', 'gap', 'ground_gap', 'ground_width', 'box_width', 'air_height', 'lower_air_height', 'coating_height', 'coating_thickness', 'coating_eps_r', 'coating_tan_delta']) {
     $(id).disabled = busy || !!imported || !!$(id).closest('[hidden]');
   }
 }
@@ -580,9 +587,9 @@ function resetStudyBounds(i) {
   try {
     const p = currentParameters(), key = $(`study-variable-${i}`).value, value = p[key];
     studySI[i] = {parameter:key,
-      low:['eps_r','coating_eps_r','lower_eps_r','upper_eps_r'].includes(key) ? Math.max(1, value*.9) : value*.9,
+      low:['eps_r','coating_eps_r','lower_eps_r','upper_eps_r','gap_eps_r'].includes(key) ? Math.max(1, value*.9) : value*.9,
       high:value === 0 ? .05*scales.mm : value*1.1};
-    if (template === 'broadside_stripline' && key === 'offset') {
+    if (isBroadside(template) && key === 'offset') {
       const span = value === 0 ? .05 * scales.mm : Math.abs(value) * .1;
       studySI[i] = {parameter: key, low: value - span, high: value + span};
     }
@@ -603,7 +610,7 @@ function refreshStudyOptions(reset=false) {
     const select=$(`study-variable-${i}`), previous=select.value;
     select.replaceChildren();
     for (const [key,label] of Object.entries(choices)) {const option=document.createElement('option');option.value=key;option.textContent=label;select.append(option);}
-    select.value=previous in choices ? previous : i===1 ? (isAsymmetric(template) ? 'left_width' : 'width') : isLayeredInterface(template) ? 'lower_eps_r' : 'eps_r';
+    select.value=previous in choices ? previous : i===1 ? (isAsymmetric(template) ? 'left_width' : 'width') : (isLayeredInterface(template) || isLayeredBroadside(template)) ? 'lower_eps_r' : 'eps_r';
     if (reset || previous !== select.value) resetStudyBounds(i);
   }
 }
@@ -626,7 +633,7 @@ function renderStudy(study, runtime) {
 function studyCSV(study) {
   const names=study.settings.variables.map(v=>v.parameter);
   const quote=value=>'"'+String(value ?? '').replaceAll('"','""')+'"';
-  const rows=[['sample',...names.map(n=>n+(['eps_r','coating_eps_r','lower_eps_r','upper_eps_r'].includes(n)?'_1':'_m')),study.quantity+'_ohm','status','error']];
+  const rows=[['sample',...names.map(n=>n+(['eps_r','coating_eps_r','lower_eps_r','upper_eps_r','gap_eps_r'].includes(n)?'_1':'_m')),study.quantity+'_ohm','status','error']];
   study.rows.forEach((row,i)=>rows.push([i+1,...names.map(n=>row.parameters[n]),row.impedance,row.status,row.error]));
   return rows.map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
 }
@@ -680,9 +687,9 @@ async function run(action) {
     const result = await transport.run(input);
     if (sequence !== runSequence || closed) return;
     resolvedMesh = {...result.document.mesh}; resolvedDomain = result.document; meshControls(); domainControls();
-    if (!imported && isNormalFilm(template)) preview();
+    if (!imported && usesEngineGeometry(template)) preview();
     if (action === 'geometry-inspect') {
-      status('Geometry inspected without solving. The coating uses the engine vertices; axes are scaled separately.');
+      status('Geometry inspected without solving. The drawing uses the engine geometry; axes are scaled separately.');
     }
     else if (action === 'mesh-inspect') {
       status('Mesh settings inspected without solving or changing the design. Refinement is an explicit input change.');
@@ -711,7 +718,7 @@ function chooseTemplate(name) {
     resolvedMesh = null; resolvedDomain = null;
     originalParameters = null; savedMesh = null; changedFields.clear();
     $('box_mode').value = 'auto'; $('air_mode').value = 'auto'; $('lower_air_mode').value = 'auto';
-    $('placement').value = ['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name) ? 'fixed' : 'centred';
+    $('placement').value = ['asymmetric_coupled_coplanar_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name) ? 'fixed' : 'centred';
     if (isAsymmetric(name)) {
       const buried = isStripline(name);
       const defaults = {left_width: buried ? .3e-3 : .4e-3, right_width: buried ? .5e-3 : .65e-3,
@@ -721,14 +728,14 @@ function chooseTemplate(name) {
       $('eps_r').value = '4'; $('tan_delta').value = '.02';
       $('left_profile').value = 'rectangular'; $('right_profile').value = 'rectangular'; $('target_variable').value = 'left_width';
     }
-    if (name === 'broadside_stripline') {
+    if (isBroadside(name)) {
       $('profile').value = 'rectangular';
       if (lengthSI.thickness === 0) {
         lengthSI.thickness = 35e-6;
         $('thickness').value = String(Number((lengthSI.thickness / scales[unit]).toPrecision(10)));
       }
     }
-    if (['offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name)) {
+    if (['asymmetric_coupled_coplanar_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline'].includes(name)) {
       lengthSI.trace_height = (lengthSI.height - lengthSI.thickness) / 2;
       $('trace_height').value = String(Number((lengthSI.trace_height / scales[unit]).toPrecision(10)));
     }
@@ -742,7 +749,7 @@ function chooseTemplate(name) {
     $('gap-field').hidden = !(isPair(template) || isCoplanar(template));
     $('ground-field').hidden = !isCoplanar(template);
     $('ground-gap-field').hidden = !(isPair(template) && isCoplanar(template));
-    $('target-label').firstChild.textContent = isAsymmetric(template) ? 'Forward differential, Ic=0 (Ω)' : isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
+    $('target-label').firstChild.textContent = isForwardPair(template) ? 'Forward differential, Ic=0 (Ω)' : isPair(template) ? 'Differential target (Ω)' : 'Target impedance (Ω)';
     $('design').disabled = false;
     $('save-editable').disabled = busy;
     geometryFields(); refreshStudyOptions(true); studyControls(); clearResult(); preview(); projectControls();

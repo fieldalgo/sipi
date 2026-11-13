@@ -11,6 +11,10 @@ from sipi.template_document import TemplateSectionDocument
 
 
 def parameters(name):
+    from engine import EXTENDED_TEMPLATES
+    if name in EXTENDED_TEMPLATES:
+        data=json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())
+        return next(row['resolved_parameters'] for row in data['cases'] if row['template']==name)
     if name in ('asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline'):
         from asymmetric_pair_cases import parameters as unequal_parameters
         return unequal_parameters(name)
@@ -93,8 +97,9 @@ def test_open_rejects_mismatch_and_unknown_options():
         with pytest.raises(ValueError): execute(request)
 
 
-def test_no_form_for_valid_unsupported_template():
-    # Engine support does not imply a matching editable UI form.
+def test_no_form_for_valid_disabled_template(monkeypatch):
+    # Keep the capability gate test even when every registered template has a form.
+    monkeypatch.delitem(TEMPLATES, 'layered_broadside_stripline')
     doc = TemplateSectionDocument('layered_broadside_stripline', dict(width=.0005, thickness=.000035, gap=.0002, lower_height=.0004, upper_height=.0006, lower_eps_r=4, gap_eps_r=3, upper_eps_r=4))
     with pytest.raises(ValueError, match='no editable form'):
         execute(dict(action='template-open', text=doc.dumps()))

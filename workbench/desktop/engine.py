@@ -25,6 +25,14 @@ TEMPLATES['offset_stripline'] = offset_stripline
 PAIR_TEMPLATES = {'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline', 'coupled_layered_coplanar_stripline', 'coupled_layered_stripline', 'broadside_stripline', 'coupled_coplanar_stripline', 'coupled_conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_grounded_coplanar', 'coupled_conformal_coated_microstrip', 'coupled_coated_unbacked_coplanar', 'coupled_unbacked_coplanar', 'coupled_microstrip', 'coupled_stripline', 'coupled_grounded_coplanar', 'coupled_coated_microstrip', 'coupled_coated_grounded_coplanar'}
 
 
+EXTENDED_TEMPLATES = ('asymmetric_coupled_layered_stripline', 'asymmetric_coupled_layered_coplanar_stripline', 'asymmetric_coupled_coplanar_stripline', 'asymmetric_coupled_grounded_coplanar', 'asymmetric_coupled_unbacked_coplanar', 'asymmetric_coupled_coated_grounded_coplanar', 'asymmetric_coupled_coated_unbacked_coplanar', 'asymmetric_coupled_coated_microstrip', 'asymmetric_coupled_conformal_coated_microstrip', 'asymmetric_coupled_conformal_coated_grounded_coplanar', 'asymmetric_coupled_conformal_coated_unbacked_coplanar', 'layered_broadside_stripline')
+from sipi import templates as _templates
+TEMPLATES.update((name, getattr(_templates, name)) for name in EXTENDED_TEMPLATES)
+ASYMMETRIC_PAIR_TEMPLATES.update(name for name in EXTENDED_TEMPLATES if name.startswith('asymmetric_'))
+PAIR_TEMPLATES.update(EXTENDED_TEMPLATES)
+FORWARD_PAIR_TEMPLATES = ASYMMETRIC_PAIR_TEMPLATES | {'layered_broadside_stripline'}
+
+
 def engine_info():
     out = {'sipi': sipi.__version__}
     for directory in (Path(__file__).resolve().parent / 'ui', Path(__file__).resolve().parent.parent / 'ui'):
@@ -141,13 +149,15 @@ def study_documents(request, nominal):
                'gap', 'ground_gap', 'ground_width', 'eps_r', 'coating_thickness', 'coating_height', 'coating_eps_r'}
     if request['template'] in ('coupled_stripline', 'offset_stripline', 'coplanar_stripline', 'coupled_coplanar_stripline') and parameters.get('trace_height') is not None:
         allowed.add('trace_height')
-    if request['template'] == 'broadside_stripline':
+    if request['template'] in ('broadside_stripline', 'layered_broadside_stripline'):
         allowed.add('offset')
     if request['template'] in ASYMMETRIC_PAIR_TEMPLATES:
         allowed.update(('left_width', 'right_width', 'left_thickness', 'right_thickness',
                         'left_top_width', 'right_top_width'))
     if request['template'] in ('layered_stripline', 'coupled_layered_stripline', 'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline'):
         allowed.update(('lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r'))
+    if request['template'] in EXTENDED_TEMPLATES:
+        allowed.update(('ground_thickness', 'trace_height', 'lower_height', 'upper_height', 'lower_eps_r', 'upper_eps_r', 'gap_eps_r'))
     names, low, high = [], [], []
     for variable in variables:
         if not isinstance(variable, dict) or set(variable) != {'parameter', 'lower', 'upper'}:
@@ -184,12 +194,12 @@ def study_documents(request, nominal):
 
 def execute_study(request, nominal):
     settings, documents = study_documents(request, nominal)
-    quantity = 'z_diff_forward' if request['template'] in ASYMMETRIC_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
+    quantity = 'z_diff_forward' if request['template'] in FORWARD_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
     rows = []
     for values, doc in documents:
         row = dict(parameters=values, document=doc.to_dict())
         try:
-            line = serialize_line(doc.analyze(), forward_pair=request['template'] in ASYMMETRIC_PAIR_TEMPLATES)
+            line = serialize_line(doc.analyze(), forward_pair=request['template'] in FORWARD_PAIR_TEMPLATES)
             value = line[quantity]
             if not math.isfinite(value) or value <= 0:
                 raise ValueError('Solver returned an invalid study impedance.')
@@ -227,9 +237,9 @@ def design_inputs(request, doc):
     mesh = request.get('mesh')
     if mesh is None:
         mesh = doc.section.mesh_settings()
-        if request['template'] in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar'):
+        if request['template'].startswith('asymmetric_coupled_conformal_coated_') and 'coplanar' in request['template'] or request['template'] in ('conformal_coated_unbacked_coplanar', 'coupled_conformal_coated_unbacked_coplanar', 'conformal_coated_grounded_coplanar', 'coupled_conformal_coated_grounded_coplanar'):
             mesh['edge_size'] *= 10
-        elif request['template'] in ('conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'):
+        elif request['template'] == 'asymmetric_coupled_conformal_coated_microstrip' or request['template'] in ('conformal_coated_microstrip', 'coupled_conformal_coated_microstrip'):
             # Start at feature/20 instead of the factory's feature/100.
             # The separate refined solve and residual gates remain required.
             mesh['edge_size'] *= 5
@@ -293,7 +303,7 @@ def saved_controls(request):
             template, parameters, mesh = data['template'], data['parameters'], data['mesh']
             if template not in TEMPLATES:
                 raise ValueError('Use Saved analysis for a template without an editable form.')
-            quantity = 'z_diff_forward' if template in ASYMMETRIC_PAIR_TEMPLATES else 'z_diff' if template in PAIR_TEMPLATES else 'z0'
+            quantity = 'z_diff_forward' if template in FORWARD_PAIR_TEMPLATES else 'z_diff' if template in PAIR_TEMPLATES else 'z0'
             if data['quantity'] != quantity:
                 raise ValueError('Use Saved analysis for this impedance quantity.')
             if kind == 'design':
@@ -326,7 +336,7 @@ def saved_controls(request):
     if not required <= request.keys() or not request.keys() <= required | {'mesh'}:
         raise ValueError('Saving analysis inputs requires a template, parameters and explicit controls.')
     doc = document(request)
-    quantity = 'z_diff_forward' if request['template'] in ASYMMETRIC_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
+    quantity = 'z_diff_forward' if request['template'] in FORWARD_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0'
     if kind == 'design':
         settings, _, variable, params, _, mesh, search = design_inputs(request, doc)
         saved = ImpedanceDesignDocument(request['template'], params, variable=variable,
@@ -503,7 +513,7 @@ def execute(request, *, record_provider=None):
     if action == 'network' and sum(not t.ground for t in doc.section.traces) not in (1, 2):
         raise ValueError('The network workbench supports one or two signal conductors.')
     out = {'engine': engine_info(), 'document': doc.to_dict()}
-    forward_pair = (request.get('template') in ASYMMETRIC_PAIR_TEMPLATES
+    forward_pair = (request.get('template') in FORWARD_PAIR_TEMPLATES
                     and 'document' not in request and 'document_text' not in request)
     if action == 'study':
         out['study'] = execute_study(request, doc)
@@ -521,7 +531,7 @@ def execute(request, *, record_provider=None):
             lambda value: factory(**{**params, variable: value}),
             settings.get('bounds'), settings.get('target'),
             tolerance=settings.get('tolerance', 0.1),
-            quantity='z_diff_forward' if asymmetric else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
+            quantity='z_diff_forward' if request['template'] in FORWARD_PAIR_TEMPLATES else 'z_diff' if request['template'] in PAIR_TEMPLATES else 'z0',
             mesh=mesh, max_evaluations=32, return_line=True, **search_options)
         # Matrix output must correspond to the returned design, not the initial width.
         out['document'] = sipi.CrossSectionDocument(

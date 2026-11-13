@@ -57,6 +57,18 @@
           <button data-template="coupled_conformal_coated_unbacked_coplanar" aria-pressed="false"><span class="mini">▰ ▱ ▱ ▰</span>Normal-film unbacked pair</button>
           <button data-template="conformal_coated_microstrip" aria-pressed="false"><span class="mini">▱</span>Normal-film microstrip</button>
           <button data-template="coupled_conformal_coated_microstrip" aria-pressed="false"><span class="mini">▱ ▱</span>Normal-film pair</button>
+          <button data-template="asymmetric_coupled_layered_stripline" aria-pressed="false">Unequal two-dielectric pair</button>
+          <button data-template="asymmetric_coupled_layered_coplanar_stripline" aria-pressed="false">Unequal two-dielectric coplanar pair</button>
+          <button data-template="asymmetric_coupled_coplanar_stripline" aria-pressed="false">Unequal buried coplanar pair</button>
+          <button data-template="asymmetric_coupled_grounded_coplanar" aria-pressed="false">Unequal grounded coplanar pair</button>
+          <button data-template="asymmetric_coupled_unbacked_coplanar" aria-pressed="false">Unequal unbacked coplanar pair</button>
+          <button data-template="asymmetric_coupled_coated_grounded_coplanar" aria-pressed="false">Unequal planar-coated grounded pair</button>
+          <button data-template="asymmetric_coupled_coated_unbacked_coplanar" aria-pressed="false">Unequal planar-coated unbacked pair</button>
+          <button data-template="asymmetric_coupled_coated_microstrip" aria-pressed="false">Unequal planar-coated surface pair</button>
+          <button data-template="asymmetric_coupled_conformal_coated_microstrip" aria-pressed="false">Unequal normal-film surface pair</button>
+          <button data-template="asymmetric_coupled_conformal_coated_grounded_coplanar" aria-pressed="false">Unequal normal-film grounded pair</button>
+          <button data-template="asymmetric_coupled_conformal_coated_unbacked_coplanar" aria-pressed="false">Unequal normal-film unbacked pair</button>
+          <button data-template="layered_broadside_stripline" aria-pressed="false">Three-dielectric broadside pair</button>
         </div>
         <p id="import-note" class="notice" hidden>Imported cross-section. Its geometry and mesh are preserved. Choose a template to start a new design.</p>
         <form id="inputs">
@@ -71,6 +83,7 @@
             <label id="ground-gap-field" hidden>Signal–ground gap<div class="number"><input id="ground_gap" type="number" value="0.2" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             <label id="ground-field" hidden>Ground width<div class="number"><input id="ground_width" type="number" value="1" min="0.000001" step="any"><span class="unit-label">mm</span></div></label>
           </div>
+          <label id="ground-thickness-field" hidden>Ground copper thickness<div class="number"><input id="ground_thickness" type="number" value=".035" min="0" step="any" required><span class="unit-label">mm</span></div></label>
           <div id="asymmetric-fields" hidden>
             <h4>Left signal</h4>
             <label>Left profile<select id="left_profile"><option value="rectangular">Rectangular</option><option value="tapered">Centred trapezoid</option></select></label>
@@ -93,11 +106,11 @@
               <label>Lower layer height<div class="number"><input id="lower_height" type="number" value="0.4" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
               <label>Upper layer height<div class="number"><input id="upper_height" type="number" value="0.6" min="0.000001" step="any" required><span class="unit-label">mm</span></div></label>
             </div>
-            <p class="fine">The lower height ends at the dielectric interface and copper bottom face. The upper height starts at that interface and includes the copper thickness. Keep the copper below the top plane.</p>
+            <p id="layered-height-note" class="fine">The lower height ends at the dielectric interface and copper bottom face. The upper height starts at that interface and includes the copper thickness. Keep the copper below the top plane.</p>
           </div>
           <div id="broadside-fields" hidden>
             <label>Horizontal offset<div class="number"><input id="offset" type="number" value="0" step="any" required><span class="unit-label">mm</span></div></label>
-            <p class="fine">The upper signal is shifted by this signed distance relative to the lower signal. The vertical gap is measured between copper faces. Both rectangular traces stay centred together between the planes.</p>
+            <p id="broadside-note" class="fine">The upper signal is shifted by this signed distance relative to the lower signal. The vertical gap is measured between copper faces. Both rectangular traces stay centred together between the planes.</p>
           </div>
           <div id="placement-fields" hidden>
             <label id="placement-mode-field">Vertical placement<select id="placement"><option value="centred">Centred between planes</option><option value="fixed">Set bottom-face height</option></select></label>
@@ -115,6 +128,7 @@
             </div>
             <p class="fine">Each layer keeps its own dielectric properties. Changing a layer height does not hold the total plane spacing fixed.</p>
           </div>
+          <div id="gap-dielectric-fields" class="fields" hidden><label>Gap permittivity<input id="gap_eps_r" type="number" value="3.0" min="1" step="any" required></label><label>Gap loss tangent<input id="gap_tan_delta" type="number" value=".01" min="0" step="any" required></label></div>
           <div id="coating-fields" hidden>
             <div class="section-label"><h3 id="coating-title">Planar coating</h3></div>
             <p id="coating-description" class="fine">Height from the substrate surface, including copper. Fills beside and above the trace with a flat top; not a conformal coating.</p>

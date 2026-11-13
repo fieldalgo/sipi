@@ -2,7 +2,7 @@
 
 [한국어](README.ko.md)
 
-The [project workflow](PROJECTS.md) keeps input variants in the thirty-form workspace
+The [project workflow](PROJECTS.md) keeps input variants in the 42-form workspace
 and adds saved-run history to **Saved analysis**. Project files and separate
 environment manifests are downloaded explicitly; nothing is uploaded automatically.
 The [receipt transport](RECEIPTS.md) binds saved calculations to their exact input controls.
@@ -18,7 +18,7 @@ Python, the engine and UI assets; it does not embed a browser or need a remote
 calculation service. Actual EXE size and Windows acceptance require a successful
 Windows build and smoke report. Download-wheel sizes are not EXE measurements.
 
-The basic workspace offers thirty cross-section forms, impedance targeting,
+The basic workspace offers 42 registered cross-section forms, impedance targeting,
 tolerance samples, saved mesh settings and line/circuit results.
 **Saved analysis** opens raw JSON for the contracts registered by the pinned
 [`sipi.execution`](../docs/packages/sipi/execution.md). It checks and saves
@@ -311,8 +311,8 @@ template arguments, their resolved geometry and all mesh settings stay together.
 Opening checks that the current engine reproduces the saved geometry exactly.
 A mismatched or unsupported file leaves your current design intact.
 
-The thirty forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. Other engine templates can use **Saved analysis**;
+The 42 forms include unequal surface and buried pairs, two-dielectric coplanar stripline (single and pair), two-dielectric stripline (single and pair), broadside stripline, coplanar stripline (single and pair), normal-film unbacked coplanar (single and pair), normal-film grounded coplanar (single and pair), normal-film microstrip (single and pair), coated unbacked coplanar (single and pair), unbacked coplanar, coupled unbacked coplanar, microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar and coupled coated grounded coplanar. The remaining forms cover eleven unequal layered, coplanar and coated pairs and the three-dielectric broadside pair. Other analysis-document types use **Saved analysis**;
 this page does not infer a form from arbitrary geometry. **Export geometry**
 keeps the existing cross-section JSON download. Opening that geometric file
 preserves its geometry and mesh but does not enable dimension editing.
@@ -561,7 +561,7 @@ added. Existing validated records in an opened project are preserved; an input
 change clears their current selection and a duplicate starts without records.
 The screen does not display old records as a newly calculated result.
 
-All project designs must use the thirty supported editable templates. Other
+All project designs must use the 42 registered editable templates. Other
 inputs, invalid/damaged projects and files over 200 KiB are rejected without
 replacing the current project. The encoded request limit is 256 KiB; oversized
 updates are rejected without truncation. A geometry-only import cannot replace
@@ -1126,3 +1126,37 @@ conductor resistance or infer a dispersive material model. Raw geometry,
 nonuniform frequency grids, advanced quantities and unsupported budgets stay
 available through Saved analysis; opening them in these controls rejects
 before replacing the current form. Unit changes preserve original SI values.
+
+## All registered cross-section forms
+
+The 42 forms reuse the engine's registered template contracts. The eleven
+additional unequal pairs keep independent left/right widths, thicknesses and
+optional top widths. Coplanar forms also expose rectangular ground thickness.
+Buried coplanar copper shares the specified bottom height; layered copper
+shares the lower/upper dielectric interface. Normal films preserve the
+normal-thickness polygon construction and its no-overlap restrictions.
+
+The three-dielectric broadside form keeps two equal rectangular signal widths,
+signed lateral offset, metal-face gap, separate outer metal-to-plane clearances,
+and each region's permittivity and loss tangent. Total height includes both
+copper thicknesses. Unequal pairs and layered broadside use the real lossless
+`z_diff_forward` diagnostic at `Icommon=0`; no independent even/odd mode,
+effective permittivity or scalar delay is inferred. Frequency calculations
+retain full matrices and the explicitly supplied diagonal resistance.
+
+Use **Inspect geometry** to display the resolved engine geometry. Editing an
+input invalidates that drawing until inspection or calculation succeeds. These
+forms support exact SI save/open, unit changes, width targeting with mandatory
+refinement, fixed-mesh studies, and saved frequency inputs. A successful form
+calculation does not establish arbitrary-geometry accuracy or frequency validity.
+
+Related checks: `test_extended_forms.py` checks all 42 full networks against
+independent voltage/current boundary equations; `extended-forms.test.mjs`
+checks the twelve added forms in three units. Generate explicit browser inputs
+with `extended_form_cases.py OUTPUT_DIRECTORY` using the checkout's `src` and
+`workbench/desktop` on PYTHONPATH. Set `SIPI_PYTHON` and `SIPI_EXTENDED_CASES` to
+that interpreter and generated `cases.json`, then run
+`node workbench/tests/extended-forms-browser.mjs OUTPUT_DIRECTORY [WEB_ROOT]`.
+The optional root selects the staged offline Worker; omission selects the native
+host. The generated `controls.json` also runs with `saved-controls-browser.mjs`
+via `SIPI_CONTROL_CASES` for three representative target/study workflows.

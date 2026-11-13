@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect all 42 registered cross-sections to editable forms, saved controls and full network calculations, with explicit forward-launch diagnostics for unequal and layered broadside pairs.
+  등록 단면 42종을 편집 폼·설정 저장·전체 네트워크 계산에 연결하고 비대칭 및 적층 broadside 쌍의 forward launch 진단을 명시합니다.
+
 - Preserve running development-branch validation while keeping the newest pending run, so incremental backups do not cancel platform checks.
   개발 브랜치의 진행 중 검증과 최신 대기 실행을 보존하여 커밋 백업이 플랫폼 검사를 취소하지 않도록 합니다.
 

@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 30종의 입력 변형과 **Saved analysis**의
+[프로젝트 흐름](PROJECTS.ko.md)은 기존 폼 42종의 입력 변형과 **Saved analysis**의
 저장 실행 이력을 지원한다. 프로젝트와 개별 환경 파일은 사용자가 직접 내보내며
 자동 원격 저장을 하지 않는다.
 [실행 결과 연결](RECEIPTS.ko.md)은 저장 계산을 해당 입력 설정에 묶는다.
@@ -17,7 +17,7 @@
 원격 계산 서비스를 포함하지 않습니다. 실제 용량과 Windows 동작은 성공한
 Windows 빌드·실행 보고서로 확인해야 합니다. wheel 크기는 EXE 크기가 아닙니다.
 
-기본 화면은 단면 입력 폼 30종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
+기본 화면은 단면 입력 폼 42종, 저장된 메시 설정, 목표 임피던스, 공차 샘플,
 단면 JSON 저장과 선로·회로 결과를 제공합니다. **Saved analysis**에서는
 [`sipi.execution`](../docs/locales/ko/pages/packages/sipi/execution.md)에 등록한
 고정 엔진의 등록 계약 원문 JSON을 열고 검증·정규 저장·실행·결과 내보내기를 합니다.
@@ -269,7 +269,7 @@ gap과 접지 폭은 기존 고정 nominal 메시 정책으로 표본 계산할 
 바꾸지 않고 거부합니다.
 
 폼은 microstrip, stripline, offset stripline, coupled microstrip, coupled stripline, grounded coplanar,
-coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline, two-dielectric stripline(single/pair), two-dielectric coplanar stripline(single/pair), unequal surface/buried pair 30종입니다. 나머지 엔진 템플릿은 **Saved analysis**를 이용합니다.
+coupled grounded coplanar, planar coated microstrip, planar coated pair, coated grounded coplanar, coupled coated grounded coplanar, unbacked coplanar, coupled unbacked coplanar, coated unbacked coplanar(single/pair), normal-film microstrip(single/pair), normal-film grounded coplanar(single/pair), normal-film unbacked coplanar(single/pair), coplanar stripline(single/pair), broadside stripline, two-dielectric stripline(single/pair), two-dielectric coplanar stripline(single/pair), unequal surface/buried pair 42종입니다. 추가 12종은 비대칭 적층·coplanar·코팅 쌍 11종과 3유전체 broadside 쌍입니다. 다른 해석 문서는 **Saved analysis**를 이용합니다.
 임의 기하에서 치수 폼을 추정하지 않습니다. **Export geometry**는 기존 단면 JSON을
 내려받으며, 이 기하 파일을 다시 열면 기하·메시는 보존하지만 치수 편집은 켜지지 않습니다.
 
@@ -480,7 +480,7 @@ Worker의 공통 어댑터를 사용하지만 실제 고정 엔진·자산으로
 기록이 있으면 보존하지만 입력 변경 시 현재 선택을 해제하고 복제본은 빈 이력으로
 시작합니다. 이전 기록을 새로 계산한 결과처럼 표시하지 않습니다.
 
-모든 설계가 현재 편집 폼 30종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
+모든 설계가 현재 편집 폼 42종 중 하나여야 합니다. 지원 외 입력·손상된 프로젝트·
 200 KiB 초과 파일은 현재 프로젝트를 바꾸지 않고 거부합니다. 인코딩한 요청 한도는
 256 KiB이며 초과 수정은 잘라내지 않고 거부합니다. 기하만 담은 파일은 활성 편집
 프로젝트 설계를 대체하지 못합니다. 편집 설계나 별도 작업창을 사용하세요. 취소는
@@ -977,3 +977,32 @@ Saved analysis로 안내합니다. 실패 표본은 실패행으로 남기고 �
 보존합니다. 도체 저항이나 재료 분산을 추정하지 않습니다. 명시 기하·불균일
 주파수·고급 선택량·다른 예산은 Saved analysis로 실행하세요. 지원 범위를 벗어난
 파일을 폼에 열면 현재 입력을 바꾸기 전에 거부합니다. 단위 변경은 원래 SI 값을 보존합니다.
+
+## 등록 단면 전체 편집 폼
+
+42종 폼은 엔진의 등록 템플릿 계약을 재사용합니다. 추가 비대칭 쌍 11종은
+좌우 폭·두께·선택 윗폭을 각각 유지합니다. Coplanar 폼은 직사각형 접지 두께도
+입력합니다. 매립 coplanar의 도체 아랫면은 지정 높이를, 적층 단면은 두 유전체의
+경계를 공유합니다. Normal film은 법선 두께 다각형과 겹침 거부 조건을 유지합니다.
+
+3유전체 broadside 폼은 같은 폭의 직사각형 신호 2개, 부호 있는 가로 이동,
+도체 안쪽 면 사이 간격, 바깥쪽 도체 면과 기준면 사이의 개별 거리, 각 영역의
+유전율·손실탄젠트를 유지합니다. 총 높이에 두 도체 두께가 포함됩니다. 비대칭
+쌍과 적층 broadside는 `Icommon=0`인 실수 무손실 `z_diff_forward` 진단을 쓰며
+독립 even/odd 모드·유효 유전율·단일 지연값을 추정하지 않습니다. 주파수 계산은
+전체 행렬과 사용자가 명시한 대각 저항을 사용합니다.
+
+**Inspect geometry**로 엔진이 구성한 형상을 표시합니다. 입력을 바꾸면 다음
+검사나 계산이 성공할 때까지 그림을 무효화합니다. 정확한 SI 저장·열기, 단위
+변경, 필수 세분을 포함한 폭 역산, 고정 메시 공차, 주파수 입력 저장을 지원합니다.
+폼의 계산 성공이 임의 기하의 정확도나 주파수 유효성을 보장하지는 않습니다.
+
+`test_extended_forms.py`는 42종 전체 네트워크를 독립 전압/전류 경계식과,
+`extended-forms.test.mjs`는 추가 12종을 세 단위로 검사합니다. `src`와
+`workbench/desktop`을 PYTHONPATH에 두고 `extended_form_cases.py 출력폴더`로
+명시 입력을 만듭니다. `SIPI_PYTHON`에 해당 Python, `SIPI_EXTENDED_CASES`에
+생성한 `cases.json`을 지정한 뒤
+`node workbench/tests/extended-forms-browser.mjs 출력폴더 [WEB_ROOT]`를 실행합니다.
+선택 경로가 있으면 로컬에 준비한 오프라인 Worker, 없으면 native 호스트를
+검사합니다. 대표 3기하의 목표·공차는 생성한 `controls.json`을
+`SIPI_CONTROL_CASES`에 지정해 `saved-controls-browser.mjs`로 검사합니다.

@@ -11,7 +11,7 @@ from sipi.design_document import ImpedanceDesignDocument
 from sipi.study import ImpedanceStudyDocument
 from sipi.quasistatic_line_document import QuasistaticLineDocument
 from sipi.execution import execute_saved
-from test_template_document import CASES
+CASES={row['template']:row for row in json.loads((Path(__file__).resolve().parents[2]/'tests/sipi/reference_data/template_section/reference.json').read_text())['cases']}
 
 MESH=dict(edge_size=8e-6,far_size=.3e-3,grade=.25)
 NETWORK=dict(start_hz=0.,stop_hz=2e8,points=3,length=.075,resistance=5.3,z_ref=47.)
