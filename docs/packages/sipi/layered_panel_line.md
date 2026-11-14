@@ -58,8 +58,9 @@ alone changes that small entry by about 1.07%. These observations are not
 per-entry convergence evidence. Select explicit absolute and relative limits
 for every quantity that matters to the application, including mutual terms.
 
-This version adds saved forward calculations, not coated panel goal searches
-or manufacturing studies. Existing [panel-line limits](panel_line.md) and
+This version adds saved forward calculations. The existing direct factory API
+can also perform [coated pair goals](layered_panel_goal.md); saved coated goal
+wrappers and manufacturing studies are separate contracts. Existing [panel-line limits](panel_line.md) and
 [layered metal assumptions](layered_metal.md) still apply.
 
 [한국어](../../locales/ko/pages/packages/sipi/layered_panel_line.md)

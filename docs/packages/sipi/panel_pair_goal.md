@@ -1,5 +1,7 @@
 # Explicit panel-current pair impedance goals
 
+[Coated metal factory goals](layered_panel_goal.md) retain the explicit panel method.
+
 [Finite-frequency pair goals](sampled_panel_pair_goal.md) check both targets at every supplied frequency.
 
 [Saved panel goals](panel_pair_goal_document.md) preserve explicit controls and common-execution failures.

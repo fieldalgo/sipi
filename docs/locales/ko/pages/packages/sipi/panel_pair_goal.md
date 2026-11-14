@@ -1,5 +1,7 @@
 # 명시 패널 전류를 사용하는 두 임피던스 목표
 
+[코팅 금속 factory 역산](layered_panel_goal.md)은 명시적인 패널 전류 방법을 유지합니다.
+
 [유한 주파수 두 목표 역산](sampled_panel_pair_goal.md)은 지정한 모든 주파수에서 두 목표를 검증합니다.
 
 [저장형 패널 역산](panel_pair_goal_document.md)은 명시 설정과 공통 실행 실패를 보존합니다.

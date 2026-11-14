@@ -51,8 +51,9 @@ assert result["result"]["current_solver"]["kind"] == "grounded-rectangle-panels"
 이 관측은 항별 수렴 근거가 아닙니다. 상호항을 포함하여 용도에 중요한 각
 물리량의 절대·상대 한계를 명시적으로 정해야 합니다.
 
-이번 버전은 저장된 순방향 계산을 추가합니다. 코팅된 패널 목표 역산·제조
-공차 계산 연결은 포함하지 않습니다. 기존 [패널 선로 제한](panel_line.md)과
+이번 버전은 저장된 순방향 계산을 추가합니다. 기존 직접 factory API로
+[코팅 쌍 선로 역산](layered_panel_goal.md)도 수행할 수 있습니다. 저장형 코팅
+목표 wrapper와 제조 공차 연결은 별도의 계약입니다. 기존 [패널 선로 제한](panel_line.md)과
 [적층 금속 가정](layered_metal.md)도 적용됩니다.
 
 [English](../../../../../packages/sipi/layered_panel_line.md)
