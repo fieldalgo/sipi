@@ -298,15 +298,16 @@ class CrossSection:
             raise ValueError("need 0 < edge_size <= far_size")
         return float(edge_size), float(far_size)
 
-    def mesh_settings(self, *, edge_size=None, far_size=None, grade=0.15, min_angle=28.0):
+    def mesh_settings(self, *, edge_size=None, far_size=None, grade=0.15, min_angle=28.0,
+                      corner_size=None):
         """Resolve and validate mesh options without generating a mesh.
 
         Return a fresh dictionary suitable for ``mesh(**settings)``. Lengths
         are metres, grade is dimensionless and min_angle is in degrees.
         """
         for key, value in (('edge_size', edge_size), ('far_size', far_size),
-                           ('grade', grade), ('min_angle', min_angle)):
-            if value is None and key in ('edge_size', 'far_size'):
+                           ('grade', grade), ('min_angle', min_angle), ('corner_size', corner_size)):
+            if value is None and key in ('edge_size', 'far_size', 'corner_size'):
                 continue
             if isinstance(value, bool) or not isinstance(value, Real) or not np.isfinite(value):
                 raise ValueError(f'{key} must be a finite real number')
@@ -315,8 +316,13 @@ class CrossSection:
             raise ValueError('grade must be >= 0')
         if not 0 < min_angle < 34:
             raise ValueError('min_angle must be in (0, 34) degrees')
-        return dict(edge_size=edge_size, far_size=far_size,
-                    grade=float(grade), min_angle=float(min_angle))
+        settings = dict(edge_size=edge_size, far_size=far_size,
+                        grade=float(grade), min_angle=float(min_angle))
+        if corner_size is not None:
+            if not 0 < corner_size <= edge_size:
+                raise ValueError('need 0 < corner_size <= edge_size')
+            settings['corner_size'] = float(corner_size)
+        return settings
 
     def _tapered_domain(self, ys, far_size):
         """Tile each horizontal slab with exact dielectric quadrilaterals.
@@ -353,7 +359,8 @@ class CrossSection:
         return domain
 
     def mesh(self, *, edge_size: float | None = None, far_size: float | None = None,
-             grade: float = 0.15, min_angle: float = 28.0) -> MeshedCrossSection:
+             grade: float = 0.15, min_angle: float = 28.0,
+             corner_size: float | None = None) -> MeshedCrossSection:
         """Mesh the dielectric with refinement toward the trace edges.
 
         edge_size: target edge length at trace corners (default: the smallest
@@ -361,6 +368,9 @@ class CrossSection:
                    capped at each positive trace thickness / 10).
                    Field singularities sit at these corners. Explicit values
                    override both parts of the default rule.
+        corner_size: optional target at trace and local dielectric corners,
+                     no larger than edge_size. None preserves the original mesh.
+                     This does not change the face target 3 * edge_size.
         far_size:  largest edge length (default: max(width, height) / 24)
         grade:     growth of the edge length per unit distance from the traces
 
@@ -368,9 +378,10 @@ class CrossSection:
         halve edge_size, grade and far_size together to check convergence.
         """
         settings = self.mesh_settings(edge_size=edge_size, far_size=far_size,
-                                      grade=grade, min_angle=min_angle)
+                                      grade=grade, min_angle=min_angle, corner_size=corner_size)
         edge_size, far_size = settings['edge_size'], settings['far_size']
         grade, min_angle = settings['grade'], settings['min_angle']
+        corner_size = settings.get('corner_size', edge_size)
         half = 0.5 * self.width
         xs = {-half, half}
         ys = set(self.interfaces().tolist())
@@ -403,7 +414,7 @@ class CrossSection:
             d_corner = np.min(np.hypot(x[..., None] - corners[:, 0],
                                        y[..., None] - corners[:, 1]), axis=-1)
             d_trace = np.min(np.stack([t.distance(x, y) for t in self.traces]), axis=0)
-            h = np.minimum(edge_size + grade * d_corner, 3.0 * edge_size + grade * d_trace)
+            h = np.minimum(corner_size + grade * d_corner, 3.0 * edge_size + grade * d_trace)
             return np.minimum(h, far_size)
 
         tm = generate(domain, "outer", min_angle=min_angle, size_fn=size_fn,
