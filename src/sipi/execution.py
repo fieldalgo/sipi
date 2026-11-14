@@ -29,6 +29,7 @@ from .adaptive_panel_resolution_document import AdaptivePanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
 from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeLineError
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
+from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
 from .shape_panel_line import (ShapePanelTransmissionLineDocument, ShapePanelLineError,
                                shape_current_record)
 from .shape_reference_panel_line import ShapeReferencePanelTransmissionLineDocument
@@ -157,6 +158,7 @@ _REGISTRY = {
     'sipi.shape-face-panel-transmission-line/1': ShapeFacePanelTransmissionLineDocument,
     'sipi.fem-shape-transmission-line/1': FEMShapeTransmissionLineDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
+    'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
     'sipi.fem-shape-line-quantity-study/1': FEMShapeLineQuantityStudyDocument,
     'sipi.fem-shape-line-quantity-design/1': FEMShapeLineQuantityDesignDocument,
     'sipi.shape-panel-resolution/1': ShapePanelResolutionDocument,
@@ -564,12 +566,16 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             out['status'] = 'failed'
             out['error'] = dict(kind='ResolutionBudgetExceeded',stage='budget',input=data,
                 message='adaptive resolution stopped before completion within the available evaluation budget')
-    elif isinstance(doc, FEMShapeResolutionDocument):
+    elif isinstance(doc, (FEMShapeResolutionDocument,FEMShapeAdaptiveResolutionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.failure is not None:
             out['status'] = 'failed'
             out['error'] = out['result']['failure']
+        elif not result.completed:
+            out['status'] = 'failed'
+            out['error'] = dict(kind='ResolutionBudgetExceeded',stage='budget',input=data,
+                message='adaptive FEM resolution stopped within the available evaluation budget',details=None)
     elif isinstance(doc, (DebyeFitDocument, TensorDebyeFitDocument, HurayFitDocument, ShuntLossInferenceDocument)):
         if len(data['frequency_hz']) > budget:
             raise ValueError('saved fit frequency count exceeds max_evaluations before fitting')

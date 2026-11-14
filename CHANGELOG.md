@@ -1,5 +1,7 @@
 # Changelog
 
+- Add strict saved bounded FEM refinement and version-2 partial budget/failure records without changing existing defaults.
+
 - Add bounded explicit FEM refinement with two consecutive mesh comparisons, separate outer checks and retained typed failures.
 
 - Add explicit saved finite FEM resolution requests with preserved per-entry comparisons and partial current evidence.

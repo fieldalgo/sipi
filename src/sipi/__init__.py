@@ -376,3 +376,6 @@ __all__ += ['FEMShapeResolutionDocument']
 
 from .fem_shape_adaptive_resolution import FEMShapeAdaptiveResolution, refine_fem_shape_line_resolution
 __all__ += ['FEMShapeAdaptiveResolution', 'refine_fem_shape_line_resolution']
+
+from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
+__all__ += ['FEMShapeAdaptiveResolutionDocument']
