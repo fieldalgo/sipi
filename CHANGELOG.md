@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit checked FEM-current geometry/material sampling with fixed boundary metals, complete failed rows and saved execution evidence.
+
 - Save explicit FEM geometry-energy lines with one dielectric/current mesh and complete or partial execution evidence.
   유전체·전류에 하나의 메시를 공유하고 완료·부분 실행 근거를 보존하는 명시 FEM 형상 에너지 선로를 저장합니다.
 

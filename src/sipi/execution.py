@@ -57,6 +57,7 @@ from .loss_inference_document import ShuntLossInferenceDocument
 from .tensor_dielectric_fit_document import TensorDebyeFitDocument
 from .line_goal_document import LineQuantityDesignDocument
 from .line_goal import LineQuantityGoalError
+from .fem_shape_study import FEMShapeLineQuantityStudyDocument
 from .line_study import LineQuantityStudyDocument
 from .line_yield import LineQuantityYieldDocument
 from .periodic_document import PeriodicNetworkDocument
@@ -152,6 +153,7 @@ _REGISTRY = {
     'sipi.shape-reference-panel-transmission-line/1': ShapeReferencePanelTransmissionLineDocument,
     'sipi.shape-face-panel-transmission-line/1': ShapeFacePanelTransmissionLineDocument,
     'sipi.fem-shape-transmission-line/1': FEMShapeTransmissionLineDocument,
+    'sipi.fem-shape-line-quantity-study/1': FEMShapeLineQuantityStudyDocument,
     'sipi.shape-panel-resolution/1': ShapePanelResolutionDocument,
     'sipi.adaptive-shape-panel-resolution/1': AdaptiveShapePanelResolutionDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
@@ -579,7 +581,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = result.to_dict()
         if result.unresolved:
             out['status'] = 'incomplete'
-    elif isinstance(doc, (LineQuantityStudyDocument, PanelForwardPairStudyDocument, SampledPanelForwardPairStudyDocument, ShapePanelForwardPairStudyDocument, ShapeSampledPanelForwardPairStudyDocument)):
+    elif isinstance(doc, (FEMShapeLineQuantityStudyDocument, LineQuantityStudyDocument, PanelForwardPairStudyDocument, SampledPanelForwardPairStudyDocument, ShapePanelForwardPairStudyDocument, ShapeSampledPanelForwardPairStudyDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.failed:

@@ -355,3 +355,7 @@ __all__ += ['fem_shape_conductor_loss_by_boundary']
 
 from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeTransmissionLineResult, FEMShapeLineError
 __all__ += ['FEMShapeTransmissionLineDocument', 'FEMShapeTransmissionLineResult', 'FEMShapeLineError']
+
+from .fem_shape_study import (FEMShapeLineQuantityStudyDocument, FEMShapeLineQuantityStudy,
+                              FEMShapeLineQuantityStudyRow)
+__all__ += ['FEMShapeLineQuantityStudyDocument', 'FEMShapeLineQuantityStudy', 'FEMShapeLineQuantityStudyRow']
