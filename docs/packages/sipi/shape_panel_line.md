@@ -72,3 +72,6 @@ accuracy. This unit adds no automatic resolution acceptance, inverse search,
 yield study, browser qualification or deployment.
 
 [한국어](../../locales/ko/pages/packages/sipi/shape_panel_line.md)
+
+Use [separate shape-line resolution checks](shape_panel_resolution.md) to retain
+independent panel, volume, joint and explicit outer-domain comparisons.

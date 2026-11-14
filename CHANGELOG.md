@@ -1,5 +1,8 @@
 # Changelog
 
+- Compare explicit shape-current lines along separate panel, volume, joint and outer axes while retaining every current sample and detailed partial failure.
+  명시 형상전류 선로를 패널·체적·동시 세분·외곽으로 나누어 비교하고 모든 전류 표본과 상세 부분 실패를 보존합니다.
+
 - Save explicit shape-current lines and retain matched RLGC, complete current samples and staged failures through common execution and receipts.
   명시 형상전류 선로를 저장하고 동일 기하 RLGC·전체 전류 표본·단계별 실패를 공통 실행과 영수증에 보존합니다.
 

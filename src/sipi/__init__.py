@@ -292,3 +292,6 @@ from .panel_shape_conductor import (PanelShapeRequest, PanelShapeSample, PanelSh
 
 from .shape_panel_line import (ShapePanelTransmissionLineDocument,
     ShapePanelTransmissionLineResult, ShapePanelLineError)
+
+from .shape_panel_resolution import (ShapePanelResolutionFailure, ShapePanelResolutionAssessment,
+    assess_shape_panel_line_resolution)
