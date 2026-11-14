@@ -1,5 +1,8 @@
 # Changelog
 
+- Save bounded refinement as explicit line-resolution/2 and preserve budget exhaustion, selected original-domain results and partial failures through common execution.
+  예산 있는 자동 세분을 명시 line-resolution/2로 저장하고 예산 소진·원래 영역의 선택 결과·부분 실패를 공통 실행에 보존합니다.
+
 - Assess panel-line resolution per entry with separate panel, volume, joint and outer comparisons, preserving failed conditions and partial results.
   패널·체적·동시 세분·외곽을 구분하여 패널 선로 해상도를 항별 평가하고 미충족 조건과 부분 결과를 보존합니다.
 

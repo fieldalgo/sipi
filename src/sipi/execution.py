@@ -115,6 +115,7 @@ _REGISTRY = {
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
+    'sipi.line-resolution/2': LineResolutionDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     'sipi.template-section/1': TemplateSectionDocument,
     'sipi.quasistatic-line/1': QuasistaticLineDocument,
@@ -482,6 +483,10 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         if result.failure is not None:
             out['status'] = 'failed'
             out['error'] = out['result']['failure']
+        elif not result.completed:
+            out['status'] = 'failed'
+            out['error'] = dict(kind='ResolutionBudgetExceeded',stage='budget',input=data,
+                message='adaptive resolution stopped before completion within the available evaluation budget')
     elif isinstance(doc, (DebyeFitDocument, TensorDebyeFitDocument, HurayFitDocument, ShuntLossInferenceDocument)):
         if len(data['frequency_hz']) > budget:
             raise ValueError('saved fit frequency count exceeds max_evaluations before fitting')

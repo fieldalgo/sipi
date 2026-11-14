@@ -8,6 +8,8 @@ from .document import _keys, _unique_object
 from .line_model import TransmissionLineDocument
 from .line_resolution import (ResolutionTolerance, LineResolutionAssessment,
                               assess_line_resolution, _resolution_inputs, _metric)
+from .adaptive_line_resolution import (AdaptiveLineResolution, refine_line_resolution,
+                                       _adaptive_inputs)
 from .sampling import _integer
 
 __all__ = ['LineResolutionDocument', 'resolution_record']
@@ -19,11 +21,11 @@ _API = {value:key for key,value in _SI.items()}
 
 def resolution_record(result):
     """Return finite real arrays and exact inputs; acceptance has limited scope."""
-    if not isinstance(result, LineResolutionAssessment):
-        raise TypeError('result must be a LineResolutionAssessment')
+    if not isinstance(result, (LineResolutionAssessment,AdaptiveLineResolution)):
+        raise TypeError('result must be a line resolution assessment')
     failure = result.failure
-    return dict(completed=result.completed, accepted=result.accepted,
-        expected_evaluations=result.expected_evaluations,
+    record = dict(completed=result.completed, accepted=result.accepted,
+        expected_evaluations=getattr(result,'expected_evaluations',None),
         tolerances={_SI[k]:dict(relative=v.relative,absolute=v.absolute) for k,v in result.tolerances.items()},
         evaluations=[dict(stage=row.stage,input=json.loads(row.input_json),
             names=list(row.result.names),frequency_hz=row.result.frequency.tolist(),
@@ -36,6 +38,15 @@ def resolution_record(result):
             for row in result.comparisons],
         failure=None if failure is None else dict(stage=failure.stage,input=json.loads(failure.input_json),
             kind=failure.kind,message=failure.message))
+    if isinstance(result,AdaptiveLineResolution):
+        record.pop('expected_evaluations')
+        selected=result.selected_evaluation
+        record.update(stop_reason=result.stop_reason,mesh_levels=result.mesh_levels,
+            expected_outer_evaluations=result.expected_outer_evaluations,
+            outer_completed=result.outer_completed,
+            selected_evaluation_index=next((i for i,row in enumerate(result.evaluations)
+                                           if row is selected),None))
+    return record
 
 
 class LineResolutionDocument:
@@ -45,7 +56,8 @@ class LineResolutionDocument:
     mesh factor, a full-evaluation budget and unit-bearing tolerance keys.
     Parsing reuses ordinary resolution admission without field solves.
     """
-    def __init__(self, line, *, outer_documents, tolerances, refinement_factor=.5, max_solves=4):
+    def __init__(self, line, *, outer_documents, tolerances, refinement_factor=.5, max_solves=4,
+                 schema='sipi.line-resolution/1', max_levels=None):
         if not isinstance(line, TransmissionLineDocument):
             raise TypeError('line must be a TransmissionLineDocument')
         if (not isinstance(outer_documents,(list,tuple))
@@ -54,17 +66,22 @@ class LineResolutionDocument:
         if (not isinstance(tolerances,Mapping) or any(k not in _SI or not isinstance(v,ResolutionTolerance)
                                                     for k,v in tolerances.items())):
             raise ValueError('tolerances must select named quantities with ResolutionTolerance values')
-        self._data = self._validate(dict(schema='sipi.line-resolution/1',line=line.to_dict(),
+        data=dict(schema=schema,line=line.to_dict(),
             outer_lines=[doc.to_dict() for doc in outer_documents],refinement_factor=refinement_factor,
             max_solves=max_solves,tolerances={_SI[k]:dict(relative=v.relative,absolute=v.absolute)
-                                            for k,v in tolerances.items()}))
+                                            for k,v in tolerances.items()})
+        if schema=='sipi.line-resolution/2':data['max_levels']=max_levels
+        elif max_levels is not None:raise ValueError('max_levels requires line-resolution/2')
+        self._data=self._validate(data)
 
     @staticmethod
     def _validate(data):
-        _keys(data,('schema','line','outer_lines','refinement_factor','max_solves','tolerances'),
-              where='line resolution')
-        if data['schema'] != 'sipi.line-resolution/1':
+        schema=data.get('schema') if isinstance(data,dict) else None
+        if schema not in ('sipi.line-resolution/1','sipi.line-resolution/2'):
             raise ValueError('unsupported line-resolution schema')
+        keys=('schema','line','outer_lines','refinement_factor','max_solves','tolerances')
+        _keys(data,keys+(('max_levels',) if schema=='sipi.line-resolution/2' else ()),
+              where='line resolution')
         values = [data['line']]
         if not isinstance(data['outer_lines'],list):
             raise ValueError('outer_lines must be an explicit list')
@@ -80,12 +97,18 @@ class LineResolutionDocument:
         for key, value in tolerances.items():
             _keys(value,('relative','absolute'),where='resolution tolerance')
             models[_API[key]] = ResolutionTolerance(**value)
-        models, stages = _resolution_inputs(documents[0],documents[1:],models,
+        if schema=='sipi.line-resolution/2':
+            levels,_,models,stages=_adaptive_inputs(documents[0],documents[1:],models,
+                data['refinement_factor'],data['max_levels'],data['max_solves'])
+        else:
+            models, stages = _resolution_inputs(documents[0],documents[1:],models,
                                              data['refinement_factor'],data['max_solves'])
-        return dict(schema=data['schema'],line=stages[0][1].to_dict(),
+        normalized=dict(schema=data['schema'],line=stages[0][1].to_dict(),
             outer_lines=[doc.to_dict() for _,doc in stages[2:]],
             refinement_factor=float(data['refinement_factor']),max_solves=data['max_solves'],
             tolerances={_SI[k]:dict(relative=v.relative,absolute=v.absolute) for k,v in models.items()})
+        if schema=='sipi.line-resolution/2':normalized['max_levels']=levels
+        return normalized
 
     @classmethod
     def from_dict(cls, data):
@@ -104,9 +127,12 @@ class LineResolutionDocument:
 
     def analyze(self, *, max_evaluations=10000):
         budget=_integer(max_evaluations,2,10000);data=self.to_dict()
-        if 2+len(data['outer_lines'])>budget:
+        adaptive=data['schema']=='sipi.line-resolution/2'
+        if (3 if adaptive else 2)+len(data['outer_lines'])>budget:
             raise ValueError('resolution evaluation budget exceeded before any field solve')
-        return assess_line_resolution(TransmissionLineDocument.from_dict(data['line']),
+        options=dict(max_levels=data['max_levels']) if adaptive else {}
+        operation=refine_line_resolution if adaptive else assess_line_resolution
+        return operation(TransmissionLineDocument.from_dict(data['line']),
             outer_documents=[TransmissionLineDocument.from_dict(v) for v in data['outer_lines']],
             tolerances={_API[k]:ResolutionTolerance(**v) for k,v in data['tolerances'].items()},
-            refinement_factor=data['refinement_factor'],max_solves=min(data['max_solves'],budget))
+            refinement_factor=data['refinement_factor'],max_solves=min(data['max_solves'],budget),**options)

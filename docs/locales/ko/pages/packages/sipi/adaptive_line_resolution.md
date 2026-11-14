@@ -51,3 +51,7 @@ accepted_input = report.selected_evaluation
 명시 예산을 사용하는 별도 Python API입니다.
 
 [English](../../../../../packages/sipi/adaptive_line_resolution.md)
+
+## 저장 요청 연결
+
+[버전 2 요청](adaptive_resolution_document.md)으로 같은 연산을 저장하고 공통 실행에 전달할 수 있습니다.

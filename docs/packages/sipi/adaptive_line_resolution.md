@@ -1,5 +1,7 @@
 # Bounded mesh refinement
 
+[Saved version-2 requests](adaptive_resolution_document.md) expose the same operation through common execution.
+
 `refine_line_resolution` applies the existing line calculation on successively
 finer meshes. It requires two consecutive elementwise comparisons to meet
 explicit tolerances before checking the supplied larger domains. It retains

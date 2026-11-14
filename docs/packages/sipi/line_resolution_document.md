@@ -54,3 +54,7 @@ capacitance tolerance. The original numerical methods, unresolved refinement
 failures, independent-reference requirements and other saved inputs are unchanged.
 
 [한국어](../../locales/ko/pages/packages/sipi/line_resolution_document.md)
+
+## Adaptive requests
+
+[Version 2](adaptive_resolution_document.md) stores bounded mesh refinement and preserves budget exhaustion separately from completed-but-unaccepted results.

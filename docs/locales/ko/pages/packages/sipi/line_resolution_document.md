@@ -50,3 +50,7 @@ JSON 키는 `schema`, `line`, `outer_lines`, `refinement_factor`, `max_solves`,
 해결되지 않은 수렴 실패, 독립 기준 대조 조건과 다른 저장 입력은 유지합니다.
 
 [English](../../../../../packages/sipi/line_resolution_document.md)
+
+## 자동 세분 요청
+
+[버전 2](adaptive_resolution_document.md)는 예산 있는 메시 자동 세분을 저장하고 예산 소진과 계산 완료 후 미수락을 구분합니다.

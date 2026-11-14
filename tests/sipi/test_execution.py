@@ -523,6 +523,8 @@ def documents():
     base.append(line_resolution())
     from test_layered_panel import document as layered_panel
     base.append(layered_panel(True))
+    from test_adaptive_resolution_document import document as adaptive_resolution
+    base.append(adaptive_resolution())
     return base
 
 

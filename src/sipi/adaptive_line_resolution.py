@@ -79,15 +79,11 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     attempted input; interrupts propagate. No extraction default, numerical
     tolerance, geometry or material is repaired or silently changed.
     """
-    levels = _integer(max_levels,2,8)
-    limit = _integer(max_solves,4,16)
-    tolerances, prepared = _resolution_inputs(line,outer_documents,tolerances,
-                                               refinement_factor,limit)
+    levels,limit,tolerances,prepared = _adaptive_inputs(line,outer_documents,tolerances,
+                                                       refinement_factor,max_levels,max_solves)
     base, first_fine = prepared[0][1], prepared[1][1]
     outer_templates = [doc for _,doc in prepared[2:]]
     count_outer = len(outer_templates)
-    if 3+count_outer > limit:
-        raise ValueError('two mesh comparisons and required outer checks exceed budget before any field solve')
     factor = float(refinement_factor)
     evaluations, comparisons = [], []
     level = 0
@@ -149,3 +145,13 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
         accepted = all(row.accepted for row in comparisons[-count_outer:])
         return finish('accepted' if accepted else 'outer-unaccepted')
     return finish('mesh-unaccepted')
+
+
+def _adaptive_inputs(line,outer_documents,tolerances,refinement_factor,max_levels,max_solves):
+    """Shared field-free admission; no unused later mesh is prepared."""
+    levels=_integer(max_levels,2,8)
+    limit=_integer(max_solves,4,16)
+    tolerances,prepared=_resolution_inputs(line,outer_documents,tolerances,refinement_factor,limit)
+    if 3+len(prepared)-2>limit:
+        raise ValueError('two mesh comparisons and required outer checks exceed budget before any field solve')
+    return levels,limit,tolerances,prepared
