@@ -172,6 +172,27 @@ def assess_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     A completed assessment may be unaccepted. Exceptions during evaluation
     retain completed results and stop subsequent solves; interrupts propagate.
     """
+    tolerances, stages = _resolution_inputs(line, outer_documents, tolerances,
+                                             refinement_factor, max_solves)
+    expected_count = len(stages)
+    evaluations, comparisons = [], []
+    for stage, doc in stages:
+        text = doc.dumps()
+        try:
+            result = doc.analyze()
+            evaluations.append(ResolutionEvaluation(stage, text, result))
+            if stage != 'base':
+                index = 0 if stage == 'mesh' else 1
+                comparisons.append(_compare(evaluations[index].result, result, tolerances,
+                                             stage, index, len(evaluations)-1))
+        except Exception as error:
+            failure = ResolutionFailure(stage, text, type(error).__name__, str(error))
+            return LineResolutionAssessment(tolerances, evaluations, comparisons, expected_count, failure)
+    return LineResolutionAssessment(tolerances, evaluations, comparisons, expected_count)
+
+
+def _resolution_inputs(line, outer_documents, tolerances, refinement_factor, max_solves):
+    """Shared field-free admission and immutable input snapshots."""
     if not isinstance(line, TransmissionLineDocument):
         raise TypeError('line must be a TransmissionLineDocument')
     factor = _scalar('refinement_factor', refinement_factor)
@@ -198,17 +219,4 @@ def assess_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     refined = TransmissionLineDocument.from_dict(raw)
     outer = [_outer_input(doc, refined) for doc in outer_documents]
     stages = [('base', base), ('mesh', refined)]+[(f'outer:{i}', doc) for i, doc in enumerate(outer)]
-    evaluations, comparisons = [], []
-    for stage, doc in stages:
-        text = doc.dumps()
-        try:
-            result = doc.analyze()
-            evaluations.append(ResolutionEvaluation(stage, text, result))
-            if stage != 'base':
-                index = 0 if stage == 'mesh' else 1
-                comparisons.append(_compare(evaluations[index].result, result, tolerances,
-                                             stage, index, len(evaluations)-1))
-        except Exception as error:
-            failure = ResolutionFailure(stage, text, type(error).__name__, str(error))
-            return LineResolutionAssessment(tolerances, evaluations, comparisons, expected_count, failure)
-    return LineResolutionAssessment(tolerances, evaluations, comparisons, expected_count)
+    return tolerances, stages

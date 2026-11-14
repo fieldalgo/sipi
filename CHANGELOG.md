@@ -1,5 +1,8 @@
 # Changelog
 
+- Save finite line-resolution requests with explicit SI tolerances and preserve completed-but-unaccepted and partial-failure results through common execution.
+  명시 SI 허용차를 갖춘 유한 선로 해상도 평가를 저장하고 공통 실행에서 완료 후 미수락과 부분 실패를 보존합니다.
+
 - Assess explicitly selected line quantities on finer meshes and larger domains, preserving unmet tolerances, failed stages and completed results.
   명시적으로 선택한 선로 물리량을 세분 메시·확장 외곽에서 평가하고 허용차 미충족·실패 단계·완료 결과를 보존합니다.
 

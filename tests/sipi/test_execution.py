@@ -519,6 +519,8 @@ def documents():
     base.append(layered_goal())
     from test_layered_selection import document as layered_selection
     base.append(layered_selection())
+    from test_line_resolution_document import document as line_resolution
+    base.append(line_resolution())
     return base
 
 
