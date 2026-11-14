@@ -345,3 +345,7 @@ __all__ += ['ShapeFaceConductorLoss', 'panel_shape_conductor_loss_by_face']
 from .shape_face_panel_line import (ShapeFacePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineResult,
     ShapeFacePanelLineError)
 __all__ += ['ShapeFacePanelTransmissionLineDocument', 'ShapeFacePanelTransmissionLineResult', 'ShapeFacePanelLineError']
+
+from .fem_shape_conductor import (FEMShapeSample, FEMShapeCurrentFactors, FEMShapeCurrentError,
+    fem_shape_current_factors)
+__all__ += ['FEMShapeSample', 'FEMShapeCurrentFactors', 'FEMShapeCurrentError', 'fem_shape_current_factors']

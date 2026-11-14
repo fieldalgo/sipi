@@ -1,5 +1,8 @@
 # Changelog
 
+- Add explicit FEM geometry-energy currents with two extensions, strict capacitance derivatives and retained original flux evidence.
+  두 연장·엄격한 정전용량 미분·원 전류 근거를 보존하는 명시 FEM 형상 에너지 전류를 추가합니다.
+
 - Save explicit face-metal shape-current lines with matched RLGC and complete/partial execution records.
   일치하는 RLGC와 완료·부분 실행 기록을 가진 면별 금속 형상전류 선로를 저장합니다.
 
