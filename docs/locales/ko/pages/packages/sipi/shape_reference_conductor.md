@@ -36,7 +36,7 @@ length=..., z_ref=...)`는 기존 RLGC 변환을 쓰므로 C/G의 기하·주파
 
 아래는 바닥 금속과 코팅 접지 패턴을 다르게 지정하는 준비 예제입니다.
 치수는 m, 전도도는 S/m입니다. 주석의 함수를 호출하면 실제 전류장을 계산합니다.
-이번 API 단위에는 새 저장 선로 스키마가 없습니다.
+전체 계산을 저장하려면 [접지 금속별 저장 선로](shape_reference_panel_line.md)를 사용합니다.
 
 ```python
 from sipi import CrossSection, Layer, Trace, MetalLayer

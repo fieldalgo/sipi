@@ -73,23 +73,7 @@ class ShapeReferenceConductorLoss:
             C=C,G=G,length=length,z_ref=z_ref,names=self.factors.names)
 
 
-def panel_shape_conductor_loss_with_reference_metals(section, frequency, *, conductors, reference,
-        ground_thickness, panels_per_edge=32, ground_modes=512, interpolation_degree=16,
-        step_fraction=1e-3):
-    """Weight each whole boundary's shape-current energy by its own surface law.
-
-    conductors maps all signal names to SurfaceMetal. reference must explicitly
-    be ReferenceSurfaceMetals, with a bottom plane and one whole-perimeter
-    SurfaceMetal per grounded trace. Top/sides are open and face-specific laws
-    are unsupported. Existing local bulk/coating/roughness and individual
-    remaining-core skin-depth gates apply before fields. The common-reference
-    API and its grouped outputs are unchanged.
-
-    No new PDE/current approximation is selected: existing full shape factors
-    provide the ungrouped matrices. R=sum(Re(Zs_b)*Q_b), and internal inductance
-    is sum(Im(Zs_b)*Q_b/omega). Geometry, two-step and finite-domain limitations
-    remain; local coatings do not resolve metal corners or interior diffusion.
-    """
+def _shape_reference_samples(section, frequency, conductors, reference, ground_thickness):
     if not isinstance(section,CrossSection):raise TypeError('section must be a CrossSection')
     if (section.bottom,section.top,section.sides)!=('ground','open','open'):
         raise ValueError('separate-reference shape loss requires bottom ground and open top/sides')
@@ -114,6 +98,28 @@ def panel_shape_conductor_loss_with_reference_metals(section, frequency, *, cond
         if remaining<=0 or np.max(depth[:,i])>remaining/5:
             raise ValueError(labels[i]+': skin depth must be <= minimum remaining conductor dimension / 5')
     correction=np.column_stack([s[2] for s in samples]);zs=np.column_stack([s[3] for s in samples])
+    return names,metals,labels,f,depth,correction,zs
+
+
+def panel_shape_conductor_loss_with_reference_metals(section, frequency, *, conductors, reference,
+        ground_thickness, panels_per_edge=32, ground_modes=512, interpolation_degree=16,
+        step_fraction=1e-3):
+    """Weight each whole boundary's shape-current energy by its own surface law.
+
+    conductors maps all signal names to SurfaceMetal. reference must explicitly
+    be ReferenceSurfaceMetals, with a bottom plane and one whole-perimeter
+    SurfaceMetal per grounded trace. Top/sides are open and face-specific laws
+    are unsupported. Existing local bulk/coating/roughness and individual
+    remaining-core skin-depth gates apply before fields. The common-reference
+    API and its grouped outputs are unchanged.
+
+    No new PDE/current approximation is selected: existing full shape factors
+    provide the ungrouped matrices. R=sum(Re(Zs_b)*Q_b), and internal inductance
+    is sum(Im(Zs_b)*Q_b/omega). Geometry, two-step and finite-domain limitations
+    remain; local coatings do not resolve metal corners or interior diffusion.
+    """
+    names,metals,labels,f,depth,correction,zs=_shape_reference_samples(
+        section,frequency,conductors,reference,ground_thickness)
     factors=panel_shape_current_factors(section,panels_per_edge=panels_per_edge,
         ground_modes=ground_modes,interpolation_degree=interpolation_degree,step_fraction=step_fraction)
     grounded=tuple(t.name for t in section.traces if t.ground)

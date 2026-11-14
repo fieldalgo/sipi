@@ -331,3 +331,6 @@ __all__ += ['AdaptiveShapePanelResolutionDocument']
 from .shape_reference_conductor import (ShapeReferenceConductorLoss,
     panel_shape_conductor_loss_with_reference_metals)
 __all__ += ['ShapeReferenceConductorLoss', 'panel_shape_conductor_loss_with_reference_metals']
+
+from .shape_reference_panel_line import ShapeReferencePanelTransmissionLineDocument
+__all__ += ['ShapeReferencePanelTransmissionLineDocument']

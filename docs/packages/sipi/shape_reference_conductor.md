@@ -39,7 +39,7 @@ C/G must correspond to the same geometry and frequency vector.
 
 This example prepares a guarded geometry with a different bottom metal and a
 coated guard. Dimensions are metres and conductivity S/m. The commented call
-runs actual fields. There is no new saved-line schema in this API unit.
+runs actual fields. See the [saved reference-metal line](shape_reference_panel_line.md) to store the complete calculation.
 
 ```python
 from sipi import CrossSection, Layer, Trace, MetalLayer

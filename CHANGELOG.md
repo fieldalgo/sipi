@@ -1,5 +1,8 @@
 # Changelog
 
+- Save separate whole-reference metals with matched shape-current RLGC, strict admission and complete execution evidence.
+  접지 경계별 전체 둘레 금속과 일치하는 형상전류 RLGC를 엄격한 사전 검사·완전한 실행 근거와 함께 저장합니다.
+
 - Seek explicit shape-current paired targets across finite frequency grids with frozen controls, reserved refinements and full current records.
   유한 주파수 격자의 명시 형상전류 쌍 목표 역산에 제어 고정·예약 세분·전체 전류 기록을 보존합니다.
 
