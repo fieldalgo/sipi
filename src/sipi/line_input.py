@@ -19,18 +19,19 @@ def _source_study(value, *, paired=False):
     return study
 
 
-def _line_from_inputs(study, conductor, parameters, evaluation):
+def _line_from_inputs(study, conductor, parameters, evaluation, *, line_schema='sipi.transmission-line/6'):
     section = _TEMPLATES[study['template']](**parameters)
     count = 2 if study['quantity'] == 'z_diff_forward' else 1
     if sum(not trace.ground for trace in section.traces) != count:
         raise ValueError(f'line source requires exactly {count} signal(s)')
     return TransmissionLineDocument(CrossSectionDocument(section, mesh=study['mesh']),
         [evaluation['frequency_hz']], materials=_models(evaluation), conductor=conductor,
-        length=0., z_ref=50., schema='sipi.transmission-line/6')
+        length=0., z_ref=50., schema=line_schema)
 
 
-def _line_from_values(study, conductor, values=None):
+def _line_from_values(study, conductor, values=None, *, line_schema='sipi.transmission-line/6'):
     parameters = study['parameters'] if values is None else _parameters(study, values)
     evaluation = (study['material_evaluation'] if values is None else
                   _sample_material(study, values))
-    return _line_from_inputs(study, conductor, parameters, evaluation)
+    options = {} if line_schema == 'sipi.transmission-line/6' else dict(line_schema=line_schema)
+    return _line_from_inputs(study, conductor, parameters, evaluation, **options)

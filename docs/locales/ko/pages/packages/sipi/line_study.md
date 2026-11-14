@@ -95,3 +95,5 @@ subnormal도 포함합니다. 상관 normal 실패·후속 시도·기하/재료
 ```sh
 python -m pytest -q tests/sipi/test_line_study.py tests/sipi/test_line_goal_document.py tests/sipi/test_execution.py tests/sipi/test_material_variables.py
 ```
+
+[고정 도금 재료 공차](layered_study.md)는 명시 study/4와 yield/3을 사용합니다.

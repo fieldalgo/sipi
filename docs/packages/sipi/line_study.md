@@ -104,3 +104,5 @@ engine contracts, not measured manufacturing, app or Windows acceptance.
 ```sh
 python -m pytest -q tests/sipi/test_line_study.py tests/sipi/test_line_goal_document.py tests/sipi/test_execution.py tests/sipi/test_material_variables.py
 ```
+
+[Fixed layered-metal studies](layered_study.md) use explicit study/4 and yield/3.

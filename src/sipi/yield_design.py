@@ -139,6 +139,9 @@ class YieldDesignDocument:
             if (data['schema'] == 'sipi.yield-design/2' and
                     study['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2')):
                 raise ValueError('yield candidates require line-quantity-study/1 or /2')
+            if (data['schema'] == 'sipi.yield-design/3' and
+                    study['schema'] == 'sipi.line-quantity-study/4'):
+                raise ValueError('yield-design/3 candidates require line-quantity-study/1, /2 or /3')
             source = study['study'] if lossy else study
             if source['sampling']['kind'] not in ('uniform', 'normal'):
                 raise ValueError('yield candidates require iid uniform or normal sampling')

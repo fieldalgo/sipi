@@ -122,3 +122,5 @@ diagnostics and circuit/length analysis. Loading performs material/core guards
 without meshing. Earlier versions reject this record; the default constructor
 version remains 1. Existing saved quantity-goal/study/yield formats retain their
 line/6 contract; they are not silently upgraded by a nested material record.
+
+[Geometry/dielectric studies with fixed coatings](layered_study.md) use explicit study/4 and yield/3.

@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect fixed layered metals to versioned geometry/dielectric sampling and iid yield, retaining failed samples and older consumer contracts.
+  실패 표본과 이전 소비자 계약을 보존하며 고정 도금 재료를 버전 있는 기하·유전체 공차 및 iid 수율 평가에 연결합니다.
+
 - Save explicit layered metals at signal/reference/ground faces in transmission-line v7 while preserving older input contracts and shared field/circuit execution.
   기존 입력 계약과 공통 전계·회로 실행을 보존하며 transmission-line v7의 신호·귀환·접지 각 면에 명시 도금 재료를 저장합니다.
 

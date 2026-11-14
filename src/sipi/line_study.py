@@ -91,7 +91,7 @@ class LineQuantityStudy:
 
 
 class LineQuantityStudyDocument:
-    """Sample full-loss line quantities with explicit saved versions 1 through 3.
+    """Sample full-loss line quantities with explicit saved versions 1 through 4.
 
     The nested study/3 or /4 supplies scalar template inputs, fixed positive
     frequency, sampling and geometry/material constraints. Its z0 selects the
@@ -107,6 +107,9 @@ class LineQuantityStudyDocument:
     with launch Id=0, retaining differential voltage coupling. Its nested
     z_diff_forward label selects paired inputs only; no source study runs.
     Versions 1 and 2 retain their previous accepted quantities.
+    Version 4 keeps these quantities and explicitly uses line/7, including
+    fixed layered surface metals. Versions 1..3 retain line/6. Coating material
+    parameters themselves are fixed; the source varies geometry/dielectrics.
 
     Every generated sample is attempted in order, including after failures.
     Failed rows retain their sample values and all representable intermediate
@@ -125,18 +128,19 @@ class LineQuantityStudyDocument:
         data = _copy(data)
         _keys(data, ('schema', 'study', 'conductor', 'quantity'), where='line quantity study')
         if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2',
-                                  'sipi.line-quantity-study/3'):
+                                  'sipi.line-quantity-study/3', 'sipi.line-quantity-study/4'):
             raise ValueError('unsupported line-quantity-study schema')
         allowed = ('impedance_real', 'attenuation')
-        if data['schema'] in ('sipi.line-quantity-study/2', 'sipi.line-quantity-study/3'):
+        if data['schema'] in ('sipi.line-quantity-study/2', 'sipi.line-quantity-study/3', 'sipi.line-quantity-study/4'):
             allowed += ('differential_forward_impedance_real',)
-        if data['schema'] == 'sipi.line-quantity-study/3':
+        if data['schema'] in ('sipi.line-quantity-study/3', 'sipi.line-quantity-study/4'):
             allowed += ('common_forward_impedance_real',)
         if not isinstance(data['quantity'], str) or data['quantity'] not in allowed:
             raise ValueError('quantity must be '+' or '.join(allowed))
         study = _source_study(data['study'], paired=data['quantity'] in
                               ('differential_forward_impedance_real', 'common_forward_impedance_real'))
-        nominal = _line_from_values(study, data['conductor'])
+        options = dict(line_schema='sipi.transmission-line/7') if data['schema'] == 'sipi.line-quantity-study/4' else {}
+        nominal = _line_from_values(study, data['conductor'], **options)
         self._data = dict(schema=data['schema'], study=study,
             conductor=nominal.to_dict()['conductor'], quantity=data['quantity'])
 
@@ -173,7 +177,8 @@ class LineQuantityStudyDocument:
                 phase = 'materials'
                 evaluation = _sample_material(study, values); material_json = _json(evaluation)
                 phase = 'input'
-                doc = _line_from_inputs(study, data['conductor'], parameters, evaluation)
+                options = dict(line_schema='sipi.transmission-line/7') if data['schema'] == 'sipi.line-quantity-study/4' else {}
+                doc = _line_from_inputs(study, data['conductor'], parameters, evaluation, **options)
                 input_json = doc.dumps()
                 phase = 'extraction'
                 line = doc.analyze()
