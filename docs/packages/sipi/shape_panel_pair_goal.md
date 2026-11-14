@@ -1,5 +1,7 @@
 # Explicit shape-current pair impedance goals
 
+[Finite-frequency paired goals](shape_sampled_panel_pair_goal.md) require every supplied frequency to meet its targets.
+
 `seek_shape_panel_forward_pair_impedances` connects the
 [capacitance-shape current method](panel_shape_conductor.md) to the existing
 bounded two-parameter search. Its factory returns a

@@ -88,12 +88,23 @@ class SampledPanelForwardPairDesign:
 
 def seek_sampled_panel_forward_pair_impedances(factory, bounds, frequencies, targets, *, tolerances,
                                  initial=None, max_evaluations=64):
-    """Seek two full-complex forward impedance targets at each supplied frequency.
+    """Seek real parts of two full-complex forward impedances at each supplied frequency.
 
-    Strict (N, 2) full-complex forward targets at 2..64 positive frequencies;
+    Strict (N, 2) positive real targets at 2..64 positive frequencies;
     reserved volume/panel/joint verification at all supplied frequencies.
     No continuous-band, global or measured-accuracy certificate.
     """
+    return _seek_sampled_panel_pair_goal(factory, bounds, frequencies, targets,
+        tolerances=tolerances, initial=initial, max_evaluations=max_evaluations,
+        document_type=PanelTransmissionLineDocument, refinements=_refinements,
+        physical_line=lambda doc:doc.line, settings=lambda doc:doc.panel_options,
+        refinement_type=SampledPanelPairRefinement, design_type=SampledPanelForwardPairDesign)
+
+
+def _seek_sampled_panel_pair_goal(factory, bounds, frequencies, targets, *, tolerances,
+        initial, max_evaluations, document_type, refinements, physical_line, settings,
+        refinement_type, design_type):
+    """Shared bounded grid search with explicitly selected line/current adapters."""
     if not callable(factory):
         raise TypeError('factory must be callable')
     frequencies = _frequencies(frequencies)
@@ -133,24 +144,24 @@ def seek_sampled_panel_forward_pair_impedances(factory, bounds, frequencies, tar
         try:
             if selected is None:
                 candidate = factory(*parameters)
-                if not isinstance(candidate, PanelTransmissionLineDocument):
-                    raise TypeError('factory must return PanelTransmissionLineDocument')
+                if not isinstance(candidate, document_type):
+                    raise TypeError(f'factory must return {document_type.__name__}')
                 text = candidate.dumps()
                 phase = 'validation'
-                doc = PanelTransmissionLineDocument.loads(text)
+                doc = document_type.loads(text)
             else:
-                doc = _refinements(selected.input_json)[stage]
-            text = doc.dumps(); data = doc.to_dict()["line"]
+                doc = refinements(selected.input_json)[stage]
+            text = doc.dumps(); input_line = physical_line(doc); data = input_line.to_dict()
             frequency = data['frequency_hz']
-            names = tuple(trace.name for trace in doc.line.cross_section.section.traces if not trace.ground)
+            names = tuple(trace.name for trace in input_line.cross_section.section.traces if not trace.ground)
             if not np.array_equal(frequency, frequencies) or len(names) != 2 or data['length_m'] != 0:
                 raise ValueError('goal requires two signals, the exact supplied frequency vector and zero length')
-            current = (tuple(frequency), names, tuple(sorted(doc.panel_options.items())))
+            current = (tuple(frequency), names, tuple(sorted(settings(doc).items())))
             if selected is None and identity is not None and current != identity:
                 raise ValueError('frequency, ordered signal names and panel settings must stay fixed')
             if selected is None:
                 identity = current
-                _refinements(text)  # Admit every future frozen refinement before fields.
+                refinements(text)  # Admit every future frozen refinement before fields.
             phase = 'extraction'
             line = doc.analyze()
             if tuple(line.frequency) != tuple(frequency) or tuple(line.names) != names:
@@ -222,6 +233,6 @@ def seek_sampled_panel_forward_pair_impedances(factory, bounds, frequencies, tar
             if np.any(abs(np.array(row.impedances)/previous.impedances-1) > .005):
                 raise failure('independent refinement exceeds relative convergence limit', stage+'/convergence',
                               chosen.parameters, text=row.input_json)
-        checked.append(SampledPanelPairRefinement(row, refined_line))
-    return SampledPanelForwardPairDesign(chosen.parameters, tuple(float(f) for f in frequencies), _rows(target), _rows(tolerance), chosen.impedances,
+        checked.append(refinement_type(row, refined_line))
+    return design_type(chosen.parameters, tuple(float(f) for f in frequencies), _rows(target), _rows(tolerance), chosen.impedances,
         chosen.input_json, tuple(history), line, tuple(checked))

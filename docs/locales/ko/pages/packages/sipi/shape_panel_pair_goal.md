@@ -1,5 +1,7 @@
 # 명시 형상전류 쌍 선로 임피던스 역산
 
+[유한 주파수 쌍 목표](shape_sampled_panel_pair_goal.md)는 요청한 모든 주파수의 목표를 검사합니다.
+
 `seek_shape_panel_forward_pair_impedances`는 [정전용량 형상미분 전류](panel_shape_conductor.md)를
 기존 범위 제한 2변수 탐색에 연결합니다. factory는
 `ShapePanelTransmissionLineDocument`를 반환해야 합니다. 기존 패널·체적 선로

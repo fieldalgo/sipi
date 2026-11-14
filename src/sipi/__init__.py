@@ -314,3 +314,6 @@ from .shape_sampled_panel_pair_study import (ShapeSampledPanelForwardPairStudyDo
 
 from .shape_sampled_panel_pair_yield import (ShapeSampledPanelPairYieldAssessment,
     ShapeSampledPanelForwardPairYieldDocument,assess_shape_sampled_panel_pair_yield)
+
+from .shape_sampled_panel_pair_goal import (ShapeSampledPanelPairRefinement,
+    ShapeSampledPanelForwardPairDesign,seek_shape_sampled_panel_forward_pair_impedances)

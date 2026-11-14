@@ -1,0 +1,327 @@
+{
+  "reference_kind": "finite-domain self-consistency targets, not an independent field reference",
+  "source_commit": "d153885d52c1373e934e8fd212ed67b60ef3b463",
+  "source_wheel_sha256": "06da72abd5c70787649a664991dc8351bb8645e5413918ca6e9ae2a5d9812112",
+  "cases": {
+    "bulk": {
+      "parameters_m": [
+        0.00055,
+        0.00035
+      ],
+      "input": {
+        "line": {
+          "line": {
+            "conductor": {
+              "conductors": {
+                "negative": {
+                  "conductivity": 58000000.0,
+                  "relative_permeability": 1.0,
+                  "roughness": {
+                    "kind": "smooth"
+                  }
+                },
+                "positive": {
+                  "conductivity": 58000000.0,
+                  "relative_permeability": 1.0,
+                  "roughness": {
+                    "kind": "smooth"
+                  }
+                }
+              },
+              "ground_thickness": 3.5e-05,
+              "kind": "surface-boundaries",
+              "reference": {
+                "conductivity": 58000000.0,
+                "relative_permeability": 1.0,
+                "roughness": {
+                  "kind": "smooth"
+                }
+              }
+            },
+            "cross_section": {
+              "box": {
+                "bottom": "ground",
+                "sides": "open",
+                "top": "open",
+                "width": 0.008
+              },
+              "layers": [
+                {
+                  "eps_r": 1.0,
+                  "name": "substrate",
+                  "tan_delta": 0.0,
+                  "thickness": 0.0002
+                },
+                {
+                  "eps_r": 1.0,
+                  "name": "air",
+                  "tan_delta": 0.0,
+                  "thickness": 0.00375
+                }
+              ],
+              "length_unit": "m",
+              "mesh": {
+                "edge_size": 1e-05,
+                "far_size": 0.0002,
+                "grade": 0.1,
+                "min_angle": 28.0
+              },
+              "schema": "sipi.cross-section/1",
+              "traces": [
+                {
+                  "ground": false,
+                  "name": "positive",
+                  "thickness": 3.5e-05,
+                  "width": 0.00055,
+                  "x": -0.00042500000000000003,
+                  "y": 0.0002
+                },
+                {
+                  "ground": false,
+                  "name": "negative",
+                  "thickness": 5e-05,
+                  "width": 0.0005,
+                  "x": 0.00045,
+                  "y": 0.0002
+                }
+              ]
+            },
+            "frequency_hz": [
+              1000000000.0,
+              2000000000.0,
+              4000000000.0
+            ],
+            "length_m": 0.0,
+            "materials": {
+              "air": {
+                "kind": "debye",
+                "parameters": {
+                  "eps_inf": 3.0,
+                  "relaxation_hz": [
+                    1000000000.0
+                  ],
+                  "strengths": [
+                    0.7
+                  ]
+                },
+                "schema": "sipi.dielectric/1"
+              },
+              "substrate": {
+                "kind": "debye",
+                "parameters": {
+                  "eps_inf": 3.0,
+                  "relaxation_hz": [
+                    1000000000.0
+                  ],
+                  "strengths": [
+                    0.7
+                  ]
+                },
+                "schema": "sipi.dielectric/1"
+              }
+            },
+            "reference_ohms": 50.0,
+            "schema": "sipi.transmission-line/6"
+          },
+          "panel": {
+            "ground_modes": 512,
+            "interpolation_degree": 16,
+            "panels_per_edge": 16
+          },
+          "schema": "sipi.panel-transmission-line/1"
+        },
+        "schema": "sipi.shape-panel-transmission-line/1",
+        "step_fraction": 0.001
+      },
+      "targets_ohm": [
+        [
+          68.8828994054204,
+          21.90566648151497
+        ],
+        [
+          71.10351393482341,
+          22.613365409231967
+        ],
+        [
+          72.29432825718574,
+          22.993194259891602
+        ]
+      ]
+    },
+    "coated": {
+      "parameters_m": [
+        0.00055,
+        0.00035
+      ],
+      "input": {
+        "line": {
+          "line": {
+            "conductor": {
+              "conductors": {
+                "negative": {
+                  "coatings": [
+                    {
+                      "conductivity": 14000000.0,
+                      "relative_permeability": 3.0,
+                      "thickness_m": 2e-07
+                    },
+                    {
+                      "conductivity": 40000000.0,
+                      "relative_permeability": 1.0,
+                      "thickness_m": 1e-06
+                    }
+                  ],
+                  "conductivity": 58000000.0,
+                  "kind": "layered",
+                  "relative_permeability": 1.0
+                },
+                "positive": {
+                  "coatings": [
+                    {
+                      "conductivity": 14000000.0,
+                      "relative_permeability": 3.0,
+                      "thickness_m": 2e-07
+                    },
+                    {
+                      "conductivity": 40000000.0,
+                      "relative_permeability": 1.0,
+                      "thickness_m": 1e-06
+                    }
+                  ],
+                  "conductivity": 58000000.0,
+                  "kind": "layered",
+                  "relative_permeability": 1.0
+                }
+              },
+              "ground_thickness": 3.5e-05,
+              "kind": "surface-boundaries",
+              "reference": {
+                "coatings": [
+                  {
+                    "conductivity": 14000000.0,
+                    "relative_permeability": 3.0,
+                    "thickness_m": 2e-07
+                  },
+                  {
+                    "conductivity": 40000000.0,
+                    "relative_permeability": 1.0,
+                    "thickness_m": 1e-06
+                  }
+                ],
+                "conductivity": 58000000.0,
+                "kind": "layered",
+                "relative_permeability": 1.0
+              }
+            },
+            "cross_section": {
+              "box": {
+                "bottom": "ground",
+                "sides": "open",
+                "top": "open",
+                "width": 0.008
+              },
+              "layers": [
+                {
+                  "eps_r": 1.0,
+                  "name": "substrate",
+                  "tan_delta": 0.0,
+                  "thickness": 0.0002
+                },
+                {
+                  "eps_r": 1.0,
+                  "name": "air",
+                  "tan_delta": 0.0,
+                  "thickness": 0.00375
+                }
+              ],
+              "length_unit": "m",
+              "mesh": {
+                "edge_size": 1e-05,
+                "far_size": 0.0002,
+                "grade": 0.1,
+                "min_angle": 28.0
+              },
+              "schema": "sipi.cross-section/1",
+              "traces": [
+                {
+                  "ground": false,
+                  "name": "positive",
+                  "thickness": 3.5e-05,
+                  "width": 0.00055,
+                  "x": -0.00042500000000000003,
+                  "y": 0.0002
+                },
+                {
+                  "ground": false,
+                  "name": "negative",
+                  "thickness": 5e-05,
+                  "width": 0.0005,
+                  "x": 0.00045,
+                  "y": 0.0002
+                }
+              ]
+            },
+            "frequency_hz": [
+              1000000000.0,
+              2000000000.0,
+              4000000000.0
+            ],
+            "length_m": 0.0,
+            "materials": {
+              "air": {
+                "kind": "debye",
+                "parameters": {
+                  "eps_inf": 3.0,
+                  "relaxation_hz": [
+                    1000000000.0
+                  ],
+                  "strengths": [
+                    0.7
+                  ]
+                },
+                "schema": "sipi.dielectric/1"
+              },
+              "substrate": {
+                "kind": "debye",
+                "parameters": {
+                  "eps_inf": 3.0,
+                  "relaxation_hz": [
+                    1000000000.0
+                  ],
+                  "strengths": [
+                    0.7
+                  ]
+                },
+                "schema": "sipi.dielectric/1"
+              }
+            },
+            "reference_ohms": 50.0,
+            "schema": "sipi.transmission-line/7"
+          },
+          "panel": {
+            "ground_modes": 512,
+            "interpolation_degree": 16,
+            "panels_per_edge": 16
+          },
+          "schema": "sipi.panel-transmission-line/2"
+        },
+        "schema": "sipi.shape-panel-transmission-line/1",
+        "step_fraction": 0.001
+      },
+      "targets_ohm": [
+        [
+          69.15159990864866,
+          21.987851629480797
+        ],
+        [
+          71.36407078277776,
+          22.693054089530932
+        ],
+        [
+          72.53749631224325,
+          23.067560900242096
+        ]
+      ]
+    }
+  }
+}

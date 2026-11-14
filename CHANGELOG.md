@@ -1,5 +1,8 @@
 # Changelog
 
+- Seek explicit shape-current paired targets across finite frequency grids with frozen controls, reserved refinements and full current records.
+  유한 주파수 격자의 명시 형상전류 쌍 목표 역산에 제어 고정·예약 세분·전체 전류 기록을 보존합니다.
+
 - Assess all shape-current frequency-grid limits as one joint event per manufactured row, preserving unresolved evidence and exact binomial bounds.
   제조 행마다 형상전류 주파수 격자의 전체 조건을 하나의 동시 사건으로 평가하고 미해결 근거·정확 이항 구간을 보존합니다.
 
