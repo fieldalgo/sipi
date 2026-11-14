@@ -136,8 +136,8 @@ def surface_current_factors(mesh, signals, ground):
     return _surface_current_data(mesh, signals, ground)[0]
 
 
-def _surface_current_data(mesh, signals, ground):
-    """Shared current solve and unchanged boundary integrals, with metal edges."""
+def _surface_current_basis(mesh, signals, ground):
+    """Validate metal boundaries and solve the original vacuum P1 basis."""
     if not signals:
         raise ValueError('at least one signal is required')
     n, count = mesh.num_nodes, len(signals)
@@ -173,6 +173,13 @@ def _surface_current_data(mesh, signals, ground):
     c0 = epsilon_0*(v.T@(k@v))
     c0 = (c0+c0.T)/2
     inverse = np.linalg.inv(c0)
+    return sets, edges, owners, group, k, v, c0, inverse
+
+
+def _surface_current_data(mesh, signals, ground):
+    """Shared current solve and unchanged boundary integrals, with metal edges."""
+    sets, edges, owners, group, k, v, c0, inverse = _surface_current_basis(mesh, signals, ground)
+    t, count = mesh.triangles, len(signals)
 
     p = mesh.nodes[t]
     determinant = ((p[:,1,0]-p[:,0,0])*(p[:,2,1]-p[:,0,1])

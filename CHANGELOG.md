@@ -1,5 +1,8 @@
 # Changelog
 
+- Add explicit dual-cell boundary-current factors and metal-loss projection with independent field checks, preserving gradient and saved-line defaults.
+  독립 전계 검증을 갖춘 명시 이중 셀 경계 전류와 금속 손실 투영을 추가하고 기존 기울기·저장 선로 기본값을 보존합니다.
+
 - Add explicit yield-design/4 for fixed coated candidates with unchanged simultaneous confidence bounds, unresolved rows and cost ordering.
   동시 신뢰구간·미해결 행·비용 순서를 유지하며 고정 도금 후보를 위한 명시 yield-design/4를 추가합니다.
 

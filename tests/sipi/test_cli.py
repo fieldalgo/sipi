@@ -211,7 +211,7 @@ def test_closed_output_pipe_keeps_documented_exit_code(tmp_path):
 @pytest.mark.parametrize('error_number', [errno.EPIPE, errno.EINVAL])
 def test_failed_stdout_flush_redirects_before_interpreter_shutdown(tmp_path, monkeypatch, capsys, error_number):
     # Windows can report EINVAL for a closed pipe, rather than BrokenPipeError.
-    # Leaving the buffered descriptor intact makes Python exit with 121.
+    # Leaving the buffered descriptor intact makes Python exit with 120.
     source = input_file(tmp_path, lumped().dumps())
     redirects = []
     class FailedOutput:
