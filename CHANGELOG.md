@@ -1,5 +1,8 @@
 # Changelog
 
+- Add explicit capacitance-shape surface currents with two-step diagnostics, exact partial requests and existing per-boundary metal laws.
+  두 차분폭 진단·정확한 부분 요청·기존 경계별 금속 법칙을 보존하는 명시 정전용량 형상미분 전류 API를 추가합니다.
+
 - Save panel-resolution/1 requests with strict SI tolerances and preserve separate-axis comparisons, unaccepted results and exact partial failures through common execution.
   엄격한 SI 허용차로 panel-resolution/1 요청을 저장하고 분리 축 비교·미수락 결과·정확한 부분 실패를 공통 실행에 보존합니다.
 

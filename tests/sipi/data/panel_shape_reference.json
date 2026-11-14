@@ -1,0 +1,436 @@
+{
+  "method": "Two-sided capacitance derivatives; 64/128/256 panels, three difference steps; final 256-panel small-step observation.",
+  "scope": "Finite discretization observations, not an absolute error certificate. Independent circular-conductor image solution is checked separately.",
+  "cases": [
+    {
+      "name": "original",
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.02
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.02,
+            "thickness": 0.001
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.01005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 5e-06,
+          "far_size": 0.0002,
+          "grade": 0.1,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "ground": false,
+            "name": "positive",
+            "thickness": 5e-05,
+            "width": 0.0005,
+            "x": -0.00039999999999999996,
+            "y": 0.001
+          },
+          {
+            "ground": false,
+            "name": "negative",
+            "thickness": 5e-05,
+            "width": 0.0005,
+            "x": 0.00039999999999999996,
+            "y": 0.001
+          }
+        ]
+      },
+      "capacitance_per_permittivity": [
+        [
+          2.967527221536943,
+          -1.2630029022073348
+        ],
+        [
+          -1.2630029022073348,
+          2.9675272215369466
+        ]
+      ],
+      "parts": [
+        [
+          [
+            1431.8666584686755,
+            -64.790887241159
+          ],
+          [
+            -64.79088724115854,
+            157.61266537826702
+          ]
+        ],
+        [
+          [
+            157.6126653846241,
+            -64.79088722598374
+          ],
+          [
+            -64.79088722598351,
+            1431.8666584380776
+          ]
+        ],
+        [
+          [
+            154.79315959330023,
+            140.08799314228207
+          ],
+          [
+            140.08799314228207,
+            154.79315957851964
+          ]
+        ]
+      ],
+      "total": [
+        [
+          1744.2724834465998,
+          10.506218675139337
+        ],
+        [
+          10.506218675140019,
+          1744.2724833948644
+        ]
+      ],
+      "panel_differences": {
+        "parts": 1.0400282370859226e-07,
+        "total": 7.375343818912907e-07,
+        "capacitance": 1.2619257334613955e-07
+      },
+      "qualification_sha256": "7cab5694a511a8c501bfd588a8862204993f95c15c150133144528833ad48bde",
+      "source_sha256": "bd05a75b1bfe0b2485866b974c952a9e69a643e1b1f66b20e697bd3c16118c2e",
+      "shared_commit": "625d9f74ca253538f172a42272c869b66d144eed",
+      "versions": {
+        "numpy": "2.5.4",
+        "scipy": "1.18.1",
+        "galerkin": "0.0.2",
+        "meshine": "0.0.2"
+      }
+    },
+    {
+      "name": "single",
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.02
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.02,
+            "thickness": 0.001
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.01005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 5e-06,
+          "far_size": 0.0002,
+          "grade": 0.1,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "name": "signal0",
+            "x": 0.0,
+            "y": 0.0008,
+            "width": 0.0008,
+            "thickness": 3.5e-05,
+            "ground": false
+          }
+        ]
+      },
+      "capacitance_per_permittivity": [
+        [
+          3.063826182025907
+        ]
+      ],
+      "parts": [
+        [
+          [
+            1024.9969519083081
+          ]
+        ],
+        [
+          [
+            188.76657591765706
+          ]
+        ]
+      ],
+      "total": [
+        [
+          1213.7635278259652
+        ]
+      ],
+      "panel_differences": {
+        "parts": 2.410191377078834e-07,
+        "total": 2.0625781263610051e-07,
+        "capacitance": 4.362447519016775e-08
+      },
+      "qualification_sha256": "b604b5005232a7575ad00e5a6d954a77e504a82d0ca4b812500a3d368a2eafa8",
+      "source_sha256": "bd05a75b1bfe0b2485866b974c952a9e69a643e1b1f66b20e697bd3c16118c2e",
+      "shared_commit": "625d9f74ca253538f172a42272c869b66d144eed",
+      "versions": {
+        "numpy": "2.5.4",
+        "scipy": "1.18.1",
+        "galerkin": "0.0.2",
+        "meshine": "0.0.2"
+      }
+    },
+    {
+      "name": "asymmetric",
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.02
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.02,
+            "thickness": 0.001
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.01005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 5e-06,
+          "far_size": 0.0002,
+          "grade": 0.1,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "name": "signal0",
+            "x": -0.0005,
+            "y": 0.0008,
+            "width": 0.00035,
+            "thickness": 3.5e-05,
+            "ground": false
+          },
+          {
+            "name": "signal1",
+            "x": 0.0005,
+            "y": 0.0012,
+            "width": 0.0007,
+            "thickness": 7e-05,
+            "ground": false
+          }
+        ]
+      },
+      "capacitance_per_permittivity": [
+        [
+          2.53133911572668,
+          -0.8027726290430336
+        ],
+        [
+          -0.8027726290430336,
+          2.770972495898477
+        ]
+      ],
+      "parts": [
+        [
+          [
+            2022.637403172121,
+            -2.668231167634559
+          ],
+          [
+            -2.6682311676345307,
+            48.4625993288889
+          ]
+        ],
+        [
+          [
+            63.05701739995571,
+            -27.25335556471606
+          ],
+          [
+            -27.253355564716003,
+            1011.7015276890248
+          ]
+        ],
+        [
+          [
+            192.0965629256515,
+            130.7448916481533
+          ],
+          [
+            130.7448916481533,
+            131.97811729468876
+          ]
+        ]
+      ],
+      "total": [
+        [
+          2277.790983497728,
+          100.82330491580268
+        ],
+        [
+          100.82330491580277,
+          1192.1422443126023
+        ]
+      ],
+      "panel_differences": {
+        "parts": 1.685729334083723e-07,
+        "total": 9.2593625206981e-08,
+        "capacitance": 8.398239276887373e-08
+      },
+      "qualification_sha256": "04761c819317a7945c0d5bf80a9034425d9e0726ae89d49316e78603ec71f756",
+      "source_sha256": "bd05a75b1bfe0b2485866b974c952a9e69a643e1b1f66b20e697bd3c16118c2e",
+      "shared_commit": "625d9f74ca253538f172a42272c869b66d144eed",
+      "versions": {
+        "numpy": "2.5.4",
+        "scipy": "1.18.1",
+        "galerkin": "0.0.2",
+        "meshine": "0.0.2"
+      }
+    },
+    {
+      "name": "close_thin",
+      "cross_section": {
+        "box": {
+          "bottom": "ground",
+          "sides": "open",
+          "top": "open",
+          "width": 0.02
+        },
+        "layers": [
+          {
+            "eps_r": 4.0,
+            "name": "substrate",
+            "tan_delta": 0.02,
+            "thickness": 0.001
+          },
+          {
+            "eps_r": 1.0,
+            "name": "air",
+            "tan_delta": 0.0,
+            "thickness": 0.01005
+          }
+        ],
+        "length_unit": "m",
+        "mesh": {
+          "edge_size": 5e-06,
+          "far_size": 0.0002,
+          "grade": 0.1,
+          "min_angle": 28.0
+        },
+        "schema": "sipi.cross-section/1",
+        "traces": [
+          {
+            "name": "signal0",
+            "x": -0.00015,
+            "y": 0.0005,
+            "width": 0.0002,
+            "thickness": 1.8e-05,
+            "ground": false
+          },
+          {
+            "name": "signal1",
+            "x": 0.00015,
+            "y": 0.0005,
+            "width": 0.0002,
+            "thickness": 1.8e-05,
+            "ground": false
+          }
+        ]
+      },
+      "capacitance_per_permittivity": [
+        [
+          2.952835810526774,
+          -1.4330960197104332
+        ],
+        [
+          -1.4330960197104332,
+          2.9528358105267696
+        ]
+      ],
+      "parts": [
+        [
+          [
+            3684.731327044719,
+            -216.3209078676614
+          ],
+          [
+            -216.3209078676614,
+            508.02897063968067
+          ]
+        ],
+        [
+          [
+            508.0289704986192,
+            -216.32090785783703
+          ],
+          [
+            -216.32090785783703,
+            3684.7313272516094
+          ]
+        ],
+        [
+          [
+            306.70016781058473,
+            289.6757138489008
+          ],
+          [
+            289.6757138489008,
+            306.70016806968374
+          ]
+        ]
+      ],
+      "total": [
+        [
+          4499.460465353923,
+          -142.96610187659763
+        ],
+        [
+          -142.96610187659763,
+          4499.460465960974
+        ]
+      ],
+      "panel_differences": {
+        "parts": 1.1483047646933494e-07,
+        "total": 1.738920193565629e-07,
+        "capacitance": 1.4146381859026479e-07
+      },
+      "qualification_sha256": "be712d15601dec140d0d2266cd2448aae8335a8b6cf3dc1f90b208dd99814f0d",
+      "source_sha256": "bd05a75b1bfe0b2485866b974c952a9e69a643e1b1f66b20e697bd3c16118c2e",
+      "shared_commit": "625d9f74ca253538f172a42272c869b66d144eed",
+      "versions": {
+        "numpy": "2.5.4",
+        "scipy": "1.18.1",
+        "galerkin": "0.0.2",
+        "meshine": "0.0.2"
+      }
+    }
+  ]
+}

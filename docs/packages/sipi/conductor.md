@@ -195,3 +195,7 @@ quadratic tool is a test dependency, not a selectable production solver.
 [Planar layered-metal impedance](layered_metal.md) resolves explicit thin metal coatings on a bulk half-space, independently of the finite-geometry surface adapter.
 
 [Explicit dual-cell currents](dual_cell_conductor.md) use weak P1 boundary reactions with independent field comparisons. Algebraic conservation is separate from resistance accuracy; saved-line defaults remain unchanged.
+
+[Explicit capacitance-shape currents](panel_shape_conductor.md) provide a
+separate integrated-current estimate with retained finite-difference samples.
+Step agreement is distinct from panel and outer-domain convergence.

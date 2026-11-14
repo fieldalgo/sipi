@@ -162,3 +162,6 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 [평면 다층 금속 임피던스](layered_metal.md)는 유한 기하 표면 어댑터와 별도로 반무한 바탕 위의 명시적 얇은 금속 도금층을 해석합니다.
 
 [명시 이중 셀 전류](dual_cell_conductor.md)는 P1 경계 반력을 사용하고 독립 전계와 대조합니다. 대수적 전류 보존과 저항 정확도는 구분하며 저장 선로 기본값을 유지합니다.
+
+[명시 정전용량 형상미분 전류](panel_shape_conductor.md)는 차분 표본을 보존하는
+별도 적분 전류 추정법입니다. 차분폭 일치는 패널·외곽 수렴과 구분합니다.

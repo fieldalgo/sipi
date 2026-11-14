@@ -286,3 +286,6 @@ from .templates import asymmetric_layered_broadside_stripline
 from .templates import tapered_layered_broadside_stripline
 
 from .templates import split_gap_broadside_stripline
+
+from .panel_shape_conductor import (PanelShapeRequest, PanelShapeSample, PanelShapeCurrentFactors,
+    PanelShapeCurrentError, panel_shape_current_factors, panel_shape_conductor_loss_by_boundary)
