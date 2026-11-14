@@ -5,6 +5,7 @@ import argparse
 import ast
 from contextlib import contextmanager
 import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -101,6 +102,19 @@ def array_record(value):
     return dict(shape=list(a.shape), sha256=sha256(a.tobytes()))
 
 
+def runtime_details():
+    """Observe the active numerical libraries; do not choose a CPU or set limits."""
+    from contextlib import redirect_stdout
+    from importlib import metadata
+    import numpy as np
+    from threadpoolctl import threadpool_info
+    stream = io.StringIO()
+    with redirect_stdout(stream):
+        np.show_runtime()
+    return dict(threadpoolctl_version=metadata.version('threadpoolctl'),
+                threadpools=threadpool_info(), numpy_runtime=stream.getvalue())
+
+
 @contextmanager
 def trace_refinement(record):
     """Observe actual calls; do not substitute their inputs or return values.
@@ -130,6 +144,8 @@ def trace_refinement(record):
         row = dict(points=array_record(points), simplices=array_record(tri.simplices))
         if not record['rounds']:
             row.update(first_points=points.tolist(), first_simplices=tri.simplices.tolist())
+        elif len(record['rounds']) < 3:
+            row['snapshot'] = dict(points=points.tolist(), simplices=tri.simplices.tolist())
         record['rounds'].append(row)
         return tri
 
@@ -141,6 +157,9 @@ def trace_refinement(record):
         if not record['triangle_calls']:
             row.update(first_points=points.tolist(), first_triangles=triangles.tolist(),
                        first_outputs=[a.tolist() for a in result])
+        elif len(record['triangle_calls']) == 1:
+            row['snapshot'] = dict(points=points.tolist(), triangles=triangles.tolist(),
+                                   outputs=[a.tolist() for a in result])
         record['triangle_calls'].append(row)
         return result
 
@@ -210,11 +229,13 @@ def probe(variant, destination):
     digest = sha256(Path(refine.__file__).read_bytes())
     if digest != data[key]:
         raise ValueError('installed refine bytes do not match requested variant')
+    runtime = runtime_details()
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=False)
     environment = dict(variant=variant, shared_commit=data['base'], refine_sha256=digest,
                        inputs_sha256=data['inputs_sha256'], reference_sha256=data['reference_sha256'],
                        probe_script_sha256=SCRIPT_SHA256, python=sys.version, platform=platform.platform(),
+                       numerical_runtime=runtime,
                        versions={n: metadata.version(n) for n in ('sipi', 'meshine', 'galerkin', 'numpy', 'scipy', 'shapely')})
     write_json(destination / 'environment.json', environment)
     completed = []

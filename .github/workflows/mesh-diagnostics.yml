@@ -47,7 +47,7 @@ jobs:
           ref: ${{ steps.engine.outputs.ref }}
           path: .validation/engine
       - name: Install build and numerical tools
-        run: python -m pip install setuptools==84.0.0 wheel pytest numpy==2.5.4 scipy==1.18.1 shapely==2.2.0
+        run: python -m pip install setuptools==84.0.0 wheel pytest numpy==2.5.4 scipy==1.18.1 shapely==2.2.0 threadpoolctl==3.6.0
       - name: Prepare exact isolated variant
         run: python tools/mesh_diagnostics/run.py prepare .validation/engine .validation/mesh-source ${{ matrix.variant }}
       - name: Build and audit installed artifacts
@@ -88,6 +88,8 @@ jobs:
           git = lambda ref: subprocess.check_output(['git', 'rev-parse', ref], text=True).strip()
           env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
           subprocess.run([sys.executable, '-c', textwrap.dedent(code), str(wheels), str(report / 'audit.json'), git('HEAD'), git('HEAD^{tree}')], cwd=isolated, env=env, check=True)
+      - name: Diagnostic tool regression
+        run: python -m pytest -q tools/tests --junitxml=.validation/mesh-report/tools.xml
       - name: Original two-dimensional mesh criteria
         shell: python
         run: |

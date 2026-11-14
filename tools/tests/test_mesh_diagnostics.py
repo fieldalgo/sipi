@@ -68,10 +68,23 @@ def test_observation_preserves_actual_mesh_and_line_result():
         observed = section.mesh(**mesh)
     assert hooks == (Domain.build, refine.Delaunay, refine._triangle_data, refine._treated_apices)
     assert record['domains'] and record['rounds'] and record['triangle_calls']
-    p, t, outputs = comparison.first_triangle(record)
-    assert record['triangle_calls'][0]['delaunay_round'] >= 0
-    for expected, actual in zip(outputs, refine._triangle_data(p, t)):
-        np.testing.assert_array_equal(actual, expected)
+    assert len(record['rounds']) >= 3 and len(record['triangle_calls']) >= 2
+    for index in range(3):
+        p, t = comparison.delaunay_snapshot(record, index)
+        np.testing.assert_array_equal(t, refine.Delaunay(p).simplices)
+    for index in range(2):
+        p, t, outputs = comparison.triangle_snapshot(record, index)
+        assert record['triangle_calls'][index]['delaunay_round'] >= 0
+        for expected, actual in zip(outputs, refine._triangle_data(p, t)):
+            np.testing.assert_array_equal(actual, expected)
+    assert all('snapshot' not in row for row in record['rounds'][3:])
+    assert all('snapshot' not in row for row in record['triangle_calls'][2:])
+    result = comparison.compare_records(record, record)
+    assert result['second_triangle']['inputs_equal']
+    assert all(x['equal'] for x in result['second_triangle']['outputs'])
+    record['rounds'][1]['snapshot']['points'][0][0] += 1
+    with pytest.raises(ValueError, match='checksum/shape'):
+        comparison.delaunay_snapshot(record, 1)
     np.testing.assert_array_equal(observed.mesh.nodes, plain.mesh.nodes)
     np.testing.assert_array_equal(observed.mesh.triangles, plain.mesh.triangles)
     a, b = observed.line_parameters(), plain.line_parameters()
@@ -206,3 +219,23 @@ def test_missing_trace_cases_do_not_look_like_comparison_success(tmp_path):
     (a/'case.json').write_text('{}')
     with pytest.raises(ValueError, match='case sets differ'):
         comparison.compare_directories(a, b)
+
+
+def test_runtime_observation_does_not_change_thread_limits_or_error_mode():
+    from threadpoolctl import threadpool_info
+    before = threadpool_info(), np.geterr()
+    record = diagnostics.runtime_details()
+    assert record['threadpoolctl_version'] and record['numpy_runtime']
+    assert record['threadpools'] == before[0]
+    assert (threadpool_info(), np.geterr()) == before
+
+
+def test_unavailable_prefix_snapshots_are_distinct_from_matching_arrays():
+    old = dict(rounds=[{}], triangle_calls=[{}])
+    assert comparison.delaunay_snapshot(old) is None
+    assert comparison.triangle_snapshot(old) is None
+    assert comparison.delaunay_snapshot(old, 2) is None
+    assert comparison.compare_triangle_snapshots(None, None) == dict(available=False)
+    for read in (comparison.delaunay_snapshot, comparison.triangle_snapshot):
+        with pytest.raises(ValueError, match='negative'):
+            read(old, -1)

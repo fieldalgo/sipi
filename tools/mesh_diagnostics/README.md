@@ -47,6 +47,15 @@ NumPy 2.5.4, SciPy 1.18.1 and Shapely 2.2.0, installs existing wheel
 dependencies and publishes no package, executable or website.
 Run tool regression with `python -m pytest -q tools/tests`.
 
+Install `threadpoolctl==3.6.0` for these developer tools. Its BSD-3-Clause
+license requires retaining its copyright, conditions and disclaimer on
+redistribution and forbids endorsement by the copyright holder. The reviewed
+package has no bundled native libraries; its license remains in the installed
+wheel. It is a diagnostic/CI dependency, not a SIPI runtime or EXE dependency.
+`environment.json` records NumPy runtime CPU features and the active BLAS
+libraries, versions, architecture selection and thread counts. Observation
+does not set CPU selection, floating-point modes or thread limits.
+
 ## Interpret the evidence
 
 Nine original saved-study inputs with two width samples each and the original
@@ -74,6 +83,11 @@ The first triangle-data call also retains its points, triangle indices, four
 output arrays and Delaunay round index. Replaying `_triangle_data` on these
 exact arrays separates arithmetic differences from different triangulations;
 the observer does not alter the arrays returned to refinement.
+The next two Delaunay calls and second triangle-data call retain bounded
+`snapshot` arrays as well. Their hashes remain in the original rows. Use
+`delaunay_snapshot(record, index)` or `triangle_snapshot(record, index)` from
+`compare.py` to validate and read them; missing old snapshots return `None`,
+never an empty successful comparison.
 
 Compare two downloaded probe directories without rerunning field solves:
 
@@ -100,6 +114,22 @@ triangulations differed in connectivity; all 32 changed internal edges across
 both sides had exact zero incircle determinants. The remaining 14 cases had
 matching initial connectivity, with subsequent divergence still unresolved.
 This observation does not accept the candidate or explain all later changes.
+
+Replacing only the initial conductor triangulation with the recorded macOS
+connectivity, then continuing on Linux, reproduced the original Linux final
+mesh and conductor values exactly at both mesh sizes. Thus the initial
+diagonal choice alone does not explain the final platform difference. Replaying
+all 20 macOS first triangle-data inputs on Linux reproduced circumcenters,
+radii and centroids exactly; angles differed by at most 4.44e-16 radians, with
+identical raw 28-degree classifications. Later refinement remains unresolved.
+
+A controlled CPU-dispatch experiment with NumPy 2.5.4 and OpenBLAS
+0.3.34.106.0 reproduced the separate scalar-length discrepancy. On the same
+Linux installation, SkylakeX and Haswell paths produced 98.87655849123043 and
+98.87641768741268 ohms for the retained asymmetric unbacked sample. The
+isolated candidate produced 98.87655849123043 and 98.87655849123048 ohms.
+This is a controlled observation, not evidence of which CPU path earlier CI
+jobs used, and does not resolve the macOS conductor gate.
 
 Compare the same case and stage. Different node hashes alone do not establish
 physical error; identical impedance does not prove identical meshes. This

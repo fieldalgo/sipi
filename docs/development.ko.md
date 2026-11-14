@@ -29,7 +29,8 @@ provenance.json은 최초 이전 스냅샷의 파일과 상류 SHA-256을 기록
 
 ## 설치 아티팩트 대조
 
-검증 도구는 `python -m pytest -q tools/tests`로 시험합니다. 정확한 자체 패키지 휠을
+비배포 수치 runtime 관측용 `threadpoolctl==3.6.0`을 설치한 뒤 검증 도구를
+`python -m pytest -q tools/tests`로 시험합니다. 정확한 자체 패키지 휠을
 설치한 뒤 `python tools/check_installed.py --wheels WHEEL_DIRECTORY`를 실행합니다.
 이 폴더에는 sipi·galerkin·meshine·simcase 휠이 각각 하나 있어야 합니다. simcase는
 기하 계약 통합 시험용입니다. 체크아웃 밖 새 프로세스에서 PYTHONPATH를 제거하고

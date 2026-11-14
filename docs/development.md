@@ -36,7 +36,8 @@ platform support. Original source history remains at the recorded upstream commi
 
 ## Exact installed-artifact validation
 
-Run `python -m pytest -q tools/tests` for the validation tools. After installing
+Install `threadpoolctl==3.6.0` for the unshipped numerical-runtime observer,
+then run `python -m pytest -q tools/tests` for the validation tools. After installing
 exact first-party wheels, run `python tools/check_installed.py --wheels WHEEL_DIRECTORY`.
 The directory must contain exactly one wheel each for sipi, galerkin, meshine and
 simcase. The last package is used only for geometry contract integration tests.

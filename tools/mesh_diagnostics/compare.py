@@ -101,38 +101,77 @@ def checked_array(values, record, *, integer=False):
     return a
 
 
-def first_triangle(record):
-    if not record.get('triangle_calls') or 'first_outputs' not in record['triangle_calls'][0]:
+def triangle_snapshot(record, index=0):
+    calls = record.get('triangle_calls', [])
+    if index < 0:
+        raise ValueError('negative triangle call index')
+    if index >= len(calls):
         return None
-    row = record['triangle_calls'][0]
-    p = checked_array(row['first_points'], row['points'])
-    t = checked_array(row['first_triangles'], row['triangles'], integer=True)
-    if len(row['first_outputs']) != 4 or len(row['outputs']) != 4:
+    row = calls[index]
+    if index == 0 and 'first_outputs' in row:
+        values = dict(points=row['first_points'], triangles=row['first_triangles'], outputs=row['first_outputs'])
+    elif 'snapshot' in row:
+        values = row['snapshot']
+    else:
+        return None
+    p = checked_array(values['points'], row['points'])
+    t = checked_array(values['triangles'], row['triangles'], integer=True)
+    if len(values['outputs']) != 4 or len(row['outputs']) != 4:
         raise ValueError('expected four triangle-data outputs')
-    outputs = [checked_array(a, h) for a, h in zip(row['first_outputs'], row['outputs'])]
+    outputs = [checked_array(a, h) for a, h in zip(values['outputs'], row['outputs'])]
     if [a.shape for a in outputs] != [(len(t), 2), (len(t),), (len(t), 3), (len(t), 2)]:
         raise ValueError('invalid triangle-data output shapes')
     return p, t, outputs
 
 
-def compare_records(left, right):
-    seeds = []
-    for record in (left, right):
-        row = record['rounds'][0]
-        seeds.append((checked_array(row['first_points'], row['points']),
-                      checked_array(row['first_simplices'], row['simplices'], integer=True)))
-    result = dict(seed=compare_seeds(*seeds[0], *seeds[1]))
-    a, b = first_triangle(left), first_triangle(right)
+def first_triangle(record):
+    return triangle_snapshot(record)
+
+
+def compare_triangle_snapshots(a, b):
     if a is None or b is None:
-        result['first_triangle'] = dict(available=False)
+        return dict(available=False)
+    same = np.array_equal(a[0], b[0]) and np.array_equal(a[1], b[1])
+    result = dict(available=True, inputs_equal=same)
+    if same:
+        result['outputs'] = [dict(
+            equal=np.array_equal(x, y), different_entries=int(np.count_nonzero(x != y)),
+            max_absolute_difference=float(np.max(np.abs(x-y), initial=0)))
+            for x, y in zip(a[2], b[2])]
+    return result
+
+
+def delaunay_snapshot(record, index=0):
+    rounds = record.get('rounds', [])
+    if index < 0:
+        raise ValueError('negative Delaunay round index')
+    if index >= len(rounds):
+        return None
+    row = rounds[index]
+    if index == 0 and 'first_points' in row:
+        values = dict(points=row['first_points'], simplices=row['first_simplices'])
+    elif 'snapshot' in row:
+        values = row['snapshot']
     else:
-        same = np.array_equal(a[0], b[0]) and np.array_equal(a[1], b[1])
-        result['first_triangle'] = dict(available=True, inputs_equal=same)
-        if same:
-            result['first_triangle']['outputs'] = [dict(
-                equal=np.array_equal(x, y), different_entries=int(np.count_nonzero(x != y)),
-                max_absolute_difference=float(np.max(np.abs(x-y), initial=0)))
-                for x, y in zip(a[2], b[2])]
+        return None
+    return (checked_array(values['points'], row['points']),
+            checked_array(values['simplices'], row['simplices'], integer=True))
+
+
+def compare_records(left, right):
+    seeds = [delaunay_snapshot(record) for record in (left, right)]
+    if any(seed is None for seed in seeds):
+        raise ValueError('initial triangulation is unavailable')
+    result = dict(seed=compare_seeds(*seeds[0], *seeds[1]))
+    result['later_seed_snapshots'] = []
+    for index in (1, 2):
+        a, b = delaunay_snapshot(left, index), delaunay_snapshot(right, index)
+        result['later_seed_snapshots'].append(dict(round=index, available=a is not None and b is not None))
+        if a is not None and b is not None:
+            result['later_seed_snapshots'][-1]['comparison'] = compare_seeds(*a, *b)
+    for index, name in enumerate(('first_triangle', 'second_triangle')):
+        result[name] = compare_triangle_snapshots(
+            triangle_snapshot(left, index), triangle_snapshot(right, index))
     return result
 
 

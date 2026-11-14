@@ -1,5 +1,8 @@
 # Changelog
 
+- Retain bounded refinement-prefix arrays and active BLAS dispatch information for same-input platform replay without selecting a numerical backend.
+  수치 backend를 선택하지 않고 플랫폼 재생에 필요한 초기 세분 배열과 실제 BLAS 실행 경로를 보존합니다.
+
 - Classify recorded mesh seed differences with exact predicates and retain first triangle-data inputs for arithmetic replay, without changing runtime criteria.
   정확한 술어로 초기 메시 차이를 분류하고 연산 재생용 첫 triangle-data 입력을 보존하며 runtime 기준은 유지합니다.
 
