@@ -132,3 +132,5 @@ both quantities at each frequency. These finite cases do not establish
 monotonic convergence for arbitrary inputs, a continuous frequency band or
 an infinite-domain error bound. They are not automatic outer checks in the
 API. Previous saved schemas and calculation defaults are unchanged.
+
+[Explicit shape-current goals](shape_panel_pair_goal.md).

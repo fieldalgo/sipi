@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect explicit shape-current lines to bounded pair impedance goals with frozen method controls and independent panel/volume refinements.
+  명시 형상전류 선로를 범위 제한 쌍 임피던스 역산에 연결하고 방식 제어 고정·독립 패널/체적 세분을 유지합니다.
+
 - Save shape-current resolution plans and preserve complete, unaccepted and detailed partial-failure receipts with explicit whole-line budgets.
   형상전류 해상도 계획을 저장하고 선로 전체 평가 예산·완료·미수락·상세 부분 실패 영수증을 보존합니다.
 

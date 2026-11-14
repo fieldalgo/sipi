@@ -88,6 +88,17 @@ def seek_panel_forward_pair_impedances(factory, bounds, targets, *, tolerances,
     global optimum, outer-domain bound or measured accuracy is certified.
     See the English/Korean usage contract for input and failure details.
     """
+    return _seek_panel_pair_goal(factory, bounds, targets, tolerances=tolerances,
+        initial=initial, max_evaluations=max_evaluations,
+        document_type=PanelTransmissionLineDocument, refinements=_refinements,
+        physical_line=lambda doc: doc.line, settings=lambda doc: doc.panel_options,
+        refinement_type=PanelPairRefinement, design_type=PanelForwardPairDesign)
+
+
+def _seek_panel_pair_goal(factory, bounds, targets, *, tolerances, initial,
+                         max_evaluations, document_type, refinements, physical_line,
+                         settings, refinement_type, design_type):
+    """Shared bounded search; explicit callers own document and result contracts."""
     if not callable(factory):
         raise TypeError('factory must be callable')
     ranges = _numbers(bounds)
@@ -124,24 +135,24 @@ def seek_panel_forward_pair_impedances(factory, bounds, targets, *, tolerances,
         try:
             if selected is None:
                 candidate = factory(*parameters)
-                if not isinstance(candidate, PanelTransmissionLineDocument):
-                    raise TypeError('factory must return PanelTransmissionLineDocument')
+                if not isinstance(candidate, document_type):
+                    raise TypeError('factory must return '+document_type.__name__)
                 text = candidate.dumps()
                 phase = 'validation'
-                doc = PanelTransmissionLineDocument.loads(text)
+                doc = document_type.loads(text)
             else:
-                doc = _refinements(selected.input_json)[stage]
-            text = doc.dumps(); data = doc.to_dict()["line"]
+                doc = refinements(selected.input_json)[stage]
+            text = doc.dumps(); source_line = physical_line(doc); data = source_line.to_dict()
             frequency = data['frequency_hz']
-            names = tuple(trace.name for trace in doc.line.cross_section.section.traces if not trace.ground)
+            names = tuple(trace.name for trace in source_line.cross_section.section.traces if not trace.ground)
             if len(frequency) != 1 or frequency[0] <= 0 or len(names) != 2 or data['length_m'] != 0:
                 raise ValueError('goal requires two signals, one positive frequency and zero length')
-            current = (frequency[0], names, tuple(sorted(doc.panel_options.items())))
+            current = (frequency[0], names, tuple(sorted(settings(doc).items())))
             if selected is None and identity is not None and current != identity:
                 raise ValueError('frequency, ordered signal names and panel settings must stay fixed')
             if selected is None:
                 identity = current
-                _refinements(text)  # Admit every future frozen refinement before fields.
+                refinements(text)  # Admit every future frozen refinement before fields.
             phase = 'extraction'
             line = doc.analyze()
             if tuple(line.frequency) != tuple(frequency) or tuple(line.names) != names:
@@ -213,6 +224,6 @@ def seek_panel_forward_pair_impedances(factory, bounds, targets, *, tolerances,
             if np.any(abs(np.array(row.impedances)/previous.impedances-1) > .005):
                 raise failure('independent refinement exceeds relative convergence limit', stage+'/convergence',
                               chosen.parameters, text=row.input_json)
-        checked.append(PanelPairRefinement(row, refined_line))
-    return PanelForwardPairDesign(chosen.parameters, tuple(target), tuple(tolerance), chosen.impedances,
+        checked.append(refinement_type(row, refined_line))
+    return design_type(chosen.parameters, tuple(target), tuple(tolerance), chosen.impedances,
         chosen.input_json, tuple(history), line, tuple(checked))

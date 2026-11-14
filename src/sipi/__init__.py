@@ -297,3 +297,6 @@ from .shape_panel_resolution import (ShapePanelResolutionFailure, ShapePanelReso
     assess_shape_panel_line_resolution)
 
 from .shape_panel_resolution_document import ShapePanelResolutionDocument
+
+from .shape_panel_pair_goal import (ShapePanelPairRefinement, ShapePanelForwardPairDesign,
+    seek_shape_panel_forward_pair_impedances)
