@@ -334,3 +334,7 @@ __all__ += ['ShapeReferenceConductorLoss', 'panel_shape_conductor_loss_with_refe
 
 from .shape_reference_panel_line import ShapeReferencePanelTransmissionLineDocument
 __all__ += ['ShapeReferencePanelTransmissionLineDocument']
+
+from .panel_shape_face_conductor import (PanelShapeFaceCurrentFactors, PanelShapeFaceCurrentError,
+    panel_shape_face_current_factors)
+__all__ += ['PanelShapeFaceCurrentFactors', 'PanelShapeFaceCurrentError', 'panel_shape_face_current_factors']

@@ -64,3 +64,5 @@ assert factors.current_error <= 1e-10
 [저장 형상전류 선로](shape_panel_line.md) 래퍼를 사용합니다.
 
 [접지 경계별 전체 둘레 금속 분리](shape_reference_conductor.md).
+
+[명시 직선면별 에너지](panel_shape_faces.md).

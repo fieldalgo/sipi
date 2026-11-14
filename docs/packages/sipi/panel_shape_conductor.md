@@ -76,3 +76,5 @@ For versioned input and common execution, use the explicit
 [saved shape-current line](shape_panel_line.md) wrapper.
 
 [Separate whole-boundary ground metals](shape_reference_conductor.md).
+
+[Explicit straight-face energies](panel_shape_faces.md).

@@ -1,5 +1,8 @@
 # Changelog
 
+- Extract explicit straight-face shape-current energies with bounded requests, whole-current evidence and strict derivative checks.
+  요청 횟수를 제한한 명시 직선면별 형상전류 에너지를 전체전류 근거·엄격한 미분 검사와 함께 추출합니다.
+
 - Save separate whole-reference metals with matched shape-current RLGC, strict admission and complete execution evidence.
   접지 경계별 전체 둘레 금속과 일치하는 형상전류 RLGC를 엄격한 사전 검사·완전한 실행 근거와 함께 저장합니다.
 
