@@ -1,5 +1,7 @@
 # Panel lines with fixed metal coatings
 
+[Fixed coated sampling and joint acceptance](layered_panel_study.md) explicitly select version 2.
+
 `sipi.panel-transmission-line/2` explicitly combines a nested
 `sipi.transmission-line/7` with the existing panel current calculation. Version
 1 still accepts only nested line versions 1–6. The new version keeps the same

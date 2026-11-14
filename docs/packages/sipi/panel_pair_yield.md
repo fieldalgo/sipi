@@ -1,5 +1,7 @@
 # Joint acceptance of paired forward impedances
 
+[Fixed coated sampling and joint acceptance](layered_panel_study.md) explicitly select version 2.
+
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_yield.md) ·
 [Paired sampling](panel_pair_study.md) · [Fixed candidates](panel_pair_selection.md)
 

@@ -1,5 +1,7 @@
 # Paired forward-impedance sampling with explicit panel currents
 
+[Fixed coated sampling and joint acceptance](layered_panel_study.md) explicitly select version 2.
+
 [Finite-frequency paired sampling](sampled_panel_pair_study.md) keeps each manufactured sample fixed across the requested grid.
 
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_study.md) ·

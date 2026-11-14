@@ -125,7 +125,7 @@ def test_strict_keys(where,kind):
 
 def test_duplicate_nonfinite_and_schema_rejection():
     text=document().dumps()
-    for bad in [text.replace('"ground_modes": 512','"ground_modes": 512, "ground_modes": 512'),text.replace('"ground_modes": 512','"ground_modes": NaN'),text.replace('sipi.panel-forward-pair-study/1','sipi.panel-forward-pair-study/2')]:
+    for bad in [text.replace('"ground_modes": 512','"ground_modes": 512, "ground_modes": 512'),text.replace('"ground_modes": 512','"ground_modes": NaN'),text.replace('sipi.panel-forward-pair-study/1','sipi.panel-forward-pair-study/unsupported')]:
         with pytest.raises(ValueError):PanelForwardPairStudyDocument.loads(bad)
 
 

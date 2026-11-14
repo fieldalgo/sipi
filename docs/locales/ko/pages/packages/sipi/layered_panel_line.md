@@ -1,5 +1,7 @@
 # 고정 금속 코팅을 사용하는 패널 선로
 
+[고정 코팅 표본과 동시 수락](layered_panel_study.md)은 버전 2를 명시적으로 선택합니다.
+
 `sipi.panel-transmission-line/2`는 내부 `sipi.transmission-line/7`과 기존
 패널 전류 계산을 명시적으로 결합합니다. 버전 1은 계속 내부 선로 1–6만
 받습니다. `schema`, `line`, `panel` 키는 같고 생성자에서 새 버전을 명시합니다.

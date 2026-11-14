@@ -1,5 +1,7 @@
 # 두 순방향 임피던스의 동시 조건 수율 평가
 
+[고정 코팅 표본과 동시 수락](layered_panel_study.md)은 버전 2를 명시적으로 선택합니다.
+
 [English](../../../../../packages/sipi/panel_pair_yield.md) ·
 [두 양의 공차 평가](panel_pair_study.md) · [고정 후보 선택](panel_pair_selection.md)
 

@@ -1,5 +1,7 @@
 # 명시 패널 전류를 사용하는 두 순방향 임피던스 공차 평가
 
+[고정 코팅 표본과 동시 수락](layered_panel_study.md)은 버전 2를 명시적으로 선택합니다.
+
 [유한 주파수 두 양 표본](sampled_panel_pair_study.md)은 같은 제조 표본을 요청 주파수 전체에 적용합니다.
 
 [English](../../../../../packages/sipi/panel_pair_study.md) ·

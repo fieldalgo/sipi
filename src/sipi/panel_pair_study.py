@@ -19,6 +19,7 @@ __all__ = ['PanelForwardPairStudyDocument', 'PanelForwardPairStudy', 'PanelForwa
 
 _QUANTITIES = ('differential_forward_impedance_real', 'common_forward_impedance_real')
 _SCHEMA = 'sipi.panel-forward-pair-study/1'
+_LAYERED_SCHEMA = 'sipi.panel-forward-pair-study/2'
 
 
 @dataclass(frozen=True)
@@ -77,6 +78,9 @@ class PanelForwardPairStudy:
 class PanelForwardPairStudyDocument:
     """Sample both full-complex forward impedances from one panel extraction.
 
+    Explicit version 2 constructs line/7 plus panel-line/2 and retains fixed
+    layered metals. Version 1 and its defaults remain unchanged.
+
     The nested paired study/3 or /4 supplies the fixed positive frequency,
     ordered geometry/material variables and existing sampling/constraint rules.
     Its z_diff_forward label selects source inputs; no quasi-static study runs.
@@ -96,22 +100,26 @@ class PanelForwardPairStudyDocument:
     The existing panel geometry, resource and skin-depth gates still apply.
     """
 
-    def __init__(self, study, *, conductor, panels_per_edge=32, ground_modes=512, interpolation_degree=10):
+    def __init__(self, study, *, conductor, panels_per_edge=32, ground_modes=512, interpolation_degree=10,
+                 schema=_SCHEMA):
         if isinstance(study, ImpedanceStudyDocument):
             study = study.to_dict()
-        self._assign(dict(schema=_SCHEMA, study=study, conductor=conductor,
+        self._assign(dict(schema=schema, study=study, conductor=conductor,
             panel=dict(panels_per_edge=panels_per_edge, ground_modes=ground_modes,
                        interpolation_degree=interpolation_degree)))
 
     def _assign(self, data):
         data = _copy(data)
         _keys(data, ('schema', 'study', 'conductor', 'panel'), where='panel forward pair study')
-        if data['schema'] != _SCHEMA:
+        if data['schema'] not in (_SCHEMA, _LAYERED_SCHEMA):
             raise ValueError('unsupported panel-forward-pair-study schema')
         study = _source_study(data['study'], paired=True)
         _keys(data['panel'], ('panels_per_edge', 'ground_modes', 'interpolation_degree'), where='panel controls')
-        nominal = PanelTransmissionLineDocument(_line_from_values(study, data['conductor']), **data['panel'])
-        self._data = dict(schema=_SCHEMA, study=study,
+        line_options = {} if data['schema']==_SCHEMA else dict(line_schema='sipi.transmission-line/7')
+        panel_options = {} if data['schema']==_SCHEMA else dict(schema='sipi.panel-transmission-line/2')
+        nominal = PanelTransmissionLineDocument(
+            _line_from_values(study, data['conductor'], **line_options), **data['panel'], **panel_options)
+        self._data = dict(schema=data['schema'], study=study,
             conductor=nominal.line.to_dict()['conductor'], panel=nominal.panel_options)
 
     @classmethod
@@ -139,6 +147,8 @@ class PanelForwardPairStudyDocument:
         budget = _integer(max_evaluations, 2, 10000)
         data = self.to_dict()
         study = data['study']
+        line_options = {} if data['schema']==_SCHEMA else dict(line_schema='sipi.transmission-line/7')
+        panel_options = {} if data['schema']==_SCHEMA else dict(schema='sipi.panel-transmission-line/2')
         samples = self.samples()
         if len(samples) > budget:
             raise ValueError('sample count exceeds max_evaluations before any solve')
@@ -157,7 +167,8 @@ class PanelForwardPairStudyDocument:
                 material_json = _json(evaluation)
                 phase = 'input'
                 doc = PanelTransmissionLineDocument(
-                    _line_from_inputs(study, data['conductor'], parameters, evaluation), **data['panel'])
+                    _line_from_inputs(study, data['conductor'], parameters, evaluation, **line_options),
+                    **data['panel'], **panel_options)
                 input_json = doc.dumps()
                 phase = 'extraction'
                 line = doc.analyze()

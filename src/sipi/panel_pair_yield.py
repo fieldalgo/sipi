@@ -16,6 +16,7 @@ from .yield_assessment import _criteria, _interval, _scalar
 __all__ = ['PanelPairYieldAssessment', 'PanelForwardPairYieldDocument', 'assess_panel_pair_yield']
 
 _SCHEMA = 'sipi.panel-forward-pair-yield/1'
+_LAYERED_SCHEMA = 'sipi.panel-forward-pair-yield/2'
 
 
 def _acceptance(acceptance, confidence, minimum_yield):
@@ -137,27 +138,33 @@ def assess_panel_pair_yield(study, *, acceptance, confidence=.95, minimum_yield=
 class PanelForwardPairYieldDocument:
     """Strict saved joint acceptance of one explicit panel-current iid study.
 
+    Explicit version 2 requires a panel-forward-pair-study/2 source; version 1
+    retains its version 1 source. The statistical event and interval are unchanged.
+
     Both named quantities require an inclusive minimum and/or maximum in ohms.
     Parsing and iid/limit validation are field-free. Analysis runs the paired
     study with its caller's budget and retains every failed or completed row.
     Existing single-quantity yield schemas and methods remain unchanged.
     """
-    def __init__(self, study, *, acceptance, confidence=.95, minimum_yield=None):
+    def __init__(self, study, *, acceptance, confidence=.95, minimum_yield=None, schema=_SCHEMA):
         if not isinstance(study, PanelForwardPairStudyDocument):
             raise ValueError('study must be a PanelForwardPairStudyDocument')
-        self._assign(dict(schema=_SCHEMA, study=study.to_dict(), acceptance=acceptance,
+        self._assign(dict(schema=schema, study=study.to_dict(), acceptance=acceptance,
                           confidence=confidence, minimum_yield=minimum_yield))
 
     def _assign(self, data):
         data = _copy(data)
         _keys(data, ('schema', 'study', 'acceptance', 'confidence', 'minimum_yield'), where='panel pair yield')
-        if data['schema'] != _SCHEMA:
+        if data['schema'] not in (_SCHEMA, _LAYERED_SCHEMA):
             raise ValueError('unsupported panel-forward-pair-yield schema')
         study = PanelForwardPairStudyDocument.from_dict(data['study']).to_dict()
+        required = 'sipi.panel-forward-pair-study/1' if data['schema']==_SCHEMA else 'sipi.panel-forward-pair-study/2'
+        if study['schema']!=required:
+            raise ValueError('panel pair yield version requires the matching study version')
         if study['study']['sampling']['kind'] not in ('uniform', 'normal'):
             raise ValueError('joint yield requires iid uniform or normal samples')
         acceptance, level, target = _acceptance(data['acceptance'], data['confidence'], data['minimum_yield'])
-        self._data = dict(schema=_SCHEMA, study=study, acceptance=acceptance,
+        self._data = dict(schema=data['schema'], study=study, acceptance=acceptance,
                           confidence=level, minimum_yield=target)
 
     @classmethod

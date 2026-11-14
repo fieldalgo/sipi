@@ -14,6 +14,7 @@ import pytest
 from sipi import CrossSection, LumpedNetworkDocument, ImpedanceDesignDocument
 from sipi import cli
 from sipi.execution_request import SavedExecutionRequest
+from sipi.execution import saved_schemas
 from test_execution import documents, cross, lumped
 
 
@@ -25,13 +26,14 @@ def input_file(tmp_path, text):
 
 def test_every_input_validates_canonically_without_fields(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(CrossSection, 'mesh', lambda *a, **k: pytest.fail('validation solved fields'))
-    count = 0
+    seen = []
     for doc in documents():
         assert cli.main(['validate', str(input_file(tmp_path, doc.dumps()))]) == 0
         captured = capsys.readouterr()
         assert captured.out == doc.dumps() + '\n' and captured.err == ''
-        count += 1
-    assert count == 125
+        seen.append(doc.to_dict()['schema'])
+    assert len(seen) == len(set(seen)) == len(saved_schemas())
+    assert set(seen) == set(saved_schemas())
 
 
 @pytest.mark.parametrize('doc', [lumped, cross])
