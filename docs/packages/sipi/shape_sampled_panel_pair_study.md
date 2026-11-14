@@ -1,5 +1,7 @@
 # Shape-current manufacturing samples across a finite frequency grid
 
+[All-frequency joint acceptance](shape_sampled_panel_pair_yield.md) keeps the original manufacturing denominator.
+
 [한국어](../../locales/ko/pages/packages/sipi/shape_sampled_panel_pair_study.md) ·
 [Single-frequency studies](shape_panel_pair_study.md) · [Original frequency-grid contract](sampled_panel_pair_study.md)
 

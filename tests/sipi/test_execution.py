@@ -553,6 +553,8 @@ def documents():
     base.append(shape_yield())
     from test_shape_sampled_panel_pair_study import document as shape_grid_study
     base.append(shape_grid_study())
+    from test_shape_sampled_panel_pair_yield import document as shape_grid_yield
+    base.append(shape_grid_yield())
     return base
 
 

@@ -1,5 +1,8 @@
 # Changelog
 
+- Assess all shape-current frequency-grid limits as one joint event per manufactured row, preserving unresolved evidence and exact binomial bounds.
+  제조 행마다 형상전류 주파수 격자의 전체 조건을 하나의 동시 사건으로 평가하고 미해결 근거·정확 이항 구간을 보존합니다.
+
 - Preserve explicit shape-current manufacturing rows across finite frequency grids, with atomic failures and full current evidence.
   유한 주파수 격자 전체에서 명시 형상전류 제조 행·행 단위 실패·전체 전류 근거를 보존합니다.
 

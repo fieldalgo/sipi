@@ -1,5 +1,7 @@
 # 유한 주파수 격자에서의 형상전류 제조 표본
 
+[전체 주파수 동시 조건 만족률](shape_sampled_panel_pair_yield.md)은 원래 제조 표본 분모를 유지합니다.
+
 [English](../../../../../packages/sipi/shape_sampled_panel_pair_study.md) ·
 [단일 주파수 표본](shape_panel_pair_study.md) · [기존 주파수 표본 계약](sampled_panel_pair_study.md)
 
