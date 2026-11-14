@@ -1,5 +1,8 @@
 # Changelog
 
+- Infer nonnegative effective shunt loss from explicit propagation attenuation and known scalar RLC, retaining constrained mismatches and exact power partitions.
+  명시 전파 감쇠와 알려진 단일 선로 RLC에서 비음수 유효 shunt 손실을 역산하고 제약에 따른 불일치와 정확 전력 분해를 보존합니다.
+
 - Save fixed-radius roughness fitting requests with strict units, explicit weights and separate completion/sample acceptance through common execution.
   고정 반경 거칠기 피팅 요청에 단위·가중치를 명시해 저장하고 공통 실행에서 계산 완료와 표본 수락을 구분합니다.
 
