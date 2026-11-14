@@ -31,7 +31,10 @@ class PanelTransmissionLineResult(TransmissionLineResult):
 
 
 class PanelTransmissionLineDocument:
-    """Strict sipi.panel-transmission-line/1 with a canonical nested line.
+    """Strict opt-in panel line with a canonical nested line.
+
+    Version 1 retains transmission-line/1 through /6. Explicit version 2
+    requires transmission-line/7 and admits its fixed layered surface metals.
 
     The nested line must select perfect or surface-boundaries conductors.
     Panel currents supply the matching vacuum capacitance and external L;
@@ -39,19 +42,23 @@ class PanelTransmissionLineDocument:
     Normalization performs no field solve. Shared geometric admission and
     numerical refinement still occur when analyze() is called.
     """
-    def __init__(self,line,*,panels_per_edge=32,ground_modes=512,interpolation_degree=10):
+    def __init__(self,line,*,panels_per_edge=32,ground_modes=512,interpolation_degree=10,
+                 schema='sipi.panel-transmission-line/1'):
         if not isinstance(line,TransmissionLineDocument):
             raise TypeError('line must be a TransmissionLineDocument')
-        self._data=self._validate(dict(schema='sipi.panel-transmission-line/1',line=line.to_dict(),
+        self._data=self._validate(dict(schema=schema,line=line.to_dict(),
             panel=dict(panels_per_edge=panels_per_edge,ground_modes=ground_modes,interpolation_degree=interpolation_degree)))
 
     @staticmethod
     def _validate(data):
         _keys(data,('schema','line','panel'),where='panel transmission line')
-        if data['schema']!='sipi.panel-transmission-line/1':raise ValueError('unsupported panel-transmission-line schema')
+        versions={'sipi.panel-transmission-line/1':(1,2,3,4,5,6),
+                  'sipi.panel-transmission-line/2':(7,)}
+        if not isinstance(data['schema'],str) or data['schema'] not in versions:
+            raise ValueError('unsupported panel-transmission-line schema')
         if (not isinstance(data['line'], dict) or data['line'].get('schema') not in
-                tuple(f'sipi.transmission-line/{v}' for v in (1, 2, 3, 4, 5, 6))):
-            raise ValueError('panel line requires a nested transmission-line/1 through /6')
+                tuple(f'sipi.transmission-line/{v}' for v in versions[data['schema']])):
+            raise ValueError('panel line requires a nested transmission-line/1 through /6 for version 1, or /7 for version 2')
         line=TransmissionLineDocument.from_dict(data['line']);value=line.to_dict();section=line.cross_section.section
         if value['conductor']['kind'] not in ('perfect','surface-boundaries'):
             raise ValueError('panel line requires perfect or surface-boundaries conductor')

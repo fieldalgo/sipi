@@ -113,6 +113,7 @@ _REGISTRY = {
     'sipi.panel-forward-pair-selection/1': PanelForwardPairSelectionDocument,
     'sipi.sampled-panel-forward-pair-selection/1': SampledPanelForwardPairSelectionDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
+    'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     'sipi.template-section/1': TemplateSectionDocument,

@@ -1,5 +1,8 @@
 # Changelog
 
+- Add explicit panel-transmission-line/2 for fixed coated metals, with separate panel, volume and outer-domain checks and unchanged version-1 inputs.
+  고정 코팅 금속용 명시 panel-transmission-line/2를 추가하고 패널·체적·외곽 검증을 구분하며 버전 1 입력을 보존합니다.
+
 - Refine line meshes within explicit budgets, requiring two consecutive selected-quantity comparisons and separate outer checks while retaining every rejected level.
   명시 예산 내에서 선로 메시를 세분하고 선택한 물리량의 연속 두 비교와 별도 외곽 검사를 요구하며 거부된 모든 단계를 보존합니다.
 

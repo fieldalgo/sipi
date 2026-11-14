@@ -1,5 +1,7 @@
 # Saved lines with explicit panel currents
 
+[Version 2](layered_panel_line.md) explicitly admits nested line/7 with fixed metal coatings.
+
 [Explicit two-parameter forward goals](panel_pair_goal.md) add independent volume, panel and joint refinement checks.
 
 `PanelTransmissionLineDocument` describes an explicit combination of shared

@@ -521,6 +521,8 @@ def documents():
     base.append(layered_selection())
     from test_line_resolution_document import document as line_resolution
     base.append(line_resolution())
+    from test_layered_panel import document as layered_panel
+    base.append(layered_panel(True))
     return base
 
 

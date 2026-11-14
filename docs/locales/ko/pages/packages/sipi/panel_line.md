@@ -98,3 +98,6 @@ output = execute_saved(text, max_evaluations=2,
 assert output["status"] == "complete"
 assert output["result"]["current_solver"]["settings"]["panels_per_edge"] == 16
 ```
+## 코팅 선로 연결
+
+[버전 2](layered_panel_line.md)는 고정 금속 코팅을 포함하는 내부 line/7을 명시적으로 지원합니다.
