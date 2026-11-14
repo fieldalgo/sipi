@@ -1,5 +1,8 @@
 # Changelog
 
+- Resolve planar finite metal layers on a bulk half-space with stable MQS impedance transfer and independent field/power checks.
+  안정적인 MQS 임피던스 전달과 독립 전계·전력 검증으로 반무한 바탕 위의 평면 유한 금속층을 해석합니다.
+
 - Save scalar shunt-loss inference requests with explicit SI arrays and separate completion/acceptance through the common executor.
   단일 선로 shunt 손실 역산 요청을 SI 배열로 저장하고 공통 실행에서 완료와 수락을 구분합니다.
 

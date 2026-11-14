@@ -191,3 +191,5 @@ not replace the existing P1 flux, resistance or exterior-boundary checks. The
 quadratic tool is a test dependency, not a selectable production solver.
 
 [Fixed-radius surface-model fitting](roughness_fit.md) accepts explicit complex surface-impedance samples and retains incompatible data.
+
+[Planar layered-metal impedance](layered_metal.md) resolves explicit thin metal coatings on a bulk half-space, independently of the finite-geometry surface adapter.

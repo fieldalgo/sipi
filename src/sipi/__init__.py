@@ -119,6 +119,7 @@ from .lumped import lumped_network, LumpedNetworkDocument
 from .connection import cascade_networks, deembed_network, connect_networks, ideal_junction
 from .propagation import LinePropagation, rlgc_propagation
 from .loss_inference import ShuntLossInference, infer_shunt_loss
+from .layered_metal import MetalLayer, LayeredSurfaceImpedance, layered_surface_impedance
 from .characteristic import LineCharacteristic, rlgc_characteristic
 from .modes import LineModes, ModeTrackingError, rlgc_modes
 from .termination import terminate_ports
@@ -181,6 +182,7 @@ __all__ = ['split_gap_broadside_stripline', 'tapered_layered_broadside_stripline
            "cascade_networks", "deembed_network", "connect_networks", "ideal_junction",
            "LinePropagation", "rlgc_propagation",
            "ShuntLossInference", "infer_shunt_loss",
+           "MetalLayer", "LayeredSurfaceImpedance", "layered_surface_impedance",
            "LineCharacteristic", "rlgc_characteristic",
            "LineModes", "ModeTrackingError", "rlgc_modes",
            "terminate_ports",

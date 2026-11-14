@@ -158,3 +158,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 않습니다. 이차 요소 도구는 시험 의존성이며 제품에서 선택하는 솔버가 아닙니다.
 
 [고정 반경 표면 모델 피팅](roughness_fit.md)은 명시적 복소 표면 임피던스를 입력받고 불일치 자료를 보존합니다.
+
+[평면 다층 금속 임피던스](layered_metal.md)는 유한 기하 표면 어댑터와 별도로 반무한 바탕 위의 명시적 얇은 금속 도금층을 해석합니다.
