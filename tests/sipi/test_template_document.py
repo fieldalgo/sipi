@@ -46,7 +46,7 @@ def test_every_existing_template_matches_frozen_geometry_and_resolved_inputs(nam
 
 
 def test_reference_preserves_exact42_original_factories_and_surface_extensions():
-    assert set(CASES) | {'tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
+    assert set(CASES) | {'split_gap_broadside_stripline', 'tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
                          'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar',
                          'asymmetric_coupled_layered_grounded_coplanar',
                          'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar',

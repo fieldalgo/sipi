@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect split-gap broadside inputs to saved interface/material studies, correlated etch sampling and separately refined forward-impedance goals.
+  gap 분할 broadside를 계면·재료 공차 저장, 식각 상관 표본과 별도 세분 전진 임피던스 목표에 연결합니다.
+
 - Add an explicit two-material gap to trapezoidal broadside sections, with independent four-layer field and reflection checks.
   사다리꼴 broadside의 금속간 간격에 두 유전체 계면을 추가하고 독립 4층 전계·반사를 검증합니다.
 

@@ -45,3 +45,45 @@ assert section.layers[1].thickness == .1e-3
 층에 대한 정확도를 보장하지 않습니다.
 
 [English](../../../../../packages/sipi/split_gap_broadside.md)
+
+## 계면 공차와 선폭 목표 저장
+
+편집 JSON·공차·목표에서 같은 template 이름과 `z_diff_forward`를 사용합니다.
+대칭 모드 목표, 가로 고정 pitch나 두 층 높이 합 제약은 적용되지 않습니다.
+`gap_lower_height` 표본은 재료 계면만 옮기고, 위쪽 gap 두께는 표본마다 유도합니다.
+범위 밖 정규 표본은 실패 행으로 남깁니다. gap 재료 변화와 위아래 선폭 상관
+공차도 같은 저장 실행 경로를 사용합니다. 선폭 목표는 계면과 두 gap 재료를 유지합니다.
+
+```python
+from sipi import ImpedanceDesignDocument
+from sipi.study import ImpedanceStudyDocument
+from sipi.template_document import TemplateSectionDocument
+
+parameters = dict(
+    lower_width=.4e-3, lower_top_width=.32e-3,
+    upper_width=.7e-3, upper_top_width=.55e-3,
+    lower_thickness=25e-6, upper_thickness=45e-6,
+    lower_height=.35e-3, upper_height=.55e-3,
+    gap=.25e-3, gap_lower_height=.1e-3,
+    lower_eps_r=3., gap_lower_eps_r=3.2,
+    gap_upper_eps_r=4.6, upper_eps_r=5.,
+    lower_tan_delta=.01, gap_lower_tan_delta=.015,
+    gap_upper_tan_delta=.025, upper_tan_delta=.03,
+    offset=.15e-3, box_width=.012,
+)
+name = 'split_gap_broadside_stripline'
+mesh = dict(edge_size=5e-6, far_size=.25e-3, grade=.2)
+editable = TemplateSectionDocument(name, parameters, mesh=mesh)
+study = ImpedanceStudyDocument(
+    name, parameters, quantity='z_diff_forward', mesh=mesh,
+    sampling=dict(kind='sweep', count=2, variables=[
+        dict(name='gap_lower_height', lower=.08e-3, upper=.12e-3)]),
+)
+goal = ImpedanceDesignDocument(
+    name, parameters, quantity='z_diff_forward', mesh=mesh,
+    variable='lower_top_width', bounds=[.3e-3, .65e-3], target=50.,
+    tolerance=.5, search_tolerance=.05,
+)
+assert ImpedanceDesignDocument.loads(goal.dumps()).dumps() == goal.dumps()
+assert len(study.sample_parameters()) == 2
+```
