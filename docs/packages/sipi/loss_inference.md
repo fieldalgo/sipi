@@ -48,3 +48,31 @@ replay, exact power balance and below-baseline data preservation. These tests
 establish the inversion contract, not measured laminate accuracy.
 
 [한국어](../../locales/ko/pages/packages/sipi/loss_inference.md)
+
+## Saved requests
+
+`ShuntLossInferenceDocument` uses `sipi.shunt-loss-inference/1` with exactly seven
+fields: schema, frequency_hz, alpha_np_per_m, R_ohm_per_m, L_h_per_m,
+C_f_per_m and max_error_np_per_m. Scalar RLC inputs normalize to explicit arrays.
+Loading and normalization never run the root solver. Duplicate/unknown keys,
+missing values and nonfinite numbers are rejected.
+
+```python
+from sipi.loss_inference_document import ShuntLossInferenceDocument
+from sipi.execution import execute_saved
+
+request = ShuntLossInferenceDocument([1e8, 1e9], alpha=[0., 0.], R=2.,
+    L=400e-9, C=150e-12, max_error_np_per_m=1e-9)
+output = execute_saved(request.dumps(), max_evaluations=2)
+assert output['status'] == 'complete'
+assert output['result']['accepted'] is False
+assert output['result']['G_s_per_m'] == [0., 0.]
+```
+
+The common executor's budget limits frequency samples before inference; internal
+root evaluations are reported separately. Completion does not imply sample
+acceptance. The original input and constrained candidate remain available for
+replay. Numerical exceptions propagate without fabricating a result. Inferred
+G may be supplied explicitly to `rlgc_network` with the same RLC and frequency;
+the resulting finite network still includes reflections, so its insertion loss
+need not equal propagation attenuation times length.

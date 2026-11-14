@@ -1,5 +1,8 @@
 # Changelog
 
+- Save scalar shunt-loss inference requests with explicit SI arrays and separate completion/acceptance through the common executor.
+  단일 선로 shunt 손실 역산 요청을 SI 배열로 저장하고 공통 실행에서 완료와 수락을 구분합니다.
+
 - Infer nonnegative effective shunt loss from explicit propagation attenuation and known scalar RLC, retaining constrained mismatches and exact power partitions.
   명시 전파 감쇠와 알려진 단일 선로 RLC에서 비음수 유효 shunt 손실을 역산하고 제약에 따른 불일치와 정확 전력 분해를 보존합니다.
 

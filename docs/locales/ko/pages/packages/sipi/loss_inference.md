@@ -41,3 +41,29 @@ fixture 보정, 임의 S21의 전파 감쇠 자동 변환, 측정 불확실성 �
 독립 R=0 해석해, 2×2 전송 방정식 행렬 지수의 고유값 크기에서 얻은 감쇠,
 저손실·고손실 RLGC 재생, 정확 전력 보존 및 기준 이하 자료 보존으로 검증합니다.
 이는 역산 계약의 검증이며 실측 적층 재료 정확도의 근거는 아닙니다.
+
+## 요청 저장
+
+`ShuntLossInferenceDocument`는 `sipi.shunt-loss-inference/1`을 사용합니다.
+정확히 일곱 필드 schema, frequency_hz, alpha_np_per_m, R_ohm_per_m,
+L_h_per_m, C_f_per_m, max_error_np_per_m을 저장합니다. 스칼라 RLC는 명시 배열로
+정규화합니다. 읽기·정규화에서는 근을 풀지 않습니다. 중복·미지원 키, 누락 값,
+비유한 숫자를 거부합니다.
+
+```python
+from sipi.loss_inference_document import ShuntLossInferenceDocument
+from sipi.execution import execute_saved
+
+request = ShuntLossInferenceDocument([1e8, 1e9], alpha=[0., 0.], R=2.,
+    L=400e-9, C=150e-12, max_error_np_per_m=1e-9)
+output = execute_saved(request.dumps(), max_evaluations=2)
+assert output['status'] == 'complete'
+assert output['result']['accepted'] is False
+assert output['result']['G_s_per_m'] == [0., 0.]
+```
+
+공통 실행 예산은 역산 전 주파수 표본 수를 제한합니다. 내부 근 평가 횟수는 결과에
+별도로 남깁니다. 계산 완료가 표본 수락을 뜻하지 않습니다. 원입력과 제약 후보를
+보존하며 수치 예외를 임의 결과로 바꾸지 않습니다. 추정 G를 같은 RLC·주파수의
+`rlgc_network`에 명시적으로 전달할 수 있습니다. 유한 선로망에는 반사가 포함되므로
+삽입 손실과 전파 감쇠×길이는 다를 수 있습니다.

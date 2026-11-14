@@ -509,6 +509,8 @@ def documents():
     base.append(magnetic_document())
     from test_roughness_fit_document import document as roughness_fit_document
     base.append(roughness_fit_document())
+    from test_loss_inference_document import document as loss_inference_document
+    base.append(loss_inference_document())
     return base
 
 
