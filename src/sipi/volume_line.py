@@ -177,7 +177,7 @@ _MESH_KEYS = ('ground_thickness','padding','metal_size','far_size','grade','min_
 
 
 class VolumeLineDocument:
-    """Strict sipi.volume-line/1: finite dielectric box in vacuum, finite grounds.
+    """Strict saved volume line: scalar v1 or named conductor conductivity v2.
 
     The cross-section document must have empty dielectric-only mesh options;
     all volume mesh settings are explicit here. Accessors return fresh inputs.
@@ -188,7 +188,8 @@ class VolumeLineDocument:
             raise TypeError('cross_section must be CrossSectionDocument')
         if not isinstance(materials,Mapping):
             raise ValueError('materials must map layer names to dielectric models')
-        self._data = self._validate(dict(schema='sipi.volume-line/1',
+        schema = 'sipi.volume-line/2' if isinstance(conductivity,Mapping) else 'sipi.volume-line/1'
+        self._data = self._validate(dict(schema=schema,
             cross_section=cross_section.to_dict(),frequency_hz=_frequencies(frequency).tolist(),
             materials={name:dielectric_to_dict(model) for name,model in materials.items()},
             mesh=mesh,conductor=dict(conductivity=conductivity,relative_permeability=relative_permeability),
@@ -198,7 +199,7 @@ class VolumeLineDocument:
     def _validate(data):
         _keys(data,('schema','cross_section','frequency_hz','materials','mesh','conductor',
                     'length_m','reference_ohms'),where='volume line')
-        if data['schema'] != 'sipi.volume-line/1':
+        if data['schema'] not in ('sipi.volume-line/1','sipi.volume-line/2'):
             raise ValueError('unsupported volume-line schema')
         doc = CrossSectionDocument.from_dict(data['cross_section'])
         if doc.mesh_options:
@@ -210,7 +211,17 @@ class VolumeLineDocument:
         if mesh['far_size'] < mesh['metal_size'] or mesh['min_angle'] >= 34:
             raise ValueError('need far_size >= metal_size and 0 < min_angle < 34')
         _keys(data['conductor'],('conductivity','relative_permeability'),where='conductor')
-        conductor = {key:_scalar(key,value) for key,value in data['conductor'].items()}
+        if data['schema'] == 'sipi.volume-line/1':
+            conductor = {key:_scalar(key,value) for key,value in data['conductor'].items()}
+        else:
+            sigma = data['conductor']['conductivity']
+            _keys(sigma,('signals','ground'),where='named conductivity')
+            names = [trace.name for trace in doc.section.traces if not trace.ground]
+            _keys(sigma['signals'],names,where='signal conductivities')
+            conductor = dict(conductivity=dict(
+                signals={name:_scalar('signal conductivity',sigma['signals'][name]) for name in names},
+                ground=_scalar('ground conductivity',sigma['ground'])),
+                relative_permeability=_scalar('relative_permeability',data['conductor']['relative_permeability']))
         f = _frequencies(data['frequency_hz'])
         if not isinstance(data['materials'],dict):
             raise ValueError('materials must be an object')
@@ -221,7 +232,7 @@ class VolumeLineDocument:
         materials = {name:supplied.get(name,ConstantDielectric(layer.eps_r,layer.tan_delta))
                      for name,layer in layers.items()}
         _material_samples(f,materials,layers)
-        return dict(schema='sipi.volume-line/1',cross_section=doc.to_dict(),frequency_hz=f.tolist(),
+        return dict(schema=data['schema'],cross_section=doc.to_dict(),frequency_hz=f.tolist(),
             mesh=mesh,materials={name:dielectric_to_dict(model) for name,model in materials.items()},
             conductor=conductor,length_m=_scalar('length_m',data['length_m'],zero=True),
             reference_ohms=_scalar('reference_ohms',data['reference_ohms']))
@@ -254,8 +265,16 @@ class VolumeLineDocument:
             raise ValueError('keep_fields must be boolean')
         section = CrossSectionDocument.from_dict(data['cross_section']).section
         volume = mesh_conductor_section(section,**data['mesh'],dielectric_interfaces=True)
+        conductor = data['conductor']
+        if data['schema'] == 'sipi.volume-line/2':
+            named = conductor['conductivity']
+            sigma = np.zeros(volume.mesh.num_triangles)
+            for name,indices in volume.signals.items():
+                sigma[indices] = named['signals'][name]
+            sigma[volume.ground] = named['ground']
+            conductor = dict(conductor,conductivity=sigma)
         result = volume_line(volume,data['frequency_hz'],
             materials={name:dielectric_from_dict(value) for name,value in data['materials'].items()},
-            **data['conductor'],length=data['length_m'],z_ref=data['reference_ohms'],
+            **conductor,length=data['length_m'],z_ref=data['reference_ohms'],
             keep_fields=keep_fields)
         return VolumeLineResult(result.conductor,result.C_complex,result.network,self.dumps())

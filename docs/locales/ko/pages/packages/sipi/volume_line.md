@@ -6,7 +6,8 @@
 [균일 선로 네트워크](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/network.md)
 
 `sipi.volume_line`은 유한 도체 내부의 DC·AC R과 전체 L, **같은 금속 표면**
-주변 유전체의 C/G를 추출합니다. 엄격한 `sipi.volume-line/1` JSON 문서에
+주변 유전체의 C/G를 추출합니다. 엄격한 `sipi.volume-line/1`(공통 전도도) 또는
+`/2`(이름별 금속) JSON 문서에
 기하·재료 모델·전도도·부피 메시·주파수·길이·기준 임피던스를 저장합니다.
 진공 안의 유한 유전체 상자와 유한 귀환 판을 정의하며 기존 상자 접지 기반
 유전체 추출을 대신 끼워 넣지 않습니다.
@@ -72,11 +73,11 @@ C=Re C*, G=−ω Im C*입니다. 네트워크에는 부피 전류의 R과 **전�
 
 | 최상위 키 | 계약 |
 |---|---|
-| `schema` | 정확히 `sipi.volume-line/1` |
+| `schema` | 공통 스칼라 전도도는 `sipi.volume-line/1`, 이름별 금속 전도도는 `/2` |
 | `cross_section` | 기존 `sipi.cross-section/1` 또는 `/2`, m 단위. 직사각 v2도 원 버전을 보존합니다. 유전체 전용 메시 옵션은 적용되지 않으므로 `mesh`가 비어 있어야 합니다. 모든 trace 두께는 양수입니다. |
 | `mesh` | `ground_thickness`, `padding`, `metal_size`, `far_size`, `grade`, `min_angle` 여섯 키 모두 필수. 유한 양의 길이·각도, grade>=0, far_size>=metal_size, angle<34. |
 | `materials` | 층 이름→버전 유전체 모델. 생략한 층은 단면의 상수 eps_r/tan_delta로 확정하여 명시적으로 저장합니다. 없는 층과 표 외삽/DC 오류는 메싱 전에 거부합니다. |
-| `conductor` | 양의 `conductivity`(S/m), `relative_permeability`(전 영역 균일) 두 키만. 거칠기 필드 없음. |
+| `conductor` | `conductivity`(S/m), 양의 `relative_permeability`(전 영역 균일) 두 키만. v1 전도도는 양의 스칼라, v2는 아래 이름별 객체. 거칠기 필드 없음. |
 | `frequency_hz` | 비어 있지 않은 음이 아닌 엄격히 증가하는 Hz 배열 |
 | `length_m`, `reference_ohms` | 음이 아닌 길이, 양의 실수 스칼라 기준 임피던스 |
 
@@ -119,3 +120,49 @@ Python 3.12.14, NumPy 2.5.4, SciPy 1.18.1, 시험 전용 scikit-fem 12.0.2를
 [주축 방향별 분산 재료](principal_dielectrics.md)는 저장 선로의 재료 매핑을 재사용합니다.
 
 [전체 전방파 행렬 진단](characteristic.md)은 기존 스칼라 모드 계약을 유지하며 비대칭 상호 RLGC를 지원합니다.
+
+
+## 이름별 금속 입력 (v2)
+
+`VolumeLineDocument`에 `conductivity={'signals': {name: sigma, ...}, 'ground': sigma}`를
+전달하면 `sipi.volume-line/2`를 선택합니다. 두 키 모두 필수이며 `signals`는
+접지하지 않은 모든 trace 이름을 정확히 포함해야 합니다. 전도도는 S/m 단위의
+유한한 양의 실수 스칼라이며 boolean은 허용하지 않습니다. 접지 trace 이름은
+별도 신호 재료가 아닙니다. 모든 귀환 판·trace는 하나의 `ground` 값과 기존의
+공통 종방향 전기장을 공유합니다. 중첩 매핑이므로 이름이 `ground`인 신호와도
+충돌하지 않습니다.
+
+```python
+from sipi import CrossSectionDocument, coupled_microstrip
+from sipi.volume_line import VolumeLineDocument
+from sipi.execution import normalize_saved
+
+section = coupled_microstrip(
+    width=.4e-3, gap=.3e-3, substrate_height=.5e-3, thickness=.1e-3,
+    eps_r=4., tan_delta=.02, box_width=.003, air_height=.001,
+)
+doc = VolumeLineDocument(
+    CrossSectionDocument(section), [0, 1e3, 1e4], materials={}, length=.1,
+    conductivity=dict(signals={'positive': 58e6, 'negative': 20e6}, ground=10e6),
+    mesh=dict(ground_thickness=.1e-3, padding=.002, metal_size=50e-6,
+              far_size=.5e-3, grade=.2, min_angle=28.),
+)
+assert doc.to_dict()['schema'] == 'sipi.volume-line/2'
+assert normalize_saved(doc.dumps()) == doc.dumps()
+result = VolumeLineDocument.loads(doc.dumps()).analyze()
+assert result.names == ('positive', 'negative')
+```
+
+메시 생성 전에 이름과 값을 검증하고, 새 부피 메시마다 그 이름으로 전도도장을
+다시 배정합니다. 저장 입력에는 삼각형 인덱스가 없습니다. 누락·외부 이름,
+숫자 배열, 잘못된 값, 추가 키를 거부합니다. v1은 이름별 매핑을 받지 않고,
+v2는 스칼라를 조용히 변환하지 않습니다. 기존 v1 JSON은 바이트 단위로
+보존합니다. 균일 재료의 v2는 조각별 풀이를 쓰며 v1과 정규화 1e-12 이내로
+일치하는지 검사합니다.
+
+공통 저장 실행기와 회로의 `kind='volume-line'` 입력도 같은 엔진으로 v2를
+재생합니다. 명시적 메시 전도도장과 R/L/C/G·네트워크 값을 비교하고, 두 신호의
+DC 면적 저항 해석해를 1e-10으로 검사하며, 재메시 후 재료 배정을 확인합니다.
+기존 혼합 금속 Bessel·독립 조립 및 부피 메시·외곽 기준은 별도로 유지합니다.
+이 형식은 도체 이름마다 하나의 재료를 지정합니다. 한 도체 안의 도금 계면,
+임의 공간장, 온도 법칙이나 보정된 거칠기를 생성·저장하는 형식은 아닙니다.

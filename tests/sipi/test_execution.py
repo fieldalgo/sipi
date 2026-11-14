@@ -499,6 +499,10 @@ def documents():
     base.append(ImpedanceDesignDocument.from_dict(refined_goal))
     from sipi.quasistatic_line_document import QuasistaticLineDocument
     base.append(QuasistaticLineDocument(cross(), [0., 1e8], resistance=5., length=.1))
+    named_volume = line(volume=True).to_dict()
+    named_volume['schema'] = 'sipi.volume-line/2'
+    named_volume['conductor']['conductivity'] = dict(signals={'signal': 58e6}, ground=20e6)
+    base.append(VolumeLineDocument.from_dict(named_volume))
     return base
 
 

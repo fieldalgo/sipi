@@ -193,6 +193,9 @@ spatially varying current is physical even before skin/proximity effects.
 on the full volume mesh. Dielectric C/G extraction is unchanged; total L is
 still used once. `sipi.volume-line/1` saved documents retain scalar conductivity:
 mesh-indexed arrays are not portable saved geometry and are rejected there.
+The separate [volume-line v2 named material contract](volume_line.md#named-metal-inputs-v2)
+saves one conductivity per signal and one for the common return; it does not
+serialize arbitrary per-triangle fields.
 
 The dedicated `test_spatial_conductivity.py` checks analytical piecewise DC
 resistance/current, the independent scikit-fem augmented system (Z, Jz and Az,

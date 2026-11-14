@@ -121,6 +121,7 @@ _REGISTRY = {
     'sipi.aperture-design/1': ApertureDesignDocument,
     **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4, 5, 6)},
     'sipi.volume-line/1': VolumeLineDocument,
+    'sipi.volume-line/2': VolumeLineDocument,
     'sipi.lumped-network/1': LumpedNetworkDocument,
     'sipi.network-assembly/1': NetworkAssemblyDocument,
     **{f'sipi.network-transforms/{v}': NetworkTransformDocument for v in (1, 2)},

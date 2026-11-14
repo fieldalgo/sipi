@@ -7,7 +7,8 @@
 
 `sipi.volume_line` extracts DC/AC R and total L inside finite conductors, and
 C/G in the dielectric surrounding **those same metal surfaces**. A strict
-`sipi.volume-line/1` JSON document saves the geometry, material models,
+`sipi.volume-line/1` (common conductivity) or `/2` (named metals) JSON document
+saves the geometry, material models,
 conductivity, volume-mesh controls, frequencies, length and reference impedance.
 It describes a finite dielectric box in vacuum, with finite reference plates;
 it does not substitute the older box-ground dielectric extraction.
@@ -82,11 +83,11 @@ numbers, booleans as numbers, and unknown schema versions are rejected.
 
 | Top-level key | Contract |
 |---|---|
-| `schema` | Exactly `sipi.volume-line/1` |
+| `schema` | `sipi.volume-line/1` for scalar conductivity; `/2` for named conductor conductivity |
 | `cross_section` | Existing `sipi.cross-section/1` or `/2`, length unit m; original version preserved, including rectangular v2. Its `mesh` must be empty because dielectric-only meshing controls do not apply here. Every trace needs positive thickness. |
 | `mesh` | All six keys: `ground_thickness`, `padding`, `metal_size`, `far_size`, `grade`, `min_angle`. Positive finite lengths/angle, grade>=0, far_size>=metal_size, angle<34. |
 | `materials` | Layer name → versioned dielectric model. Omitted layer entries resolve to the section's constant eps_r/tan_delta and are saved explicitly. Unknown names and table extrapolation/DC errors fail before meshing. |
-| `conductor` | Exactly positive `conductivity` (S/m) and `relative_permeability` (uniform); no roughness parameters. |
+| `conductor` | Exactly `conductivity` (S/m) and positive `relative_permeability` (uniform); v1 conductivity is a positive scalar, v2 is the named object below. No roughness parameters. |
 | `frequency_hz` | Nonempty, nonnegative, strictly increasing Hz array |
 | `length_m`, `reference_ohms` | Nonnegative length and positive scalar real reference impedance |
 
@@ -133,3 +134,50 @@ implemented. Material fits still need independent measured validation.
 [Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.
 
 [Full-matrix forward-wave diagnostics](characteristic.md) support asymmetric reciprocal RLGC without changing the scalar-mode contract.
+
+## Named metal inputs (v2)
+
+Passing `conductivity={'signals': {name: sigma, ...}, 'ground': sigma}` to
+`VolumeLineDocument` selects `sipi.volume-line/2`. Both keys are required;
+`signals` must contain exactly all nongrounded trace names. Every conductivity
+is a finite positive real scalar in S/m, never a boolean. Grounded trace names
+are not separate signal materials: all reference plates/traces share the
+single `ground` value and the existing common longitudinal field. The nested
+mapping separates a signal named `ground` from the common return value.
+
+```python
+from sipi import CrossSectionDocument, coupled_microstrip
+from sipi.volume_line import VolumeLineDocument
+from sipi.execution import normalize_saved
+
+section = coupled_microstrip(
+    width=.4e-3, gap=.3e-3, substrate_height=.5e-3, thickness=.1e-3,
+    eps_r=4., tan_delta=.02, box_width=.003, air_height=.001,
+)
+doc = VolumeLineDocument(
+    CrossSectionDocument(section), [0, 1e3, 1e4], materials={}, length=.1,
+    conductivity=dict(signals={'positive': 58e6, 'negative': 20e6}, ground=10e6),
+    mesh=dict(ground_thickness=.1e-3, padding=.002, metal_size=50e-6,
+              far_size=.5e-3, grade=.2, min_angle=28.),
+)
+assert doc.to_dict()['schema'] == 'sipi.volume-line/2'
+assert normalize_saved(doc.dumps()) == doc.dumps()
+result = VolumeLineDocument.loads(doc.dumps()).analyze()
+assert result.names == ('positive', 'negative')
+```
+
+Validation resolves exact names before meshing. Each new volume mesh receives
+fresh coefficients from those names, so saved inputs never contain triangle
+indices. Unknown/missing names, numeric arrays, invalid values and extra keys
+fail; v1 does not accept named mappings and v2 does not silently accept a scalar.
+Existing v1 JSON remains byte-for-byte stable. A v2 uniform material case uses
+the piecewise solver path and is checked against v1 within normalized 1e-12.
+
+The common saved executor and a circuit's `kind='volume-line'` source replay
+v2 through the same engine. Tests compare all R/L/C/G and network values with
+an explicit mesh-level conductivity field, check analytical two-signal DC area
+resistance at 1e-10, and preserve assignment after remeshing. Existing mixed-metal
+Bessel/independent-assembly and volume mesh/boundary gates remain separate.
+This format assigns one material per named conductor; it does not generate or
+save plating interfaces inside one conductor, arbitrary spatial fields,
+temperature laws or calibrated roughness.

@@ -179,7 +179,9 @@ assert max(result.current_error) < 1e-10
 `MeshedConductors.impedance`와 직접 `volume_line`은 전체 부피 메시 순서의
 배열을 그대로 전달합니다. 유전체 C/G는 바뀌지 않으며 전체 L을 한 번만 씁니다.
 저장 `sipi.volume-line/1`은 스칼라 전도도를 유지합니다. 메시 인덱스 배열은
-이식 가능한 저장 기하가 아니므로 해당 JSON에서 거부합니다.
+이식 가능한 저장 기하가 아니므로 해당 JSON에서 거부합니다. 별도
+[volume-line v2](volume_line.md)는 신호 이름별 전도도와 공통 귀환 전도도를
+저장하며 임의 삼각형별 공간장을 직렬화하지 않습니다.
 
 `test_spatial_conductivity.py`는 조각별 DC 저항·전류 해석해, 독립 scikit-fem
 증대 계(Z/Jz/Az 정규화 오차 <1e-9), 혼합 금속 동축 Bessel 수렴을 검사합니다.
