@@ -1,2 +1,5 @@
 # These original upstream notices are hash-checked as raw bytes on every OS.
 workbench/packaging/notices/** -text
+tools/mesh_diagnostics/** text eol=lf
+# Unified-diff blank context lines contain a required single space.
+tools/mesh_diagnostics/candidate.patch whitespace=-blank-at-eol

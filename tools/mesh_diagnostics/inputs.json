@@ -1,0 +1,358 @@
+[
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "thickness": 3.5e-05,
+      "top_width": null,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03,
+      "width": 0.0005
+    },
+    "quantity": "z0",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.000495,
+          "name": "width",
+          "upper": 0.000505
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "layered_microstrip"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0003,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "thickness": 3.5e-05,
+      "top_width": null,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03,
+      "width": 0.0005
+    },
+    "quantity": "z_diff",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.000495,
+          "name": "width",
+          "upper": 0.000505
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "coupled_layered_microstrip"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0003,
+      "left_thickness": 2.5e-05,
+      "left_top_width": 0.00032,
+      "left_width": 0.0004,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "right_thickness": 4.5e-05,
+      "right_top_width": 0.00055,
+      "right_width": 0.0007,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03
+    },
+    "quantity": "z_diff_forward",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.00039600000000000003,
+          "name": "left_width",
+          "upper": 0.000404
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "asymmetric_coupled_layered_microstrip"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0002,
+      "ground_width": 0.001,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "thickness": 3.5e-05,
+      "top_width": 0.0004,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03,
+      "width": 0.0005
+    },
+    "quantity": "z0",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.000495,
+          "name": "width",
+          "upper": 0.000505
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "layered_grounded_coplanar"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0003,
+      "ground_gap": 0.0002,
+      "ground_width": 0.001,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "thickness": 3.5e-05,
+      "top_width": 0.0004,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03,
+      "width": 0.0005
+    },
+    "quantity": "z_diff",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.000495,
+          "name": "width",
+          "upper": 0.000505
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "coupled_layered_grounded_coplanar"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0003,
+      "ground_gap": 0.0002,
+      "ground_thickness": 3.5e-05,
+      "ground_width": 0.001,
+      "left_thickness": 2.5e-05,
+      "left_top_width": 0.00032,
+      "left_width": 0.0004,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "right_thickness": 4.5e-05,
+      "right_top_width": 0.00055,
+      "right_width": 0.0007,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03
+    },
+    "quantity": "z_diff_forward",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.00039600000000000003,
+          "name": "left_width",
+          "upper": 0.000404
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "asymmetric_coupled_layered_grounded_coplanar"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0002,
+      "ground_width": 0.001,
+      "lower_air_height": 0.01,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "thickness": 3.5e-05,
+      "top_width": 0.0004,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03,
+      "width": 0.0005
+    },
+    "quantity": "z0",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.000495,
+          "name": "width",
+          "upper": 0.000505
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "layered_unbacked_coplanar"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0003,
+      "ground_gap": 0.0002,
+      "ground_width": 0.001,
+      "lower_air_height": 0.01,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "thickness": 3.5e-05,
+      "top_width": 0.0004,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03,
+      "width": 0.0005
+    },
+    "quantity": "z_diff",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.000495,
+          "name": "width",
+          "upper": 0.000505
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "coupled_layered_unbacked_coplanar"
+  },
+  {
+    "fixed_pitch_m": null,
+    "mesh": {
+      "edge_size": 8e-06,
+      "far_size": 0.0003,
+      "grade": 0.25,
+      "min_angle": 28.0
+    },
+    "parameters": {
+      "air_height": 0.01,
+      "box_width": 0.02,
+      "gap": 0.0003,
+      "ground_gap": 0.0002,
+      "ground_thickness": 3.5e-05,
+      "ground_width": 0.001,
+      "left_thickness": 2.5e-05,
+      "left_top_width": 0.00032,
+      "left_width": 0.0004,
+      "lower_air_height": 0.01,
+      "lower_eps_r": 3.0,
+      "lower_height": 0.0003,
+      "lower_tan_delta": 0.01,
+      "right_thickness": 4.5e-05,
+      "right_top_width": 0.00055,
+      "right_width": 0.0007,
+      "upper_eps_r": 5.0,
+      "upper_height": 0.0007,
+      "upper_tan_delta": 0.03
+    },
+    "quantity": "z_diff_forward",
+    "sampling": {
+      "count": 2,
+      "kind": "sweep",
+      "variables": [
+        {
+          "lower": 0.00039600000000000003,
+          "name": "left_width",
+          "upper": 0.000404
+        }
+      ]
+    },
+    "schema": "sipi.impedance-study/1",
+    "template": "asymmetric_coupled_layered_unbacked_coplanar"
+  }
+]

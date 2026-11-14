@@ -1,5 +1,8 @@
 # Changelog
 
+- Add isolated original/candidate mesh diagnostics with exact-source checks, retained runtime limits and refinement traces across platform jobs.
+  정확한 소스·기존 runtime 기준·세분 기록을 보존하는 원본/후보 메시 격리 진단과 플랫폼별 실행을 추가합니다.
+
 - Connect saved trapezoidal broadside inputs to correlated etch-face studies and separately refined 50-ohm top-width goals.
   사다리꼴 broadside 저장 입력을 식각면 상관 공차와 별도 세분 50Ω 윗면 선폭 목표에 연결합니다.
 

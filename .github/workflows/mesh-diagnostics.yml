@@ -1,0 +1,114 @@
+name: Mesh candidate diagnostics
+on:
+  push:
+    branches: [codex/independent-repository]
+    paths:
+      - '.github/workflows/mesh-diagnostics.yml'
+      - 'tools/mesh_diagnostics/**'
+      - 'tools/tests/test_mesh_diagnostics.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mesh-diagnostics-${{ github.ref }}
+  cancel-in-progress: false
+  queue: single
+jobs:
+  installed:
+    name: ${{ matrix.os }} / ${{ matrix.variant }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, windows-latest]
+        variant: [original, candidate]
+    runs-on: ${{ matrix.os }}
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - id: engine
+        shell: python
+        run: |
+          import json, os
+          pin = json.load(open('dependencies.json'))['development_source']['commit']
+          study = json.load(open('tools/mesh_diagnostics/manifest.json'))
+          assert pin == study['base'], 'This study requires its exact shared baseline'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('ref=' + pin + '\n')
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          repository: fieldalgo/openphysics
+          ref: ${{ steps.engine.outputs.ref }}
+          path: .validation/engine
+      - name: Install build and numerical tools
+        run: python -m pip install setuptools==84.0.0 wheel pytest numpy==2.5.4 scipy==1.18.1 shapely==2.2.0
+      - name: Prepare exact isolated variant
+        run: python tools/mesh_diagnostics/run.py prepare .validation/engine .validation/mesh-source ${{ matrix.variant }}
+      - name: Build and audit installed artifacts
+        id: prepare
+        shell: python
+        run: |
+          import importlib.util, json, os, pathlib, shutil, subprocess, sys, textwrap
+          root = pathlib.Path.cwd()
+          report = root / '.validation/mesh-report'
+          report.mkdir()
+          source = root / '.validation/mesh-source'
+          shutil.copy2(source / 'provenance.json', report)
+          wheels = root / '.validation/mesh-wheels'
+          wheels.mkdir()
+          for name in ('galerkin', 'physmat', 'simcase', 'meshine', 'sipi'):
+              cwd = (root if name == 'sipi' else source / 'packages/meshine' if name == 'meshine'
+                     else root / '.validation/engine/packages' / name)
+              env = dict(os.environ)
+              if name == 'meshine':
+                  env['OPENPHYSICS_DOCS_REF'] = json.loads((source / 'provenance.json').read_text())['shared_commit']
+                  env['GIT_CEILING_DIRECTORIES'] = str(source)
+              subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', str(wheels), '.'], cwd=cwd, env=env, check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'install', *map(str, wheels.glob('*.whl'))], check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'check'], check=True)
+          isolated = root / '.validation/mesh-installed'
+          shutil.copytree(source / 'tests', isolated / 'tests')
+          shutil.copy2(root / 'tools/verify_install.py', isolated)
+          code = '''
+          import hashlib, json, pathlib, platform, sys
+          from importlib import metadata
+          from verify_install import audit
+          wheels, output, commit, tree = sys.argv[1:]
+          report = dict(commit=commit, tree=tree, python=sys.version, platform=platform.platform(),
+              audit=audit(wheels), versions={n: metadata.version(n) for n in ('numpy', 'scipy', 'shapely', 'pytest')},
+              wheel_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in pathlib.Path(wheels).glob('*.whl')})
+          pathlib.Path(output).write_text(json.dumps(report, indent=2), encoding='utf-8')
+          '''
+          git = lambda ref: subprocess.check_output(['git', 'rev-parse', ref], text=True).strip()
+          env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
+          subprocess.run([sys.executable, '-c', textwrap.dedent(code), str(wheels), str(report / 'audit.json'), git('HEAD'), git('HEAD^{tree}')], cwd=isolated, env=env, check=True)
+      - name: Original two-dimensional mesh criteria
+        shell: python
+        run: |
+          import json, os, pathlib, subprocess, sys
+          root = pathlib.Path.cwd()
+          data = json.loads((root / 'tools/mesh_diagnostics/manifest.json').read_text())
+          tests = ['tests/meshine/' + name for name in data['tests']]
+          env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
+          result = subprocess.run([sys.executable, '-m', 'pytest', '-v', *tests, '--junitxml=' + str(root / '.validation/mesh-report/mesh.xml')], cwd=root / '.validation/mesh-installed', env=env)
+          sys.exit(result.returncode)
+      - name: Record original inputs and refinement traces
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        shell: python
+        run: |
+          import os, pathlib, subprocess, sys
+          root = pathlib.Path.cwd()
+          env = {k: v for k, v in os.environ.items() if k != 'PYTHONPATH'}
+          subprocess.run([sys.executable, str(root / 'tools/mesh_diagnostics/run.py'), 'probe', '${{ matrix.variant }}', str(root / '.validation/mesh-report/probe')], cwd=root / '.validation/mesh-installed', env=env, check=True)
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: mesh-${{ matrix.os }}-${{ matrix.variant }}
+          include-hidden-files: true
+          path: .validation/mesh-report/

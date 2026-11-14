@@ -1,0 +1,41 @@
+{
+  "base": "625d9f74ca253538f172a42272c869b66d144eed",
+  "original_refine_sha256": "9a4da0ce429f1d061a5d25ca01d6fea8023e11eadbabb6491b7d75631bc4ccc0",
+  "candidate_refine_sha256": "ca2e69b055d90ef0074577449eae96de57b3ac81b6b9635d94731d577fa694ac",
+  "replacements": 4,
+  "package_and_tests": {
+    "packages/meshine/.gitignore": "399603bed540d1793ba8aa37fafb31a16f79c7787fa42ac76370510c6f137cf8",
+    "packages/meshine/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "packages/meshine/NOTICE": "5860aa099749393d2b5d9f072a7cbf50e39a052a3c35f90ef871dfe82af71c5a",
+    "packages/meshine/README.md": "9cb7cf67a0f45bc07467984a804ebcbe7882d432f8fdc15a5cdc52491e79fe5c",
+    "packages/meshine/pyproject.toml": "e5fa7888da2028593be2cb4326a6b2fec9a68b6688cb13b99b9c97c679080b6e",
+    "packages/meshine/setup.py": "ff85c04f866531b2961ddbe5eff04f6d1d146a2e852c1bd9d291738c96c6b368",
+    "packages/meshine/src/meshine/__init__.py": "06e85dba331ab501117183431ebfef61368f02451d8f45ea0d759d56b45fe9e3",
+    "packages/meshine/src/meshine/extrude.py": "d52d823c98e61b0f35044b42e862ed2117caf5d31de4a275d09e3137ca0a5269",
+    "packages/meshine/src/meshine/geometry.py": "d7466f81708b9604eb2dcfa6df66aae812a0bcceaf7327afbce2df0e5fb301b5",
+    "packages/meshine/src/meshine/geometry_v1.py": "f6111dae7d25880cce5d71280da689a95c939247aa2acf95f5731aafd6b646d3",
+    "packages/meshine/src/meshine/mesh.py": "7feb8fa4e7d325615d15e901bbb12ab0c29d87600178bcf1ab855fb533852fd8",
+    "packages/meshine/src/meshine/mesh3d.py": "85402e0f05d3b7f3a5d10f2f831ca46352562e5513f3befc61b676ab3dd9b0d1",
+    "packages/meshine/src/meshine/refine.py": "9a4da0ce429f1d061a5d25ca01d6fea8023e11eadbabb6491b7d75631bc4ccc0",
+    "packages/meshine/src/meshine/shapes.py": "2be77ec4257a09f8066f5d56f0ec9f32513f8533c5e7167ceb4092a04461ffa1",
+    "tests/meshine/test_candidate_order.py": "d593de8919c5edcaa9f136bdcd184f5858c3430b360a56c3104b249092b9f148",
+    "tests/meshine/test_extrude.py": "c9810bb02fa9e62a0b0ee5e6e0e8d32521ba5599f017731d4afa5950cba51fe1",
+    "tests/meshine/test_mesh3d.py": "594c9ff9c672a9cd2c579628a3b40108fe701ec20ce206bbbd78a998fd9de3eb",
+    "tests/meshine/test_mesher.py": "01ed801012f252677d10748b7c4b3d9ae570df3ca0017b59927ffb9d1e7703e2",
+    "tests/meshine/test_meshine_scale.py": "b2a399995ce910b9d8899622466b9bc47df8e19c7e6aba8e881c54b283de77c5",
+    "tests/meshine/test_refine_cost.py": "6b1c41de3ff3747b8ffc62639c6a8be054e8696aa36e3c5fe6f24b8902172af0",
+    "tests/meshine/test_size_limit.py": "2326cff4f2e54aa283dea80f2063716bf3e00a5665ce51acb0ddf2b87728442a",
+    "tests/meshine/test_small_angles.py": "828e71d6a787e879fbac164afaa81250893de2b0ce2acca224146d64fea18d24"
+  },
+  "patch_sha256": "1cb1b1e37135026d0178f364df9dba5dcd68831d737ba41524cbf5bc43c21687",
+  "inputs_sha256": "2023028d26c52d41332c2eef4360430ed5b31b909cc20a497ebb50c3527025a7",
+  "tests": [
+    "test_candidate_order.py",
+    "test_mesher.py",
+    "test_meshine_scale.py",
+    "test_refine_cost.py",
+    "test_size_limit.py",
+    "test_small_angles.py"
+  ],
+  "reference_sha256": "f00738939dc005f6d88558eb2aaabaf3e02a02226e71a60b04235202c10fb954"
+}

@@ -1,0 +1,34 @@
+{
+  "scope": "Recorded native impedance comparison, not a physical reference",
+  "sipi_commit": "e0fa2fbc6165be29b5b09dd3afc7bf8413040a00",
+  "shared_commit": "625d9f74ca253538f172a42272c869b66d144eed",
+  "inputs_sha256": "2023028d26c52d41332c2eef4360430ed5b31b909cc20a497ebb50c3527025a7",
+  "runtime": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "shapely": "2.2.0",
+    "geos": "3.14.1"
+  },
+  "relative_impedance_limit": 1e-09,
+  "values": {
+    "layered_microstrip-0": 91.25037578203217,
+    "layered_microstrip-1": 90.62032840834756,
+    "coupled_layered_microstrip-0": 108.85883353300572,
+    "coupled_layered_microstrip-1": 108.22264911130533,
+    "asymmetric_coupled_layered_microstrip-0": 110.83060465181742,
+    "asymmetric_coupled_layered_microstrip-1": 110.52235836005602,
+    "layered_grounded_coplanar-0": 59.27274792317507,
+    "layered_grounded_coplanar-1": 58.97757127629036,
+    "coupled_layered_grounded_coplanar-0": 98.56404338772248,
+    "coupled_layered_grounded_coplanar-1": 98.08613361017574,
+    "asymmetric_coupled_layered_grounded_coplanar-0": 97.63052090171587,
+    "asymmetric_coupled_layered_grounded_coplanar-1": 97.385978662138,
+    "layered_unbacked_coplanar-0": 62.90907958580982,
+    "layered_unbacked_coplanar-1": 62.67475395336703,
+    "coupled_layered_unbacked_coplanar-0": 99.54260995834484,
+    "coupled_layered_unbacked_coplanar-1": 99.09328070268724,
+    "asymmetric_coupled_layered_unbacked_coplanar-0": 98.87655849123043,
+    "asymmetric_coupled_layered_unbacked_coplanar-1": 98.60027725248136
+  }
+}

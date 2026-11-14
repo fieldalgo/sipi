@@ -1,5 +1,9 @@
 # 개발
 
+원본·후보의 정확한 소스, 설치 payload와 플랫폼별 세분 기록은
+[격리된 메시 후보 진단](../tools/mesh_diagnostics/README.ko.md)을 참고하세요.
+제품 의존성 pin과 기존 수치 기준은 유지합니다.
+
 SIPI는 외부 설치된 galerkin·meshine을 사용합니다. 공동 개발 시 dependencies.json의
 커밋으로 만든 휠을 설치하고 `python -m pip install --no-deps .`로 SIPI를 설치합니다.
 이 커밋은 개발 기준선이며 PyPI 게시 완료를 의미하지 않습니다.

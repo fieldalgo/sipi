@@ -1,5 +1,10 @@
 # Development
 
+See [isolated mesh candidate diagnostics](../tools/mesh_diagnostics/README.md)
+for exact-source original/candidate builds, installed payload checks and
+cross-platform refinement traces. The product dependency pin and original
+numerical criteria remain unchanged.
+
 SIPI uses externally installed galerkin and meshine packages. For coordinated development,
 install their wheels built from the commit in `dependencies.json`, then install this project
 with `python -m pip install --no-deps .`. The pinned commit is a development baseline,
