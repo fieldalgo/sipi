@@ -70,6 +70,37 @@ contain actual vacuum surface-current inputs; load with
 `numpy.load(path, allow_pickle=False)`. Matrix entries and conductor factors
 are observations, not replacements for original numerical/convergence gates.
 
+The first triangle-data call also retains its points, triangle indices, four
+output arrays and Delaunay round index. Replaying `_triangle_data` on these
+exact arrays separates arithmetic differences from different triangulations;
+the observer does not alter the arrays returned to refinement.
+
+Compare two downloaded probe directories without rerunning field solves:
+
+```sh
+python tools/mesh_diagnostics/compare.py LEFT_PROBE RIGHT_PROBE NEW_REPORT.json
+```
+
+The comparison verifies stored array hashes, distinguishes triangle ordering
+from connectivity, and evaluates changed internal edges with exact rational
+orientation/incircle predicates on the recorded binary64 coordinates. A zero
+incircle determinant identifies four exactly cocircular vertices; it does not
+validate the whole triangulation or establish a final error bound. Changed
+coordinates are reported rather than treated as matching node indices. When
+both traces include the first triangle-data arrays, output differences are
+measured only if their complete input arrays match. Older traces explicitly
+report that these arrays are unavailable. Reports are created exclusively.
+
+At `21624a9`, diagnostic run `43549799850` passed all 265 original mesh tests
+in each of six jobs. Windows original/candidate and Linux candidate passed
+the 18 impedance comparisons. Linux original failed one; macOS original and
+candidate each failed all 18 at the retained 1e-9 limit. In the candidate
+Linux/macOS traces, all 20 initial point sets matched. Six initial
+triangulations differed in connectivity; all 32 changed internal edges across
+both sides had exact zero incircle determinants. The remaining 14 cases had
+matching initial connectivity, with subsequent divergence still unresolved.
+This observation does not accept the candidate or explain all later changes.
+
 Compare the same case and stage. Different node hashes alone do not establish
 physical error; identical impedance does not prove identical meshes. This
 study does not validate 3D refinement, arbitrary geometry, material data,

@@ -135,8 +135,13 @@ def trace_refinement(record):
 
     def observed_triangle(points, triangles):
         result = triangle(points, triangles)
-        record['triangle_calls'].append(dict(points=array_record(points), triangles=array_record(triangles),
-                                            outputs=[array_record(a) for a in result]))
+        row = dict(points=array_record(points), triangles=array_record(triangles),
+                   outputs=[array_record(a) for a in result],
+                   delaunay_round=len(record['rounds'])-1)
+        if not record['triangle_calls']:
+            row.update(first_points=points.tolist(), first_triangles=triangles.tolist(),
+                       first_outputs=[a.tolist() for a in result])
+        record['triangle_calls'].append(row)
         return result
 
     def observed_apices(*args, **kwargs):

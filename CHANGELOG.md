@@ -1,5 +1,8 @@
 # Changelog
 
+- Classify recorded mesh seed differences with exact predicates and retain first triangle-data inputs for arithmetic replay, without changing runtime criteria.
+  정확한 술어로 초기 메시 차이를 분류하고 연산 재생용 첫 triangle-data 입력을 보존하며 runtime 기준은 유지합니다.
+
 - Add isolated original/candidate mesh diagnostics with exact-source checks, retained runtime limits and refinement traces across platform jobs.
   정확한 소스·기존 runtime 기준·세분 기록을 보존하는 원본/후보 메시 격리 진단과 플랫폼별 실행을 추가합니다.
 
