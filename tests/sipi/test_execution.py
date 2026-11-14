@@ -561,6 +561,8 @@ def documents():
     base.append(adaptive_shape())
     from test_shape_reference_panel_line import document as reference_shape_line
     base.append(reference_shape_line(True))
+    from test_shape_face_panel_line import document as face_shape_line
+    base.append(face_shape_line())
     return base
 
 

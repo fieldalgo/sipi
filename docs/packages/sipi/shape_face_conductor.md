@@ -81,3 +81,5 @@ references do not establish absolute or small mutual-entry accuracy for
 arbitrary geometry. Refine the intended geometry and outer box separately.
 Browser/EXE bindings, saved face-loss input and new platform qualification
 are outside this direct API unit.
+
+[Save a face-metal line](shape_face_panel_line.md).

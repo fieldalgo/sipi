@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit face-metal shape-current lines with matched RLGC and complete/partial execution records.
+  일치하는 RLGC와 완료·부분 실행 기록을 가진 면별 금속 형상전류 선로를 저장합니다.
+
 - Apply explicit signal and ground face surface laws to retained shape-current energies.
   보존된 형상전류 에너지에 신호·접지 면별 표면 재료를 명시 적용합니다.
 

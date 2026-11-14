@@ -69,3 +69,5 @@ options = dict(conductors=conductors, reference=reference, ground_thickness=35e-
 유한 영역 수렴 관측과 앞선 독립 전류 기준은 임의 기하의 절대 정확도나 작은 상호항
 정확도를 보장하지 않습니다. 대상 기하의 패널과 외곽을 별도로 세분해야 합니다.
 브라우저/EXE 연결, 면별 손실 저장 입력, 새 플랫폼 검증은 이 직접 API 단위의 범위 밖입니다.
+
+[면별 금속 선로 저장](shape_face_panel_line.md).

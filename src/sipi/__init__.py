@@ -341,3 +341,7 @@ __all__ += ['PanelShapeFaceCurrentFactors', 'PanelShapeFaceCurrentError', 'panel
 
 from .shape_face_conductor import ShapeFaceConductorLoss, panel_shape_conductor_loss_by_face
 __all__ += ['ShapeFaceConductorLoss', 'panel_shape_conductor_loss_by_face']
+
+from .shape_face_panel_line import (ShapeFacePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineResult,
+    ShapeFacePanelLineError)
+__all__ += ['ShapeFacePanelTransmissionLineDocument', 'ShapeFacePanelTransmissionLineResult', 'ShapeFacePanelLineError']
