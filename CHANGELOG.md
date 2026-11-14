@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit shape-current lines and retain matched RLGC, complete current samples and staged failures through common execution and receipts.
+  명시 형상전류 선로를 저장하고 동일 기하 RLGC·전체 전류 표본·단계별 실패를 공통 실행과 영수증에 보존합니다.
+
 - Add explicit capacitance-shape surface currents with two-step diagnostics, exact partial requests and existing per-boundary metal laws.
   두 차분폭 진단·정확한 부분 요청·기존 경계별 금속 법칙을 보존하는 명시 정전용량 형상미분 전류 API를 추가합니다.
 

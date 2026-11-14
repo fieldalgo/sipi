@@ -27,6 +27,8 @@ from .line_resolution_document import LineResolutionDocument, resolution_record
 from .panel_resolution_document import PanelResolutionDocument
 from .adaptive_panel_resolution_document import AdaptivePanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
+from .shape_panel_line import (ShapePanelTransmissionLineDocument, ShapePanelLineError,
+                               shape_current_record)
 from .volume_line import VolumeLineDocument
 from .lumped import LumpedNetworkDocument
 from .assembly_document import NetworkAssemblyDocument
@@ -126,6 +128,7 @@ _REGISTRY = {
     'sipi.sampled-panel-forward-pair-selection/1': SampledPanelForwardPairSelectionDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
+    'sipi.shape-panel-transmission-line/1': ShapePanelTransmissionLineDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
     'sipi.line-resolution/2': LineResolutionDocument,
     'sipi.panel-resolution/1': PanelResolutionDocument,
@@ -478,7 +481,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         raise ValueError('saved 3D frequency count exceeds max_evaluations before any field solve')
     if isinstance(doc, PanelTransmissionLineDocument) and len(data['line']['frequency_hz']) > budget:
         raise ValueError('saved panel-line frequency count exceeds max_evaluations before any field solve')
-    if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument)):
+    if isinstance(doc, ShapePanelTransmissionLineDocument) and len(data['line']['line']['frequency_hz']) > budget:
+        raise ValueError('saved shape-panel-line frequency count exceeds max_evaluations before any field solve')
+    if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line, volume-line or panel-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
     if isinstance(doc, (MixedBoundaryMulticonductorRLGCLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
@@ -622,7 +627,13 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         if result.failed:
             out['status'] = 'incomplete'
     else:
-        result = doc.analyze()
+        try:
+            result = doc.analyze()
+        except ShapePanelLineError as exc:
+            if not isinstance(doc, ShapePanelTransmissionLineDocument):
+                raise
+            out.update(status='failed', error=exc.to_dict())
+            return json.loads(json.dumps(out, ensure_ascii=False, allow_nan=False))
         if isinstance(result, BandAssessment):
             out['result'] = result.to_dict()
         elif isinstance(doc, (CrossSectionDocument, TemplateSectionDocument)):
@@ -655,12 +666,12 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 C0_f_per_m=_array(line.C0), C_loss_f_per_m=_array(line.C_loss),
                 L_h_per_m=_array(line.L), network=_network(result.network),
                 model='constant diagonal series R; quasi-static C/L and constant-tangent G(f)')
-        elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument)):
+        elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument)):
             out['result'] = dict(names=list(result.names), frequency_hz=_array(result.frequency),
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),
                 G_s_per_m=_array(result.G), C_f_per_m=_array(result.C),
                 network=_network(result.network), diagnostics=_diagnostics(result, diagnostics))
-            if isinstance(doc, (TransmissionLineDocument, PanelTransmissionLineDocument)) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss)):
+            if isinstance(doc, (TransmissionLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument)) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss)):
                 loss = result.conductor
                 out['result']['conductor_boundaries'] = dict(labels=list(loss.boundary_labels),
                     skin_depth_m=_array(loss.skin_depth), roughness_factor=_array(loss.roughness_factor),
@@ -672,7 +683,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                         current_integrals=_array(loss.factors.current_integrals),
                         whole_boundary_current_integrals=_array(loss.factors.base.current_integrals),
                         current_flux_error=loss.factors.current_error)
-            if isinstance(doc, PanelTransmissionLineDocument):
+            if isinstance(doc, ShapePanelTransmissionLineDocument):
+                out['result']['current_solver'] = shape_current_record(result.current_factors, result.panel_settings)
+            elif isinstance(doc, PanelTransmissionLineDocument):
                 factors = result.current_factors
                 out['result']['current_solver'] = dict(
                     kind='grounded-rectangle-panels', settings=dict(result.panel_settings),

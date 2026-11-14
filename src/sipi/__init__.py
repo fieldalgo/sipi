@@ -289,3 +289,6 @@ from .templates import split_gap_broadside_stripline
 
 from .panel_shape_conductor import (PanelShapeRequest, PanelShapeSample, PanelShapeCurrentFactors,
     PanelShapeCurrentError, panel_shape_current_factors, panel_shape_conductor_loss_by_boundary)
+
+from .shape_panel_line import (ShapePanelTransmissionLineDocument,
+    ShapePanelTransmissionLineResult, ShapePanelLineError)

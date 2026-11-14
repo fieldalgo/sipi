@@ -541,6 +541,8 @@ def documents():
     base.append(sampled_resolution_yield())
     from test_adaptive_panel_resolution_document import document as adaptive_panel_resolution
     base.append(adaptive_panel_resolution())
+    from test_shape_panel_line import document as shape_panel_line
+    base.append(shape_panel_line(True))
     return base
 
 

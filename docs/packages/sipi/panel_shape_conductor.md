@@ -71,3 +71,6 @@ the larger-domain check passed. This evidence does not establish arbitrary
 polygon, measured foil, native-platform or whole-product accuracy.
 
 [한국어](../../locales/ko/pages/packages/sipi/panel_shape_conductor.md)
+
+For versioned input and common execution, use the explicit
+[saved shape-current line](shape_panel_line.md) wrapper.
