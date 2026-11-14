@@ -81,17 +81,3 @@ def test_closed_pair_signal_order_reversal(closed_fields, closed_results):
     other = api.fem_shape_current_factors(field.mesh, dict(reversed(list(field.signals.items()))), field.ground)
     np.testing.assert_allclose(other.extension_parts[:,[1,0,2],::-1,::-1], closed_results[0][0].extension_parts, rtol=1e-8, atol=0)
     np.testing.assert_allclose(other.C0[::-1,::-1], closed_results[0][0].C0, rtol=1e-8, atol=0)
-
-
-@pytest.mark.parametrize('count', [3,4])
-def test_refined_three_and_four_signal_independent_energy(count, monkeypatch, record_property):
-    section = CrossSection([Layer('vacuum',.002)],
-        [Trace('s'+str(i), (i-(count-1)/2)*.0008, .0004, .00095, .0001) for i in range(count)], .008, top='ground')
-    factor = .5 if count == 3 else .25
-    field = section.mesh(edge_size=5e-6*factor,far_size=.0002*factor,grade=.1*factor)
-    result, reference = solve_with_reference(field.mesh, field.signals, field.ground, monkeypatch)
-    record_property('multisignal_shape_energy', json.dumps(observations(result, reference)))
-    assert result.names == tuple('s'+str(i) for i in range(count))
-    assert len(result.samples) == 8*(count+1)
-    assert max_boundary_error(result.extension_parts, reference['parts']) <= .01
-    assert np.max(abs(result.C0-reference['C0']))/np.max(abs(reference['C0'])) <= .001

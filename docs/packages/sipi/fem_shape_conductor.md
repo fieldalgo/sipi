@@ -75,3 +75,5 @@ mesh/outer convergence. Validation on another operating system or in a browser
 Worker/portable executable must be performed separately for the exact artifact.
 
 [한국어](../../locales/ko/pages/packages/sipi/fem_shape_conductor.md)
+
+The two larger independent P2 checks use [preserved reference observations](fem_shape_references.md); product currents and finite differences still run, with unchanged comparison criteria.

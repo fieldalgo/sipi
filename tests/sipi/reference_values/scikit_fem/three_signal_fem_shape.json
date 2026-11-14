@@ -1,0 +1,385 @@
+{
+  "schema": "openphysics.reference-values/1",
+  "case": "fem_shape_3_signals",
+  "physics": "vacuum cross-sectional current geometry energy",
+  "comparison": "different-discretization",
+  "role": "Preserved independent quadratic-potential observation; original higher-order comparison criteria remain in the consuming test, not an absolute error bound.",
+  "references": [
+    {
+      "tool": "scikit-fem",
+      "version": "12.0.2",
+      "build": "installed Python distribution; wheel archive not retained",
+      "modified": {
+        "value": false,
+        "description": "No patches to the installed reference library."
+      },
+      "license": "BSD-3-Clause",
+      "source": "https://github.com/kinnala/scikit-fem",
+      "install": {
+        "kind": "existing test environment",
+        "command": null,
+        "lock": null
+      },
+      "settings": {
+        "quadrature_orders": [
+          4,
+          6
+        ],
+        "sparse_solver": "SciPy SuperLU"
+      },
+      "discretization": {
+        "potential": "P2 on the recorded triangular mesh",
+        "velocity": "P1 prescribed geometry motion from the product boundary contract"
+      },
+      "arrays": [
+        "*"
+      ],
+      "execution": "in-process",
+      "independence": {
+        "product_loaded": true,
+        "inputs_from_product": true
+      }
+    }
+  ],
+  "generator": {
+    "path": "private research repository",
+    "sha256": "46406859022e08218f9371bcdee843694656da193089f6e92dcd2e1e528582ca",
+    "command": "python generate_compare.py; compare every P2 output with retained successful observations; never rewrite original values",
+    "product_commit": "b0559b2fcae6344194c57818b78f0141f5b873c1",
+    "clean": true
+  },
+  "generated_utc": "2026-11-14T21:39:11.700233+00:00",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.5.4",
+    "os": "Linux",
+    "cpu": "x86_64",
+    "dtype": "float64",
+    "backend/device": "CPU; SciPy 1.18.1 SuperLU"
+  },
+  "cost": {
+    "compile_s": null,
+    "compute_s": 16.538204234995646,
+    "wall_time_s": 27.416726936993655,
+    "peak_rss_mb": 933.6640625,
+    "threads": 1,
+    "not_measured": [
+      "separate compilation cost",
+      "incremental reference-only peak RSS; recorded RSS is whole-process high-water mark"
+    ]
+  },
+  "inputs": {
+    "cross_section": {
+      "box": {
+        "bottom": "ground",
+        "sides": "open",
+        "top": "ground",
+        "width": 0.008
+      },
+      "layers": [
+        {
+          "eps_r": 1.0,
+          "name": "vacuum",
+          "tan_delta": 0.0,
+          "thickness": 0.002
+        }
+      ],
+      "length_unit": "m",
+      "mesh": {
+        "edge_size": 2.5e-06,
+        "far_size": 0.0001,
+        "grade": 0.05
+      },
+      "schema": "sipi.cross-section/1",
+      "traces": [
+        {
+          "ground": false,
+          "name": "s0",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": -0.0008,
+          "y": 0.00095
+        },
+        {
+          "ground": false,
+          "name": "s1",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": 0.0,
+          "y": 0.00095
+        },
+        {
+          "ground": false,
+          "name": "s2",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": 0.0008,
+          "y": 0.00095
+        }
+      ]
+    },
+    "signals": 3,
+    "extensions": [
+      "harmonic",
+      "positive radial-weighted harmonic about node centroid"
+    ],
+    "reference_mesh": {
+      "nodes": 49858,
+      "triangles": 98558,
+      "nodes_sha256": "e81a84a9602e24482be29b2c3f43309dd0ccf80338b5fe9b44a384d314e941be",
+      "triangles_sha256": "dc1bd21c3d8f0ca75a1738e186d36356ded46a1a94f80ca978711dedee80f070"
+    }
+  },
+  "matched": [
+    "geometry, vacuum coefficients, ordered conductors and reference boundaries",
+    "same original mesh recipe and prescribed velocities",
+    "all independently recomputed P2 outputs exactly match retained successful source observations"
+  ],
+  "not_matched": [
+    "product potential is P1; reference potential is P2",
+    "future remeshing on another platform may produce different arrays; mesh hashes identify the recorded reference mesh only",
+    "velocity fields use the product boundary prescription; this is not an independent velocity-construction test"
+  ],
+  "reference_self_check": [
+    "free-node residual, boundary charge/energy identity and quadrature orders 4/6 satisfy the original 1e-10 checks",
+    "Original successful numerical arrays are unchanged; original source XML SHA256 ac91a4efb2ed7c9652eb47032f6ab42aae4ba2ef0f43bf83bbb5b938559517ff"
+  ],
+  "failed_or_discarded": [
+    "Earlier coarse three-signal C0 comparison failed; earlier coarse and half-size four-signal PSD checks failed. Those records and criteria remain preserved; this record identifies the already accepted refined input."
+  ],
+  "not_run": [
+    "new platform or empirical validation",
+    "independent reference execution by the consuming stored-value test"
+  ],
+  "values": [
+    {
+      "name": "C0",
+      "unit": "F/m",
+      "dtype": "<f8",
+      "shape": [
+        3,
+        3
+      ],
+      "data": [
+        [
+          2.801067479875811e-11,
+          -8.017779949521742e-12,
+          -3.856849677760241e-13
+        ],
+        [
+          -8.017779949521642e-12,
+          3.0709598226807254e-11,
+          -8.017781663801285e-12
+        ],
+        [
+          -3.8568496777601535e-13,
+          -8.017781663801225e-12,
+          2.8010678260447858e-11
+        ]
+      ]
+    },
+    {
+      "name": "parts",
+      "unit": "1/m",
+      "dtype": "<f8",
+      "shape": [
+        2,
+        4,
+        3,
+        3
+      ],
+      "data": [
+        [
+          [
+            [
+              1385.3128082616352,
+              -37.82270862771112,
+              -11.196797814961373
+            ],
+            [
+              -37.82270862771113,
+              84.88073981613336,
+              27.104377658475677
+            ],
+            [
+              -11.196797814961371,
+              27.104377658475677,
+              8.659819218854384
+            ]
+          ],
+          [
+            [
+              91.17930574145996,
+              -32.0034590180937,
+              -83.16513348766016
+            ],
+            [
+              -32.00345901809369,
+              1389.8334177537738,
+              -32.013735172315215
+            ],
+            [
+              -83.16513348766013,
+              -32.013735172315215,
+              91.17997787927692
+            ]
+          ],
+          [
+            [
+              8.659619163813602,
+              27.10368750474573,
+              -11.19380352611498
+            ],
+            [
+              27.103687504745732,
+              84.87861367087758,
+              -37.81328337158001
+            ],
+            [
+              -11.193803526114984,
+              -37.81328337158002,
+              1385.2930101948423
+            ]
+          ],
+          [
+            [
+              150.43254524395758,
+              120.68733726581776,
+              71.18561128929288
+            ],
+            [
+              120.68733726581776,
+              147.33907411593356,
+              120.68699271940297
+            ],
+            [
+              71.18561128929286,
+              120.68699271940297,
+              150.43266164831294
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              1385.3126311458595,
+              -37.822781107746636,
+              -11.19682119144488
+            ],
+            [
+              -37.82278110774664,
+              84.88072943871052,
+              27.104375371406608
+            ],
+            [
+              -11.19682119144488,
+              27.104375371406604,
+              8.65981738141429
+            ]
+          ],
+          [
+            [
+              91.17928580223635,
+              -32.003454456827974,
+              -83.16512433427178
+            ],
+            [
+              -32.00345445682796,
+              1389.8332500220479,
+              -32.01373487606498
+            ],
+            [
+              -83.1651243342718,
+              -32.01373487606497,
+              91.17995981570536
+            ]
+          ],
+          [
+            [
+              8.659617225510635,
+              27.103685209534156,
+              -11.19382679236164
+            ],
+            [
+              27.103685209534156,
+              84.8786027657313,
+              -37.81335557178978
+            ],
+            [
+              -11.19382679236164,
+              -37.8133555717898,
+              1385.2928337873566
+            ]
+          ],
+          [
+            [
+              150.432440305757,
+              120.68734140058652,
+              71.18561815869612
+            ],
+            [
+              120.68734140058652,
+              147.3389678034434,
+              120.68699333011388
+            ],
+            [
+              71.18561815869612,
+              120.68699333011388,
+              150.43255787363873
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "residual",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [],
+      "data": 7.371025635192505e-13
+    },
+    {
+      "name": "energy_error",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [],
+      "data": 3.32696408441395e-13
+    },
+    {
+      "name": "local_errors",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [
+        2
+      ],
+      "data": [
+        5.206141141581349e-13,
+        5.780626400939356e-13
+      ]
+    },
+    {
+      "name": "quadrature",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [],
+      "data": 2.8302417648910683e-14
+    }
+  ],
+  "consumers": [
+    "tests/sipi/test_reference_fem_shape_multisignal.py"
+  ],
+  "provenance_status": "reconstructed",
+  "not_recorded": {
+    "references[0].install.command": "The comparison reused the existing pinned test environment; no installation command ran in this measurement.",
+    "references[0].install.lock": "The historical reference wheel lock/archive was not retained with the successful observations; exact runtime versions were queried.",
+    "cost.compile_s": "The comparison recorded reference and whole-run wall time, not a separate compilation phase."
+  },
+  "regeneration": [],
+  "reproduction": {
+    "path": "tests/sipi/reference_values/scikit_fem/compare_multisignal.py",
+    "sha256": "0bb3ef6e9c1a206b9093a47c7578fb1909c3d3b1468e2b1a8e3d24020a67122a",
+    "mode": "compare only; never writes baseline data"
+  },
+  "values_sha256": "4c5bb618a9da014fc13f67c5a4d1575da1c20b0eb25803c70b77818aff594e23",
+  "content_sha256": "726c243ca9c705f4af135f63350202b95c38343f601d8ae3b2f33e9fda392209"
+}

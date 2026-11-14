@@ -1,0 +1,526 @@
+{
+  "schema": "openphysics.reference-values/1",
+  "case": "fem_shape_4_signals",
+  "physics": "vacuum cross-sectional current geometry energy",
+  "comparison": "different-discretization",
+  "role": "Preserved independent quadratic-potential observation; original higher-order comparison criteria remain in the consuming test, not an absolute error bound.",
+  "references": [
+    {
+      "tool": "scikit-fem",
+      "version": "12.0.2",
+      "build": "installed Python distribution; wheel archive not retained",
+      "modified": {
+        "value": false,
+        "description": "No patches to the installed reference library."
+      },
+      "license": "BSD-3-Clause",
+      "source": "https://github.com/kinnala/scikit-fem",
+      "install": {
+        "kind": "existing test environment",
+        "command": null,
+        "lock": null
+      },
+      "settings": {
+        "quadrature_orders": [
+          4,
+          6
+        ],
+        "sparse_solver": "SciPy SuperLU"
+      },
+      "discretization": {
+        "potential": "P2 on the recorded triangular mesh",
+        "velocity": "P1 prescribed geometry motion from the product boundary contract"
+      },
+      "arrays": [
+        "*"
+      ],
+      "execution": "in-process",
+      "independence": {
+        "product_loaded": true,
+        "inputs_from_product": true
+      }
+    }
+  ],
+  "generator": {
+    "path": "private research repository",
+    "sha256": "46406859022e08218f9371bcdee843694656da193089f6e92dcd2e1e528582ca",
+    "command": "python generate_compare.py; compare every P2 output with retained successful observations; never rewrite original values",
+    "product_commit": "b0559b2fcae6344194c57818b78f0141f5b873c1",
+    "clean": true
+  },
+  "generated_utc": "2026-11-14T21:43:36.061782+00:00",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.5.4",
+    "os": "Linux",
+    "cpu": "x86_64",
+    "dtype": "float64",
+    "backend/device": "CPU; SciPy 1.18.1 SuperLU"
+  },
+  "cost": {
+    "compile_s": null,
+    "compute_s": 157.14738717197906,
+    "wall_time_s": 264.3056622889999,
+    "peak_rss_mb": 5008.21875,
+    "threads": 1,
+    "not_measured": [
+      "separate compilation cost",
+      "incremental reference-only peak RSS; recorded RSS is whole-process high-water mark"
+    ]
+  },
+  "inputs": {
+    "cross_section": {
+      "box": {
+        "bottom": "ground",
+        "sides": "open",
+        "top": "ground",
+        "width": 0.008
+      },
+      "layers": [
+        {
+          "eps_r": 1.0,
+          "name": "vacuum",
+          "tan_delta": 0.0,
+          "thickness": 0.002
+        }
+      ],
+      "length_unit": "m",
+      "mesh": {
+        "edge_size": 1.25e-06,
+        "far_size": 5e-05,
+        "grade": 0.025
+      },
+      "schema": "sipi.cross-section/1",
+      "traces": [
+        {
+          "ground": false,
+          "name": "s0",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": -0.0012000000000000001,
+          "y": 0.00095
+        },
+        {
+          "ground": false,
+          "name": "s1",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": -0.0004,
+          "y": 0.00095
+        },
+        {
+          "ground": false,
+          "name": "s2",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": 0.0004,
+          "y": 0.00095
+        },
+        {
+          "ground": false,
+          "name": "s3",
+          "thickness": 0.0001,
+          "width": 0.0004,
+          "x": 0.0012000000000000001,
+          "y": 0.00095
+        }
+      ]
+    },
+    "signals": 4,
+    "extensions": [
+      "harmonic",
+      "positive radial-weighted harmonic about node centroid"
+    ],
+    "reference_mesh": {
+      "nodes": 251046,
+      "triangles": 499349,
+      "nodes_sha256": "3b9fdb81e3473662ab64e1d2ca1c51a50a8feba4ce86575be81c40ed54ef89f8",
+      "triangles_sha256": "cec42b77658b13d18a73286a61fc9abea329c7238da5db0fab6368aed251131a"
+    }
+  },
+  "matched": [
+    "geometry, vacuum coefficients, ordered conductors and reference boundaries",
+    "same original mesh recipe and prescribed velocities",
+    "all independently recomputed P2 outputs exactly match retained successful source observations"
+  ],
+  "not_matched": [
+    "product potential is P1; reference potential is P2",
+    "future remeshing on another platform may produce different arrays; mesh hashes identify the recorded reference mesh only",
+    "velocity fields use the product boundary prescription; this is not an independent velocity-construction test"
+  ],
+  "reference_self_check": [
+    "free-node residual, boundary charge/energy identity and quadrature orders 4/6 satisfy the original 1e-10 checks",
+    "Original successful numerical arrays are unchanged; original source XML SHA256 ac91a4efb2ed7c9652eb47032f6ab42aae4ba2ef0f43bf83bbb5b938559517ff"
+  ],
+  "failed_or_discarded": [
+    "Earlier coarse three-signal C0 comparison failed; earlier coarse and half-size four-signal PSD checks failed. Those records and criteria remain preserved; this record identifies the already accepted refined input."
+  ],
+  "not_run": [
+    "new platform or empirical validation",
+    "independent reference execution by the consuming stored-value test"
+  ],
+  "values": [
+    {
+      "name": "C0",
+      "unit": "F/m",
+      "dtype": "<f8",
+      "shape": [
+        4,
+        4
+      ],
+      "data": [
+        [
+          2.800751858494767e-11,
+          -8.017068522609847e-12,
+          -3.759604381704281e-13,
+          -3.036735071108505e-14
+        ],
+        [
+          -8.017068522609621e-12,
+          3.071414548439876e-11,
+          -7.896445650611595e-12,
+          -3.7596032785694035e-13
+        ],
+        [
+          -3.759604381704076e-13,
+          -7.896445650611892e-12,
+          3.071414634645628e-11,
+          -8.017067874853867e-12
+        ],
+        [
+          -3.036735071108565e-14,
+          -3.759603278569643e-13,
+          -8.01706787485407e-12,
+          2.800751684301496e-11
+        ]
+      ]
+    },
+    {
+      "name": "parts",
+      "unit": "1/m",
+      "dtype": "<f8",
+      "shape": [
+        2,
+        5,
+        4,
+        4
+      ],
+      "data": [
+        [
+          [
+            [
+              1384.387012637399,
+              -37.585229150314944,
+              -10.944838812475771,
+              -3.660121732094625
+            ],
+            [
+              -37.58522915031496,
+              84.4670501365321,
+              26.540676599147076,
+              8.945467926259003
+            ],
+            [
+              -10.944838812475776,
+              26.540676599147076,
+              8.344057182729438,
+              2.812464172822987
+            ],
+            [
+              -3.6601217320946247,
+              8.945467926259003,
+              2.8124641728229864,
+              0.9479944452325787
+            ]
+          ],
+          [
+            [
+              91.37148116920962,
+              -31.427675113073658,
+              -81.77854712434377,
+              -26.39319473432884
+            ],
+            [
+              -31.427675113073644,
+              1388.5463922834022,
+              -31.90856143729451,
+              -9.27896136878822
+            ],
+            [
+              -81.77854712434377,
+              -31.908561437294523,
+              87.95222685731288,
+              28.121842814864763
+            ],
+            [
+              -26.39319473432884,
+              -9.27896136878822,
+              28.121842814864763,
+              8.996625129410718
+            ]
+          ],
+          [
+            [
+              8.996966906063324,
+              28.122894510321288,
+              -9.28308541884732,
+              -26.393926824677454
+            ],
+            [
+              28.122894510321288,
+              87.95546226844621,
+              -31.92150571112364,
+              -81.78086054698048
+            ],
+            [
+              -9.283085418847323,
+              -31.921505711123633,
+              1388.5792796148014,
+              -31.417164049034476
+            ],
+            [
+              -26.39392682467746,
+              -81.78086054698048,
+              -31.41716404903447,
+              91.37274339748647
+            ]
+          ],
+          [
+            [
+              0.9479971984037211,
+              2.812471004167253,
+              8.94549250945548,
+              -3.6602828371113474
+            ],
+            [
+              2.812471004167253,
+              8.344074994145627,
+              26.540746095305337,
+              -10.945315629287757
+            ],
+            [
+              8.945492509455477,
+              26.540746095305334,
+              84.46698326608954,
+              -37.58675141818739
+            ],
+            [
+              -3.6602828371113465,
+              -10.945315629287764,
+              -37.58675141818739,
+              1384.3926203733577
+            ]
+          ],
+          [
+            [
+              150.44820020068136,
+              120.1653576622741,
+              69.71394614601796,
+              34.27533756220046
+            ],
+            [
+              120.1653576622741,
+              146.03541981228892,
+              117.87845505722099,
+              69.71391529492563
+            ],
+            [
+              69.71394614601796,
+              117.87845505722099,
+              146.0362306129774,
+              120.16537317600098
+            ],
+            [
+              34.27533756220046,
+              69.71391529492564,
+              120.16537317600098,
+              150.4486827609131
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              1384.3869805813915,
+              -37.58528869350434,
+              -10.944858342733282,
+              -3.6601283076231965
+            ],
+            [
+              -37.58528869350434,
+              84.46704965437849,
+              26.540674872125436,
+              8.945467412612178
+            ],
+            [
+              -10.944858342733282,
+              26.540674872125443,
+              8.344057523335477,
+              2.8124643703519787
+            ],
+            [
+              -3.6601283076231943,
+              8.945467412612178,
+              2.812464370351978,
+              0.9479944591411086
+            ]
+          ],
+          [
+            [
+              91.37147098652937,
+              -31.42764642801642,
+              -81.77853975718747,
+              -26.393192021825588
+            ],
+            [
+              -31.427646428016434,
+              1388.5462594245637,
+              -31.908585060251923,
+              -9.278968139185599
+            ],
+            [
+              -81.77853975718747,
+              -31.90858506025193,
+              87.9522140769646,
+              28.121842771550746
+            ],
+            [
+              -26.393192021825588,
+              -9.278968139185602,
+              28.12184277155075,
+              8.996623042280735
+            ]
+          ],
+          [
+            [
+              8.996964641719225,
+              28.122894526034358,
+              -9.28309257881778,
+              -26.39392425556837
+            ],
+            [
+              28.122894526034358,
+              87.95545011464985,
+              -31.92153048546588,
+              -81.78085359327058
+            ],
+            [
+              -9.283092578817783,
+              -31.921530485465865,
+              1388.579148829573,
+              -31.417135165176933
+            ],
+            [
+              -26.39392425556837,
+              -81.78085359327058,
+              -31.417135165176955,
+              91.3727364576452
+            ]
+          ],
+          [
+            [
+              0.9479971778324296,
+              2.8124711275920817,
+              8.945491744557126,
+              -3.6602890418822955
+            ],
+            [
+              2.8124711275920817,
+              8.344075155281999,
+              26.54074360984524,
+              -10.945334052120769
+            ],
+            [
+              8.945491744557126,
+              26.540743609845247,
+              84.4669786555944,
+              -37.58680738195841
+            ],
+            [
+              -3.6602890418822978,
+              -10.94533405212078,
+              -37.58680738195841,
+              1384.3925786584225
+            ]
+          ],
+          [
+            [
+              150.44812035326035,
+              120.16536665190682,
+              69.71395489512057,
+              34.275342954095386
+            ],
+            [
+              120.16536665190682,
+              146.03531995754446,
+              117.8784581531341,
+              69.71392380971987
+            ],
+            [
+              69.71395489512058,
+              117.87845815313413,
+              146.03613860426847,
+              120.16538247242809
+            ],
+            [
+              34.275342954095386,
+              69.71392380971987,
+              120.16538247242808,
+              150.448607121385
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "residual",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [],
+      "data": 2.000247690017808e-12
+    },
+    {
+      "name": "energy_error",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [],
+      "data": 7.440902097115266e-13
+    },
+    {
+      "name": "local_errors",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [
+        2
+      ],
+      "data": [
+        2.2250117256325163e-12,
+        2.443199636694542e-12
+      ]
+    },
+    {
+      "name": "quadrature",
+      "unit": "1",
+      "dtype": "<f8",
+      "shape": [],
+      "data": 1.3050520196335816e-13
+    }
+  ],
+  "consumers": [
+    "tests/sipi/test_reference_fem_shape_multisignal.py"
+  ],
+  "provenance_status": "reconstructed",
+  "not_recorded": {
+    "references[0].install.command": "The comparison reused the existing pinned test environment; no installation command ran in this measurement.",
+    "references[0].install.lock": "The historical reference wheel lock/archive was not retained with the successful observations; exact runtime versions were queried.",
+    "cost.compile_s": "The comparison recorded reference and whole-run wall time, not a separate compilation phase."
+  },
+  "regeneration": [],
+  "reproduction": {
+    "path": "tests/sipi/reference_values/scikit_fem/compare_multisignal.py",
+    "sha256": "0bb3ef6e9c1a206b9093a47c7578fb1909c3d3b1468e2b1a8e3d24020a67122a",
+    "mode": "compare only; never writes baseline data"
+  },
+  "values_sha256": "bc6a523b3d7531499e675a86b99bb5bc61578d0446528c7b37af021ba5d025f4",
+  "content_sha256": "58d681171f1499c80c59286fe82ab42abfe8b9f8f917980bf9dff45a7abcf983"
+}
