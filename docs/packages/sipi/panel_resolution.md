@@ -1,5 +1,7 @@
 # Elementwise panel-line resolution checks
 
+[Saved requests](panel_resolution_document.md) preserve the same separate-axis results through common execution.
+
 `assess_panel_line_resolution` compares a panel line along three separate
 axes: panel controls, dielectric volume mesh and finite outer domain. It
 accepts either panel-line version, preserving the selected current method.
@@ -59,8 +61,8 @@ propagate. `completed` and `accepted` remain separate: even a fully evaluated
 report can fail the requested agreement conditions.
 
 The result is a `PanelResolutionAssessment` and works with
-`resolution_record` for ordinary JSON-compatible result storage. This is a
-Python evaluation API, not a new executable saved-request schema. Input
+`resolution_record` for ordinary JSON-compatible result storage. To save an
+executable request, use the linked `PanelResolutionDocument` wrapper. Input
 snapshots include both panel settings and the nested line. Existing
 line-resolution requests remain unchanged.
 

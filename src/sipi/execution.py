@@ -24,6 +24,7 @@ from .aperture_section import ApertureSectionDocument
 from .aperture_study import ApertureStudyDocument, ApertureDesignDocument, CapacitanceGoalError
 from .line_model import TransmissionLineDocument
 from .line_resolution_document import LineResolutionDocument, resolution_record
+from .panel_resolution_document import PanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
 from .volume_line import VolumeLineDocument
 from .lumped import LumpedNetworkDocument
@@ -116,6 +117,7 @@ _REGISTRY = {
     'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
     'sipi.line-resolution/2': LineResolutionDocument,
+    'sipi.panel-resolution/1': PanelResolutionDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     'sipi.template-section/1': TemplateSectionDocument,
     'sipi.quasistatic-line/1': QuasistaticLineDocument,
@@ -477,7 +479,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             surface_impedance_ohms=_array(profile.impedance),
             skin_depth_m=_array(profile.skin_depth),
             reference_plane_m=profile.reference_plane_m, cutoff_rms=profile.cutoff_rms)
-    elif isinstance(doc, LineResolutionDocument):
+    elif isinstance(doc, (LineResolutionDocument,PanelResolutionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = resolution_record(result)
         if result.failure is not None:

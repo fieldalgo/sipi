@@ -525,6 +525,8 @@ def documents():
     base.append(layered_panel(True))
     from test_adaptive_resolution_document import document as adaptive_resolution
     base.append(adaptive_resolution())
+    from test_panel_resolution_document import document as panel_resolution
+    base.append(panel_resolution())
     return base
 
 

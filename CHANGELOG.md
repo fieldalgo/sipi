@@ -1,5 +1,8 @@
 # Changelog
 
+- Save panel-resolution/1 requests with strict SI tolerances and preserve separate-axis comparisons, unaccepted results and exact partial failures through common execution.
+  엄격한 SI 허용차로 panel-resolution/1 요청을 저장하고 분리 축 비교·미수락 결과·정확한 부분 실패를 공통 실행에 보존합니다.
+
 - Save bounded refinement as explicit line-resolution/2 and preserve budget exhaustion, selected original-domain results and partial failures through common execution.
   예산 있는 자동 세분을 명시 line-resolution/2로 저장하고 예산 소진·원래 영역의 선택 결과·부분 실패를 공통 실행에 보존합니다.
 

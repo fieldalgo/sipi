@@ -38,6 +38,27 @@ def assess_panel_line_resolution(line, *, refined_panel_options, outer_documents
     exact input/stage, then stops. User interrupts propagate. Inputs, budgets
     and physically unchanged outer domains are checked before any field solve.
     """
+    tolerances,stages=_panel_resolution_inputs(line,refined_panel_options,outer_documents,
+                                               tolerances,refinement_factor,max_solves)
+    count=len(stages)
+    evaluations,comparisons=[],[]
+    for stage,doc,references in stages:
+        text=doc.dumps()
+        try:
+            result=doc.analyze()
+            evaluations.append(ResolutionEvaluation(stage,text,result))
+            for index,label in references:
+                comparisons.append(_compare(evaluations[index].result,result,tolerances,
+                                             label,index,len(evaluations)-1))
+        except Exception as error:
+            failure=ResolutionFailure(stage,text,type(error).__name__,str(error))
+            return PanelResolutionAssessment(tolerances,evaluations,comparisons,count,failure)
+    return PanelResolutionAssessment(tolerances,evaluations,comparisons,count)
+
+
+def _panel_resolution_inputs(line,refined_panel_options,outer_documents,tolerances,
+                             refinement_factor,max_solves):
+    """Shared field-free admission and immutable planned inputs."""
     if not isinstance(line,PanelTransmissionLineDocument):
         raise TypeError('line must be a PanelTransmissionLineDocument')
     if (not isinstance(outer_documents,(list,tuple)) or not outer_documents
@@ -72,16 +93,4 @@ def assess_panel_line_resolution(line, *, refined_panel_options, outer_documents
             ('joint',joint,((1,'joint:panel'),(2,'joint:volume')))]
     stages.extend((f'outer:{i}',PanelTransmissionLineDocument.loads(doc.dumps()),
                    ((3,f'outer:{i}'),)) for i,doc in enumerate(outer_documents))
-    evaluations,comparisons=[],[]
-    for stage,doc,references in stages:
-        text=doc.dumps()
-        try:
-            result=doc.analyze()
-            evaluations.append(ResolutionEvaluation(stage,text,result))
-            for index,label in references:
-                comparisons.append(_compare(evaluations[index].result,result,tolerances,
-                                             label,index,len(evaluations)-1))
-        except Exception as error:
-            failure=ResolutionFailure(stage,text,type(error).__name__,str(error))
-            return PanelResolutionAssessment(tolerances,evaluations,comparisons,count,failure)
-    return PanelResolutionAssessment(tolerances,evaluations,comparisons,count)
+    return tolerances,stages
