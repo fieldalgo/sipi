@@ -88,3 +88,5 @@ failed 상태와 null result, 시도 횟수·단계·실패 매개변수·원인
 ```sh
 python -m pytest -q tests/sipi/test_line_goal_document.py tests/sipi/test_execution.py tests/sipi/test_material_variables.py
 ```
+
+[고정 금속 도금층의 명시 goal/4](layered_goal.md)는 같은 탐색·세분 조건을 유지합니다.

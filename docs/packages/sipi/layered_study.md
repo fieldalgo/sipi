@@ -46,8 +46,8 @@ The per-run budget is checked before any field solve.
 Versions study/1..3 continue generating line/6. Yield/1 still admits study/1..2,
 and yield/2 still admits study/1..3. Existing yield-design candidate selection
 versions also retain their earlier study contracts; reading a new study does
-not silently extend an old consumer. Saved quantity goals likewise retain
-their earlier conductor format until an explicit extension is selected.
+not silently extend an old consumer. Saved quantity goals retain their earlier conductor format in versions 1..3;
+[explicit goal/4](layered_goal.md) connects fixed coatings.
 
 Validation replays sampled RLGC through direct line/7 calls. Scalar quantities
 are compared with an independent 2x2 matrix exponential; paired forward launches

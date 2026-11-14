@@ -515,6 +515,8 @@ def documents():
     base.append(layered_line_document())
     from test_layered_study import document as layered_study_document, yield_document as layered_yield_document
     base.extend((layered_study_document(), layered_yield_document()))
+    from test_layered_goal import document as layered_goal
+    base.append(layered_goal())
     return base
 
 

@@ -95,3 +95,5 @@ global optimum, continuous-band, app or Windows acceptance is implied.
 ```sh
 python -m pytest -q tests/sipi/test_line_goal_document.py tests/sipi/test_execution.py tests/sipi/test_material_variables.py
 ```
+
+[Explicit goal/4 with fixed metal coatings](layered_goal.md) retains the same search and refinement rules.

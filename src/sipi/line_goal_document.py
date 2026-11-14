@@ -14,7 +14,7 @@ __all__ = ['LineQuantityDesignDocument']
 
 
 class LineQuantityDesignDocument:
-    """Saved geometry/material factory and lossy target, versions 1 through 3.
+    """Saved geometry/material factory and lossy target, versions 1 through 4.
 
     study is a /3 or /4 ImpedanceStudyDocument (or its dictionary), with z0
     for scalar goals or z_diff_forward for either explicit paired goal,
@@ -32,12 +32,14 @@ class LineQuantityDesignDocument:
     The goal uses full lossy RLGC through seek_line_quantity. Existing fixed
     pitch and total stack-height constraints are preserved.
 
-    conductor is the exact transmission-line/6 record, fixed across the search.
+    Explicit version 4 uses transmission-line/7, including fixed layered metal
+    coatings. Versions 1..3 retain line/6; coating parameters are not search
+    variables. The conductor remains fixed across the search.
     Normalization retains the study's endpoint geometry/material preflight and
     adds the nominal conductor guards, without meshing. Later candidate failures
     (such as endpoint skin depth or an invalid interior) count as factory attempts;
     they are not silently repaired.
-    Selected and refined inputs retain zero-length line/6 documents at 50 ohms;
+    Selected and refined inputs retain zero-length documents at 50 ohms;
     that network reference does not define the characteristic target quantity.
     """
     def __init__(self, study, *, conductor, quantity, target, tolerance, max_evaluations=40,
@@ -53,13 +55,13 @@ class LineQuantityDesignDocument:
         _keys(data, ('schema', 'study', 'conductor', 'quantity', 'target', 'tolerance',
                      'max_evaluations'), where='line quantity design')
         if data['schema'] not in ('sipi.line-quantity-design/1', 'sipi.line-quantity-design/2',
-                                  'sipi.line-quantity-design/3'):
+                                  'sipi.line-quantity-design/3', 'sipi.line-quantity-design/4'):
             raise ValueError('unsupported line-quantity-design schema')
         quantity = data['quantity']
         allowed = ('impedance_real', 'attenuation')
-        if data['schema'] in ('sipi.line-quantity-design/2', 'sipi.line-quantity-design/3'):
+        if data['schema'] in ('sipi.line-quantity-design/2', 'sipi.line-quantity-design/3', 'sipi.line-quantity-design/4'):
             allowed += ('differential_forward_impedance_real',)
-        if data['schema'] == 'sipi.line-quantity-design/3':
+        if data['schema'] in ('sipi.line-quantity-design/3', 'sipi.line-quantity-design/4'):
             allowed += ('common_forward_impedance_real',)
         if not isinstance(quantity, str) or quantity not in allowed:
             raise ValueError('quantity must be '+' or '.join(allowed))
@@ -75,7 +77,8 @@ class LineQuantityDesignDocument:
         lower, upper = (_scalar('parameter bound', variable[key]) for key in ('lower', 'upper'))
         if lower >= upper:
             raise ValueError('lower parameter bound must be below upper')
-        nominal = _line_from_values(study, data['conductor'])
+        options = dict(line_schema='sipi.transmission-line/7') if data['schema'] == 'sipi.line-quantity-design/4' else {}
+        nominal = _line_from_values(study, data['conductor'], **options)
         self._data = dict(schema=data['schema'], study=study,
             conductor=nominal.to_dict()['conductor'], quantity=quantity, target=target,
             tolerance=tolerance, max_evaluations=budget)
@@ -98,6 +101,7 @@ class LineQuantityDesignDocument:
 
     def solve(self):
         data = self.to_dict(); study = data['study']; variable = study['sampling']['variables'][0]
-        return seek_line_quantity(lambda value: _line_from_values(study, data['conductor'], [value]),
+        options = dict(line_schema='sipi.transmission-line/7') if data['schema'] == 'sipi.line-quantity-design/4' else {}
+        return seek_line_quantity(lambda value: _line_from_values(study, data['conductor'], [value], **options),
             [variable['lower'], variable['upper']], data['target'], quantity=data['quantity'],
             tolerance=data['tolerance'], max_evaluations=data['max_evaluations'])

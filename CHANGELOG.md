@@ -1,5 +1,8 @@
 # Changelog
 
+- Connect fixed layered metals to explicit line-quantity-design/4, preserving prior versions, failed attempts and selected/refined target gates.
+  이전 버전과 실패 시도 및 선택·세분 목표 조건을 보존하며 고정 도금 재료를 명시 line-quantity-design/4에 연결합니다.
+
 - Connect fixed layered metals to versioned geometry/dielectric sampling and iid yield, retaining failed samples and older consumer contracts.
   실패 표본과 이전 소비자 계약을 보존하며 고정 도금 재료를 버전 있는 기하·유전체 공차 및 iid 수율 평가에 연결합니다.
 
