@@ -52,8 +52,11 @@ The outer electric boundary has zero normal D; the outer magnetic boundary
 fixes Az=0. These are explicit finite-domain approximations, not identical
 field boundary equations. All grounded plates/traces form one common reference.
 Dielectric material interfaces do not change conductivity: it is zero outside
-metal, with one common positive value inside. Relative permeability is uniform
-throughout the entire magnetic domain. Mesh and boundary convergence are separate.
+metal. Saved v1 inputs use one common positive value inside. The direct API
+also accepts a positive elementwise metal field on the full volume mesh; see
+[the conductivity contract](conductor_diffusion.md#piecewise-conductivity-in-the-metal).
+Relative permeability is uniform throughout the entire magnetic domain. Mesh
+and boundary convergence are separate.
 
 `volume_line(volume, frequency, materials=..., conductivity=..., length=...,
 z_ref=50, relative_permeability=1, keep_fields=False)` is the direct mesh API.
@@ -123,8 +126,8 @@ The initial coax mesh (8 radial, 128 angular) missed the .1% criterion at .22878
 It was refined, with no tolerance relaxation. The finite-box material definition
 and electric boundary differ from older open-box extraction, so their values
 must not be silently interchanged. This document is separate from surface-model
-input contracts. Nonuniform conductor conductivity/permeability, conductor
-roughness, radiation, arbitrary mask contours, and 3D transitions are not
+input contracts. Nonuniform permeability, automatic conductor roughness,
+radiation, arbitrary mask contours, and 3D transitions are not
 implemented. Material fits still need independent measured validation.
 
 [Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.

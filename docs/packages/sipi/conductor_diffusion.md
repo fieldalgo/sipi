@@ -62,14 +62,14 @@ constant. `magnetic_boundary` contains exterior **node indices** fixing Az=0;
 other exterior edges have the zero natural magnetic flux condition. Choose the
 boundary deliberately and test domain enlargement.
 
-With exp(+jωt), uniform positive conductivity σ in metal (zero outside),
+With exp(+jωt), positive elementwise conductivity σ in metal (zero outside),
 uniform permeability µ, and P1 basis φ, the assembled problem is
 
 ```text
 Kij = integral grad(phi_i).grad(phi_j)/mu
 Mij = integral sigma*phi_i*phi_j
 Qig = integral sigma*chi_g*phi_i
-Dgg = sigma*area_g
+Dgg = integral sigma*chi_g
 (K + j*omega*M) A - Q E = 0
 D E - j*omega*Q.T A = I
 ```
@@ -79,12 +79,13 @@ of −1 for the common return. Each column excites +1 A in one signal and −1 A
 in the reference; other signals carry zero net current. The solver uses a
 small current-constraint Schur system after the magnetic solve; Z=S.T E.
 R=Re Z and L=Im Z/ω. At DC, E=D⁻¹S, K A=Q E, and L=A.T K A. This is a DC
-energy limit, not division by zero. The DC resistance is the exact polygonal
-area result `diag(1/(sigma*signal_area)) + 1/(sigma*ground_area)`.
+energy limit, not division by zero. The DC resistance is `diag(1/D_signal) + 1/D_ground`, with each D equal to
+the sum of conductivity times triangle area. For uniform metal this reduces
+to the exact polygonal area result `diag(1/(sigma*signal_area)) + 1/(sigma*ground_area)`.
 
 Frequencies must be nonnegative and strictly increasing. At every positive
-frequency the solver requires σ/(ωε₀) >= 1000 and **every actual metal triangle
-edge <= skin depth**, δ=sqrt(2/(ωµσ)). This is a necessary resolution gate,
+frequency every metal element must satisfy σ/(ωε₀) >= 1000 and **each actual
+metal triangle edge <= its local skin depth**, δ=sqrt(2/(ωµσ)). This is a necessary resolution gate,
 not a convergence certificate. High frequencies can require many triangles.
 There is no automatic surface/volume switch or unverified interpolation.
 
@@ -97,7 +98,7 @@ For F frequencies, N signals and G=N+1 conductor groups:
 | `Z`, `R`, `L` | (F,N,N); ohm/m, ohm/m, H/m |
 | `voltage_gradient` | (F,G,N), V/m for unit-current excitations |
 | `current_integrals` | (F,G,N), A; checked against S |
-| `skin_depth`, `max_edge_over_skin_depth` | (F,), m and dimensionless; DC gives infinity and zero |
+| `skin_depth`, `max_edge_over_skin_depth` | (F,), minimum metal skin depth in m and maximum local edge/skin-depth ratio; DC gives infinity and zero |
 | `current_error`, `power_error`, `magnetic_energy_error` | (F,), maximum current residual in A and relative energy residuals |
 | `vector_potential` | Optional (F,nodes,N), Wb/m |
 | `current_density` | Optional (F,triangles,N), A/m²; **element-centre** Jz, zero outside metal, not peak current |
@@ -140,10 +141,64 @@ assembly comparison tests the algebra on a common mesh. These are separate
 forms of evidence, not an accuracy promise for every PCB geometry.
 
 This is a 2D longitudinal magnetoquasistatic model. Displacement current in
-metal, radiation, roughness, temperature-dependent or different conductor
-conductivities, nonuniform/nonlinear magnetic media, and 3D transitions are
+metal, radiation, automatic roughness or temperature models,
+nonuniform/nonlinear magnetic media, and 3D transitions are
 not implemented. Refine both metal and exterior meshes and enlarge the
 magnetic boundary for each new geometry/frequency range.
 
 For matched finite-box dielectric extraction and volume JSON, use the separate
 [volume line model](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/volume_line.md).
+
+## Piecewise conductivity in the metal
+
+`conductivity` also accepts a real array of shape `(mesh.num_triangles,)`, in
+exactly that mesh's triangle order: strictly positive in every signal/return
+triangle, exactly zero everywhere else. Values are constant within an element.
+Booleans, complex/object arrays, nonfinite values and implicit broadcasting are
+rejected. The input is copied; it is never modified. A material boundary must
+follow triangle edges; assigning values at centroids does not resolve a layer
+that is thinner than the mesh. A newly generated mesh needs a newly assigned
+conductivity field. Magnetic permeability remains one uniform scalar.
+
+For example, assign different conductivities to the inner and return metal of
+a coaxial volume mesh, then extract the same conserved currents:
+
+```python
+import numpy as np
+from galerkin import disk_mesh
+from sipi.conductor_diffusion import conductor_impedance
+
+mesh = disk_mesh([.5e-3, 1.5e-3, 2e-3, 3e-3], [8, 8, 8, 4], 64)
+inner = np.flatnonzero(mesh.regions == 0)
+return_metal = np.flatnonzero(mesh.regions == 2)
+sigma = np.zeros(mesh.num_triangles)
+sigma[inner] = 58e6
+sigma[return_metal] = 20e6
+result = conductor_impedance(
+    mesh, [0, 1e4], signals={'inner': inner}, ground=return_metal,
+    conductivity=sigma, magnetic_boundary=mesh.boundary['outer'], keep_fields=True,
+)
+assert max(result.current_error) < 1e-10
+```
+
+The reported `skin_depth` is the smallest metal skin depth at each frequency.
+The resolution ratio uses each element's own conductivity and longest edge;
+it does not divide the globally largest edge by the globally smallest depth.
+The good-conductor condition must hold in the least conductive metal too.
+No new relaxation of the current, power, magnetic-energy or reciprocity gates
+is introduced. At DC, each connected group shares one E and its local J=σE;
+spatially varying current is physical even before skin/proximity effects.
+
+`MeshedConductors.impedance` and direct `volume_line` forward the same array
+on the full volume mesh. Dielectric C/G extraction is unchanged; total L is
+still used once. `sipi.volume-line/1` saved documents retain scalar conductivity:
+mesh-indexed arrays are not portable saved geometry and are rejected there.
+
+The dedicated `test_spatial_conductivity.py` checks analytical piecewise DC
+resistance/current, the independent scikit-fem augmented system (Z, Jz and Az,
+normalized error <1e-9), and mixed-metal coax Bessel convergence. With inner
+58 MS/m and return 20 MS/m, 100 Hz–1 MHz, radial counts 16/32/64 and 256 angular
+cells, maximum R/L/Z errors are 1.3471%, .34470%, .088602%; the final gate is
+1%. Enlarging the exterior from 3 to 6 mm changes Z by less than 1e-9 relative.
+These checks establish the explicit piecewise model, not measured plating,
+automatically generated foil roughness or temperature-dependent material fits.

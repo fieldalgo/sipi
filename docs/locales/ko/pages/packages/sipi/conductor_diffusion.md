@@ -57,14 +57,14 @@ conductivity=..., magnetic_boundary=...)`는 galerkin 삼각형 메시를 받습
 그 외 외곽 변에는 자연 자기 플럭스 0 조건이 적용됩니다. 경계를 명시적으로
 선택하고 계산 영역 확대를 검증해야 합니다.
 
-exp(+jωt), 금속 내 균일한 양의 전도도 σ(밖에서는 0), 전 영역 균일 µ,
+exp(+jωt), 금속 요소별 양의 전도도 σ(밖에서는 0), 전 영역 균일 µ,
 P1 기저 φ에 대해 다음 계를 조립합니다.
 
 ```text
 Kij = integral grad(phi_i).grad(phi_j)/mu
 Mij = integral sigma*phi_i*phi_j
 Qig = integral sigma*chi_g*phi_i
-Dgg = sigma*area_g
+Dgg = integral sigma*chi_g
 (K + j*omega*M) A - Q E = 0
 D E - j*omega*Q.T A = I
 ```
@@ -73,11 +73,13 @@ D E - j*omega*Q.T A = I
 구성됩니다. 각 열은 한 신호에 +1 A, 귀환에 −1 A를 가하며 다른 신호의 순전류는
 0입니다. 자기장 풀이 후 작은 전류 제약 Schur 계를 풀며 Z=S.T E입니다.
 R=Re Z, L=Im Z/ω입니다. DC에서는 E=D⁻¹S, K A=Q E, L=A.T K A로 에너지
-극한을 계산하며 0으로 나누지 않습니다. DC 저항은 실제 다각형 면적에 대해
-`diag(1/(sigma*signal_area)) + 1/(sigma*ground_area)`와 일치합니다.
+극한을 계산하며 0으로 나누지 않습니다. DC 저항은 각 그룹의
+D=Σ(요소 전도도×면적)에 대해 `diag(1/D_signal) + 1/D_ground`입니다.
+균일 금속에서는 실제 다각형 면적의
+`diag(1/(sigma*signal_area)) + 1/(sigma*ground_area)`로 환원됩니다.
 
 주파수는 음수가 아니며 엄격히 증가해야 합니다. 모든 양의 주파수에서
-σ/(ωε₀) >= 1000 및 **실제 모든 금속 삼각형 변 <= 표피 깊이**
+각 금속 요소에서 σ/(ωε₀) >= 1000 및 **실제 삼각형 변 <= 해당 요소 표피 깊이**
 δ=sqrt(2/(ωµσ))를 요구합니다. 이는 필요한 해상도 조건이며 수렴 보증이
 아닙니다. 고주파에서는 많은 삼각형이 필요할 수 있습니다. 표면·부피 모델의
 자동 전환이나 미검증 보간은 없습니다.
@@ -91,7 +93,7 @@ R=Re Z, L=Im Z/ω입니다. DC에서는 E=D⁻¹S, K A=Q E, L=A.T K A로 에너�
 | `Z`, `R`, `L` | (F,N,N); ohm/m, ohm/m, H/m |
 | `voltage_gradient` | (F,G,N), 단위 전류에 대한 V/m |
 | `current_integrals` | (F,G,N), A; S와 비교 |
-| `skin_depth`, `max_edge_over_skin_depth` | (F,), m과 무차원; DC는 무한대와 0 |
+| `skin_depth`, `max_edge_over_skin_depth` | (F,), 금속 내 최소 표피 깊이(m)와 요소별 변/표피깊이 비의 최대; DC는 무한대와 0 |
 | `current_error`, `power_error`, `magnetic_energy_error` | (F,), 최대 전류 잔차 A 및 상대 에너지 잔차 |
 | `vector_potential` | 선택적 (F,nodes,N), Wb/m |
 | `current_density` | 선택적 (F,triangles,N), A/m²; **요소 중심** Jz이며 금속 밖은 0, 피크 전류가 아님 |
@@ -130,8 +132,58 @@ Bessel 기준은 k=sqrt(jωµσ), 중심 도체의 I0/I1, 귀환 관의 I/K 수�
 금속 내부 표피 깊이를 해상하며 독립 조립 비교는 같은 메시의 대수를 검증합니다.
 서로 다른 근거이며 모든 PCB 기하의 정확도를 보장하지 않습니다.
 
-2D 종방향 자기준정적 모델입니다. 금속 변위전류, 방사, 거칠기, 온도 의존 또는
-서로 다른 도체 전도도, 비균일·비선형 자기 매질, 3D 전이는 구현하지 않았습니다.
+2D 종방향 자기준정적 모델입니다. 금속 변위전류, 방사, 자동 거칠기·온도 모델,
+비균일·비선형 자기 매질, 3D 전이는 구현하지 않았습니다.
 새 기하·주파수 범위마다 금속·외부 메시를 세분하고 자기 경계를 확대해야 합니다.
 
 동일한 유한 상자 유전체 추출과 부피 JSON은 별도 [부피 선로 모델](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/volume_line.md)을 사용합니다.
+
+
+## 금속 영역의 조각별 전도도
+
+`conductivity`는 `(mesh.num_triangles,)` 실수 배열도 받습니다. 해당 메시의
+삼각형 순서를 정확히 따르며 신호·귀환 금속에서는 엄격히 양수, 나머지는
+정확히 0입니다. 요소 내부 전도도는 상수입니다. boolean·complex·object 배열,
+비유한 값, 암묵적 broadcasting은 거부합니다. 입력을 복사하며 수정하지 않습니다.
+재료 계면은 삼각형 변과 맞아야 합니다. 요소 중심에 값을 지정해도 메시보다
+얇은 층이 해상되는 것은 아닙니다. 메시를 새로 만들면 전도도도 다시 배정해야
+합니다. 투자율은 전 영역에서 하나의 균일한 스칼라입니다.
+
+예를 들어 동축선의 중심과 귀환 금속에 다른 전도도를 지정할 수 있습니다.
+
+```python
+import numpy as np
+from galerkin import disk_mesh
+from sipi.conductor_diffusion import conductor_impedance
+
+mesh = disk_mesh([.5e-3, 1.5e-3, 2e-3, 3e-3], [8, 8, 8, 4], 64)
+inner = np.flatnonzero(mesh.regions == 0)
+return_metal = np.flatnonzero(mesh.regions == 2)
+sigma = np.zeros(mesh.num_triangles)
+sigma[inner] = 58e6
+sigma[return_metal] = 20e6
+result = conductor_impedance(
+    mesh, [0, 1e4], signals={'inner': inner}, ground=return_metal,
+    conductivity=sigma, magnetic_boundary=mesh.boundary['outer'], keep_fields=True,
+)
+assert max(result.current_error) < 1e-10
+```
+
+`skin_depth`는 주파수별 금속 내 최소 표피 깊이입니다. 해상도 비는 각 요소의
+전도도와 최대 변 길이를 사용합니다. 전역 최대 변을 전역 최소 깊이로 나누지
+않습니다. 가장 낮은 전도도 금속도 good-conductor 조건을 만족해야 합니다.
+전류·전력·자기에너지·상반성 기준은 완화하지 않습니다. DC에서는 각 그룹이
+하나의 E를 공유하고 국소 J=σE이므로 표피·근접 효과 이전에도 전류가 공간적으로
+달라집니다.
+
+`MeshedConductors.impedance`와 직접 `volume_line`은 전체 부피 메시 순서의
+배열을 그대로 전달합니다. 유전체 C/G는 바뀌지 않으며 전체 L을 한 번만 씁니다.
+저장 `sipi.volume-line/1`은 스칼라 전도도를 유지합니다. 메시 인덱스 배열은
+이식 가능한 저장 기하가 아니므로 해당 JSON에서 거부합니다.
+
+`test_spatial_conductivity.py`는 조각별 DC 저항·전류 해석해, 독립 scikit-fem
+증대 계(Z/Jz/Az 정규화 오차 <1e-9), 혼합 금속 동축 Bessel 수렴을 검사합니다.
+중심 58 MS/m, 귀환 20 MS/m, 100 Hz–1 MHz, 각방향 256개와 반경 16/32/64개에서
+R/L/Z 최대 오차는 1.3471%, .34470%, .088602%이며 최종 기준은 1%입니다.
+외곽을 3→6 mm로 넓힐 때 Z 상대 변화는 1e-9 미만입니다. 이는 명시적 조각별
+모델 검증이며 실측 도금·자동 foil 거칠기·온도 재료 피팅 검증은 아닙니다.

@@ -1,5 +1,8 @@
 # Changelog
 
+- Support explicit elementwise conductivity in 2D metal current diffusion, with local skin-resolution gates and conserved current/energy.
+  2D 금속 전류 확산에 요소별 전도도를 지원하고 국소 표피 해상도와 전류·에너지 보존을 검사합니다.
+
 - Connect split-gap broadside inputs to saved interface/material studies, correlated etch sampling and separately refined forward-impedance goals.
   gap 분할 broadside를 계면·재료 공차 저장, 식각 상관 표본과 별도 세분 전진 임피던스 목표에 연결합니다.
 

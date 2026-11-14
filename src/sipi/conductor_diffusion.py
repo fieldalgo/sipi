@@ -17,7 +17,7 @@ from .constants import epsilon_0, mu_0
 from scipy.sparse.linalg import splu
 
 from galerkin import assemble_load, assemble_mass, assemble_stiffness
-from .network import _frequencies, _scalar, rlgc_network
+from .network import _frequencies, _real, _scalar, rlgc_network
 
 __all__ = ['ConductorDiffusion', 'conductor_impedance']
 
@@ -48,6 +48,8 @@ class ConductorDiffusion:
     excites +1 A in one signal and -1 A in the reference. Optional retained Az
     is (F,nodes,N); Jz is the element-centre value (F,triangles,N), not an exact
     peak or a piecewise-constant approximation used by the solver.
+    skin_depth is the minimum over metal; max_edge_over_skin_depth is the
+    maximum of each metal triangle's own edge/skin-depth ratio.
     """
     frequency: np.ndarray
     names: tuple[str,...]
@@ -86,7 +88,9 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
     signals maps names to metal TRIANGLE indices; ground is another triangle
     set, whose connected or disconnected pieces share one longitudinal field.
     These are volume regions, not the node sets of a dielectric-only section.
-    conductivity is common to all metals; permeability is uniform everywhere.
+    conductivity is a positive scalar shared by metals or one real value per
+    mesh triangle, positive in metal and exactly zero outside. Array values
+    are piecewise constant; permeability remains uniform everywhere.
     magnetic_boundary explicitly fixes Az=0 on exterior NODES. Other exterior
     edges have zero natural magnetic flux. Compare outer-boundary refinements.
 
@@ -95,7 +99,9 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
     not an accuracy certificate; refine the mesh and the magnetic domain.
     """
     f = _frequencies(frequency)
-    sigma = _scalar('conductivity',conductivity)
+    scalar_sigma = np.ndim(conductivity) == 0
+    sigma = (_scalar('conductivity',conductivity) if scalar_sigma
+             else _real('conductivity',conductivity))
     mu_r = _scalar('relative_permeability',relative_permeability)
     if type(keep_fields) is not bool:
         raise ValueError('keep_fields must be boolean')
@@ -133,22 +139,35 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
     if np.any(areas <= 0) or not np.all(np.isfinite(areas)):
         raise ValueError('mesh must have positive finite triangle areas')
     metal = labels >= 0
+    if not scalar_sigma and (sigma.shape != (mesh.num_triangles,)
+            or np.any(sigma[metal] <= 0) or np.any(sigma[~metal] != 0)):
+        raise ValueError('conductivity needs one value per triangle, positive in metal and zero outside')
+    coefficients = np.where(metal,sigma,0) if scalar_sigma else sigma
+    minimum_sigma = sigma if scalar_sigma else np.min(coefficients[metal])
+    maximum_sigma = sigma if scalar_sigma else np.max(coefficients[metal])
     longest = max(np.max(np.linalg.norm(p[metal,i]-p[metal,j],axis=1))
                   for i,j in ((0,1),(1,2),(2,0)))
     skin = np.full(len(f),np.inf)
     positive = f > 0
-    if np.any(np.log(sigma)-np.log(2*np.pi*epsilon_0)-np.log(f[positive]) < np.log(1000)):
+    if np.any(np.log(minimum_sigma)-np.log(2*np.pi*epsilon_0)-np.log(f[positive]) < np.log(1000)):
         raise ValueError('current diffusion requires sigma/(omega*eps0) >= 1000')
-    skin[positive] = np.exp(-.5*(np.log(np.pi)+np.log(f[positive])+np.log(mu)+np.log(sigma)))
+    skin[positive] = np.exp(-.5*(np.log(np.pi)+np.log(f[positive])+np.log(mu)+np.log(maximum_sigma)))
     ratio = longest/skin
+    if not scalar_sigma:
+        lengths = np.maximum.reduce([np.linalg.norm(p[metal,i]-p[metal,j],axis=1)
+                                     for i,j in ((0,1),(1,2),(2,0))])
+        for index in np.flatnonzero(positive):
+            local_skin = np.exp(-.5*(np.log(np.pi)+np.log(f[index])+np.log(mu)
+                                     +np.log(coefficients[metal])))
+            ratio[index] = np.max(lengths/local_skin)
     if np.any(ratio > 1):
         raise ValueError('metal mesh edge exceeds skin depth; refine the metal volume mesh')
 
-    # Q[:,g] = integral sigma*chi_g*phi, D[g,g] = sigma*metal area.
-    coefficients = np.where(metal,sigma,0)
-    q = np.column_stack([assemble_load(mesh,np.where(labels == group,sigma,0))
+    # Q[:,g] = integral sigma*chi_g*phi, D[g,g] = integral sigma*chi_g.
+    q = np.column_stack([assemble_load(mesh,np.where(labels == group,coefficients,0))
                          for group in range(len(sets))])
-    d = sigma*np.array([areas[indices].sum() for indices in sets])
+    d = (sigma*np.array([areas[indices].sum() for indices in sets]) if scalar_sigma
+         else np.array([np.sum(coefficients[indices]*areas[indices]) for indices in sets]))
     free = np.setdiff1d(np.arange(mesh.num_nodes),fixed)
     if not len(free) or not np.all(np.isfinite(d)) or np.any(d <= 0):
         raise ValueError('invalid conductor conductance or no free magnetic nodes')
@@ -183,7 +202,7 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
         full = np.zeros((mesh.num_nodes,n),dtype=complex)
         full[free] = az
         electric = e[labels[metal],None,:]-1j*omega*full[t[metal]]
-        weights = sigma*areas[metal]/12
+        weights = coefficients[metal]*areas[metal]/12
         sums = electric.sum(axis=1)
         joule = (np.einsum('tan,tam,t->nm',electric.conj(),electric,weights)
                  + sums.conj().T@(weights[:,None]*sums))
@@ -206,7 +225,7 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
         energy_errors.append(residual_l)
         if keep_fields:
             current = np.zeros((mesh.num_triangles,n),dtype=complex)
-            current[metal] = sigma*electric.mean(axis=1)
+            current[metal] = coefficients[metal,None]*electric.mean(axis=1)
             fields.append(full)
             densities.append(current)
     return ConductorDiffusion(f,tuple(signals),np.asarray(impedances,dtype=complex),

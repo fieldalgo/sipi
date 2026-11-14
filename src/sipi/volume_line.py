@@ -135,7 +135,8 @@ def volume_line(volume,frequency,*,materials,conductivity,length,z_ref=50.0,
     volume must carry layer_triangles, from dielectric_interfaces=True or an
     explicit mesh-level construction. Every nonmetal triangle absent from this
     mapping is vacuum. materials must include exactly every mapped layer.
-    Shared conductivity and permeability follow conductor_impedance limits.
+    Conductivity on the full volume mesh and uniform permeability follow
+    conductor_impedance limits. Saved v1 documents retain scalar conductivity.
     """
     if not isinstance(volume,MeshedConductors) or volume.layer_triangles is None:
         raise ValueError('volume must resolve and identify dielectric interfaces')
