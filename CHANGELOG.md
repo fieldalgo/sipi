@@ -307,6 +307,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved finite-frequency shape-current pair goals with field-free corner/refinement admission and retained execution failure details.
+
 - Retain resolved edge size and growth for automatic single unbacked coplanar width targeting before its mandatory refinement, while preserving explicit meshes, other templates, numerical budgets and target tolerances.
 
 - Add the single unbacked coplanar form with explicit lower-air domain controls, exact editable input retention, finite-ground tolerance samples and fixed-mesh width targeting. Preserve open outer boundaries, existing numerical limits and mandatory refinement.

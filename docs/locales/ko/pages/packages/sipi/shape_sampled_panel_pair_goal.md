@@ -79,3 +79,5 @@ assert line(.55e-3,.35e-3).to_dict()['line']['line']['frequency_hz'] == frequenc
 역산의 자기 일관성 근거이며 독립 절대 정확도 근거가 아닙니다. 기존 작은 영역
 외곽 미수락도 유지합니다. 전역 최적해·유일성·연속 대역·충분한 외곽·절대 정확도를
 인증하지 않습니다.
+
+[저장 요청과 실행 기록](shape_sampled_panel_pair_goal_document.md).

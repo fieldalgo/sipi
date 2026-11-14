@@ -86,3 +86,5 @@ finite-domain targets exercise inverse-search self-consistency; they do not supp
 independent absolute accuracy evidence. Existing small-domain outer rejections
 remain unchanged. No global optimum, uniqueness, continuous-band compliance,
 outer-domain sufficiency or absolute accuracy is certified.
+
+[Saved requests and execution receipts](shape_sampled_panel_pair_goal_document.md).

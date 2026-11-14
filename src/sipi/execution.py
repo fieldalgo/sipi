@@ -64,6 +64,7 @@ from .pair_design import PairImpedanceGoalError
 from .pair_line_goal_document import ForwardPairDesignDocument
 from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .shape_panel_pair_goal_document import ShapePanelForwardPairDesignDocument
+from .shape_sampled_panel_pair_goal_document import ShapeSampledPanelForwardPairDesignDocument
 from .panel_pair_study import PanelForwardPairStudyDocument
 from .shape_panel_pair_study import ShapePanelForwardPairStudyDocument
 from .shape_sampled_panel_pair_study import ShapeSampledPanelForwardPairStudyDocument
@@ -124,6 +125,7 @@ _REGISTRY = {
     'sipi.sampled-panel-forward-pair-design/2': SampledPanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,
     'sipi.shape-panel-forward-pair-design/1': ShapePanelForwardPairDesignDocument,
+    'sipi.shape-sampled-panel-forward-pair-design/1': ShapeSampledPanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-design/2': PanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-study/1': PanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-study/2': PanelForwardPairStudyDocument,
@@ -580,8 +582,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 material_evaluation=(None if exc.material_evaluation_json is None
                                      else json.loads(exc.material_evaluation_json)),
                 history=[row.to_dict() for row in exc.history]))
-    elif isinstance(doc, SampledPanelForwardPairDesignDocument):
-        if data['max_evaluations'] > budget:
+    elif isinstance(doc, (SampledPanelForwardPairDesignDocument, ShapeSampledPanelForwardPairDesignDocument)):
+        goal_data = data['design'] if isinstance(doc, ShapeSampledPanelForwardPairDesignDocument) else data
+        if goal_data['max_evaluations'] > budget:
             raise ValueError('saved goal batch budget exceeds max_evaluations before any solve')
         try:
             out['result'] = doc.solve().to_dict()
@@ -592,6 +595,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 stage=exc.stage, failed_parameters=exc.failed_parameters, cause_type=exc.cause_type,
                 input=None if exc.input_json is None else json.loads(exc.input_json),
                 history=[row.to_dict() for row in exc.history]))
+            if isinstance(doc, ShapeSampledPanelForwardPairDesignDocument) and isinstance(exc.__cause__, ShapePanelLineError):
+                out['error']['cause_details'] = exc.__cause__.to_dict()
     elif isinstance(doc, (ForwardPairDesignDocument, PanelForwardPairDesignDocument, ShapePanelForwardPairDesignDocument)):
         goal_data = doc.goal_input if isinstance(doc, (PanelForwardPairDesignDocument, ShapePanelForwardPairDesignDocument)) else data
         if goal_data['max_evaluations'] > budget:

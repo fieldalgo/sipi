@@ -317,3 +317,6 @@ from .shape_sampled_panel_pair_yield import (ShapeSampledPanelPairYieldAssessmen
 
 from .shape_sampled_panel_pair_goal import (ShapeSampledPanelPairRefinement,
     ShapeSampledPanelForwardPairDesign,seek_shape_sampled_panel_forward_pair_impedances)
+
+from .shape_sampled_panel_pair_goal_document import ShapeSampledPanelForwardPairDesignDocument
+__all__ += ['ShapeSampledPanelForwardPairDesignDocument']
