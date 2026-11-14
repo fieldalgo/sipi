@@ -107,7 +107,9 @@ __all__ = ['saved_schemas', 'normalize_saved', 'execute_saved']
 
 _REGISTRY = {
     'sipi.sampled-panel-forward-pair-yield/1': SampledPanelForwardPairYieldDocument,
+    'sipi.sampled-panel-forward-pair-yield/2': SampledPanelForwardPairYieldDocument,
     'sipi.sampled-panel-forward-pair-study/1': SampledPanelForwardPairStudyDocument,
+    'sipi.sampled-panel-forward-pair-study/2': SampledPanelForwardPairStudyDocument,
     'sipi.sampled-panel-forward-pair-design/1': SampledPanelForwardPairDesignDocument,
     'sipi.sampled-panel-forward-pair-design/2': SampledPanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,

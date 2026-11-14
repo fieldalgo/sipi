@@ -160,7 +160,7 @@ def test_field_free_saved_roundtrip_and_copied_limits(monkeypatch):
     monkeypatch.setattr(CrossSection,'mesh',forbidden);monkeypatch.setattr(PanelTransmissionLineDocument,'analyze',forbidden)
     bounds=limits();doc=Document(random_document(),acceptance=bounds);text=doc.dumps()
     bounds[Q[0]]['minimum'][0]=0.;assert doc.dumps()==text and Document.loads(text).dumps()==text
-    for bad in [text.replace('"confidence": 0.95','"confidence": 0.95, "confidence": 0.95'),text.replace('"confidence": 0.95','"confidence": NaN'),text.replace('sipi.sampled-panel-forward-pair-yield/1','sipi.sampled-panel-forward-pair-yield/2')]:
+    for bad in [text.replace('"confidence": 0.95','"confidence": 0.95, "confidence": 0.95'),text.replace('"confidence": 0.95','"confidence": NaN'),text.replace('sipi.sampled-panel-forward-pair-yield/1','sipi.sampled-panel-forward-pair-yield/unsupported')]:
         with pytest.raises(ValueError):Document.loads(bad)
 
 

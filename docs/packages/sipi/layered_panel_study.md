@@ -92,3 +92,5 @@ not measured production yield.
 
 [Paired sampling](panel_pair_study.md) · [Joint acceptance](panel_pair_yield.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/layered_panel_study.md)
+
+[Fixed frequency grids](layered_sampled_panel_study.md) keep each manufactured row across all supplied frequencies.

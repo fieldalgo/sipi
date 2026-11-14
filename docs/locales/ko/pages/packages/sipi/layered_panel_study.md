@@ -85,3 +85,5 @@ study API는 모든 행을 자동 세분하거나 외곽 오차를 보증하지 
 
 [쌍 표본 계산](panel_pair_study.md) · [동시 수락](panel_pair_yield.md) ·
 [English](../../../../../packages/sipi/layered_panel_study.md)
+
+[유한 주파수 평가](layered_sampled_panel_study.md)는 한 제조 표본을 모든 지정 주파수에서 공유합니다.
