@@ -62,6 +62,25 @@ class PanelPairResolutionYieldAssessment:
                   for i,label in enumerate(self.classifications)])
 
 
+def _resolution_documents(documents):
+    """Field-free identity and distinct-control checks shared by saved requests."""
+    if not isinstance(documents,(list,tuple)) or not 2<=len(documents)<=8:
+        raise ValueError('resolution comparison requires 2..8 paired studies')
+    if any(not isinstance(doc,PanelForwardPairStudyDocument) for doc in documents):
+        raise ValueError('each resolution must be a PanelForwardPairStudyDocument')
+    reference=None;seen=set()
+    for doc in documents:
+        data=doc.to_dict()
+        settings=dict(mesh=data['study'].pop('mesh'),panel=data.pop('panel'))
+        signature=json.dumps(settings,sort_keys=True,allow_nan=False)
+        if signature in seen:raise ValueError('resolution controls must be distinct')
+        seen.add(signature)
+        if reference is None:reference=data
+        elif data!=reference:
+            raise ValueError('resolution studies must preserve physical inputs and sampling')
+    return tuple(documents)
+
+
 def assess_panel_pair_resolution_yield(studies, *, acceptance, confidence=.95, minimum_yield=None):
     """Compare 2..8 fixed resolutions of the same iid paired study, without fields.
 
@@ -82,18 +101,9 @@ def assess_panel_pair_resolution_yield(studies, *, acceptance, confidence=.95, m
         raise ValueError('resolution comparison requires 2..8 paired studies')
     if any(not isinstance(study,PanelForwardPairStudy) for study in studies):
         raise ValueError('each resolution must be a PanelForwardPairStudy')
-    reference=None;seen=set();assessments=[]
-    for study in studies:
-        data=PanelForwardPairStudyDocument.loads(study.input_json).to_dict()
-        settings=dict(mesh=data['study'].pop('mesh'),panel=data.pop('panel'))
-        signature=json.dumps(settings,sort_keys=True,allow_nan=False)
-        if signature in seen:raise ValueError('resolution controls must be distinct')
-        seen.add(signature)
-        if reference is None:reference=data
-        elif data!=reference:
-            raise ValueError('resolution studies must preserve physical inputs and sampling')
-        assessments.append(assess_panel_pair_yield(study,acceptance=acceptance,
-            confidence=confidence,minimum_yield=minimum_yield))
+    _resolution_documents(tuple(PanelForwardPairStudyDocument.loads(study.input_json) for study in studies))
+    assessments=[assess_panel_pair_yield(study,acceptance=acceptance,
+        confidence=confidence,minimum_yield=minimum_yield) for study in studies]
     labels=[]
     for i in range(len(assessments[0].classifications)):
         row=tuple(a.classifications[i] for a in assessments)

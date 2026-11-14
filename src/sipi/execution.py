@@ -62,6 +62,7 @@ from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .panel_pair_study import PanelForwardPairStudyDocument
 from .sampled_panel_pair_study import SampledPanelForwardPairStudyDocument
 from .panel_pair_yield import PanelForwardPairYieldDocument
+from .panel_resolution_yield_document import PanelResolutionYieldDocument
 from .sampled_panel_pair_yield import SampledPanelForwardPairYieldDocument
 from .panel_pair_selection import PanelForwardPairSelectionDocument
 from .sampled_panel_pair_selection import SampledPanelForwardPairSelectionDocument
@@ -114,6 +115,7 @@ _REGISTRY = {
     'sipi.panel-forward-pair-study/2': PanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-yield/1': PanelForwardPairYieldDocument,
     'sipi.panel-forward-pair-yield/2': PanelForwardPairYieldDocument,
+    'sipi.panel-resolution-yield/1': PanelResolutionYieldDocument,
     'sipi.panel-forward-pair-selection/1': PanelForwardPairSelectionDocument,
     'sipi.sampled-panel-forward-pair-selection/1': SampledPanelForwardPairSelectionDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
@@ -509,7 +511,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     elif isinstance(doc, NortonCircuitDocument):
         out['result'] = _norton_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument,
-                          PanelForwardPairYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument, SampledPanelForwardPairSelectionDocument)):
+                          PanelForwardPairYieldDocument, PanelResolutionYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument, SampledPanelForwardPairSelectionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

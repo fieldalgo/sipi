@@ -1,5 +1,7 @@
 # Joint acceptance across fixed numerical resolutions
 
+[Saved comparison requests](panel_resolution_yield_document.md) preserve the full evaluation plan.
+
 `assess_panel_pair_resolution_yield` compares 2–8 already calculated
 `PanelForwardPairStudy` results without performing fields. All inputs must
 retain the same version/current method, physical geometry, fixed metals,

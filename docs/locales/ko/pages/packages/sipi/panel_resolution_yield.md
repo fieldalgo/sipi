@@ -1,5 +1,7 @@
 # 고정된 수치 해상도 사이의 동시 수락 비교
 
+[비교 요청 저장](panel_resolution_yield_document.md)은 전체 평가 계획을 보존합니다.
+
 `assess_panel_pair_resolution_yield`는 이미 계산한 `PanelForwardPairStudy`
 2~8개를 전계 계산 없이 비교합니다. 모든 입력의 버전·전류 방법, 물리 기하,
 고정 금속, 유전체 모델, 주파수, 제약조건, IID 표본 규칙은 같아야 합니다.
