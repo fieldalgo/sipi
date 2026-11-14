@@ -181,3 +181,5 @@ Bessel/independent-assembly and volume mesh/boundary gates remain separate.
 This format assigns one material per named conductor; it does not generate or
 save plating interfaces inside one conductor, arbitrary spatial fields,
 temperature laws or calibrated roughness.
+
+For explicit core/coating interfaces, use [volume-line v3](metal_cores.md#save-the-interface-and-its-material).

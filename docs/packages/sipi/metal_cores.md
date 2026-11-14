@@ -74,3 +74,51 @@ case, not arbitrary thin plating, nonlinear magnetic coatings, temperature
 laws, 3D transitions or measured foil accuracy.
 
 [한국어](../../locales/ko/pages/packages/sipi/metal_cores.md)
+
+## Save the interface and its material
+
+`VolumeLineDocument(..., metal_cores=...)` selects `sipi.volume-line/3`.
+The nonempty mapping associates each existing trace name with exactly
+`vertices` and a positive scalar `conductivity` in S/m. Supply named base
+conductivities (`signals` and `ground`), as in v2: they apply to coating and
+uncoated metal. Each core overrides that base value inside its polygon.
+
+```python
+from sipi import CrossSectionDocument, microstrip
+from sipi.volume_line import VolumeLineDocument
+from sipi.execution import normalize_saved, execute_saved
+
+section = microstrip(width=.4e-3, substrate_height=.5e-3, thickness=.1e-3,
+                     eps_r=4., tan_delta=.02, box_width=.002, air_height=.5e-3)
+doc = VolumeLineDocument(
+    CrossSectionDocument(section), [0, 1e3, 1e4], materials={}, length=.1,
+    conductivity=dict(signals={'signal': 20e6}, ground=58e6),
+    metal_cores={'signal': dict(conductivity=58e6, vertices=[
+        [-.18e-3, .52e-3], [.18e-3, .52e-3],
+        [.18e-3, .58e-3], [-.18e-3, .58e-3]])},
+    mesh=dict(ground_thickness=.1e-3, padding=.002, metal_size=25e-6,
+              far_size=.25e-3, grade=.1, min_angle=28.),
+)
+text = doc.dumps()
+assert normalize_saved(text) == text
+output = execute_saved(text)
+assert output['status'] == 'complete'
+```
+
+Normalization validates and copies geometry/materials without meshing. Loading
+and execution regenerate the conforming mesh and assign conductivities by
+physical name and coordinates; triangle numbers are never saved. An explicit
+grounded trace may have a core with its own conductivity while remaining part
+of the common return. A circuit's `kind='volume-line'` input accepts the same
+v3 document. Ordinary solver failures, including insufficient skin-depth
+resolution, still propagate as errors.
+
+v1/v2 documents retain their original schemas and serialized values. They
+reject the new field; v3 requires it and named base conductivity. No automatic
+version upgrade, scalar-to-named conversion or inferred coating thickness is
+performed. `metal_cores=None` in the constructor retains v1/v2 selection; an
+empty mapping is invalid for v3. Tests compare saved and direct R/L/C/G/S/J,
+analytic DC resistance at 1e-10, fresh-mesh material assignment, circuit
+termination and strict invalid inputs. The mesh/reference limits above still
+apply. Saved interfaces do not add temperature, magnetic material variation,
+multiple nested coating layers or arbitrary conductivity fields.

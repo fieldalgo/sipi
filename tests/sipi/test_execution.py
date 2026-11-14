@@ -503,6 +503,8 @@ def documents():
     named_volume['schema'] = 'sipi.volume-line/2'
     named_volume['conductor']['conductivity'] = dict(signals={'signal': 58e6}, ground=20e6)
     base.append(VolumeLineDocument.from_dict(named_volume))
+    from test_core_document import document as core_document
+    base.append(core_document())
     return base
 
 

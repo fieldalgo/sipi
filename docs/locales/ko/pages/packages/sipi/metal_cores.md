@@ -65,3 +65,48 @@ fine 메시 padding 2→4mm의 L 변화는 .01194(.02 기준), 같은 메시 독
 비선형 자성 코팅, 온도 법칙, 3D 전이나 실측 foil 정확도 보증이 아닙니다.
 
 [English](../../../../packages/sipi/metal_cores.md)
+
+## 계면과 재료 저장
+
+`VolumeLineDocument(..., metal_cores=...)`는 `sipi.volume-line/3`을 선택합니다.
+비어 있지 않은 매핑에 기존 trace 이름별로 정확히 `vertices`와 양의 스칼라
+`conductivity`(S/m)를 지정합니다. 기본 전도도는 v2와 같이 이름별 `signals`와
+공통 `ground`입니다. 기본값은 도금층과 코어 없는 금속에 적용되며, 각 코어는
+자신의 다각형 내부에 별도 전도도를 적용합니다.
+
+```python
+from sipi import CrossSectionDocument, microstrip
+from sipi.volume_line import VolumeLineDocument
+from sipi.execution import normalize_saved, execute_saved
+
+section = microstrip(width=.4e-3, substrate_height=.5e-3, thickness=.1e-3,
+                     eps_r=4., tan_delta=.02, box_width=.002, air_height=.5e-3)
+doc = VolumeLineDocument(
+    CrossSectionDocument(section), [0, 1e3, 1e4], materials={}, length=.1,
+    conductivity=dict(signals={'signal': 20e6}, ground=58e6),
+    metal_cores={'signal': dict(conductivity=58e6, vertices=[
+        [-.18e-3, .52e-3], [.18e-3, .52e-3],
+        [.18e-3, .58e-3], [-.18e-3, .58e-3]])},
+    mesh=dict(ground_thickness=.1e-3, padding=.002, metal_size=25e-6,
+              far_size=.25e-3, grade=.1, min_angle=28.),
+)
+text = doc.dumps()
+assert normalize_saved(text) == text
+output = execute_saved(text)
+assert output['status'] == 'complete'
+```
+
+정규화는 메시를 만들지 않고 기하·재료를 검증하고 복사합니다. 불러온 문서를
+계산할 때 정합 메시를 다시 만들고 물리적 이름·좌표로 전도도를 배정합니다.
+삼각형 번호는 저장하지 않습니다. 명시적 접지 trace도 코어에 별도 전도도를
+줄 수 있으며 공통 귀환에 계속 속합니다. 회로의 `kind='volume-line'` 입력도
+같은 v3 문서를 받습니다. 표피 깊이 해상도 부족 등 일반 솔버 실패는 기존과
+같이 오류로 전달합니다.
+
+v1/v2의 버전과 직렬화 값은 보존하며 새 필드를 거부합니다. v3에는 코어와
+이름별 기본 전도도가 필수입니다. 자동 버전 승격·스칼라 변환·도금 두께 추정은
+없습니다. 생성자의 `metal_cores=None`은 기존 v1/v2 선택을 유지하며, 빈 매핑은
+v3에서 거부합니다. 저장/직접 R/L/C/G/S/J 비교, 1e-10 DC 면적 저항, 새 메시의
+재료 배정, 회로 종단 및 잘못된 입력 검사를 수행합니다. 위 메시·독립 참조의
+유효범위는 그대로입니다. 온도·공간별 투자율·여러 중첩 도금층·임의 전도도장
+저장은 이 형식에 포함하지 않습니다.

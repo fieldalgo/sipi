@@ -62,6 +62,24 @@ class MeshedConductors:
             relative_permeability=relative_permeability,keep_fields=keep_fields)
 
 
+def _metal_cores(section, metal_cores):
+    """Validate and copy strict core polygons without constructing a mesh."""
+    cores = {}
+    if metal_cores is not None:
+        if not isinstance(metal_cores,Mapping):
+            raise ValueError('metal_cores must map trace names to core polygon vertices')
+        traces = {trace.name:trace for trace in section.traces}
+        if not set(metal_cores) <= set(traces):
+            raise ValueError('metal core names must identify existing traces')
+        for name,vertices in metal_cores.items():
+            core = PolygonTrace(name,vertices)
+            outer = trace_shape(traces[name])
+            if not outer.contains(core._shape) or not outer.boundary.disjoint(core._shape):
+                raise ValueError('metal core must lie strictly inside its trace without boundary contact')
+            cores[name] = core
+    return cores
+
+
 def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
                            far_size, grade=.2, min_angle=28.0,
                            dielectric_interfaces=False, metal_cores=None):
@@ -94,19 +112,7 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
         raise ValueError('need far_size >= metal_size and 0 < min_angle < 34')
     if any(trace.thickness <= 0 for trace in section.traces):
         raise ValueError('volume current diffusion requires finite-thickness traces')
-    cores = {}
-    if metal_cores is not None:
-        if not isinstance(metal_cores,Mapping):
-            raise ValueError('metal_cores must map trace names to core polygon vertices')
-        traces = {trace.name:trace for trace in section.traces}
-        if not set(metal_cores) <= set(traces):
-            raise ValueError('metal core names must identify existing traces')
-        for name,vertices in metal_cores.items():
-            core = PolygonTrace(name,vertices)
-            outer = trace_shape(traces[name])
-            if not outer.contains(core._shape) or not outer.boundary.disjoint(core._shape):
-                raise ValueError('metal core must lie strictly inside its trace without boundary contact')
-            cores[name] = core
+    cores = _metal_cores(section,metal_cores)
     thickness,padding,metal_size,far_size,min_angle = (
         values[k] for k in ('ground_thickness','padding','metal_size','far_size','min_angle'))
     w,h = section.width,section.height

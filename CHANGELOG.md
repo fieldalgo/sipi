@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit metal core geometry and conductivity in volume-line v3 and replay through the common executor and circuit inputs.
+  volume-line v3에 금속 코어 기하·전도도를 저장하고 공통 실행·회로 입력으로 재생합니다.
+
 - Mesh explicit core/coating interfaces inside finite 2D traces while retaining their common current constraints and finished outer geometry.
   유한 2D trace 안의 코어·도금 계면을 정합 메시로 만들고 공통 전류 제약과 완성 외곽을 보존합니다.
 
