@@ -7,7 +7,7 @@ import json
 
 from sipi.execution import (
     _integer, _load, execute_saved,
-    TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument,
+    TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument,
 )
 
 __all__ = ['SavedExecutionRequest']
@@ -52,7 +52,7 @@ class SavedExecutionRequest:
             raise ValueError('diagnostics must contain unique characteristic/modes selections')
         doc = _load(self.source_text, self.max_input_bytes)
         if values and not isinstance(doc, (
-                TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument)):
+                TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument)):
             raise ValueError('diagnostics require a top-level transmission-line, volume-line or panel-line')
         object.__setattr__(self, 'diagnostics', tuple(sorted(values)))
         canonical = doc.dumps()

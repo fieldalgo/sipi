@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit FEM geometry-energy lines with one dielectric/current mesh and complete or partial execution evidence.
+  유전체·전류에 하나의 메시를 공유하고 완료·부분 실행 근거를 보존하는 명시 FEM 형상 에너지 선로를 저장합니다.
+
 - Apply explicit whole-boundary surface metals to checked FEM geometry-energy currents while preserving original admission and flux checks.
   기존 재료·전류 잔차 검사를 보존하며 검산된 FEM 형상 에너지 전류에 전체 경계별 표면 금속을 적용합니다.
 

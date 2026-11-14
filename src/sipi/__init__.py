@@ -352,3 +352,6 @@ __all__ += ['FEMShapeSample', 'FEMShapeCurrentFactors', 'FEMShapeCurrentError', 
 
 from .fem_shape_loss import fem_shape_conductor_loss_by_boundary
 __all__ += ['fem_shape_conductor_loss_by_boundary']
+
+from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeTransmissionLineResult, FEMShapeLineError
+__all__ += ['FEMShapeTransmissionLineDocument', 'FEMShapeTransmissionLineResult', 'FEMShapeLineError']
