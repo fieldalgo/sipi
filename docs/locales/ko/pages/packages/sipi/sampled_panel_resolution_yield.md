@@ -71,3 +71,5 @@ assert comparison.frequencies == (1e9, 2e9, 4e9)
 [코팅 유한 주파수 study](layered_sampled_panel_study.md) ·
 [단일 주파수 해상도 비교](panel_resolution_yield.md) ·
 [English](../../../../../packages/sipi/sampled_panel_resolution_yield.md)
+
+[전체 비교 저장·실행](sampled_panel_resolution_yield_document.md).
