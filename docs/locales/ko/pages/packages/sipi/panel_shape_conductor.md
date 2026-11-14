@@ -62,3 +62,5 @@ assert factors.current_error <= 1e-10
 
 버전 있는 입력과 공통 실행에는 별도
 [저장 형상전류 선로](shape_panel_line.md) 래퍼를 사용합니다.
+
+[접지 경계별 전체 둘레 금속 분리](shape_reference_conductor.md).

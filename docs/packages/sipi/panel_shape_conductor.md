@@ -74,3 +74,5 @@ polygon, measured foil, native-platform or whole-product accuracy.
 
 For versioned input and common execution, use the explicit
 [saved shape-current line](shape_panel_line.md) wrapper.
+
+[Separate whole-boundary ground metals](shape_reference_conductor.md).
