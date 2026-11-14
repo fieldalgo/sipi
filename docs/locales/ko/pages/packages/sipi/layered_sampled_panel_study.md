@@ -89,3 +89,5 @@ uniform/normal만 받습니다. 첫 주파수는 study 기준 주파수와 일�
 [고정 주파수 코팅 공차](layered_panel_study.md) ·
 [코팅 주파수 벡터 목표](layered_sampled_panel_goal_document.md) ·
 [English](../../../../../packages/sipi/layered_sampled_panel_study.md)
+
+[고정 수치 해상도 비교](sampled_panel_resolution_yield.md).

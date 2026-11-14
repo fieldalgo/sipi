@@ -95,3 +95,5 @@ population or include numerical error in a nominal yield interval.
 [Coated fixed-frequency sampling](layered_panel_study.md) ·
 [Coated frequency-grid goals](layered_sampled_panel_goal_document.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/layered_sampled_panel_study.md)
+
+[Compare fixed numerical resolutions](sampled_panel_resolution_yield.md).
