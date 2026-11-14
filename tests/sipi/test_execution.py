@@ -557,6 +557,8 @@ def documents():
     base.append(shape_grid_yield())
     from test_shape_sampled_panel_pair_goal_document import document as shape_grid_goal
     base.append(shape_grid_goal())
+    from test_adaptive_shape_panel_resolution_document import document as adaptive_shape
+    base.append(adaptive_shape())
     return base
 
 

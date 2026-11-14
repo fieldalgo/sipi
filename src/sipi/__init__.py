@@ -324,3 +324,6 @@ __all__ += ['ShapeSampledPanelForwardPairDesignDocument']
 from .adaptive_shape_panel_resolution import (ShapePanelResolutionRefinement, AdaptiveShapePanelResolution,
     refine_shape_panel_line_resolution)
 __all__ += ['ShapePanelResolutionRefinement', 'AdaptiveShapePanelResolution', 'refine_shape_panel_line_resolution']
+
+from .adaptive_shape_panel_resolution_document import AdaptiveShapePanelResolutionDocument
+__all__ += ['AdaptiveShapePanelResolutionDocument']

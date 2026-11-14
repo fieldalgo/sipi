@@ -307,6 +307,8 @@
 
 ## [Unreleased]
 
+- Save explicit adaptive shape-current refinement plans and retain completed, unaccepted and partial executions through common requests and receipts.
+
 - Add explicit bounded shape-current panel/volume refinement plans with consecutive checks, retained current work and distinct unaccepted outcomes.
 
 - Add explicit saved finite-frequency shape-current pair goals with field-free corner/refinement admission and retained execution failure details.

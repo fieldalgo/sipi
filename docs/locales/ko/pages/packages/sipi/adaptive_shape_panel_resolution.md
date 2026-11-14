@@ -72,3 +72,5 @@ controls = dict(refinements=steps, tolerances={'C0': ResolutionTolerance(.1, 0.)
                 max_solves=8)
 # result = refine_shape_panel_line_resolution(base, **controls)  # Starts fields.
 ```
+
+[저장 계획과 실행 기록](adaptive_shape_panel_resolution_document.md).
