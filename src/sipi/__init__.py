@@ -305,3 +305,6 @@ from .shape_panel_pair_goal_document import ShapePanelForwardPairDesignDocument
 
 from .shape_panel_pair_study import (ShapePanelForwardPairStudyDocument,
     ShapePanelForwardPairStudy, ShapePanelForwardPairStudyRow)
+
+from .shape_panel_pair_yield import (ShapePanelPairYieldAssessment, ShapePanelForwardPairYieldDocument,
+    assess_shape_panel_pair_yield)

@@ -1,5 +1,8 @@
 # Changelog
 
+- Assess explicit shape-current joint acceptance with unchanged exact binomial bounds and complete unresolved-row evidence.
+  명시 형상전류 동시 조건 만족률에 기존 정확 이항 구간과 미해결 행의 전체 근거를 보존합니다.
+
 - Preserve explicit shape-current manufacturing samples, full current evidence and failed rows through saved studies.
   명시 형상전류 제조 표본·전체 전류 근거·실패 행을 저장된 공차 분석에 보존합니다.
 

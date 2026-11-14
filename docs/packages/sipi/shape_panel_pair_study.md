@@ -1,5 +1,7 @@
 # Manufacturing samples with explicit shape currents
 
+[Explicit joint acceptance](shape_panel_pair_yield.md) retains the same sampled current evidence.
+
 [한국어](../../locales/ko/pages/packages/sipi/shape_panel_pair_study.md) ·
 [Current method](shape_panel_line.md) · [Original sampling contract](panel_pair_study.md)
 

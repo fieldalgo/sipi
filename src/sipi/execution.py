@@ -68,6 +68,7 @@ from .panel_pair_study import PanelForwardPairStudyDocument
 from .shape_panel_pair_study import ShapePanelForwardPairStudyDocument
 from .sampled_panel_pair_study import SampledPanelForwardPairStudyDocument
 from .panel_pair_yield import PanelForwardPairYieldDocument
+from .shape_panel_pair_yield import ShapePanelForwardPairYieldDocument
 from .panel_resolution_yield_document import PanelResolutionYieldDocument
 from .sampled_panel_resolution_yield_document import SampledPanelResolutionYieldDocument
 from .sampled_panel_pair_yield import SampledPanelForwardPairYieldDocument
@@ -125,6 +126,7 @@ _REGISTRY = {
     'sipi.panel-forward-pair-study/1': PanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-study/2': PanelForwardPairStudyDocument,
     'sipi.shape-panel-forward-pair-study/1': ShapePanelForwardPairStudyDocument,
+    'sipi.shape-panel-forward-pair-yield/1': ShapePanelForwardPairYieldDocument,
     'sipi.panel-forward-pair-yield/1': PanelForwardPairYieldDocument,
     'sipi.panel-forward-pair-yield/2': PanelForwardPairYieldDocument,
     'sipi.panel-resolution-yield/1': PanelResolutionYieldDocument,
@@ -539,7 +541,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     elif isinstance(doc, NortonCircuitDocument):
         out['result'] = _norton_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument,
-                          PanelForwardPairYieldDocument, PanelResolutionYieldDocument, SampledPanelResolutionYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument, SampledPanelForwardPairSelectionDocument)):
+                          PanelForwardPairYieldDocument, ShapePanelForwardPairYieldDocument, PanelResolutionYieldDocument, SampledPanelResolutionYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument, SampledPanelForwardPairSelectionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

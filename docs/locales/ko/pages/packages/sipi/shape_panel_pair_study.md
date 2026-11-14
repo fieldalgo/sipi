@@ -1,5 +1,7 @@
 # 명시 형상전류를 사용하는 제조 공차 표본
 
+[명시 동시 조건 만족률](shape_panel_pair_yield.md)은 표본의 전류 근거를 그대로 보존합니다.
+
 [English](../../../../../packages/sipi/shape_panel_pair_study.md) ·
 [전류 방식](shape_panel_line.md) · [기존 표본 계약](panel_pair_study.md)
 
