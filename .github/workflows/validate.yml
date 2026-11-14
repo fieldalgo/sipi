@@ -13,7 +13,7 @@ concurrency:
   queue: ${{ github.ref == 'refs/heads/main' && 'max' || 'single' }}
 jobs:
   tests:
-    name: ${{ matrix.os }} / ${{ matrix.suite }}
+    name: ${{ matrix.os }} / ${{ matrix.suite }} / part ${{ matrix.shard }}
     timeout-minutes: 360
     if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     strategy:
@@ -21,6 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-15, windows-latest]
         suite: [source, installed]
+        shard: [0, 1, 2]
     runs-on: ${{ matrix.os }}
     env:
       OPENBLAS_NUM_THREADS: '1'
@@ -68,15 +69,46 @@ jobs:
         if: ${{ matrix.suite == 'source' }}
         env:
           PYTHONPATH: src
-        run: python -m pytest -q tests/sipi --junitxml=.validation/source.xml
+        run: python -m pytest -q tests/sipi -p tools.pytest_shard --sipi-shard-count=3 --sipi-shard-index=${{ matrix.shard }} --sipi-shard-report=.validation/source-shard.json --junitxml=.validation/source.xml
       - name: Installed regression and geometry contract
         if: ${{ matrix.suite == 'installed' }}
-        run: python tools/check_installed.py --wheels .validation/wheels
+        run: python tools/check_installed.py --wheels .validation/wheels --shard-count=3 --shard-index=${{ matrix.shard }}
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
-          name: validation-${{ matrix.os }}-${{ matrix.suite }}
+          name: validation-${{ matrix.os }}-${{ matrix.suite }}-${{ matrix.shard }}
           include-hidden-files: true
           path: |
             .validation/*.xml
             .validation/installed.json
+            .validation/*-shard.json
+  coverage:
+    name: Complete partition coverage
+    needs: tests
+    if: ${{ always() && (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          pattern: validation-*
+          path: .validation/partitions
+      - name: Require every collected case in every platform and suite
+        shell: python
+        env:
+          VALIDATION_RESULT: ${{ needs.tests.result }}
+        run: |
+          import json, os, pathlib, subprocess, sys
+          root = pathlib.Path('.validation/partitions')
+          for platform in ('ubuntu-latest', 'macos-15', 'windows-latest'):
+              collections = {}
+              for suite in ('source', 'installed'):
+                  paths = [root / f'validation-{platform}-{suite}-{i}' / f'{suite}-shard.json' for i in range(3)]
+                  subprocess.run([sys.executable, 'tools/check_shards.py', *map(str, paths)], check=True)
+                  collections[suite] = json.loads(paths[0].read_text(encoding='utf-8'))['all_nodeids']
+              assert collections['source'] == [node for node in collections['installed'] if node.startswith('tests/sipi/')], platform
+          assert os.environ['VALIDATION_RESULT'] == 'success', 'validation matrix did not succeed'

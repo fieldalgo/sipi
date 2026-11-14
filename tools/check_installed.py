@@ -16,7 +16,13 @@ import tempfile
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--wheels', required=True, type=Path, help='the exact wheels installed for this run')
+    parser.add_argument('--shard-index', type=int, default=None)
+    parser.add_argument('--shard-count', type=int, default=None)
     args = parser.parse_args()
+    if (args.shard_index is not None or args.shard_count is not None) and not (
+            args.shard_index is not None and args.shard_count is not None
+            and 0 <= args.shard_index < args.shard_count <= 64):
+        parser.error('provide 0 <= shard-index < shard-count <= 64')
     root = Path(__file__).resolve().parents[1]
     report = root / '.validation'
     report.mkdir(exist_ok=True)
@@ -45,9 +51,18 @@ def main():
             for name in ('tests', 'integration'):
                 shutil.copytree(root / name, outside / name)
             shutil.copy2(root / 'pyproject.toml', outside / 'pyproject.toml')
+            partition_args = []
+            if args.shard_index is not None:
+                (outside / 'tools').mkdir()
+                shutil.copy2(root / 'tools' / 'pytest_shard.py', outside / 'tools' / 'pytest_shard.py')
+                outcome['partition'] = dict(index=args.shard_index, count=args.shard_count)
+                partition_args = ['-p', 'tools.pytest_shard',
+                                  '--sipi-shard-index=' + str(args.shard_index),
+                                  '--sipi-shard-count=' + str(args.shard_count),
+                                  '--sipi-shard-report=' + str(report / 'installed-shard.json')]
             outcome['phase'] = 'regression'
             subprocess.run([sys.executable, '-m', 'pytest', '-q', 'tests', 'integration',
-                            '--junitxml=' + str(xml)], cwd=outside, env=env, check=True)
+                            '--junitxml=' + str(xml), *partition_args], cwd=outside, env=env, check=True)
         outcome.update(status='passed', phase='complete')
     except Exception as exc:
         outcome.update(status='failed', error=str(exc))

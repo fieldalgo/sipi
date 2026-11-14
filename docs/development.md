@@ -68,8 +68,11 @@ ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 ## Continuous validation
 
 The validation workflow runs source and installed-artifact regression in separate
-Linux, macOS and Windows jobs. Each job retains a six-hour limit; splitting avoids
-combining both complete suites into one timeout budget. It runs for ready pull
+Linux, macOS and Windows jobs, with three partitions per suite. Each job retains
+a six-hour limit. Whole test modules are assigned by a stable SHA-256 of their
+relative path, keeping module fixtures together. All cases are collected before
+selection; a partition does not relax numerical criteria or mark omitted cases
+as skipped. It runs for ready pull
 requests, main pushes and pushes to the current independent-repository development
 branch, so pre-merge validation can run without opening a pull request. Every job
 retains the pinned independent references, wheel/sdist build, validation-tool checks
@@ -77,8 +80,9 @@ and failure reports. The installed suite includes geometry-contract checks. Thes
 checks do not publish packages, executables or websites.
 
 Validation uploads explicitly allow the hidden `.validation` directory while
-restricting artifact paths to `.validation/*.xml` and
-`.validation/installed.json`. Without that option, the upload action excludes
+restricting artifact paths to `.validation/*.xml`, `.validation/installed.json`
+and `.validation/*-shard.json`. Each platform/suite/partition has its own artifact.
+Without that option, the upload action excludes
 the generated reports even when the tests wrote them successfully. Source
 checkouts, wheels and other hidden files are not artifact inputs.
 
@@ -87,6 +91,28 @@ pending run. This permits incremental commits to be backed up without
 cancelling their in-flight platform evidence. Pull-request updates still
 cancel obsolete runs; main retains its full queue. A completed older commit
 does not establish validation of a newer branch head.
+
+`tools/pytest_shard.py` is an opt-in validation plugin, not a runtime dependency.
+The ordinary local pytest and installed-check commands remain unpartitioned.
+For an individual source partition, append `-p tools.pytest_shard
+--sipi-shard-count=3 --sipi-shard-index=0
+--sipi-shard-report=.validation/source-shard.json` to the source command above;
+use indices 0, 1 and 2 in separate runs with fresh report paths. For the installed
+runner, use `--shard-count=3 --shard-index=0`; it copies the plugin outside the
+checkout and still audits all four wheels and clears PYTHONPATH.
+
+The manifest retains every original node ID, its collection hash, the selected
+IDs, completed IDs and exit status. Existing manifests are refused, and missing
+or partial execution cannot establish a passing suite. `tools/check_shards.py`
+requires all indices, identical original collections, exact disjoint coverage
+and successful completion of every selected case. Its explicit `--collect-only`
+mode verifies discovery only and reports `executed: false`.
+The workflow's final coverage job checks all six platform/suite groups and the
+shared source/installed product collection. A failed or interrupted partition
+fails that check even when its other partitions pass. Check names include the
+partition index; required-check configuration must be reviewed before integration.
+This scheduling change does not fix existing numerical failures, certify a new
+platform or guarantee that future test growth fits the time limit.
 
 The paired surface-conductor and Cannonball refinement tests record
 `conductor_refinement` JSON in their JUnit testcase properties before checking

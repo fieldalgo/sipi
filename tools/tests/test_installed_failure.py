@@ -52,3 +52,46 @@ def test_missing_artifacts_fail_before_pytest_and_record_error(tmp_path):
     assert report['status'] == 'failed'
     assert report['phase'] == 'artifact-audit'
     assert 'expected exactly one wheel' in report['stderr']
+
+
+def test_partition_runner_keeps_external_import_environment_and_fresh_reports(tmp_path, monkeypatch):
+    root = tmp_path / 'candidate'
+    (root / 'tools').mkdir(parents=True)
+    for name in ('tests', 'integration'):
+        (root / name).mkdir()
+    (root / 'pyproject.toml').write_text('[tool.pytest.ini_options]\n')
+    tools = Path(__file__).resolve().parents[1]
+    for name in ('check_installed.py', 'verify_install.py', 'pytest_shard.py'):
+        shutil.copy2(tools / name, root / 'tools' / name)
+    monkeypatch.setenv('PYTHONPATH', str(root / 'poison-source'))
+    monkeypatch.setattr(sys, 'argv', ['check_installed.py', '--wheels', str(tmp_path),
+                                    '--shard-index', '1', '--shard-count', '3'])
+    calls = []
+    def observe(command, *, cwd, env, **kwargs):
+        calls.append(command)
+        assert cwd != root and root not in cwd.parents
+        assert 'PYTHONPATH' not in env
+        assert env['OPENPHYSICS_REQUIRE_CROSSCHECK'] == '1'
+        if len(calls) == 1:
+            return subprocess.CompletedProcess(command, 0, stdout='[]')
+        assert (cwd / 'tools/pytest_shard.py').read_bytes() == (tools / 'pytest_shard.py').read_bytes()
+        assert (cwd / 'tests').is_dir() and (cwd / 'integration').is_dir()
+        assert '-p' in command and 'tools.pytest_shard' in command
+        assert '--sipi-shard-index=1' in command and '--sipi-shard-count=3' in command
+        assert '--sipi-shard-report=' + str(root / '.validation/installed-shard.json') in command
+        # Preserve an actual failing subprocess's status; successful audit is not regression success.
+        raise subprocess.CalledProcessError(1, command)
+    monkeypatch.setattr(subprocess, 'run', observe)
+    with pytest.raises(subprocess.CalledProcessError):
+        runpy.run_path(str(root / 'tools/check_installed.py'), run_name='__main__')
+    report = json.loads((root / '.validation/installed.json').read_text())
+    assert len(calls) == 2 and report['status'] == 'failed' and report['phase'] == 'regression'
+    assert report['partition'] == {'index': 1, 'count': 3}
+
+
+@pytest.mark.parametrize('options', [['--shard-index=0'], ['--shard-count=3'],
+                                   ['--shard-index=3', '--shard-count=3']])
+def test_invalid_installed_partition_options_do_not_launch(tmp_path, options):
+    result = subprocess.run([sys.executable, str(Path(__file__).resolve().parents[1] / 'check_installed.py'),
+                             '--wheels', str(tmp_path), *options], capture_output=True, text=True)
+    assert result.returncode == 2 and 'provide 0 <= shard-index' in result.stderr
