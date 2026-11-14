@@ -1,5 +1,7 @@
 # Changelog
 
+- Validate actual FEM attenuation-material and common-launch width goals with independent characteristic checks and frozen-input refinement.
+
 - Save bounded FEM-current line goals with reproducible one-variable inputs and complete execution failure evidence.
 
 - Add explicit bounded FEM-current line-quantity goals with frozen-input refinement and retained current evidence.

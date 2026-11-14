@@ -61,9 +61,14 @@ JSON-compatible, with the saved line's explicit failed-observation markers.
 
 Validation includes actual scalar and differential width goals, an independent
 matrix/scalar square-root characteristic calculation, frozen-input refinement,
-budgets, failure retention and original goal regressions. Transport checks for
-attenuation and common-launch goals reuse observed fields explicitly; they are
-not new physical inverse-recovery experiments. The current implementation does
+budgets, failure retention and original goal regressions. Separate actual-field checks also solve a dielectric-loss target of 1.0 Np/m
+(absolute tolerance 0.01 Np/m, tan_delta in 0.01..0.03) and a common-launch
+target of 45.8 ohm (absolute tolerance 0.1 ohm, width in 0.39..0.41 mm), at
+2 GHz. Each uses four actual attempts, including frozen-input refinement, and
+independent characteristic square roots. Attenuation is 0.991319/0.991450 Np/m
+at tan_delta 0.02; common impedance is 45.789133/45.821079 ohm at width 0.4 mm.
+Other transport-only checks still reuse observed fields explicitly and are not
+additional physical inverse-recovery experiments. The current implementation does
 not certify outer-domain sufficiency, continuous-band behavior or empirical
 accuracy. Existing criteria and saved documents remain unchanged. Full platform
 regression and a saved factory wrapper are separate work.

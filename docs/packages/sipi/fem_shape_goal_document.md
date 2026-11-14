@@ -59,8 +59,9 @@ propagates. This wrapper does not turn failures into partial accepted designs.
 Validation uses actual scalar and differential saved width goals matched to the
 direct API, independent characteristic square roots, field-free material/pitch
 mapping and exact complete/failed record/project round trips. Transport-only tests
-explicitly reuse already computed designs. It does not add physical inverse
-validation for other quantities, new platform support, runtime guarantees or
-empirical accuracy. Existing schemas and defaults remain unchanged.
+explicitly reuse already computed designs. Separate actual saved goals also validate the bounded dielectric-loss attenuation
+and common-launch width examples documented by the direct API, with unchanged
+absolute target and 0.005 mesh-change criteria. This does not establish new
+platform support, runtime guarantees or empirical accuracy. Existing schemas and defaults remain unchanged.
 
 [한국어](../../locales/ko/pages/packages/sipi/fem_shape_goal_document.md)
