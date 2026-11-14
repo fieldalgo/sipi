@@ -295,3 +295,5 @@ from .shape_panel_line import (ShapePanelTransmissionLineDocument,
 
 from .shape_panel_resolution import (ShapePanelResolutionFailure, ShapePanelResolutionAssessment,
     assess_shape_panel_line_resolution)
+
+from .shape_panel_resolution_document import ShapePanelResolutionDocument

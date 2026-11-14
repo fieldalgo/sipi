@@ -1,5 +1,8 @@
 # Changelog
 
+- Save shape-current resolution plans and preserve complete, unaccepted and detailed partial-failure receipts with explicit whole-line budgets.
+  형상전류 해상도 계획을 저장하고 선로 전체 평가 예산·완료·미수락·상세 부분 실패 영수증을 보존합니다.
+
 - Compare explicit shape-current lines along separate panel, volume, joint and outer axes while retaining every current sample and detailed partial failure.
   명시 형상전류 선로를 패널·체적·동시 세분·외곽으로 나누어 비교하고 모든 전류 표본과 상세 부분 실패를 보존합니다.
 

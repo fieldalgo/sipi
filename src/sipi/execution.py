@@ -29,6 +29,7 @@ from .adaptive_panel_resolution_document import AdaptivePanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
 from .shape_panel_line import (ShapePanelTransmissionLineDocument, ShapePanelLineError,
                                shape_current_record)
+from .shape_panel_resolution_document import ShapePanelResolutionDocument
 from .volume_line import VolumeLineDocument
 from .lumped import LumpedNetworkDocument
 from .assembly_document import NetworkAssemblyDocument
@@ -129,6 +130,7 @@ _REGISTRY = {
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
     'sipi.shape-panel-transmission-line/1': ShapePanelTransmissionLineDocument,
+    'sipi.shape-panel-resolution/1': ShapePanelResolutionDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
     'sipi.line-resolution/2': LineResolutionDocument,
     'sipi.panel-resolution/1': PanelResolutionDocument,
@@ -496,6 +498,16 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             surface_impedance_ohms=_array(profile.impedance),
             skin_depth_m=_array(profile.skin_depth),
             reference_plane_m=profile.reference_plane_m, cutoff_rms=profile.cutoff_rms)
+    elif isinstance(doc, ShapePanelResolutionDocument):
+        assessment = doc.analyze(max_evaluations=budget)
+        record = assessment.to_dict()
+        if assessment.failure is None:
+            out['result'] = record
+        else:
+            failure = assessment.failure
+            out.update(status='failed', error=dict(type='ShapePanelResolutionFailure',
+                message=failure.message, stage=failure.stage, cause_type=failure.kind,
+                input=json.loads(failure.input_json), partial_assessment=record))
     elif isinstance(doc, (LineResolutionDocument,PanelResolutionDocument,AdaptivePanelResolutionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = resolution_record(result)

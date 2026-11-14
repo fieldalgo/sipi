@@ -543,6 +543,8 @@ def documents():
     base.append(adaptive_panel_resolution())
     from test_shape_panel_line import document as shape_panel_line
     base.append(shape_panel_line(True))
+    from test_shape_panel_resolution_document import document as shape_panel_resolution
+    base.append(shape_panel_resolution())
     return base
 
 

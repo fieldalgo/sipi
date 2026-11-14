@@ -71,3 +71,5 @@ assert len(result.to_dict()['evaluations'][0]['current_solver']['samples']) == 1
 작은 상호 항과 허용값 0의 미수락, 네 축 논리표, 마지막 주파수, 모든 실패 단계를
 검사합니다. 기존 추출 기본값·저장 스키마·수치 수락 기준은 유지합니다.
 이 직접 API에 역산이나 수율 연구를 추가하지 않습니다.
+
+[JSON 저장과 실행 영수증](shape_panel_resolution_document.md).

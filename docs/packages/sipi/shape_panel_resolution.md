@@ -78,3 +78,5 @@ Existing extraction defaults, saved schemas and numerical acceptance criteria
 are unchanged. This direct API does not add an inverse search or yield study.
 
 [한국어](../../locales/ko/pages/packages/sipi/shape_panel_resolution.md)
+
+[Saved JSON and execution receipts](shape_panel_resolution_document.md).
