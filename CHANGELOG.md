@@ -1,5 +1,8 @@
 # Changelog
 
+- Assess explicitly selected line quantities on finer meshes and larger domains, preserving unmet tolerances, failed stages and completed results.
+  명시적으로 선택한 선로 물리량을 세분 메시·확장 외곽에서 평가하고 허용차 미충족·실패 단계·완료 결과를 보존합니다.
+
 - Add explicit dual-cell boundary-current factors and metal-loss projection with independent field checks, preserving gradient and saved-line defaults.
   독립 전계 검증을 갖춘 명시 이중 셀 경계 전류와 금속 손실 투영을 추가하고 기존 기울기·저장 선로 기본값을 보존합니다.
 

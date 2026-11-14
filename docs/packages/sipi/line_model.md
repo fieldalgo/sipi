@@ -1,5 +1,7 @@
 # Reproducible frequency-dependent line models
 
+[Mesh and outer-domain assessment](line_resolution.md) reports finite agreement for explicitly selected quantities and retains failed evaluations.
+
 [Lossy scalar goals](line_goal.md) target Re(Zc) or attenuation with a separate refinement check.
 
 [Saved ground-face lines](ground_face_line.md) use explicit line/6 for per-face ground laws.
