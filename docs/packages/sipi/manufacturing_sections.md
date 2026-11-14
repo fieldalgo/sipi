@@ -154,3 +154,5 @@ See [normal-thickness coated two-substrate coplanar sections](layered_conformal_
 See [unequal broadside conductors in three dielectrics](asymmetric_broadside.md) for independent lower/upper widths and copper thicknesses.
 
 See [trapezoidal broadside conductors](tapered_broadside.md) for independent top/bottom widths and etch faces.
+
+See [broadside with an interface inside the gap](split_gap_broadside.md) for four explicit dielectric layers and movable gap material boundaries.

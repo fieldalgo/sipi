@@ -10,7 +10,7 @@ from numbers import Real
 
 from .crosssection import CrossSection, Layer, Trace
 
-__all__ = ['tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
+__all__ = ['split_gap_broadside_stripline', 'tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
            'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
            'asymmetric_coupled_layered_stripline',
@@ -1095,6 +1095,45 @@ def tapered_layered_broadside_stripline(*, lower_width, upper_width,
     traces = [replace(t, top_width=None if top == t.width else top)
               for t, top in zip(base.traces, (low_top, high_top))]
     return CrossSection(base.layers, traces, width, top='ground')
+
+
+def split_gap_broadside_stripline(*, lower_width, upper_width,
+                                 lower_top_width, upper_top_width, gap,
+                                 gap_lower_height, lower_height, upper_height,
+                                 lower_eps_r, gap_lower_eps_r, gap_upper_eps_r,
+                                 upper_eps_r, lower_thickness, upper_thickness,
+                                 offset=0.0, lower_tan_delta=0.0,
+                                 gap_lower_tan_delta=0.0, gap_upper_tan_delta=0.0,
+                                 upper_tan_delta=0.0, box_width=None):
+    """Trapezoidal broadside pair with two explicit materials in the gap.
+
+    gap_lower_height locates the horizontal interface above the lower copper's
+    inner (+y) face and must be strictly between zero and gap. The remaining
+    gap belongs to gap_upper. Outer clearances exclude copper; bottom/top
+    widths refer to geometric -y/+y faces for both conductors. Both planes
+    are grounded, sides open. No exchange symmetry or even/odd modes are
+    assumed. The four dielectric regions retain their identities even when
+    adjacent material values match.
+    """
+    split = _positive('gap_lower_height', gap_lower_height)
+    g = _positive('gap', gap)
+    if split >= g:
+        raise ValueError('gap_lower_height must be strictly less than gap')
+    base = tapered_layered_broadside_stripline(
+        lower_width=lower_width, upper_width=upper_width,
+        lower_top_width=lower_top_width, upper_top_width=upper_top_width,
+        gap=g, lower_height=lower_height, upper_height=upper_height,
+        lower_eps_r=lower_eps_r, gap_eps_r=gap_lower_eps_r,
+        upper_eps_r=upper_eps_r, lower_thickness=lower_thickness,
+        upper_thickness=upper_thickness, offset=offset,
+        lower_tan_delta=lower_tan_delta, gap_tan_delta=gap_lower_tan_delta,
+        upper_tan_delta=upper_tan_delta, box_width=box_width)
+    layers = [base.layers[0],
+              Layer('gap_lower', split, base.layers[1].eps_r, base.layers[1].tan_delta),
+              Layer('gap_upper', g-split, _positive('gap_upper_eps_r', gap_upper_eps_r),
+                    _positive('gap_upper_tan_delta', gap_upper_tan_delta, zero=True)),
+              base.layers[2]]
+    return CrossSection(layers, base.traces, base.width, top='ground')
 
 
 def layered_stripline(*, width, lower_height, upper_height, lower_eps_r, upper_eps_r,

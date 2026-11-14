@@ -1,5 +1,8 @@
 # Changelog
 
+- Add an explicit two-material gap to trapezoidal broadside sections, with independent four-layer field and reflection checks.
+  사다리꼴 broadside의 금속간 간격에 두 유전체 계면을 추가하고 독립 4층 전계·반사를 검증합니다.
+
 - Retain bounded refinement-prefix arrays and active BLAS dispatch information for same-input platform replay without selecting a numerical backend.
   수치 backend를 선택하지 않고 플랫폼 재생에 필요한 초기 세분 배열과 실제 BLAS 실행 경로를 보존합니다.
 

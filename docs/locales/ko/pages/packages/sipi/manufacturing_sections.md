@@ -129,3 +129,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 OPENBLAS_NUM_THREADS=1 \
 [3유전체의 비대칭 broadside 단면](asymmetric_broadside.md)은 상하 도체의 선폭·동박 두께를 독립적으로 지정합니다.
 
 독립 위아래 선폭과 식각면은 [사다리꼴 broadside](tapered_broadside.md)를 참고하세요.
+
+네 유전체 층과 gap 내부 계면 위치는 [gap 분할 broadside](split_gap_broadside.md)를 참고하세요.
