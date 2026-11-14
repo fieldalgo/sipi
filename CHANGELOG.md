@@ -307,6 +307,8 @@
 
 ## [Unreleased]
 
+- Add explicit bounded shape-current panel/volume refinement plans with consecutive checks, retained current work and distinct unaccepted outcomes.
+
 - Add explicit saved finite-frequency shape-current pair goals with field-free corner/refinement admission and retained execution failure details.
 
 - Retain resolved edge size and growth for automatic single unbacked coplanar width targeting before its mandatory refinement, while preserving explicit meshes, other templates, numerical budgets and target tolerances.

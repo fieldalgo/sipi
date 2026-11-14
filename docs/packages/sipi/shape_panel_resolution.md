@@ -80,3 +80,5 @@ are unchanged. This direct API does not add an inverse search or yield study.
 [한국어](../../locales/ko/pages/packages/sipi/shape_panel_resolution.md)
 
 [Saved JSON and execution receipts](shape_panel_resolution_document.md).
+
+[Explicit plans with two consecutive accepted levels](adaptive_shape_panel_resolution.md).

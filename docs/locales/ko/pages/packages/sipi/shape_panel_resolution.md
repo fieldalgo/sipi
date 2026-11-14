@@ -73,3 +73,5 @@ assert len(result.to_dict()['evaluations'][0]['current_solver']['samples']) == 1
 이 직접 API에 역산이나 수율 연구를 추가하지 않습니다.
 
 [JSON 저장과 실행 영수증](shape_panel_resolution_document.md).
+
+[연속 두 단계 비교가 필요한 명시적 세분 계획](adaptive_shape_panel_resolution.md).

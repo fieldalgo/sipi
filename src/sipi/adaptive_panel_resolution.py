@@ -118,12 +118,20 @@ def refine_panel_line_resolution(line, *, refinements, tolerances,
     """
     limit, tolerances, plans = _adaptive_panel_inputs(
         line, refinements, tolerances, refinement_factor, max_solves)
+    return _run_adaptive_panel_resolution(limit, tolerances, plans,
+        result_type=AdaptivePanelResolution,
+        failure_factory=lambda stage,text,error:ResolutionFailure(
+            stage, text, type(error).__name__, str(error)))
+
+
+def _run_adaptive_panel_resolution(limit, tolerances, plans, *, result_type, failure_factory):
+    """Shared finite-plan state machine; admission selects the physical method."""
     evaluations, comparisons = [], []
     count_outer = len(plans[0])-4
     level = 0
 
     def finish(reason, failure=None):
-        return AdaptivePanelResolution(tolerances, evaluations, comparisons, level,
+        return result_type(tolerances, evaluations, comparisons, level,
                                        count_outer, reason, failure)
 
     def evaluate(stage, doc, references=()):
@@ -135,7 +143,7 @@ def refine_panel_line_resolution(line, *, refinements, tolerances,
                 comparisons.append(_compare(evaluations[index].result, result, tolerances,
                                              label, index, len(evaluations)-1))
         except Exception as error:
-            return ResolutionFailure(stage, text, type(error).__name__, str(error))
+            return failure_factory(stage, text, error)
         return None
 
     failure = evaluate('base', plans[0][0][1])

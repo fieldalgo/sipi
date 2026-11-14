@@ -320,3 +320,7 @@ from .shape_sampled_panel_pair_goal import (ShapeSampledPanelPairRefinement,
 
 from .shape_sampled_panel_pair_goal_document import ShapeSampledPanelForwardPairDesignDocument
 __all__ += ['ShapeSampledPanelForwardPairDesignDocument']
+
+from .adaptive_shape_panel_resolution import (ShapePanelResolutionRefinement, AdaptiveShapePanelResolution,
+    refine_shape_panel_line_resolution)
+__all__ += ['ShapePanelResolutionRefinement', 'AdaptiveShapePanelResolution', 'refine_shape_panel_line_resolution']
