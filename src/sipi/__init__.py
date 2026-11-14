@@ -302,3 +302,6 @@ from .shape_panel_pair_goal import (ShapePanelPairRefinement, ShapePanelForwardP
     seek_shape_panel_forward_pair_impedances)
 
 from .shape_panel_pair_goal_document import ShapePanelForwardPairDesignDocument
+
+from .shape_panel_pair_study import (ShapePanelForwardPairStudyDocument,
+    ShapePanelForwardPairStudy, ShapePanelForwardPairStudyRow)

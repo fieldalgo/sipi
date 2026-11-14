@@ -547,6 +547,8 @@ def documents():
     base.append(shape_panel_resolution())
     from test_shape_panel_pair_goal_document import document as shape_panel_goal
     base.append(shape_panel_goal())
+    from test_shape_panel_pair_study import document as shape_panel_study
+    base.append(shape_panel_study(layered=True))
     return base
 
 

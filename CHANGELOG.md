@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserve explicit shape-current manufacturing samples, full current evidence and failed rows through saved studies.
+  명시 형상전류 제조 표본·전체 전류 근거·실패 행을 저장된 공차 분석에 보존합니다.
+
 - Add opt-in execution-record/2 for unchanged partial resolution failure and budget-stop receipts while preserving version-1 admission and defaults.
   기존 해상도 부분 실패·예산 소진 영수증용 명시 execution-record/2를 추가하고 버전 1 검사와 기본값을 유지합니다.
 

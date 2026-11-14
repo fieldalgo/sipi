@@ -65,6 +65,7 @@ from .pair_line_goal_document import ForwardPairDesignDocument
 from .panel_pair_goal_document import PanelForwardPairDesignDocument
 from .shape_panel_pair_goal_document import ShapePanelForwardPairDesignDocument
 from .panel_pair_study import PanelForwardPairStudyDocument
+from .shape_panel_pair_study import ShapePanelForwardPairStudyDocument
 from .sampled_panel_pair_study import SampledPanelForwardPairStudyDocument
 from .panel_pair_yield import PanelForwardPairYieldDocument
 from .panel_resolution_yield_document import PanelResolutionYieldDocument
@@ -123,6 +124,7 @@ _REGISTRY = {
     'sipi.panel-forward-pair-design/2': PanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-study/1': PanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-study/2': PanelForwardPairStudyDocument,
+    'sipi.shape-panel-forward-pair-study/1': ShapePanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-yield/1': PanelForwardPairYieldDocument,
     'sipi.panel-forward-pair-yield/2': PanelForwardPairYieldDocument,
     'sipi.panel-resolution-yield/1': PanelResolutionYieldDocument,
@@ -542,7 +544,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = result.to_dict()
         if result.unresolved:
             out['status'] = 'incomplete'
-    elif isinstance(doc, (LineQuantityStudyDocument, PanelForwardPairStudyDocument, SampledPanelForwardPairStudyDocument)):
+    elif isinstance(doc, (LineQuantityStudyDocument, PanelForwardPairStudyDocument, SampledPanelForwardPairStudyDocument, ShapePanelForwardPairStudyDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.failed:
