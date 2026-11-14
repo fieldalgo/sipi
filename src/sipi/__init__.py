@@ -379,3 +379,6 @@ __all__ += ['FEMShapeAdaptiveResolution', 'refine_fem_shape_line_resolution']
 
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
 __all__ += ['FEMShapeAdaptiveResolutionDocument']
+
+from .corner_document import CornerCrossSectionDocument
+__all__ += ['CornerCrossSectionDocument']

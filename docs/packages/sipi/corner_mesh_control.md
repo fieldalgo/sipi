@@ -30,11 +30,10 @@ same target function. Geometry, materials, mesher ordering and boundary
 labels are unchanged. To refine all length scales, halve `corner_size`
 together with `edge_size`, `far_size` and `grade`; retain `min_angle`.
 
-This option is currently a direct Python mesh control. Existing saved
-cross-section versions 1–3 reject it, as do their saved study and goal paths.
-Do not insert the key into an old document or discard it when recording an
-experiment. Store the explicit Python settings separately until a versioned
-saved contract supports this control.
+Use the separate [saved corner section](corner_document.md) to retain this
+control with an original geometry snapshot. Existing cross-section versions
+1–3 reject the key, as do their saved study and goal paths. Do not insert it
+into an old document or discard it when recording an experiment.
 
 Validation covers rectangular, tapered, polygonal and local-region sections:
 default mesh identity, geometry area and material labels, homogeneous

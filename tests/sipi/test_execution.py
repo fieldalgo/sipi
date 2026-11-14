@@ -573,6 +573,8 @@ def documents():
     base.append(fem_shape_resolution())
     from test_fem_shape_adaptive_document import document as fem_shape_adaptive
     base.append(fem_shape_adaptive())
+    from test_corner_document import document as corner_section
+    base.append(corner_section())
     return base
 
 

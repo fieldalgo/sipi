@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit corner mesh targets with original geometry snapshots and shared execution records.
+
 - Add explicit direct-Python corner mesh targets while preserving existing defaults and saved-input contracts.
 
 - Add strict saved bounded FEM refinement and version-2 partial budget/failure records without changing existing defaults.
