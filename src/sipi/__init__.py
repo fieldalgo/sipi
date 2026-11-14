@@ -363,3 +363,6 @@ __all__ += ['FEMShapeLineQuantityStudyDocument', 'FEMShapeLineQuantityStudy', 'F
 from .fem_shape_goal import (FEMShapeLineQuantityDesign, FEMShapeLineQuantityGoalError,
                              seek_fem_shape_line_quantity)
 __all__ += ['FEMShapeLineQuantityDesign', 'FEMShapeLineQuantityGoalError', 'seek_fem_shape_line_quantity']
+
+from .fem_shape_goal_document import FEMShapeLineQuantityDesignDocument
+__all__ += ['FEMShapeLineQuantityDesignDocument']

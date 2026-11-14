@@ -56,6 +56,8 @@ from .roughness_fit_document import HurayFitDocument
 from .loss_inference_document import ShuntLossInferenceDocument
 from .tensor_dielectric_fit_document import TensorDebyeFitDocument
 from .line_goal_document import LineQuantityDesignDocument
+from .fem_shape_goal_document import FEMShapeLineQuantityDesignDocument
+from .fem_shape_goal import FEMShapeLineQuantityGoalError
 from .line_goal import LineQuantityGoalError
 from .fem_shape_study import FEMShapeLineQuantityStudyDocument
 from .line_study import LineQuantityStudyDocument
@@ -154,6 +156,7 @@ _REGISTRY = {
     'sipi.shape-face-panel-transmission-line/1': ShapeFacePanelTransmissionLineDocument,
     'sipi.fem-shape-transmission-line/1': FEMShapeTransmissionLineDocument,
     'sipi.fem-shape-line-quantity-study/1': FEMShapeLineQuantityStudyDocument,
+    'sipi.fem-shape-line-quantity-design/1': FEMShapeLineQuantityDesignDocument,
     'sipi.shape-panel-resolution/1': ShapePanelResolutionDocument,
     'sipi.adaptive-shape-panel-resolution/1': AdaptiveShapePanelResolutionDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
@@ -641,6 +644,13 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 history=[row.to_dict() for row in exc.history]))
             if isinstance(doc, ShapePanelForwardPairDesignDocument) and isinstance(exc.__cause__, ShapePanelLineError):
                 out['error']['cause_details'] = exc.__cause__.to_dict()
+    elif isinstance(doc, FEMShapeLineQuantityDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved FEM goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except FEMShapeLineQuantityGoalError as exc:
+            out.update(status='failed', error=exc.to_dict())
     elif isinstance(doc, LineQuantityDesignDocument):
         if data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')

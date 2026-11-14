@@ -1,5 +1,7 @@
 # Changelog
 
+- Save bounded FEM-current line goals with reproducible one-variable inputs and complete execution failure evidence.
+
 - Add explicit bounded FEM-current line-quantity goals with frozen-input refinement and retained current evidence.
 
 - Add explicit checked FEM-current geometry/material sampling with fixed boundary metals, complete failed rows and saved execution evidence.
