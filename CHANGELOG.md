@@ -1,5 +1,8 @@
 # Changelog
 
+- Save named signal, return, nonmetal and core permeabilities in strict volume-line v4, with fresh-mesh material assignment.
+  엄격한 volume-line v4에 신호·귀환·비금속·코어 투자율을 저장하고 새 메시마다 재료를 배정합니다.
+
 - Support piecewise linear isotropic permeability in metal-volume diffusion with colocated skin-depth and magnetic-energy checks.
   금속 체적 확산에 영역별 선형 등방 투자율과 같은 위치의 표피 깊이·자기 에너지 검사를 지원합니다.
 

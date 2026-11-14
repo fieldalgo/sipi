@@ -505,6 +505,8 @@ def documents():
     base.append(VolumeLineDocument.from_dict(named_volume))
     from test_core_document import document as core_document
     base.append(core_document())
+    from test_magnetic_document import document as magnetic_document
+    base.append(magnetic_document())
     return base
 
 

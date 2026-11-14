@@ -177,7 +177,7 @@ _MESH_KEYS = ('ground_thickness','padding','metal_size','far_size','grade','min_
 
 
 class VolumeLineDocument:
-    """Strict saved volume line: scalar v1, named v2 or core/coating v3.
+    """Strict volume line: scalar v1, named v2, cores v3, named magnetics v4.
 
     The cross-section document must have empty dielectric-only mesh options;
     all volume mesh settings are explicit here. Accessors return fresh inputs.
@@ -193,6 +193,9 @@ class VolumeLineDocument:
         if metal_cores is not None:
             schema = 'sipi.volume-line/3'
             extra['metal_cores'] = metal_cores
+        if isinstance(relative_permeability,Mapping):
+            schema = 'sipi.volume-line/4'
+            extra['metal_cores'] = {} if metal_cores is None else metal_cores
         self._data = self._validate(dict(schema=schema,
             cross_section=cross_section.to_dict(),frequency_hz=_frequencies(frequency).tolist(),
             materials={name:dielectric_to_dict(model) for name,model in materials.items()},
@@ -201,11 +204,12 @@ class VolumeLineDocument:
 
     @staticmethod
     def _validate(data):
-        core_version = isinstance(data,dict) and data.get('schema') == 'sipi.volume-line/3'
+        magnetic_version = isinstance(data,dict) and data.get('schema') == 'sipi.volume-line/4'
+        core_version = magnetic_version or (isinstance(data,dict) and data.get('schema') == 'sipi.volume-line/3')
         extra = ('metal_cores',) if core_version else ()
         _keys(data,('schema','cross_section','frequency_hz','materials','mesh','conductor',
                     'length_m','reference_ohms')+extra,where='volume line')
-        if data['schema'] not in ('sipi.volume-line/1','sipi.volume-line/2','sipi.volume-line/3'):
+        if data['schema'] not in ('sipi.volume-line/1','sipi.volume-line/2','sipi.volume-line/3','sipi.volume-line/4'):
             raise ValueError('unsupported volume-line schema')
         doc = CrossSectionDocument.from_dict(data['cross_section'])
         if doc.mesh_options:
@@ -227,12 +231,13 @@ class VolumeLineDocument:
             conductor = dict(conductivity=dict(
                 signals={name:_scalar('signal conductivity',sigma['signals'][name]) for name in names},
                 ground=_scalar('ground conductivity',sigma['ground'])),
-                relative_permeability=_scalar('relative_permeability',data['conductor']['relative_permeability']))
+                relative_permeability=(data['conductor']['relative_permeability'] if magnetic_version
+                    else _scalar('relative_permeability',data['conductor']['relative_permeability'])))
         cores = {}
         if core_version:
             raw = data['metal_cores']
-            if not isinstance(raw,Mapping) or not raw:
-                raise ValueError('metal_cores must be a nonempty trace mapping')
+            if not isinstance(raw,Mapping) or (not raw and not magnetic_version):
+                raise ValueError('metal_cores must be a trace mapping, nonempty in v3')
             for name,value in raw.items():
                 _keys(value,('vertices','conductivity'),where='metal core')
                 cores[name] = dict(vertices=value['vertices'],
@@ -240,6 +245,16 @@ class VolumeLineDocument:
             shapes = _metal_cores(doc.section,{name:core['vertices'] for name,core in cores.items()})
             for name,shape in shapes.items():
                 cores[name]['vertices'] = [list(point) for point in shape.vertices]
+        if magnetic_version:
+            mu = conductor['relative_permeability']
+            _keys(mu,('signals','ground','nonmetal','cores'),where='named permeability')
+            _keys(mu['signals'],names,where='signal permeabilities')
+            _keys(mu['cores'],cores,where='core permeabilities')
+            conductor['relative_permeability'] = dict(
+                signals={name:_scalar('signal permeability',mu['signals'][name]) for name in names},
+                ground=_scalar('ground permeability',mu['ground']),
+                nonmetal=_scalar('nonmetal permeability',mu['nonmetal']),
+                cores={name:_scalar('core permeability',mu['cores'][name]) for name in cores})
         f = _frequencies(data['frequency_hz'])
         if not isinstance(data['materials'],dict):
             raise ValueError('materials must be an object')
@@ -289,7 +304,7 @@ class VolumeLineDocument:
         volume = mesh_conductor_section(section,**data['mesh'],dielectric_interfaces=True,
             metal_cores={name:core['vertices'] for name,core in cores.items()})
         conductor = data['conductor']
-        if data['schema'] in ('sipi.volume-line/2','sipi.volume-line/3'):
+        if data['schema'] in ('sipi.volume-line/2','sipi.volume-line/3','sipi.volume-line/4'):
             named = conductor['conductivity']
             sigma = np.zeros(volume.mesh.num_triangles)
             for name,indices in volume.signals.items():
@@ -298,6 +313,15 @@ class VolumeLineDocument:
             for name,core in cores.items():
                 sigma[volume.core_triangles[name]] = core['conductivity']
             conductor = dict(conductor,conductivity=sigma)
+        if data['schema'] == 'sipi.volume-line/4':
+            named = conductor['relative_permeability']
+            mu = np.full(volume.mesh.num_triangles,named['nonmetal'])
+            for name,indices in volume.signals.items():
+                mu[indices] = named['signals'][name]
+            mu[volume.ground] = named['ground']
+            for name,indices in (volume.core_triangles or {}).items():
+                mu[indices] = named['cores'][name]
+            conductor = dict(conductor,relative_permeability=mu)
         result = volume_line(volume,data['frequency_hz'],
             materials={name:dielectric_from_dict(value) for name,value in data['materials'].items()},
             **conductor,length=data['length_m'],z_ref=data['reference_ohms'],

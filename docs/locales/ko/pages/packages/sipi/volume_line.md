@@ -168,3 +168,5 @@ DC 면적 저항 해석해를 1e-10으로 검사하며, 재메시 후 재료 배
 임의 공간장, 온도 법칙이나 보정된 거칠기를 생성·저장하는 형식은 아닙니다.
 
 명시적 코어·도금 계면 저장은 [volume-line v3](metal_cores.md#계면과-재료-저장)를 사용합니다.
+
+[Volume-line v4](spatial_permeability.md#volume-line-v4의-이름별-자기-재료-저장)는 이름별 선형 자기 재료를 저장합니다.

@@ -123,6 +123,7 @@ _REGISTRY = {
     'sipi.volume-line/1': VolumeLineDocument,
     'sipi.volume-line/2': VolumeLineDocument,
     'sipi.volume-line/3': VolumeLineDocument,
+    'sipi.volume-line/4': VolumeLineDocument,
     'sipi.lumped-network/1': LumpedNetworkDocument,
     'sipi.network-assembly/1': NetworkAssemblyDocument,
     **{f'sipi.network-transforms/{v}': NetworkTransformDocument for v in (1, 2)},

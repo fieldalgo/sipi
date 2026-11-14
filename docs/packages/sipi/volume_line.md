@@ -183,3 +183,5 @@ save plating interfaces inside one conductor, arbitrary spatial fields,
 temperature laws or calibrated roughness.
 
 For explicit core/coating interfaces, use [volume-line v3](metal_cores.md#save-the-interface-and-its-material).
+
+[Volume-line v4](spatial_permeability.md#named-magnetic-materials-in-saved-volume-line-v4) saves named linear magnetic materials.

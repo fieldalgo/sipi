@@ -70,3 +70,55 @@ C/G 불변, 수동 네트워크 및 잘못된 계수도 검사합니다. 기존 
 연산과 수치 기준은 보존합니다.
 
 [English](../../../../packages/sipi/spatial_permeability.md)
+
+## volume-line v4의 이름별 자기 재료 저장
+
+`VolumeLineDocument`의 `relative_permeability`에 매핑을 전달하면
+`sipi.volume-line/4`를 선택합니다. 객체에는 정확히 다음 네 필드가 필요합니다.
+
+- `signals`: 각 신호 이름에 대한 양의 실수.
+- `ground`: 모든 생성 plate와 명시적 접지 trace의 공통 값.
+- `nonmetal`: 모든 비전도 삼각형의 공통 값.
+- `cores`: 명시적 코어 이름별 값. 해당 금속의 기본값보다 우선합니다.
+
+기본 전도도도 이름별 `signals`·`ground` 객체여야 합니다. `metal_cores`는 v3의
+좌표·전도도 계약으로 저장합니다. v4는 빈 코어 매핑도 허용하며 JSON에 명시적으로
+남깁니다. `signals` 안의 `ground`·`nonmetal` 같은 이름도 일반 신호 이름입니다.
+삼각형 번호를 저장하지 않고 새 메시마다 이름으로 재료를 배정합니다.
+
+```python
+from sipi import CrossSectionDocument, microstrip
+from sipi.volume_line import VolumeLineDocument
+from sipi.execution import normalize_saved, execute_saved
+
+section = microstrip(width=.4e-3, substrate_height=.5e-3, thickness=.1e-3,
+                     eps_r=4., box_width=.002, air_height=.5e-3)
+doc = VolumeLineDocument(
+    CrossSectionDocument(section), [0, 1e3, 1e4], materials={}, length=.1,
+    conductivity=dict(signals={'signal': 20e6}, ground=58e6),
+    relative_permeability=dict(signals={'signal': 5.}, ground=3., nonmetal=1.,
+                               cores={'signal': 2.}),
+    metal_cores={'signal': dict(conductivity=58e6, vertices=[
+        [-.18e-3, .52e-3], [.18e-3, .52e-3],
+        [.18e-3, .58e-3], [-.18e-3, .58e-3]])},
+    mesh=dict(ground_thickness=.1e-3, padding=.002, metal_size=25e-6,
+              far_size=.25e-3, grade=.1, min_angle=28.),
+)
+text = doc.dumps()
+assert doc.to_dict()['schema'] == 'sipi.volume-line/4'
+assert normalize_saved(text) == text
+assert execute_saved(text)['status'] == 'complete'
+```
+
+빠지거나 추가된 이름·필드, 배열 값, 잘못된 계수, 맞지 않는 스키마 버전은
+메시 생성 전에 거부합니다. 스칼라 투자율은 기존 버전을 계속 선택하며 그
+버전들은 이 객체를 묵시적으로 허용하지 않습니다. v4는 이름 없는 재료를
+추정하거나 스칼라 전도도를 자동 변환하지 않습니다. 공통 실행기와 회로의
+`kind='volume-line'` 입력이 같은 문서를 재생합니다. 표피 깊이 해상도 부족은
+계속 오류입니다. 저장/직접 R/L/C/G/S/J, 재메시 재료 배정, DC 면적 저항, 회로
+응답 및 균일 v2와 정규화 1e-13 일치를 검사합니다. 위 해석식·독립 전계 기준도
+그대로 유지합니다.
+
+이 저장 형식의 비금속 투자율은 한 값입니다. 서로 다른 여러 자기 유전체
+영역은 정합 메시의 직접 요소장 입력을 사용해야 합니다. 분산·비선형·손실
+자기 모델을 추가하는 형식은 아닙니다.
