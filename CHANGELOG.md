@@ -1,5 +1,8 @@
 # Changelog
 
+- Add opt-in execution-record/2 for unchanged partial resolution failure and budget-stop receipts while preserving version-1 admission and defaults.
+  기존 해상도 부분 실패·예산 소진 영수증용 명시 execution-record/2를 추가하고 버전 1 검사와 기본값을 유지합니다.
+
 - Save explicit shape-current pair goals, preflight offset corners and preserve detailed current failures in execution receipts.
   명시 형상전류 쌍 역산을 저장하고 미분 이동 경계 조합을 사전 검사하며 상세 전류 실패를 실행 영수증에 보존합니다.
 

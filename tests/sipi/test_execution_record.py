@@ -194,7 +194,7 @@ def test_missing_record_keys(field):
  'incomplete_null_result','failed_result','failed_null_error','failed_no_type','failed_no_message','artifact_schema','artifact_verified','artifact_order','extra'])
 def test_rehashed_structural_mismatches_still_reject(kind):
     raw=record().to_dict();receipt=raw['receipt'];output=receipt['execution'];request=receipt['request']
-    if kind=='schema':raw['schema']='sipi.execution-record/2'
+    if kind=='schema':raw['schema']='sipi.execution-record/3'
     if kind=='run':raw['run_id']='bad id'
     if kind=='source':raw['source_text']='{}'
     if kind=='receipt_schema':receipt['schema']='sipi.execution-receipt/2'

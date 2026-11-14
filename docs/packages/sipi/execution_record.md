@@ -109,3 +109,5 @@ limits, tampering, detached data and preparation without execution. All register
 engine inputs can be structurally reopened without fields. These checks do not
 add physical accuracy, automatic persistence/recovery, UI integration, artifact
 authentication or platform support.
+
+[Explicit version-2 partial resolution records](partial_execution_record.md).

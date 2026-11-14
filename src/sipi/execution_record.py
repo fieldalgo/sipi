@@ -18,6 +18,8 @@ _VERSION=re.compile(r'[A-Za-z0-9+._-]{1,128}')
 _DIGEST=re.compile(r'[0-9a-f]{64}')
 _KINDS=('wheel','source-archive','wasm','executable','runtime')
 _DEFAULT_LIMIT=8*1024*1024
+_PARTIAL_RESOLUTION_SCHEMAS=('sipi.line-resolution/1','sipi.line-resolution/2',
+    'sipi.panel-resolution/1','sipi.adaptive-panel-resolution/1')
 
 
 def _canonical(value):
@@ -55,6 +57,45 @@ def _artifact_declaration(items):
                 items=sorted(rows,key=lambda row:(row['component'],row['kind'])))
 
 
+def _partial_resolution_failure(output,source):
+    """Version-2 structural variant; preserve existing partial execution bytes."""
+    schema=source['schema']
+    result,error=output['result'],output['error']
+    if schema not in _PARTIAL_RESOLUTION_SCHEMAS or not isinstance(result,dict):
+        raise ValueError('partial failed result requires a supported resolution input')
+    adaptive=schema in ('sipi.line-resolution/2','sipi.adaptive-panel-resolution/1')
+    keys=('completed','accepted','tolerances','evaluations','comparisons','failure')
+    level='refinement_levels' if schema=='sipi.adaptive-panel-resolution/1' else 'mesh_levels'
+    keys+=('stop_reason',level,'expected_outer_evaluations','outer_completed','selected_evaluation_index') if adaptive else ('expected_evaluations',)
+    _keys(result,keys,where='partial resolution result')
+    _keys(error,('stage','input','kind','message'),where='partial resolution error')
+    if (result['completed'] is not False or result['accepted'] is not False
+            or _canonical(result['tolerances'])!=_canonical(source['tolerances'])
+            or any(not isinstance(error[k],str) or not error[k] for k in ('stage','kind'))
+            or not isinstance(error['message'],str) or not isinstance(error['input'],dict)):
+        raise ValueError('partial resolution failure flags, tolerances or error are inconsistent')
+    for key in ('evaluations','comparisons'):
+        if not isinstance(result[key],list) or any(not isinstance(row,dict) for row in result[key]):
+            raise ValueError('partial resolution history must retain object rows')
+    if adaptive:
+        _integer(level,result[level],0,10000)
+        _integer('expected_outer_evaluations',result['expected_outer_evaluations'],1,10000)
+        if result['outer_completed'] is not False or result['selected_evaluation_index'] is not None:
+            raise ValueError('failed adaptive resolution cannot select a qualified evaluation')
+    else:
+        expected=_integer('expected_evaluations',result['expected_evaluations'],1,10000)
+        if len(result['evaluations'])>expected:
+            raise ValueError('partial resolution exceeds its planned evaluations')
+    if result['failure'] is not None:
+        if (_canonical(result['failure'])!=_canonical(error)
+                or (adaptive and result['stop_reason']!='field-failed')):
+            raise ValueError('partial resolution failure must match its original error')
+    elif (not adaptive or result['stop_reason']!='budget-exhausted'
+            or error['kind']!='ResolutionBudgetExceeded' or error['stage']!='budget'
+            or _canonical(error['input'])!=_canonical(source)):
+        raise ValueError('partial resolution without field failure must retain budget exhaustion')
+
+
 def _prepared(data):
     receipt=data['receipt']
     _keys(receipt,('schema','request','execution'),where='execution receipt')
@@ -77,7 +118,9 @@ def _prepared(data):
             raise ValueError('completed/incomplete execution needs a result object and null error')
     elif output['status']=='failed':
         error=output['error']
-        if (output['result'] is not None or not isinstance(error,dict)
+        if data['schema']=='sipi.execution-record/2' and output['result'] is not None:
+            _partial_resolution_failure(output,request['input'])
+        elif (output['result'] is not None or not isinstance(error,dict)
                 or not isinstance(error.get('type'),str) or not error['type']
                 or not isinstance(error.get('message'),str)):
             raise ValueError('failed execution needs null result and a typed error message')
@@ -90,7 +133,7 @@ def _validated(data,max_record_bytes):
     text=_canonical(data)
     if len(text.encode('utf-8'))>limit:raise ValueError('saved result exceeds max_record_bytes')
     _keys(data,('schema','run_id','source_text','receipt','artifacts','content_sha256'),where='execution record')
-    if data['schema']!='sipi.execution-record/1' or not _matches(_RUN,data['run_id']):
+    if data['schema'] not in ('sipi.execution-record/1','sipi.execution-record/2') or not _matches(_RUN,data['run_id']):
         raise ValueError('unsupported execution record schema or invalid run_id')
     if not _matches(_DIGEST,data['content_sha256']) or data['content_sha256']!=_digest(data):
         raise ValueError('execution record content digest mismatch')
@@ -112,13 +155,18 @@ class SavedExecutionRecord:
     Hosts own run-ID uniqueness, stale-response handling, actual artifact checks,
     cancellation, filesystem persistence and project state. Numerical result
     plausibility is not certified by this structural envelope.
+
+    Version 1 remains the default. Explicit version 2 additionally preserves
+    the existing non-null partial-result failure variant of supported resolution
+    requests, including adaptive budget exhaustion, without changing execution.
     """
     _data_json: str=field(repr=False)
 
-    def __init__(self,request,receipt,*,run_id,artifacts,max_record_bytes=_DEFAULT_LIMIT):
+    def __init__(self,request,receipt,*,run_id,artifacts,max_record_bytes=_DEFAULT_LIMIT,
+                 schema='sipi.execution-record/1'):
         if not isinstance(request,SavedExecutionRequest):
             raise ValueError('request must be a SavedExecutionRequest')
-        data=dict(schema='sipi.execution-record/1',run_id=run_id,source_text=request.source_text,
+        data=dict(schema=schema,run_id=run_id,source_text=request.source_text,
                   receipt=_json_copy(receipt),artifacts=_artifact_declaration(_json_copy(artifacts)))
         _keys(data['receipt'],('schema','request','execution'),where='execution receipt')
         if _canonical(data['receipt'].get('request'))!=_canonical(request.to_dict()):
