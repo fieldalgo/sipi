@@ -139,3 +139,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_line_model.
 [Principal-axis dispersive materials](principal_dielectrics.md) reuse the saved line material mapping.
 
 [Full-matrix forward-wave diagnostics](characteristic.md) support asymmetric reciprocal RLGC without changing the scalar-mode contract.
+
+Version 7 adds [explicit planar metal coatings](layered_metal.md) to boundary/face materials; earlier versions and the default remain unchanged.

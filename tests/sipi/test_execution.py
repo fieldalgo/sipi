@@ -511,6 +511,8 @@ def documents():
     base.append(roughness_fit_document())
     from test_loss_inference_document import document as loss_inference_document
     base.append(loss_inference_document())
+    from test_layered_line import document as layered_line_document
+    base.append(layered_line_document())
     return base
 
 

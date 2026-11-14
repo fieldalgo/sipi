@@ -73,5 +73,35 @@ assert loss.R.shape == (2, 1, 1)
 새 반경 방향 기준은 바탕 원통 Bessel 해와 원통 확산 ODE를 연결하며 반경이 커지면
 평면 법칙에 접근합니다. 이는 최초 구성 모델 검증에 사용한 **평면 깊이 ODE**와
 별개입니다. 평행판 전력, microstrip 메시·외곽 수렴, 선로망 수동성과 도금 없는 경우의
-호환성도 따로 검사합니다. 기존 transmission-line 저장 형식 1..6은 아직 이 재료를
-저장하지 않습니다.
+호환성도 따로 검사합니다. 기존 transmission-line 저장 형식 1..6의 재료 계약은
+그대로이며 새 버전 7에 명시 도금층을 추가합니다.
+
+## 선로 저장 버전 7
+
+경계·면별 재료는 정확히 네 필드 `kind='layered'`, `conductivity`,
+`relative_permeability`, `coatings`로 명시합니다. 각 층에는 정확히
+`thickness_m`, `conductivity`, `relative_permeability`가 필요합니다. 층 순서와
+명시 빈 배열을 보존하며 이 재료에 거칠기 필드를 함께 넣을 수 없습니다. 일반 표면
+재료의 기존 세 필드 형식은 유지하며 도금 재료와 섞어 사용할 수 있습니다.
+
+```python
+from sipi import CrossSectionDocument, microstrip
+from sipi.line_model import TransmissionLineDocument
+from sipi.execution import normalize_saved
+
+section = microstrip(width=.5e-3, substrate_height=1e-3, thickness=50e-6, eps_r=4.)
+material = dict(kind='layered', conductivity=58e6, relative_permeability=1.,
+    coatings=[dict(thickness_m=.2e-6, conductivity=14e6, relative_permeability=3.)])
+request = TransmissionLineDocument(CrossSectionDocument(section), [1e9, 4e9],
+    materials={}, length=.03, schema='sipi.transmission-line/7',
+    conductor=dict(kind='surface-boundaries',
+        conductors={section.traces[0].name: material}, reference=material,
+        ground_thickness=35e-6))
+assert normalize_saved(request.dumps()) == request.dumps()
+```
+
+버전 7에서 이름별 신호, 신호의 각 면, 공통 귀환, 명시 접지 평면·측벽·전체 접지
+trace·접지 trace의 각 면에 새 재료를 지정할 수 있습니다. 한 메시·전류 추출과
+유전체 계산, 공통 실행·진단·회로·길이 해석을 재사용합니다. 읽을 때는 메시 없이
+재료·코어 조건을 검사합니다. 이전 버전은 이 재료를 거부하며 생성자의 기본 버전은
+계속 1입니다. 기존 목표·공차·수율 저장 문서의 line/6 계약은 자동 확장하지 않습니다.

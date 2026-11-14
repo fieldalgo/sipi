@@ -121,7 +121,7 @@ _REGISTRY = {
     'sipi.aperture-section/1': ApertureSectionDocument,
     'sipi.aperture-study/1': ApertureStudyDocument,
     'sipi.aperture-design/1': ApertureDesignDocument,
-    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4, 5, 6)},
+    **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4, 5, 6, 7)},
     'sipi.volume-line/1': VolumeLineDocument,
     'sipi.volume-line/2': VolumeLineDocument,
     'sipi.volume-line/3': VolumeLineDocument,

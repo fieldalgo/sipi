@@ -88,4 +88,37 @@ diffusion ODE; it approaches the planar law as radius increases. This is
 distinct from the **planar depth ODE** used in the initial constitutive-kernel
 validation. Plate power, microstrip mesh/outer refinement, network passivity,
 and zero-coating compatibility are checked separately. Saved transmission-line
-formats 1..6 do not yet encode this material.
+formats 1..6 keep their existing material contract; version 7 adds explicit layers.
+
+## Saved transmission-line version 7
+
+Each boundary/face material can explicitly select exactly four fields:
+`kind='layered'`, `conductivity`, `relative_permeability` and `coatings`.
+Each coating requires exactly `thickness_m`, `conductivity` and
+`relative_permeability`. Order is retained. An empty list stays explicit;
+roughness fields are not allowed on this record. Ordinary surface materials
+keep their earlier three-field format and may be mixed with layered materials.
+
+```python
+from sipi import CrossSectionDocument, microstrip
+from sipi.line_model import TransmissionLineDocument
+from sipi.execution import normalize_saved
+
+section = microstrip(width=.5e-3, substrate_height=1e-3, thickness=50e-6, eps_r=4.)
+material = dict(kind='layered', conductivity=58e6, relative_permeability=1.,
+    coatings=[dict(thickness_m=.2e-6, conductivity=14e6, relative_permeability=3.)])
+request = TransmissionLineDocument(CrossSectionDocument(section), [1e9, 4e9],
+    materials={}, length=.03, schema='sipi.transmission-line/7',
+    conductor=dict(kind='surface-boundaries',
+        conductors={section.traces[0].name: material}, reference=material,
+        ground_thickness=35e-6))
+assert normalize_saved(request.dumps()) == request.dumps()
+```
+
+Version 7 permits the new record at every named signal, signal face, common
+reference, explicit ground plane/wall, whole ground trace and ground-trace face.
+It reuses one mesh/current extraction, dielectric calculation, common execution,
+diagnostics and circuit/length analysis. Loading performs material/core guards
+without meshing. Earlier versions reject this record; the default constructor
+version remains 1. Existing saved quantity-goal/study/yield formats retain their
+line/6 contract; they are not silently upgraded by a nested material record.

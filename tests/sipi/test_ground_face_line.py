@@ -195,7 +195,7 @@ def test_skrf_confirms_scalar_network_from_saved_ground_faces():
     assert error < 1e-10
 
 
-@pytest.mark.parametrize('case', ['schema1', 'schema2', 'schema3', 'schema4', 'schema5', 'schema7',
+@pytest.mark.parametrize('case', ['schema1', 'schema2', 'schema3', 'schema4', 'schema5', 'schema8',
     'missing_kind', 'unknown_kind', 'missing_bottom', 'missing_top', 'missing_left', 'missing_right',
     'extra_face', 'null_face', 'unknown_metal', 'missing_sigma', 'boolean_sigma', 'infinite_sigma',
     'bad_roughness', 'plane_faces', 'thin', 'polygon', 'collision',

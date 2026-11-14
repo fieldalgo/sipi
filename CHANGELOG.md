@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit layered metals at signal/reference/ground faces in transmission-line v7 while preserving older input contracts and shared field/circuit execution.
+  기존 입력 계약과 공통 전계·회로 실행을 보존하며 transmission-line v7의 신호·귀환·접지 각 면에 명시 도금 재료를 저장합니다.
+
 - Attach explicit planar metal coatings to boundary/face loss calculations with remaining-core skin-depth gates and independent radial-limit checks.
   남은 코어의 표피 깊이 조건과 독립 원통 극한 검증을 적용하여 명시 평면 금속 도금층을 경계·면별 손실 계산에 연결합니다.
 

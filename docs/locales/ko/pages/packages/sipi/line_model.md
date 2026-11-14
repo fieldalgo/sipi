@@ -116,3 +116,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_line_model.
 [주축 방향별 분산 재료](principal_dielectrics.md)는 저장 선로의 재료 매핑을 재사용합니다.
 
 [전체 전방파 행렬 진단](characteristic.md)은 기존 스칼라 모드 계약을 유지하며 비대칭 상호 RLGC를 지원합니다.
+
+버전 7은 경계·면별 재료에 [명시 평면 금속 도금층](layered_metal.md)을 추가합니다. 이전 버전과 기본 버전은 유지합니다.
