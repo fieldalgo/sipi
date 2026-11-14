@@ -1,5 +1,8 @@
 # Changelog
 
+- Refine line meshes within explicit budgets, requiring two consecutive selected-quantity comparisons and separate outer checks while retaining every rejected level.
+  명시 예산 내에서 선로 메시를 세분하고 선택한 물리량의 연속 두 비교와 별도 외곽 검사를 요구하며 거부된 모든 단계를 보존합니다.
+
 - Save finite line-resolution requests with explicit SI tolerances and preserve completed-but-unaccepted and partial-failure results through common execution.
   명시 SI 허용차를 갖춘 유한 선로 해상도 평가를 저장하고 공통 실행에서 완료 후 미수락과 부분 실패를 보존합니다.
 

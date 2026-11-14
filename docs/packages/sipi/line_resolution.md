@@ -2,6 +2,8 @@
 
 [Saved requests](line_resolution_document.md) preserve SI tolerances and partial failures through common execution.
 
+[Bounded automatic refinement](adaptive_line_resolution.md) requires two consecutive mesh comparisons before checking the explicit outer domains.
+
 `assess_line_resolution` evaluates a saved line on its original mesh, a finer
 mesh and explicitly expanded domains. It reports finite agreement for selected
 quantities and tolerances. It does not certify absolute accuracy or change a
