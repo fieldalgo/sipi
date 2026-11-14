@@ -69,3 +69,5 @@ assert all(abs(x) <= tol for x, tol in zip(goal.residuals, goal.tolerances))
 명시적으로 선택하며 기존 버전 1 저장 입력은 그대로 유지합니다.
 
 [역산 계약](panel_pair_goal.md) · [English](../../../../../packages/sipi/layered_panel_goal.md)
+
+[유한 주파수 공동 역산](layered_sampled_panel_goal.md)은 명시한 모든 주파수에서 두 목표를 동시에 적용합니다.

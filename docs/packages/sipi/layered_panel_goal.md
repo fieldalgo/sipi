@@ -74,3 +74,5 @@ remain in force. [Saved coated goals](layered_panel_goal_document.md) explicitly
 version 2 contract; the existing version 1 saved input remains unchanged.
 
 [Pair goal contract](panel_pair_goal.md) · [한국어](../../locales/ko/pages/packages/sipi/layered_panel_goal.md)
+
+[Goals at several fixed frequencies](layered_sampled_panel_goal.md) impose both targets at every supplied sample.
