@@ -10,6 +10,7 @@ from .line_resolution import (ResolutionTolerance, LineResolutionAssessment,
                               assess_line_resolution, _resolution_inputs, _metric)
 from .adaptive_line_resolution import (AdaptiveLineResolution, refine_line_resolution,
                                        _adaptive_inputs)
+from .adaptive_panel_resolution import AdaptivePanelResolution
 from .sampling import _integer
 
 __all__ = ['LineResolutionDocument', 'resolution_record']
@@ -21,7 +22,7 @@ _API = {value:key for key,value in _SI.items()}
 
 def resolution_record(result):
     """Return finite real arrays and exact inputs; acceptance has limited scope."""
-    if not isinstance(result, (LineResolutionAssessment,AdaptiveLineResolution)):
+    if not isinstance(result, (LineResolutionAssessment,AdaptiveLineResolution,AdaptivePanelResolution)):
         raise TypeError('result must be a line resolution assessment')
     failure = result.failure
     record = dict(completed=result.completed, accepted=result.accepted,
@@ -38,10 +39,12 @@ def resolution_record(result):
             for row in result.comparisons],
         failure=None if failure is None else dict(stage=failure.stage,input=json.loads(failure.input_json),
             kind=failure.kind,message=failure.message))
-    if isinstance(result,AdaptiveLineResolution):
+    if isinstance(result,(AdaptiveLineResolution,AdaptivePanelResolution)):
         record.pop('expected_evaluations')
         selected=result.selected_evaluation
-        record.update(stop_reason=result.stop_reason,mesh_levels=result.mesh_levels,
+        levels = (dict(refinement_levels=result.refinement_levels) if isinstance(result,AdaptivePanelResolution)
+                  else dict(mesh_levels=result.mesh_levels))
+        record.update(stop_reason=result.stop_reason, **levels,
             expected_outer_evaluations=result.expected_outer_evaluations,
             outer_completed=result.outer_completed,
             selected_evaluation_index=next((i for i,row in enumerate(result.evaluations)
