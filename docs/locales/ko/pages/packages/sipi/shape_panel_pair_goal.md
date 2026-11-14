@@ -76,3 +76,5 @@ assert len(goal.to_dict()['current_solver']['samples']) == 13
 유한 패널·메시 비교 통과가 외곽 충분성·절대 정확도·유일해·전역 최적점을 보증하지 않습니다. 하부 접지·열린 외벽의 볼록 도체 범위를 유지합니다. 선택 기하의 유한 외곽 검사는 별도이며 작은 상호 손실 항은 자체 해상도 평가가 필요합니다.
 
 [English](../../../../../packages/sipi/shape_panel_pair_goal.md)
+
+[요청 저장과 실행 영수증](shape_panel_pair_goal_document.md).

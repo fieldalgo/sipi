@@ -1,5 +1,8 @@
 # Changelog
 
+- Save explicit shape-current pair goals, preflight offset corners and preserve detailed current failures in execution receipts.
+  명시 형상전류 쌍 역산을 저장하고 미분 이동 경계 조합을 사전 검사하며 상세 전류 실패를 실행 영수증에 보존합니다.
+
 - Connect explicit shape-current lines to bounded pair impedance goals with frozen method controls and independent panel/volume refinements.
   명시 형상전류 선로를 범위 제한 쌍 임피던스 역산에 연결하고 방식 제어 고정·독립 패널/체적 세분을 유지합니다.
 

@@ -300,3 +300,5 @@ from .shape_panel_resolution_document import ShapePanelResolutionDocument
 
 from .shape_panel_pair_goal import (ShapePanelPairRefinement, ShapePanelForwardPairDesign,
     seek_shape_panel_forward_pair_impedances)
+
+from .shape_panel_pair_goal_document import ShapePanelForwardPairDesignDocument

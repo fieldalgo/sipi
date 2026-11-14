@@ -83,3 +83,5 @@ assert len(goal.to_dict()['current_solver']['samples']) == 13
 Finite panel/volume agreement does not establish outer-domain sufficiency, absolute accuracy, uniqueness or a global optimum. The bottom-ground/open-wall convex geometry scope remains unchanged. Selected finite outer-domain checks are separate; small mutual loss entries need their own resolution assessment.
 
 [한국어](../../locales/ko/pages/packages/sipi/shape_panel_pair_goal.md)
+
+[Saved requests and execution receipts](shape_panel_pair_goal_document.md).
