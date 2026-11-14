@@ -77,3 +77,16 @@ Worker/portable executable must be performed separately for the exact artifact.
 [한국어](../../locales/ko/pages/packages/sipi/fem_shape_conductor.md)
 
 The two larger independent P2 checks use [preserved reference observations](fem_shape_references.md); product currents and finite differences still run, with unchanged comparison criteria.
+
+## Small mutual-loss entries
+
+A whole-matrix energy comparison does not bound every small derived loss entry.
+For the registered closed pair with different/coated boundary metals, the original
+1% entrywise mesh criterion remains unmet. On the same fine/quarter meshes,
+independent P1/P2 mutual-R differences reach about 13.46%/9.67%, despite much
+smaller whole-Q differences. The P2 reference itself changes with refinement;
+it is not an absolute ground truth. These Linux observations establish a limit
+of the checked path, not a new platform or geometry accuracy claim. Preserve the
+original numerical gates. Use [finite observations](fem_shape_resolution.md) or
+[bounded refinement](fem_shape_adaptive_resolution.md) to retain unresolved
+quantities; derivative consistency and flux checks alone cannot qualify them.

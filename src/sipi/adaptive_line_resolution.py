@@ -79,8 +79,19 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     attempted input; interrupts propagate. No extraction default, numerical
     tolerance, geometry or material is repaired or silently changed.
     """
+    return _refine_line_resolution(line,outer_documents=outer_documents,tolerances=tolerances,
+        refinement_factor=refinement_factor,max_levels=max_levels,max_solves=max_solves)
+
+
+def _failure(stage,text,error):
+    return ResolutionFailure(stage,text,type(error).__name__,str(error))
+
+
+def _refine_line_resolution(line,*,outer_documents,tolerances,refinement_factor=.5,
+        max_levels=4,max_solves=8,document_type=TransmissionLineDocument,
+        assessment_type=AdaptiveLineResolution,failure_factory=_failure):
     levels,limit,tolerances,prepared = _adaptive_inputs(line,outer_documents,tolerances,
-                                                       refinement_factor,max_levels,max_solves)
+        refinement_factor,max_levels,max_solves,document_type=document_type)
     base, first_fine = prepared[0][1], prepared[1][1]
     outer_templates = [doc for _,doc in prepared[2:]]
     count_outer = len(outer_templates)
@@ -89,7 +100,7 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     level = 0
 
     def finish(reason, failure=None):
-        return AdaptiveLineResolution(tolerances,evaluations,comparisons,level,
+        return assessment_type(tolerances,evaluations,comparisons,level,
                                       count_outer,reason,failure)
 
     def evaluate(stage, doc, reference_index=None):
@@ -101,12 +112,12 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
                 comparisons.append(_compare(evaluations[reference_index].result,result,tolerances,
                                              stage,reference_index,len(evaluations)-1))
         except Exception as error:
-            return ResolutionFailure(stage,text,type(error).__name__,str(error))
+            return failure_factory(stage,text,error)
         return None
 
     def preparation_failure(stage, raw, error):
-        return ResolutionFailure(stage,json.dumps(raw,sort_keys=True,indent=2,ensure_ascii=False,
-                                                  allow_nan=False),type(error).__name__,str(error))
+        return failure_factory(stage,json.dumps(raw,sort_keys=True,indent=2,ensure_ascii=False,
+                                                  allow_nan=False),error)
 
     failure = evaluate('base',base)
     if failure is not None:
@@ -121,7 +132,7 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
         for key in ('edge_size','far_size','grade'):
             raw['cross_section']['mesh'][key] *= factor
         try:
-            doc = first_fine if level == 1 else TransmissionLineDocument.from_dict(raw)
+            doc = first_fine if level == 1 else document_type.from_dict(raw)
         except Exception as error:
             return finish('field-failed',preparation_failure(stage,raw,error))
         failure = evaluate(stage,doc,previous_index)
@@ -136,7 +147,7 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
             raw = template.to_dict()
             raw['cross_section']['mesh'] = doc.to_dict()['cross_section']['mesh']
             try:
-                outer = _outer_input(TransmissionLineDocument.from_dict(raw),doc)
+                outer = _outer_input(document_type.from_dict(raw),doc,document_type=document_type)
             except Exception as error:
                 return finish('field-failed',preparation_failure(stage,raw,error))
             failure = evaluate(stage,outer,previous_index)
@@ -147,11 +158,12 @@ def refine_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     return finish('mesh-unaccepted')
 
 
-def _adaptive_inputs(line,outer_documents,tolerances,refinement_factor,max_levels,max_solves):
+def _adaptive_inputs(line,outer_documents,tolerances,refinement_factor,max_levels,max_solves,
+                     *,document_type=TransmissionLineDocument):
     """Shared field-free admission; no unused later mesh is prepared."""
     levels=_integer(max_levels,2,8)
     limit=_integer(max_solves,4,16)
-    tolerances,prepared=_resolution_inputs(line,outer_documents,tolerances,refinement_factor,limit)
+    tolerances,prepared=_resolution_inputs(line,outer_documents,tolerances,refinement_factor,limit,document_type=document_type)
     if 3+len(prepared)-2>limit:
         raise ValueError('two mesh comparisons and required outer checks exceed budget before any field solve')
     return levels,limit,tolerances,prepared

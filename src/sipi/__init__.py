@@ -373,3 +373,6 @@ __all__ += ['FEMShapeResolutionFailure', 'FEMShapeResolutionAssessment', 'assess
 
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 __all__ += ['FEMShapeResolutionDocument']
+
+from .fem_shape_adaptive_resolution import FEMShapeAdaptiveResolution, refine_fem_shape_line_resolution
+__all__ += ['FEMShapeAdaptiveResolution', 'refine_fem_shape_line_resolution']

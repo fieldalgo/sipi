@@ -1,5 +1,7 @@
 # Changelog
 
+- Add bounded explicit FEM refinement with two consecutive mesh comparisons, separate outer checks and retained typed failures.
+
 - Add explicit saved finite FEM resolution requests with preserved per-entry comparisons and partial current evidence.
 
 - Add explicit finite FEM-current mesh and open-domain assessments with per-entry SI allowances and complete failure evidence.
