@@ -148,61 +148,79 @@ class SampledPanelForwardPairStudyDocument:
         return ImpedanceStudyDocument.from_dict(self._data['study']).samples()
 
     def analyze(self, *, max_evaluations=128):
-        budget = _integer(max_evaluations, 2, 10000)
-        data = self.to_dict()
-        study = data['study']
-        layered = data['schema']==_LAYERED_SCHEMA
-        options = dict(line_schema='sipi.transmission-line/7') if layered else {}
-        samples = self.samples()
-        if len(samples) > budget:
-            raise ValueError('sample count exceeds max_evaluations before any solve')
-        rows = []
-        for index, values in enumerate(samples):
-            parameters_json = material_json = input_json = None
-            line = None
+        return _run_sampled_panel_study(self, max_evaluations=max_evaluations,
+            make_line=_sampled_study_line, physical_line=lambda doc:doc.line,
+            row_factory=_plain_sampled_study_row, result_factory=SampledPanelForwardPairStudy,
+            input_text=self.dumps)
+
+
+def _sampled_study_line(data, parameters, evaluation):
+    layered = data['schema']==_LAYERED_SCHEMA
+    options = dict(line_schema='sipi.transmission-line/7') if layered else {}
+    return _full_line(_line_from_inputs(data['study'], data['conductor'], parameters, evaluation, **options),
+                      data['frequency_hz'], data['panel'], layered=layered)
+
+
+def _plain_sampled_study_row(*args, cause=None):
+    return SampledPanelForwardPairStudyRow(*args)
+
+
+def _run_sampled_panel_study(source, *, max_evaluations, make_line, physical_line,
+                            row_factory, result_factory, input_text):
+    """Share ordered full-grid batches with explicit current-method adapters."""
+    budget = _integer(max_evaluations, 2, 10000)
+    data = source.to_dict()
+    study = data['study']
+    samples = source.samples()
+    if len(samples) > budget:
+        raise ValueError('sample count exceeds max_evaluations before any solve')
+    rows = []
+    for index, values in enumerate(samples):
+        parameters_json = material_json = input_json = None
+        line = None
+        quantities = None
+        phase = 'parameters'
+        error_type = error = cause = None
+        try:
+            parameters = _parameters(study, values)
+            parameters_json = _json(parameters)
+            phase = 'materials'
+            evaluation = _sample_material(study, values)
+            material_json = _json(evaluation)
+            phase = 'input'
+            doc = make_line(data, parameters, evaluation)
+            input_json = doc.dumps()
+            phase = 'extraction'
+            line = doc.analyze()
+            names = tuple((t.name for t in physical_line(doc).cross_section.section.traces if not t.ground))
+            if (len(names) != 2 or tuple(line.names) != names
+                    or tuple(line.frequency) != tuple(data['frequency_hz'])):
+                raise ValueError('extraction changed signal names or frequency')
+            phase = 'diagnostic'
+            characteristic = line.characteristic()
+            if (characteristic.basis != 'single-ended' or tuple(characteristic.names) != names
+                    or tuple(characteristic.frequency) != tuple(line.frequency)):
+                raise ValueError('characteristic changed signal coordinates or frequency')
+            mixed = characteristic.mixed_mode()
+            if (mixed.basis != 'mixed-mode' or tuple(mixed.names) != ('differential', 'common')
+                    or tuple(mixed.frequency) != tuple(line.frequency)):
+                raise ValueError('mixed characteristic changed coordinates or frequency')
+            matrix = np.asarray(mixed.z_characteristic)
+            if matrix.shape != (len(data['frequency_hz']), 2, 2) or not np.all(np.isfinite(matrix)):
+                raise ValueError('mixed characteristic must contain one finite 2-by-2 matrix per frequency')
+            quantities = tuple(tuple(float(x) for x in row) for row in np.diagonal(matrix, axis1=1, axis2=2).real)
+            if np.any(np.asarray(quantities) <= 0) or not np.all(np.isfinite(quantities)):
+                raise ValueError('solver returned invalid forward impedances')
+            phase = 'complete'
+        except Exception as exc:
+            cause = exc
             quantities = None
-            phase = 'parameters'
-            error_type = error = None
-            try:
-                parameters = _parameters(study, values)
-                parameters_json = _json(parameters)
-                phase = 'materials'
-                evaluation = _sample_material(study, values)
-                material_json = _json(evaluation)
-                phase = 'input'
-                doc = _full_line(_line_from_inputs(study, data['conductor'], parameters, evaluation, **options),
-                                 data['frequency_hz'], data['panel'], layered=layered)
-                input_json = doc.dumps()
-                phase = 'extraction'
-                line = doc.analyze()
-                names = tuple((t.name for t in doc.line.cross_section.section.traces if not t.ground))
-                if (len(names) != 2 or tuple(line.names) != names
-                        or tuple(line.frequency) != tuple(data['frequency_hz'])):
-                    raise ValueError('extraction changed signal names or frequency')
-                phase = 'diagnostic'
-                characteristic = line.characteristic()
-                if (characteristic.basis != 'single-ended' or tuple(characteristic.names) != names
-                        or tuple(characteristic.frequency) != tuple(line.frequency)):
-                    raise ValueError('characteristic changed signal coordinates or frequency')
-                mixed = characteristic.mixed_mode()
-                if (mixed.basis != 'mixed-mode' or tuple(mixed.names) != ('differential', 'common')
-                        or tuple(mixed.frequency) != tuple(line.frequency)):
-                    raise ValueError('mixed characteristic changed coordinates or frequency')
-                matrix = np.asarray(mixed.z_characteristic)
-                if matrix.shape != (len(data['frequency_hz']), 2, 2) or not np.all(np.isfinite(matrix)):
-                    raise ValueError('mixed characteristic must contain one finite 2-by-2 matrix per frequency')
-                quantities = tuple(tuple(float(x) for x in row) for row in np.diagonal(matrix, axis1=1, axis2=2).real)
-                if np.any(np.asarray(quantities) <= 0) or not np.all(np.isfinite(quantities)):
-                    raise ValueError('solver returned invalid forward impedances')
-                phase = 'complete'
-            except Exception as exc:
-                quantities = None
-                error_type = type(exc).__name__
-                error = str(exc)
-            rows.append(SampledPanelForwardPairStudyRow(index, tuple(map(float, values)), parameters_json,
-                material_json, input_json, quantities, phase, error_type, error, line))
-        summary = ({q: tuple(_summary([row.values[f][i] for row in rows])
-                            for f in range(len(data['frequency_hz']))) for i, q in enumerate(_QUANTITIES)}
-                   if all((row.complete for row in rows)) else None)
-        return SampledPanelForwardPairStudy(self.dumps(), tuple(data['frequency_hz']),
-            tuple((v['name'] for v in study['sampling']['variables'])), tuple(rows), summary)
+            error_type = type(exc).__name__
+            error = str(exc)
+        rows.append(row_factory(index, tuple(map(float, values)), parameters_json,
+            material_json, input_json, quantities, phase, error_type, error, line, cause=cause))
+    summary = ({q: tuple(_summary([row.values[f][i] for row in rows])
+                        for f in range(len(data['frequency_hz']))) for i, q in enumerate(_QUANTITIES)}
+               if all((row.complete for row in rows)) else None)
+    return result_factory(input_text(), tuple(data['frequency_hz']),
+        tuple((v['name'] for v in study['sampling']['variables'])), tuple(rows), summary)

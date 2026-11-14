@@ -1,5 +1,7 @@
 # 명시 형상전류를 사용하는 제조 공차 표본
 
+[유한 주파수 격자](shape_sampled_panel_pair_study.md)는 하나의 제조 표본을 요청한 전체 주파수에서 유지합니다.
+
 [명시 동시 조건 만족률](shape_panel_pair_yield.md)은 표본의 전류 근거를 그대로 보존합니다.
 
 [English](../../../../../packages/sipi/shape_panel_pair_study.md) ·

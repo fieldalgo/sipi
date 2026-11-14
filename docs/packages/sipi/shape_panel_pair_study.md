@@ -1,5 +1,7 @@
 # Manufacturing samples with explicit shape currents
 
+[Finite frequency grids](shape_sampled_panel_pair_study.md) preserve one manufactured sample across all requested frequencies.
+
 [Explicit joint acceptance](shape_panel_pair_yield.md) retains the same sampled current evidence.
 
 [한국어](../../locales/ko/pages/packages/sipi/shape_panel_pair_study.md) ·
