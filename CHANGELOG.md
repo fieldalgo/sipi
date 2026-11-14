@@ -1,5 +1,8 @@
 # Changelog
 
+- Apply explicit signal and ground face surface laws to retained shape-current energies.
+  보존된 형상전류 에너지에 신호·접지 면별 표면 재료를 명시 적용합니다.
+
 - Extract explicit straight-face shape-current energies with bounded requests, whole-current evidence and strict derivative checks.
   요청 횟수를 제한한 명시 직선면별 형상전류 에너지를 전체전류 근거·엄격한 미분 검사와 함께 추출합니다.
 

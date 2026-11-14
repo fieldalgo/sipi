@@ -74,3 +74,5 @@ not absolute or small mutual-entry error bounds. Refine panels and the outer
 box independently for the intended geometry; unresolved inputs can fail.
 There is no material-loss weighting, new saved input, browser integration or
 cross-platform qualification in this energy-only API unit.
+
+[Apply explicit face surface laws](shape_face_conductor.md).
