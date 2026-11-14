@@ -9,7 +9,7 @@ from types import MappingProxyType
 
 import numpy as np
 
-from .boundary_conductor import SurfaceMetal
+from .boundary_conductor import SurfaceMetal, _remaining_dimension
 from .conductor import SurfaceCurrentFactors, _readonly, _surface_current_data
 from .crosssection import CrossSection, Trace
 from .network import _frequencies, _scalar, rlgc_network
@@ -25,7 +25,8 @@ class TraceFaceMetals:
     """Four explicit surface laws in global section coordinates.
 
     Left/right follow the sloping faces for a tapered Trace. These are local
-    high-frequency surface impedances, not a bulk coating/diffusion model.
+    high-frequency surface impedances. LayeredSurfaceMetal supplies a local
+    planar coating law, not a finite 2D coating/diffusion solution.
     """
     bottom: SurfaceMetal
     top: SurfaceMetal
@@ -53,7 +54,8 @@ class ReferenceSurfaceMetals:
     law. ``conductors`` maps exactly the grounded trace names to SurfaceMetal
     (whole perimeter) or TraceFaceMetals (four finite rectangular/tapered faces).
     Whole-perimeter polygon grounds remain supported. These local perturbative
-    laws do not model coatings or current diffusion inside metal.
+    laws do not resolve 2D coating corners or current diffusion inside metal.
+    LayeredSurfaceMetal can explicitly select the local planar coating law.
     """
     bottom: SurfaceMetal | None
     top: SurfaceMetal | None
@@ -211,6 +213,7 @@ def _face_samples(section, frequency, conductors, reference, ground_thickness):
     samples = [m._samples(f) for m in metals]
     depth = np.column_stack([s[1] for s in samples])
     for i, minimum in enumerate(dimensions):
+        minimum = _remaining_dimension(metals[i], minimum)
         if minimum <= 0 or np.max(depth[:, i]) > minimum/5:
             label = (names[i//4]+':'+_FACES[i%4] if i < 4*len(names) else
                      'reference' if surfaces is None else surfaces[i-4*len(names)][0])

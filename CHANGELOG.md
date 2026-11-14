@@ -1,5 +1,8 @@
 # Changelog
 
+- Attach explicit planar metal coatings to boundary/face loss calculations with remaining-core skin-depth gates and independent radial-limit checks.
+  남은 코어의 표피 깊이 조건과 독립 원통 극한 검증을 적용하여 명시 평면 금속 도금층을 경계·면별 손실 계산에 연결합니다.
+
 - Resolve planar finite metal layers on a bulk half-space with stable MQS impedance transfer and independent field/power checks.
   안정적인 MQS 임피던스 전달과 독립 전계·전력 검증으로 반무한 바탕 위의 평면 유한 금속층을 해석합니다.
 

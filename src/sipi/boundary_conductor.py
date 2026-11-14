@@ -5,14 +5,16 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+import math
 
 import numpy as np
 
 from .conductor import SurfaceCurrentFactors, _metal_samples, _readonly, surface_current_factors
 from .network import _scalar, _frequencies, rlgc_network
 from .roughness import CausalHuray, CannonballHuray, GroissRMS
+from .layered_metal import MetalLayer, layered_surface_impedance
 
-__all__ = ['SurfaceMetal', 'BoundaryConductorLoss', 'surface_conductor_loss_by_boundary']
+__all__ = ['SurfaceMetal', 'LayeredSurfaceMetal', 'BoundaryConductorLoss', 'surface_conductor_loss_by_boundary']
 
 
 @dataclass(frozen=True)
@@ -43,12 +45,62 @@ class SurfaceMetal:
 
 
 @dataclass(frozen=True)
+class LayeredSurfaceMetal(SurfaceMetal):
+    """Explicit outside-in coatings using the local planar MQS surface law.
+
+    The inherited conductivity/permeability describe the base metal. Coatings
+    occupy the inside of the finished section boundary. No roughness combination
+    is supported. Finite geometry uses a conservative remaining-core gate;
+    it does not resolve coating corners or replace volume diffusion.
+    """
+    coatings: tuple[MetalLayer, ...] = ()
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.roughness is not None or self.roughness_rms != 0:
+            raise ValueError('layered metal cannot be combined with roughness')
+        try:
+            layers = tuple(self.coatings)
+        except TypeError as exc:
+            raise ValueError('coatings must contain MetalLayer objects') from exc
+        if len(layers) > 32 or not all(isinstance(layer, MetalLayer) for layer in layers):
+            raise ValueError('coatings must contain at most 32 MetalLayer objects')
+        object.__setattr__(self, 'coatings', layers)
+        if not math.isfinite(self.coating_thickness):
+            raise ValueError('total coating thickness cannot be represented')
+
+    @property
+    def coating_thickness(self):
+        try:
+            return math.fsum(layer.thickness_m for layer in self.coatings)
+        except OverflowError as exc:
+            raise ValueError('total coating thickness cannot be represented') from exc
+
+    def _samples(self, frequency):
+        result = layered_surface_impedance(frequency, conductivity=self.conductivity,
+            relative_permeability=self.relative_permeability, layers=self.coatings)
+        active = [i for i, layer in enumerate(self.coatings) if layer.thickness_m > 0]+[len(self.coatings)]
+        depth = np.max(result.skin_depth[:, active], axis=1)
+        return result.frequency, depth, np.ones_like(depth), result.impedance
+
+
+def _remaining_dimension(metal, minimum):
+    """Allow coatings on both opposing faces; preserve the old uncoated gate."""
+    if not isinstance(metal, LayeredSurfaceMetal):
+        return minimum
+    depth = metal.coating_thickness
+    return 0. if depth >= minimum/2 else minimum-2*depth
+
+
+@dataclass(frozen=True)
 class BoundaryConductorLoss:
     """R and internal L with separate metal columns: signals, then reference.
 
     ``skin_depth``, ``roughness_factor`` and ``surface_impedance`` have shape
     (frequencies, signals+1). Reference combines all ground surfaces, whose
     material must be identical. This is not independent top/bottom foil data.
+    For LayeredSurfaceMetal, depth is the maximum active-material skin depth
+    and roughness_factor is one; coating effects reside in surface_impedance.
     """
     frequency: np.ndarray
     R: np.ndarray
@@ -102,6 +154,7 @@ def _boundary_samples(section, frequency, conductors, reference, ground_thicknes
     samples = [metal._samples(f) for metal in metals]
     depth = np.column_stack([s[1] for s in samples])
     for index, minimum in enumerate(dimensions):
+        minimum = _remaining_dimension(metals[index], minimum)
         if minimum <= 0 or np.max(depth[:, index]) > minimum/5:
             label = 'signal '+names[index] if index < len(names) else 'reference'
             raise ValueError(f'{label}: surface loss requires finite conductors and skin depth <= minimum conductor dimension / 5')
@@ -134,6 +187,9 @@ def surface_conductor_loss_by_boundary(section, frequency, *, conductors, refere
     Current flux error above 5% is rejected; loss/outer convergence is separate.
     This is first-order surface perturbation, not finite-metal diffusion,
     independent foil-face assignment or proof of a roughness model's validity.
+    LayeredSurfaceMetal additionally removes twice its coating thickness from
+    the minimum dimension before the original skin-depth gate. This checks
+    available core thickness, not arbitrary corner/curvature accuracy.
     """
     samples = _boundary_samples(section, frequency, conductors, reference, ground_thickness)
     return _boundary_from_mesh(section.mesh(**mesh_options), *samples)

@@ -39,3 +39,39 @@ tanh가 부동소수 정밀도로 1이며 뒤쪽 영향은 지수적으로 작�
 비교합니다. 바탕 깊이를 표피 깊이의 8/12/16배로 바꾸어 반무한 극한을 확인합니다.
 층 순서·균일 층 분할·0층·두꺼운 층·확산 스케일 불변식도 검사합니다. 이 국소 모델은
 2D 메시·외곽 경계를 사용하지 않으며 이후 단면 연결에는 별도 검증이 필요합니다.
+
+## 명시적 단면 표면 재료
+
+`LayeredSurfaceMetal`은 기존 경계별·면별 표면 전류 계산에 이 국소 법칙을 연결합니다.
+상속된 전도도·투자율은 바탕 금속이며 `coatings`는 바깥부터 안쪽 순서의 `MetalLayer`
+튜플입니다. 완성 외곽 기하는 그대로이며 도금층은 안쪽을 차지합니다. 검증하지 않은
+배율을 곱하지 않도록 거칠기 동시 지정은 거부합니다.
+
+```python
+from sipi import microstrip, MetalLayer
+from sipi.boundary_conductor import (
+    SurfaceMetal, LayeredSurfaceMetal, surface_conductor_loss_by_boundary)
+
+section = microstrip(width=.5e-3, substrate_height=1e-3,
+                     thickness=50e-6, eps_r=4., box_width=6e-3, air_height=3e-3)
+coated = LayeredSurfaceMetal(58e6, coatings=(MetalLayer(.2e-6, 14e6, 3.),))
+loss = surface_conductor_loss_by_boundary(section, [1e9, 4e9],
+    conductors={section.traces[0].name: coated}, reference=SurfaceMetal(58e6),
+    ground_thickness=35e-6, edge_size=5e-6, far_size=.2e-3, grade=.1)
+assert loss.R.shape == (2, 1, 1)
+```
+
+메시 생성 전에 코어 유효 최소 치수를 보수적으로
+`minimum_dimension - 2*sum(coating thickness)`로 계산합니다. 이 값은 양수여야 하며
+바탕과 두께가 0이 아닌 층의 최대 표피 깊이가 그 1/5 이하여야 합니다. 도금 없는
+재료는 원래 기준을 유지합니다. 두께 0인 층은 치수나 최대 침투 깊이를 늘리지 않습니다.
+보고하는 `skin_depth`는 재료별 표피 깊이의 최댓값이고 `roughness_factor`는 1입니다.
+전체 도금 응답은 `surface_impedance`에 들어갑니다. 신호·귀환 면별로 따로 검사하며
+실제 offset 코어 메시를 만드는 것은 아닙니다.
+
+이 조건은 국소 1차 근사의 사용 범위이며 모서리나 임의 곡률의 오차 보증은 아닙니다.
+새 반경 방향 기준은 바탕 원통 Bessel 해와 원통 확산 ODE를 연결하며 반경이 커지면
+평면 법칙에 접근합니다. 이는 최초 구성 모델 검증에 사용한 **평면 깊이 ODE**와
+별개입니다. 평행판 전력, microstrip 메시·외곽 수렴, 선로망 수동성과 도금 없는 경우의
+호환성도 따로 검사합니다. 기존 transmission-line 저장 형식 1..6은 아직 이 재료를
+저장하지 않습니다.
