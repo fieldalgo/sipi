@@ -139,3 +139,38 @@ gate and parked browser failure remain separate. Passing diagnostics does
 not authorize a product pin change or accept the UI candidate.
 
 [한국어](README.ko.md)
+
+## Exact cocircular tie experiment
+
+`ties.canonical_ties(points, triangles)` is an unshipped diagnostic for an
+already valid, unconstrained triangulation. It returns ordered CCW triangles
+and a flip count. Coordinates remain unchanged. Vertices are ranked by their
+coordinate pairs; an interior diagonal is replaced by the smaller ranked
+alternative only when the four binary64 points are **exactly** cocircular and
+the quadrilateral is convex. Fraction predicates use no proximity threshold.
+Every flip decreases the ranked edge multiset, preventing a flip cycle. The
+helper does not validate the entire domain, preserve interior constraints or
+repair non-Delaunay input. It is not called by the product mesher and changes
+neither the existing `legacy` nor `stable` candidate-order contract.
+
+The tests cover 288 rectangle order/scale/translation combinations, 60 fans of
+12 integer-coordinate points on an exact radius-five circle, an adjacent
+binary64 value that must not be treated as a tie, idempotence, boundary/area
+preservation and rejected malformed records. This establishes those contracts,
+not general triangulation accuracy or platform convergence.
+
+For the retained `0a7395d` Linux/macOS candidate traces, 58 of the 60 first-three
+stage pairs have the same point set. Fourteen of those pairs have different
+connectivity before normalization; all 58 have identical ordered triangles
+after the experiment. The other two pairs have different coordinates and are
+excluded from this same-input comparison.
+
+Full-mesh experiments remain separate failures. Replacing axis-aligned right
+triangle circumcenters alone gives a conductor coarse/fine factor change of
+0.050451984547489746 and fails 17 of the 18 original runtime comparisons.
+Applying only this exact-tie/order intervention to the installed scalar-length
+candidate on Linux gives 19,598/75,121 coarse/fine nodes and a conductor factor
+change of 0.05765770656716615. Both exceed the unchanged 0.05 conductor gate.
+The second experiment takes about 123 seconds for both meshes on that host;
+it is not a portable performance guarantee. Neither experiment is a product
+fix or grounds for replacing original failure records, fixtures or criteria.

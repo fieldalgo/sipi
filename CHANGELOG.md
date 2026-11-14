@@ -1,5 +1,8 @@
 # Changelog
 
+- Add an unshipped exact cocircular-tie diagnostic, with order/geometry invariants and failed full-mesh observations kept separate.
+  정확 공원점 연결의 비배포 진단과 순서·기하 불변식 검사를 추가하고 전체 메시 실패 관측을 구분합니다.
+
 - Support explicit elementwise conductivity in 2D metal current diffusion, with local skin-resolution gates and conserved current/energy.
   2D 금속 전류 확산에 요소별 전도도를 지원하고 국소 표피 해상도와 전류·에너지 보존을 검사합니다.
 

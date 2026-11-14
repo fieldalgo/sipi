@@ -6,6 +6,7 @@ on:
       - '.github/workflows/mesh-diagnostics.yml'
       - 'tools/mesh_diagnostics/**'
       - 'tools/tests/test_mesh_diagnostics.py'
+      - 'tools/tests/test_mesh_ties.py'
   workflow_dispatch:
 permissions:
   contents: read
