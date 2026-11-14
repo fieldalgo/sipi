@@ -1,5 +1,8 @@
 # Changelog
 
+- Assess panel-line resolution per entry with separate panel, volume, joint and outer comparisons, preserving failed conditions and partial results.
+  패널·체적·동시 세분·외곽을 구분하여 패널 선로 해상도를 항별 평가하고 미충족 조건과 부분 결과를 보존합니다.
+
 - Add explicit panel-transmission-line/2 for fixed coated metals, with separate panel, volume and outer-domain checks and unchanged version-1 inputs.
   고정 코팅 금속용 명시 panel-transmission-line/2를 추가하고 패널·체적·외곽 검증을 구분하며 버전 1 입력을 보존합니다.
 

@@ -1,5 +1,7 @@
 # 패널 전류를 명시하는 저장 선로
 
+[항별 해상도 검사](panel_resolution.md)는 패널·체적·외곽의 일치 여부를 구분합니다.
+
 [명시적 두 매개변수 역산](panel_pair_goal.md)은 체적·패널·동시 세분을 각각 검증합니다.
 
 `PanelTransmissionLineDocument`는 공유 경계 패널 진공 전류와 기존 유전체
