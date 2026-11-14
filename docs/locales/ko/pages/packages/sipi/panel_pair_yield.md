@@ -1,5 +1,7 @@
 # 두 순방향 임피던스의 동시 조건 수율 평가
 
+[해상도 비교](panel_resolution_yield.md)는 표본 라벨이 서로 다르면 미확정으로 보존합니다.
+
 [고정 코팅 표본과 동시 수락](layered_panel_study.md)은 버전 2를 명시적으로 선택합니다.
 
 [English](../../../../../packages/sipi/panel_pair_yield.md) ·

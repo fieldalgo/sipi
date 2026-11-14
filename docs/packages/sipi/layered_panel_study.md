@@ -1,5 +1,7 @@
 # Coated panel paired tolerances and joint acceptance
 
+[Resolution comparison](panel_resolution_yield.md) retains conflicting sample labels as unresolved.
+
 Explicit `sipi.panel-forward-pair-study/2` connects the existing paired sampling
 contract to line/7 and panel-line/2. The root keys remain `schema`, `study`,
 `conductor` and `panel`. Each signal and reference boundary keeps its fixed

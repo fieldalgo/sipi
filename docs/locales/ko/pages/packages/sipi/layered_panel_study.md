@@ -1,5 +1,7 @@
 # 코팅 패널 쌍 선로 공차와 동시 수락
 
+[해상도 비교](panel_resolution_yield.md)는 표본 라벨이 서로 다르면 미확정으로 보존합니다.
+
 명시적인 `sipi.panel-forward-pair-study/2`는 기존 쌍 선로 표본 계산을
 line/7·panel-line/2에 연결합니다. 최상위 키는 `schema`, `study`,
 `conductor`, `panel`입니다. 신호 및 기준 경계마다 벌크 금속과 순서 있는
