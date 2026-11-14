@@ -1,5 +1,8 @@
 # Changelog
 
+- Apply explicit whole-boundary surface metals to checked FEM geometry-energy currents while preserving original admission and flux checks.
+  기존 재료·전류 잔차 검사를 보존하며 검산된 FEM 형상 에너지 전류에 전체 경계별 표면 금속을 적용합니다.
+
 - Add explicit FEM geometry-energy currents with two extensions, strict capacitance derivatives and retained original flux evidence.
   두 연장·엄격한 정전용량 미분·원 전류 근거를 보존하는 명시 FEM 형상 에너지 전류를 추가합니다.
 
