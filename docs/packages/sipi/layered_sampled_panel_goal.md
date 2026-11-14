@@ -80,6 +80,9 @@ It does not certify unsampled frequencies, continuous-band feasibility, a global
 optimum or production yield. The original single-frequency API and saved
 contracts retain their meanings.
 
+[Saved version 2 requests](layered_sampled_panel_goal_document.md) preserve the
+coated factory inputs and whole-frequency-batch budget through common execution.
+
 [Single-frequency coated goal](layered_panel_goal.md) ·
 [Finite-frequency contract](sampled_panel_pair_goal.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/layered_sampled_panel_goal.md)

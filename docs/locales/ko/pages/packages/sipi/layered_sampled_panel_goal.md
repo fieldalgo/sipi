@@ -73,6 +73,9 @@ assert np.all(abs(np.asarray(goal.residuals)) <= goal.tolerances)
 연속 대역의 가능성, 전역 최적해나 생산 수율을 보장하지 않습니다. 기존 단일
 주파수 API와 저장 계약의 의미는 유지합니다.
 
+[버전 2 저장 요청](layered_sampled_panel_goal_document.md)은 코팅 factory 입력과
+전체 주파수 배치 예산을 공통 실행에서도 보존합니다.
+
 [단일 주파수 코팅 역산](layered_panel_goal.md) ·
 [유한 주파수 계약](sampled_panel_pair_goal.md) ·
 [English](../../../../../packages/sipi/layered_sampled_panel_goal.md)

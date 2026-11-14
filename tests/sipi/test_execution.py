@@ -533,6 +533,8 @@ def documents():
     base.extend((layered_panel_study(), layered_panel_yield()))
     from test_panel_resolution_yield_document import document as panel_resolution_yield
     base.append(panel_resolution_yield())
+    from test_layered_sampled_panel_goal_document import document as layered_sampled_goal
+    base.append(layered_sampled_goal())
     return base
 
 

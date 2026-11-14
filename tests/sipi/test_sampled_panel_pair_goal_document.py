@@ -83,7 +83,7 @@ def test_duplicate_schema_and_nonfinite_json():
     text=document().dumps()
     for changed in [text.replace('"ground_modes": 512','"ground_modes": 512, "ground_modes": 512'),
                     text.replace('"ground_modes": 512','"ground_modes": NaN'),
-                    text.replace('sipi.sampled-panel-forward-pair-design/1','sipi.sampled-panel-forward-pair-design/2')]:
+                    text.replace('sipi.sampled-panel-forward-pair-design/1','sipi.sampled-panel-forward-pair-design/unsupported')]:
         with pytest.raises(ValueError):Document.loads(changed)
 
 
