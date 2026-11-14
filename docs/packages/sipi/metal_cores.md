@@ -49,7 +49,7 @@ Dielectric extraction removes the entire core-plus-coating conductor. Core
 conductivity therefore does not change the outer electric geometry or C/G on
 a given mesh. The explicit interface can change the discretization when the
 mesh is regenerated; compare mesh and outer-domain convergence separately.
-Uniform permeability and all diffusion good-conductor, local skin-depth,
+Scalar or [piecewise linear permeability](spatial_permeability.md) and all diffusion good-conductor, local skin-depth,
 current, Joule power and magnetic-energy gates remain in force.
 `metal_cores=None` and `{}` use the original meshing path. Existing volume-line
 v1/v2 JSON does not save these interfaces; it still describes homogeneous

@@ -90,7 +90,10 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
     These are volume regions, not the node sets of a dielectric-only section.
     conductivity is a positive scalar shared by metals or one real value per
     mesh triangle, positive in metal and exactly zero outside. Array values
-    are piecewise constant; permeability remains uniform everywhere.
+    are piecewise constant. relative_permeability is a positive scalar or one
+    positive real value per triangle, including nonmetal space. It describes
+    linear, isotropic, frequency-independent material; no magnetic loss or
+    hysteresis. Use a mesh conforming to each material interface.
     magnetic_boundary explicitly fixes Az=0 on exterior NODES. Other exterior
     edges have zero natural magnetic flux. Compare outer-boundary refinements.
 
@@ -102,7 +105,11 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
     scalar_sigma = np.ndim(conductivity) == 0
     sigma = (_scalar('conductivity',conductivity) if scalar_sigma
              else _real('conductivity',conductivity))
-    mu_r = _scalar('relative_permeability',relative_permeability)
+    scalar_mu = np.ndim(relative_permeability) == 0
+    mu_r = (_scalar('relative_permeability',relative_permeability) if scalar_mu
+            else _real('relative_permeability',relative_permeability))
+    if not scalar_mu and (mu_r.shape != (mesh.num_triangles,) or np.any(mu_r <= 0)):
+        raise ValueError('relative_permeability needs one positive value per triangle')
     if type(keep_fields) is not bool:
         raise ValueError('keep_fields must be boolean')
     if (not isinstance(signals,Mapping) or not signals
@@ -110,7 +117,7 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
                    for name in signals)):
         raise ValueError('signals must map nonempty single-line names to metal triangles')
     mu = mu_0*mu_r
-    if (not np.isfinite(mu) or mu < 1/np.finfo(float).max
+    if (not np.all(np.isfinite(mu)) or np.any(mu < 1/np.finfo(float).max)
             or f[-1] > np.finfo(float).max/(2*np.pi)):
         raise ValueError('frequency or permeability is outside the representable range')
     t, nodes = mesh.triangles, mesh.nodes
@@ -151,13 +158,17 @@ def conductor_impedance(mesh, frequency, *, signals, ground, conductivity,
     positive = f > 0
     if np.any(np.log(minimum_sigma)-np.log(2*np.pi*epsilon_0)-np.log(f[positive]) < np.log(1000)):
         raise ValueError('current diffusion requires sigma/(omega*eps0) >= 1000')
-    skin[positive] = np.exp(-.5*(np.log(np.pi)+np.log(f[positive])+np.log(mu)+np.log(maximum_sigma)))
+    if scalar_mu:
+        skin[positive] = np.exp(-.5*(np.log(np.pi)+np.log(f[positive])+np.log(mu)+np.log(maximum_sigma)))
+    else:
+        local_log = np.log(mu[metal])+np.log(coefficients[metal])
+        skin[positive] = np.exp(-.5*(np.log(np.pi)+np.log(f[positive])+np.max(local_log)))
     ratio = longest/skin
-    if not scalar_sigma:
+    if not scalar_sigma or not scalar_mu:
         lengths = np.maximum.reduce([np.linalg.norm(p[metal,i]-p[metal,j],axis=1)
                                      for i,j in ((0,1),(1,2),(2,0))])
         for index in np.flatnonzero(positive):
-            local_skin = np.exp(-.5*(np.log(np.pi)+np.log(f[index])+np.log(mu)
+            local_skin = np.exp(-.5*(np.log(np.pi)+np.log(f[index])+np.log(mu if scalar_mu else mu[metal])
                                      +np.log(coefficients[metal])))
             ratio[index] = np.max(lengths/local_skin)
     if np.any(ratio > 1):

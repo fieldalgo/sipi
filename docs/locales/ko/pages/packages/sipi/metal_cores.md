@@ -44,7 +44,7 @@ assert max(result.current_error) < 1e-10
 유전체 추출에서는 코어와 도금층 전체를 도체로 제거합니다. 따라서 같은 메시에서
 코어 전도도가 외부 전기 기하·C/G를 바꾸지 않습니다. 계면을 추가해 메시를 새로
 만들면 이산화는 바뀔 수 있으므로 메시와 외곽 수렴을 따로 확인해야 합니다.
-균일 투자율과 기존 good-conductor·국소 표피 깊이·전류·Joule 전력·자기에너지
+스칼라 또는 [영역별 선형 투자율](spatial_permeability.md)과 기존 good-conductor·국소 표피 깊이·전류·Joule 전력·자기에너지
 기준을 모두 유지합니다. `metal_cores=None` 및 `{}`는 기존 메시 경로입니다.
 기존 volume-line v1/v2 JSON은 이 내부 계면을 저장하지 않으며 이름별 도체
 내부를 균일 재료로 정의합니다.

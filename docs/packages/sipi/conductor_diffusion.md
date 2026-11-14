@@ -63,7 +63,7 @@ other exterior edges have the zero natural magnetic flux condition. Choose the
 boundary deliberately and test domain enlargement.
 
 With exp(+jωt), positive elementwise conductivity σ in metal (zero outside),
-uniform permeability µ, and P1 basis φ, the assembled problem is
+positive elementwise permeability µ, and P1 basis φ, the assembled problem is
 
 ```text
 Kij = integral grad(phi_i).grad(phi_j)/mu
@@ -142,7 +142,7 @@ forms of evidence, not an accuracy promise for every PCB geometry.
 
 This is a 2D longitudinal magnetoquasistatic model. Displacement current in
 metal, radiation, automatic roughness or temperature models,
-nonuniform/nonlinear magnetic media, and 3D transitions are
+nonlinear, lossy or dispersive magnetic media, and 3D transitions are
 not implemented. Refine both metal and exterior meshes and enlarge the
 magnetic boundary for each new geometry/frequency range.
 
@@ -158,7 +158,7 @@ Booleans, complex/object arrays, nonfinite values and implicit broadcasting are
 rejected. The input is copied; it is never modified. A material boundary must
 follow triangle edges; assigning values at centroids does not resolve a layer
 that is thinner than the mesh. A newly generated mesh needs a newly assigned
-conductivity field. Magnetic permeability remains one uniform scalar.
+conductivity field. Permeability may also be elementwise; see the linked magnetic-material contract.
 
 For example, assign different conductivities to the inner and return metal of
 a coaxial volume mesh, then extract the same conserved currents:
@@ -207,3 +207,5 @@ These checks establish the explicit piecewise model, not measured plating,
 automatically generated foil roughness or temperature-dependent material fits.
 
 [Explicit core/coating interfaces](metal_cores.md) provide conforming internal metal regions for spatial conductivity.
+
+See [piecewise permeability](spatial_permeability.md) for explicit linear magnetic material fields.

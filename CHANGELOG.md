@@ -1,5 +1,8 @@
 # Changelog
 
+- Support piecewise linear isotropic permeability in metal-volume diffusion with colocated skin-depth and magnetic-energy checks.
+  금속 체적 확산에 영역별 선형 등방 투자율과 같은 위치의 표피 깊이·자기 에너지 검사를 지원합니다.
+
 - Save explicit metal core geometry and conductivity in volume-line v3 and replay through the common executor and circuit inputs.
   volume-line v3에 금속 코어 기하·전도도를 저장하고 공통 실행·회로 입력으로 재생합니다.
 

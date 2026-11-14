@@ -93,7 +93,7 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
 
     metal_size and far_size are target edge sizes, not an error estimate. The
     diffusion solver independently checks the actual metal edges against skin
-    depth. Relative permeability is uniform; dielectric layer eps is not used.
+    depth. Permeability follows conductor_impedance; dielectric eps is not used.
     dielectric_interfaces=True also resolves the finite dielectric box/layers
     and records their triangle sets; the exterior remains nonconducting space.
     Optional metal_cores maps existing trace names to simple polygon vertices
