@@ -16,6 +16,7 @@ import numpy as np
 from .document import CrossSectionDocument, _unique_object
 from .template_document import TemplateSectionDocument
 from .corner_document import CornerCrossSectionDocument
+from .corner_study import CornerImpedanceStudyDocument
 from .quasistatic_line_document import QuasistaticLineDocument
 from .study import ImpedanceStudyDocument
 from .design_document import ImpedanceDesignDocument
@@ -171,6 +172,7 @@ _REGISTRY = {
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     'sipi.template-section/1': TemplateSectionDocument,
     'sipi.corner-cross-section/1': CornerCrossSectionDocument,
+    'sipi.corner-impedance-study/1': CornerImpedanceStudyDocument,
     'sipi.quasistatic-line/1': QuasistaticLineDocument,
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
     **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2, 3, 4)},
@@ -704,9 +706,9 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                     cause_type=exc.cause_type, input=json.loads(exc.input_json),
                     material_evaluation=(None if exc.material_evaluation_json is None
                                          else json.loads(exc.material_evaluation_json)))
-    elif isinstance(doc, (ImpedanceStudyDocument, ApertureStudyDocument)):
+    elif isinstance(doc, (ImpedanceStudyDocument, ApertureStudyDocument, CornerImpedanceStudyDocument)):
         result = doc.analyze(max_evaluations=budget)
-        value, unit = ('impedance', 'ohm') if isinstance(doc, ImpedanceStudyDocument) else ('capacitance', 'F/m')
+        value, unit = ('impedance', 'ohm') if isinstance(doc, (ImpedanceStudyDocument, CornerImpedanceStudyDocument)) else ('capacitance', 'F/m')
         out['result'] = _study(result, value, unit)
         if result.failed:
             out['status'] = 'incomplete'

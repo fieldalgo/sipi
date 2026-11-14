@@ -1,5 +1,7 @@
 # Changelog
 
+- Apply saved explicit corner controls to geometry and material samples while preserving failed rows and original study behavior.
+
 - Save explicit corner mesh targets with original geometry snapshots and shared execution records.
 
 - Add explicit direct-Python corner mesh targets while preserving existing defaults and saved-input contracts.

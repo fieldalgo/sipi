@@ -575,6 +575,8 @@ def documents():
     base.append(fem_shape_adaptive())
     from test_corner_document import document as corner_section
     base.append(corner_section())
+    from test_corner_study import document as corner_study
+    base.append(corner_study())
     return base
 
 

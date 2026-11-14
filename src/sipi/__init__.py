@@ -382,3 +382,6 @@ __all__ += ['FEMShapeAdaptiveResolutionDocument']
 
 from .corner_document import CornerCrossSectionDocument
 __all__ += ['CornerCrossSectionDocument']
+
+from .corner_study import CornerImpedanceStudyDocument
+__all__ += ['CornerImpedanceStudyDocument']

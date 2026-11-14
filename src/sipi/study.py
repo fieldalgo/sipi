@@ -14,6 +14,7 @@ import numpy as np
 from . import templates
 from .sampling import _numbers, _scalar, _integer, _copy, _validate_sampling, _sample_values
 from .document import CrossSectionDocument, _keys, _unique_object
+from .corner_document import CornerCrossSectionDocument
 from .impedance_material import (_material_input, _validate_material_input,
                                  _analyze_material, _is_material_parameter,
                                  _material_bindings, _sample_material, _MaterialMeshReuse)
@@ -104,7 +105,7 @@ def _parameters(data, values):
 class StudyRow:
     index: int
     parameters: object
-    document: CrossSectionDocument | None
+    document: CrossSectionDocument | CornerCrossSectionDocument | None
     impedance: float | None
     error_type: str | None
     error: str | None
@@ -303,35 +304,44 @@ class ImpedanceStudyDocument:
         vacuum capacitance within this call. Every material is evaluated again;
         changed geometry is remeshed. No per-row convergence is inferred.
         """
-        budget = _integer(max_evaluations, 2, 10000)
-        parameters = self.sample_parameters()
-        if len(parameters) > budget:
-            raise ValueError('sample count exceeds max_evaluations before any solve')
-        data, rows = self._data, []
-        samples = self.samples()
-        material_mesh = _MaterialMeshReuse()
-        for i, values in enumerate(parameters):
-            doc = None
-            evaluation = _sample_material(data, samples[i])
-            saved = (None if data['schema'] != 'sipi.impedance-study/4' else
-                     json.dumps(evaluation, sort_keys=True, allow_nan=False))
-            try:
-                section = _TEMPLATES[data['template']](**values)
-                doc = CrossSectionDocument(section, mesh=data['mesh'])
-                line = (doc.analyze() if evaluation is None
-                        else _analyze_material(doc, evaluation, data['quantity'],
-                                               mesh_reuse=material_mesh))
-                value = float(line.even_odd()['z_diff'] if data['quantity'] == 'z_diff'
-                              else getattr(line, data['quantity']))
-                if not np.isfinite(value) or value <= 0:
-                    raise ValueError('solver returned a nonpositive or nonfinite impedance')
-                rows.append(StudyRow(i, values, doc, value, None, None, saved))
-            except Exception as exc:
-                rows.append(StudyRow(i, values, doc, None, type(exc).__name__, str(exc), saved))
-        summary = None
-        if all(row.complete for row in rows):
-            z = np.array([row.impedance for row in rows])
-            summary = dict(minimum=float(z.min()), maximum=float(z.max()), mean=float(z.mean()),
-                           sample_std=float(z.std(ddof=1)), p05=float(np.quantile(z, .05, method='linear')),
-                           p95=float(np.quantile(z, .95, method='linear')))
-        return ImpedanceStudy(self.dumps(), data['quantity'], tuple(rows), summary)
+        return _analyze_study(self, max_evaluations=max_evaluations)
+
+
+def _analyze_study(study, *, max_evaluations=128, document_factory=None, input_json=None):
+    """Share sample accounting; custom snapshots remain explicit to the caller."""
+    if document_factory is None:
+        document_factory = CrossSectionDocument
+    if input_json is None:
+        input_json = study.dumps()
+    budget = _integer(max_evaluations, 2, 10000)
+    parameters = study.sample_parameters()
+    if len(parameters) > budget:
+        raise ValueError('sample count exceeds max_evaluations before any solve')
+    data, rows = study._data, []
+    samples = study.samples()
+    material_mesh = _MaterialMeshReuse()
+    for i, values in enumerate(parameters):
+        doc = None
+        evaluation = _sample_material(data, samples[i])
+        saved = (None if data['schema'] != 'sipi.impedance-study/4' else
+                 json.dumps(evaluation, sort_keys=True, allow_nan=False))
+        try:
+            section = _TEMPLATES[data['template']](**values)
+            doc = document_factory(section, mesh=data['mesh'])
+            line = (doc.analyze() if evaluation is None
+                    else _analyze_material(doc, evaluation, data['quantity'],
+                                           mesh_reuse=material_mesh))
+            value = float(line.even_odd()['z_diff'] if data['quantity'] == 'z_diff'
+                          else getattr(line, data['quantity']))
+            if not np.isfinite(value) or value <= 0:
+                raise ValueError('solver returned a nonpositive or nonfinite impedance')
+            rows.append(StudyRow(i, values, doc, value, None, None, saved))
+        except Exception as exc:
+            rows.append(StudyRow(i, values, doc, None, type(exc).__name__, str(exc), saved))
+    summary = None
+    if all(row.complete for row in rows):
+        z = np.array([row.impedance for row in rows])
+        summary = dict(minimum=float(z.min()), maximum=float(z.max()), mean=float(z.mean()),
+                       sample_std=float(z.std(ddof=1)), p05=float(np.quantile(z, .05, method='linear')),
+                       p95=float(np.quantile(z, .95, method='linear')))
+    return ImpedanceStudy(input_json, data['quantity'], tuple(rows), summary)
