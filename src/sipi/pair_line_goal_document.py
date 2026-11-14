@@ -15,6 +15,44 @@ _SCHEMA = 'sipi.forward-pair-design/1'
 _QUANTITIES = ('differential_forward_impedance_real', 'common_forward_impedance_real')
 
 
+_GOAL_KEYS = ('study', 'conductor', 'targets_ohm', 'tolerances_ohm', 'initial', 'max_evaluations')
+
+
+def _pair_design_inputs(data, *, line_schema='sipi.transmission-line/6'):
+    """Normalize field-free goal inputs; the caller selects the current method."""
+    data = _copy(data)
+    _keys(data, _GOAL_KEYS, where='forward pair inputs')
+    for key in ('targets_ohm', 'tolerances_ohm'):
+        _keys(data[key], _QUANTITIES, where=key)
+        data[key] = {q: _scalar(data[key][q], positive=True) for q in _QUANTITIES}
+    budget = _integer(data['max_evaluations'], 2, 10000)
+    study = _source_study(data['study'], paired=True)
+    sampling = study['sampling']
+    if sampling['kind'] != 'corners' or len(sampling['variables']) != 2:
+        raise ValueError('forward pair source requires corners with exactly two variables')
+    bounds = []
+    for variable in sampling['variables']:
+        lower, upper = (_scalar(variable[key], positive=True) for key in ('lower', 'upper'))
+        if lower >= upper:
+            raise ValueError('lower parameter bound must be below upper')
+        bounds.append((lower, upper))
+    initial = data['initial']
+    if initial is not None:
+        if not isinstance(initial, list) or len(initial) != 2:
+            raise ValueError('initial must be null or two ordered parameters')
+        initial = [_scalar(x, positive=True) for x in initial]
+        if any(x < lower or x > upper for x, (lower, upper) in zip(initial, bounds)):
+            raise ValueError('initial must lie inside each variable bound')
+    point = [lower+(upper-lower)/2 for lower, upper in bounds] if initial is None else initial
+    options = {} if line_schema == 'sipi.transmission-line/6' else dict(line_schema=line_schema)
+    nominal = _line_from_values(study, data['conductor'], **options)
+    conductor = nominal.to_dict()['conductor']
+    _line_from_values(study, conductor, point, **options)
+    return dict(study=study, conductor=conductor,
+        targets_ohm=data['targets_ohm'], tolerances_ohm=data['tolerances_ohm'],
+        initial=initial, max_evaluations=budget)
+
+
 class ForwardPairDesignDocument:
     """Two ordered template/material variables and two explicit real targets.
 
@@ -54,34 +92,8 @@ class ForwardPairDesignDocument:
                      'tolerances_ohm', 'initial', 'max_evaluations'), where='forward pair design')
         if data['schema'] != _SCHEMA:
             raise ValueError('unsupported forward-pair-design schema')
-        for key in ('targets_ohm', 'tolerances_ohm'):
-            _keys(data[key], _QUANTITIES, where=key)
-            data[key] = {q: _scalar(data[key][q], positive=True) for q in _QUANTITIES}
-        budget = _integer(data['max_evaluations'], 2, 10000)
-        study = _source_study(data['study'], paired=True)
-        sampling = study['sampling']
-        if sampling['kind'] != 'corners' or len(sampling['variables']) != 2:
-            raise ValueError('forward pair source requires corners with exactly two variables')
-        bounds = []
-        for variable in sampling['variables']:
-            lower, upper = (_scalar(variable[key], positive=True) for key in ('lower', 'upper'))
-            if lower >= upper:
-                raise ValueError('lower parameter bound must be below upper')
-            bounds.append((lower, upper))
-        initial = data['initial']
-        if initial is not None:
-            if not isinstance(initial, list) or len(initial) != 2:
-                raise ValueError('initial must be null or two ordered parameters')
-            initial = [_scalar(x, positive=True) for x in initial]
-            if any(x < lower or x > upper for x, (lower, upper) in zip(initial, bounds)):
-                raise ValueError('initial must lie inside each variable bound')
-        point = [lower+(upper-lower)/2 for lower, upper in bounds] if initial is None else initial
-        nominal = _line_from_values(study, data['conductor'])
-        conductor = nominal.to_dict()['conductor']
-        _line_from_values(study, conductor, point)
-        self._data = dict(schema=_SCHEMA, study=study, conductor=conductor,
-            targets_ohm=data['targets_ohm'], tolerances_ohm=data['tolerances_ohm'],
-            initial=initial, max_evaluations=budget)
+        self._data = dict(schema=_SCHEMA, **_pair_design_inputs(
+            {key:data[key] for key in _GOAL_KEYS}))
 
     @classmethod
     def from_dict(cls, data):

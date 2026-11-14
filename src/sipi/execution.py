@@ -109,6 +109,7 @@ _REGISTRY = {
     'sipi.sampled-panel-forward-pair-study/1': SampledPanelForwardPairStudyDocument,
     'sipi.sampled-panel-forward-pair-design/1': SampledPanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-design/1': PanelForwardPairDesignDocument,
+    'sipi.panel-forward-pair-design/2': PanelForwardPairDesignDocument,
     'sipi.panel-forward-pair-study/1': PanelForwardPairStudyDocument,
     'sipi.panel-forward-pair-yield/1': PanelForwardPairYieldDocument,
     'sipi.panel-forward-pair-selection/1': PanelForwardPairSelectionDocument,
@@ -554,7 +555,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 input=None if exc.input_json is None else json.loads(exc.input_json),
                 history=[row.to_dict() for row in exc.history]))
     elif isinstance(doc, (ForwardPairDesignDocument, PanelForwardPairDesignDocument)):
-        goal_data = data['design'] if isinstance(doc, PanelForwardPairDesignDocument) else data
+        goal_data = doc.goal_input if isinstance(doc, PanelForwardPairDesignDocument) else data
         if goal_data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')
         try:

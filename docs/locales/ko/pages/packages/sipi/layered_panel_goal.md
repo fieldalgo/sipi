@@ -65,8 +65,7 @@ assert all(abs(x) <= tol for x, tol in zip(goal.residuals, goal.tolerances))
 
 작은 상호 저항 항에는 기존 [패널 선로 한계](layered_panel_line.md)가 남아 있습니다.
 대각 임피던스 통과로 그 항의 상대 정확도나 무한 영역 극한을 보장하지 않습니다.
-코팅 잔여 코어·표피 깊이·패널 기하 제한도 유지합니다. 저장형 패널 목표 wrapper는
-기존 버전 1 입력 계약을 사용하며, 이 factory 예제가 코팅 목표 저장 스키마를
-추가하는 것은 아닙니다.
+코팅 잔여 코어·표피 깊이·패널 기하 제한도 유지합니다. [코팅 목표 저장](layered_panel_goal_document.md)은 최상위 입력 필드를 쓰는 버전 2 계약을
+명시적으로 선택하며 기존 버전 1 저장 입력은 그대로 유지합니다.
 
 [역산 계약](panel_pair_goal.md) · [English](../../../../../packages/sipi/layered_panel_goal.md)

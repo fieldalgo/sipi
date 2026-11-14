@@ -70,7 +70,7 @@ current integrals and search history are retained in the numerical test records.
 Small mutual resistance entries retain the [panel-line accuracy limits](layered_panel_line.md).
 Diagonal impedance acceptance does not certify their relative accuracy or an
 infinite-domain limit. Coating core/skin-depth and panel geometry restrictions
-remain in force. The saved panel goal wrapper still uses its existing version
-1 input contract; this factory example does not add a saved coated goal schema.
+remain in force. [Saved coated goals](layered_panel_goal_document.md) explicitly select the flat
+version 2 contract; the existing version 1 saved input remains unchanged.
 
 [Pair goal contract](panel_pair_goal.md) · [한국어](../../locales/ko/pages/packages/sipi/layered_panel_goal.md)

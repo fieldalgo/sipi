@@ -1,5 +1,7 @@
 # Saved explicit panel-current pair goals
 
+[Saved coated panel goals](layered_panel_goal_document.md) explicitly select version 2.
+
 [한국어](../../locales/ko/pages/packages/sipi/panel_pair_goal_document.md) ·
 [Direct panel goals](panel_pair_goal.md) · [Panel lines](panel_line.md) ·
 [Paired sampling](panel_pair_study.md)

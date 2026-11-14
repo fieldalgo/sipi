@@ -1,5 +1,7 @@
 # 명시 패널 전류를 사용하는 저장형 두 목표 역산
 
+[코팅 패널 목표 저장](layered_panel_goal_document.md)은 버전 2를 명시적으로 선택합니다.
+
 [English](../../../../../packages/sipi/panel_pair_goal_document.md) ·
 [직접 패널 역산](panel_pair_goal.md) · [패널 선로](panel_line.md) ·
 [두 양의 공차 평가](panel_pair_study.md)
