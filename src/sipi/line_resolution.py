@@ -129,9 +129,9 @@ def _compare(reference, actual, tolerances, stage, reference_index, evaluation_i
     return ResolutionComparison(stage, reference_index, evaluation_index, differences, allowances)
 
 
-def _outer_input(outer, refined):
-    if not isinstance(outer, TransmissionLineDocument):
-        raise TypeError('outer documents must be TransmissionLineDocument objects')
+def _outer_input(outer, refined, *, document_type=TransmissionLineDocument):
+    if not isinstance(outer, document_type):
+        raise TypeError(f'outer documents must be {document_type.__name__} objects')
     data, expected = outer.to_dict(), refined.to_dict()
     geometry, baseline = data['cross_section'], expected['cross_section']
     if len(geometry['layers']) != len(baseline['layers']):
@@ -148,7 +148,7 @@ def _outer_input(outer, refined):
     geometry['layers'][-1]['thickness'] = old_height
     if data != expected:
         raise ValueError('outer documents must preserve refined mesh, physical geometry, materials and ports')
-    return TransmissionLineDocument.loads(outer.dumps())
+    return document_type.loads(outer.dumps())
 
 
 def assess_line_resolution(line, *, outer_documents, tolerances, refinement_factor=.5, max_solves=4):
@@ -191,10 +191,11 @@ def assess_line_resolution(line, *, outer_documents, tolerances, refinement_fact
     return LineResolutionAssessment(tolerances, evaluations, comparisons, expected_count)
 
 
-def _resolution_inputs(line, outer_documents, tolerances, refinement_factor, max_solves):
+def _resolution_inputs(line, outer_documents, tolerances, refinement_factor, max_solves,
+                       *, document_type=TransmissionLineDocument):
     """Shared field-free admission and immutable input snapshots."""
-    if not isinstance(line, TransmissionLineDocument):
-        raise TypeError('line must be a TransmissionLineDocument')
+    if not isinstance(line, document_type):
+        raise TypeError(f'line must be a {document_type.__name__}')
     factor = _scalar('refinement_factor', refinement_factor)
     if factor >= 1:
         raise ValueError('refinement_factor must be below one')
@@ -209,14 +210,14 @@ def _resolution_inputs(line, outer_documents, tolerances, refinement_factor, max
                    for key, value in tolerances.items())):
         raise ValueError('tolerances must select named quantities with ResolutionTolerance values')
     tolerances = dict(tolerances)
-    base = TransmissionLineDocument.loads(line.dumps())
+    base = document_type.loads(line.dumps())
     raw = base.to_dict()
     mesh = raw['cross_section']['mesh']
     if not {'edge_size', 'far_size', 'grade'} <= set(mesh):
         raise ValueError('resolution assessment requires explicit edge_size, far_size and grade')
     for key in ('edge_size', 'far_size', 'grade'):
         mesh[key] *= factor
-    refined = TransmissionLineDocument.from_dict(raw)
-    outer = [_outer_input(doc, refined) for doc in outer_documents]
+    refined = document_type.from_dict(raw)
+    outer = [_outer_input(doc, refined, document_type=document_type) for doc in outer_documents]
     stages = [('base', base), ('mesh', refined)]+[(f'outer:{i}', doc) for i, doc in enumerate(outer)]
     return tolerances, stages

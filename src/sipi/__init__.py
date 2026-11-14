@@ -366,3 +366,7 @@ __all__ += ['FEMShapeLineQuantityDesign', 'FEMShapeLineQuantityGoalError', 'seek
 
 from .fem_shape_goal_document import FEMShapeLineQuantityDesignDocument
 __all__ += ['FEMShapeLineQuantityDesignDocument']
+
+from .fem_shape_resolution import (FEMShapeResolutionFailure, FEMShapeResolutionAssessment,
+                                   assess_fem_shape_line_resolution)
+__all__ += ['FEMShapeResolutionFailure', 'FEMShapeResolutionAssessment', 'assess_fem_shape_line_resolution']

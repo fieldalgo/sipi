@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit finite FEM-current mesh and open-domain assessments with per-entry SI allowances and complete failure evidence.
+
 - Preserve the two larger independent P2 observations in audited reference records while retaining live FEM currents, derivative checks and original numerical criteria.
 
 - Validate actual FEM attenuation-material and common-launch width goals with independent characteristic checks and frozen-input refinement.
