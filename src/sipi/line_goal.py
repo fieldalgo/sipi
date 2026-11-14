@@ -129,6 +129,14 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
     errors raise ValueError/TypeError before invoking the factory. Subsequent
     failures raise LineQuantityGoalError with completed rows and failure data.
     """
+    return _seek_line_quantity(factory, bounds, target, quantity=quantity,
+        tolerance=tolerance, max_evaluations=max_evaluations)
+
+
+def _seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_evaluations=40,
+                        document_type=TransmissionLineDocument, design_type=LineQuantityDesign,
+                        error_type=LineQuantityGoalError, refine_input=None, decorate_error=None):
+    """Shared bounded search; optional adapters do not change the original path."""
     if not callable(factory):
         raise TypeError('factory must be callable')
     if not isinstance(quantity, str) or quantity not in _UNITS:
@@ -146,10 +154,12 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
     budget = _integer(max_evaluations, 3, 10000)
     history = []; attempts = 0; identity = None
 
-    def failure(message, stage, parameter=None, *, cause=None, text=None):
-        return LineQuantityGoalError(message, history, attempts=attempts, quantity=quantity,
+    def failure(message, stage, parameter=None, *, cause=None, text=None, line=None):
+        error = error_type(message, history, attempts=attempts, quantity=quantity,
             failed_parameter=parameter, stage=stage,
             cause_type=None if cause is None else type(cause).__name__, input_json=text)
+        if decorate_error is not None: decorate_error(error, cause, line)
+        return error
 
     def evaluate(parameter, stage='search', selected=None):
         nonlocal attempts, identity
@@ -158,20 +168,23 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
             raise failure('evaluation budget exhausted before target convergence', 'budget', parameter)
         attempts += 1
         phase = 'factory' if selected is None else 'refinement-input'
-        text = None
+        text = None; line = None
         try:
             if selected is None:
                 candidate = factory(parameter)
-                if not isinstance(candidate, TransmissionLineDocument):
-                    raise TypeError('factory must return TransmissionLineDocument')
+                if not isinstance(candidate, document_type):
+                    raise TypeError(f'factory must return {document_type.__name__}')
                 text = candidate.dumps()
                 phase = 'validation'
-                doc = TransmissionLineDocument.loads(text)
+                doc = document_type.loads(text)
             else:
                 data = json.loads(selected.input_json)
-                for key in ('edge_size', 'far_size', 'grade'):
-                    data['cross_section']['mesh'][key] /= 2
-                doc = TransmissionLineDocument.from_dict(data)
+                if refine_input is None:
+                    for key in ('edge_size', 'far_size', 'grade'):
+                        data['cross_section']['mesh'][key] /= 2
+                else:
+                    data = refine_input(data)
+                doc = document_type.from_dict(data)
             text = doc.dumps(); data = doc.to_dict()
             frequency = data['frequency_hz']
             names = tuple(t.name for t in doc.cross_section.section.traces if not t.ground)
@@ -205,7 +218,7 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
                 raise ValueError('solver returned an invalid goal quantity')
         except Exception as exc:
             raise failure(f'{stage} {phase} failed: {exc}', stage+'/'+phase, parameter,
-                          cause=exc, text=text) from exc
+                          cause=exc, text=text, line=line) from exc
         row = LineQuantityEvaluation(parameter, value, stage, text)
         history.append(row)
         return row, line
@@ -233,6 +246,6 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
     refined, refined_line = evaluate(chosen.parameter, 'refinement', chosen)
     if abs(refined.value-target) > tolerance:
         raise failure('refined mesh misses target; tighten mesh and rerun', 'refinement/acceptance',
-                      chosen.parameter, text=refined.input_json)
-    return LineQuantityDesign(chosen.parameter, target, tolerance, quantity, chosen.value,
+                      chosen.parameter, text=refined.input_json, line=refined_line)
+    return design_type(chosen.parameter, target, tolerance, quantity, chosen.value,
         refined.value, tuple(history), line, refined_line)

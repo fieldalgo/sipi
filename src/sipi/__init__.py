@@ -359,3 +359,7 @@ __all__ += ['FEMShapeTransmissionLineDocument', 'FEMShapeTransmissionLineResult'
 from .fem_shape_study import (FEMShapeLineQuantityStudyDocument, FEMShapeLineQuantityStudy,
                               FEMShapeLineQuantityStudyRow)
 __all__ += ['FEMShapeLineQuantityStudyDocument', 'FEMShapeLineQuantityStudy', 'FEMShapeLineQuantityStudyRow']
+
+from .fem_shape_goal import (FEMShapeLineQuantityDesign, FEMShapeLineQuantityGoalError,
+                             seek_fem_shape_line_quantity)
+__all__ += ['FEMShapeLineQuantityDesign', 'FEMShapeLineQuantityGoalError', 'seek_fem_shape_line_quantity']
