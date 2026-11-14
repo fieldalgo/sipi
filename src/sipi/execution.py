@@ -39,6 +39,7 @@ from .face_conductor import FaceConductorLoss
 from .yield_assessment import ImpedanceYieldDocument
 from .yield_design import YieldDesignDocument
 from .dielectric_fit import DebyeFitDocument
+from .roughness_fit_document import HurayFitDocument
 from .tensor_dielectric_fit_document import TensorDebyeFitDocument
 from .line_goal_document import LineQuantityDesignDocument
 from .line_goal import LineQuantityGoalError
@@ -138,6 +139,7 @@ _REGISTRY = {
     'sipi.yield-design/2': YieldDesignDocument,
     'sipi.yield-design/3': YieldDesignDocument,
     'sipi.dielectric-fit/1': DebyeFitDocument,
+    'sipi.roughness-fit/1': HurayFitDocument,
     'sipi.tensor-dielectric-fit/1': TensorDebyeFitDocument,
     'sipi.line-quantity-design/1': LineQuantityDesignDocument,
     'sipi.line-quantity-design/2': LineQuantityDesignDocument,
@@ -465,7 +467,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             surface_impedance_ohms=_array(profile.impedance),
             skin_depth_m=_array(profile.skin_depth),
             reference_plane_m=profile.reference_plane_m, cutoff_rms=profile.cutoff_rms)
-    elif isinstance(doc, (DebyeFitDocument, TensorDebyeFitDocument)):
+    elif isinstance(doc, (DebyeFitDocument, TensorDebyeFitDocument, HurayFitDocument)):
         if len(data['frequency_hz']) > budget:
             raise ValueError('saved fit frequency count exceeds max_evaluations before fitting')
         out['result'] = doc.analyze().to_dict()

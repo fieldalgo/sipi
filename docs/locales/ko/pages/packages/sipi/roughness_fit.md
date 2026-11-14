@@ -63,3 +63,38 @@ KKT 최적성 오차가 1e-10을 넘으면 실패합니다. 가중치 기본값�
 기하·표피 깊이와 메시·외곽 수렴 기준이 계속 필요합니다.
 
 [English](../../../../packages/sipi/roughness_fit.md)
+
+## 피팅 요청 저장·재실행
+
+`HurayFitDocument`는 `sipi.roughness-fit/1`을 사용합니다. 필수 9개 필드는
+`schema`, `frequency_hz`, `resistance_ohms_per_square`,
+`reactance_ohms_per_square`, `radii_m`, `conductivity`,
+`relative_permeability`, `weights`, `max_error_ratio`입니다. 생성할 때 기본값을
+명시적 숫자·가중치로 확장하며 저장 JSON은 필드를 생략하거나 null 가중치를
+쓸 수 없습니다. 읽기·정규화는 SVD·최적화·전계 풀이 없이 입력을 검증합니다.
+
+```python
+import numpy as np
+from sipi.conductor import surface_impedance
+from sipi.roughness import CausalHuray
+from sipi.roughness_fit_document import HurayFitDocument
+from sipi.execution import normalize_saved, execute_saved
+
+frequency = np.geomspace(1e6, 1e11, 41)
+samples = surface_impedance(frequency, conductivity=58e6,
+    roughness=CausalHuray([.2e-6, 1.2e-6, 4e-6], [.7, 2., 1.5]))
+doc = HurayFitDocument(frequency, resistance=samples.real, reactance=samples.imag,
+    radii_m=[.2e-6, 1.2e-6, 4e-6], conductivity=58e6, max_error_ratio=1e-8)
+text = doc.dumps()
+assert normalize_saved(text) == text
+output = execute_saved(text, max_evaluations=len(frequency))
+assert output['status'] == 'complete' and output['result']['accepted']
+```
+
+피팅 전에 공통 실행 예산이 모든 입력 주파수를 포함해야 합니다. 계산을 마쳤지만
+자료와 맞지 않는 후보는 실행 `status='complete'`, 결과 `accepted=False`로
+남습니다. 두 필드는 뜻이 다릅니다. 순위·조건수·최적화·입력 오류는 결과를
+만들어내지 않고 예외로 전달합니다. 중복/알 수 없는 키, 비유한 숫자, 맞지 않는
+버전은 거부합니다. 결과 모델은 기존 `causal-huray` 객체로 transmission-line
+v2 이상에 사용할 수 있으며 v1은 기존 RMS 계약을 유지합니다. 피팅 문서 자체는
+기하를 풀거나 선로의 메시·유효범위 기준을 바꾸지 않습니다.

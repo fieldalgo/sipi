@@ -1,5 +1,8 @@
 # Changelog
 
+- Save fixed-radius roughness fitting requests with strict units, explicit weights and separate completion/sample acceptance through common execution.
+  고정 반경 거칠기 피팅 요청에 단위·가중치를 명시해 저장하고 공통 실행에서 계산 완료와 표본 수락을 구분합니다.
+
 - Fit nonnegative causal sphere area ratios at explicit fixed radii from surface-impedance samples, retaining residuals and identifiability gates.
   표면 임피던스 표본에서 명시적 고정 반경의 인과적 구 면적 비율을 피팅하고 잔차·식별성 기준을 보존합니다.
 

@@ -507,6 +507,8 @@ def documents():
     base.append(core_document())
     from test_magnetic_document import document as magnetic_document
     base.append(magnetic_document())
+    from test_roughness_fit_document import document as roughness_fit_document
+    base.append(roughness_fit_document())
     return base
 
 

@@ -71,3 +71,41 @@ No mesh or exterior boundary is solved in fitting. Geometry/skin-depth and
 convergence requirements still apply when using the fitted law in a line.
 
 [한국어](../../locales/ko/pages/packages/sipi/roughness_fit.md)
+
+## Save and replay a fitting request
+
+`HurayFitDocument` uses `sipi.roughness-fit/1`. Its nine required fields are
+`schema`, `frequency_hz`, `resistance_ohms_per_square`,
+`reactance_ohms_per_square`, `radii_m`, `conductivity`,
+`relative_permeability`, `weights`, and `max_error_ratio`. Defaults are expanded
+into explicit numeric values and weights when constructing a document; saved
+JSON cannot omit fields or use null weights. Parsing and normalization perform
+input validation without SVD, optimization or a field solve.
+
+```python
+import numpy as np
+from sipi.conductor import surface_impedance
+from sipi.roughness import CausalHuray
+from sipi.roughness_fit_document import HurayFitDocument
+from sipi.execution import normalize_saved, execute_saved
+
+frequency = np.geomspace(1e6, 1e11, 41)
+samples = surface_impedance(frequency, conductivity=58e6,
+    roughness=CausalHuray([.2e-6, 1.2e-6, 4e-6], [.7, 2., 1.5]))
+doc = HurayFitDocument(frequency, resistance=samples.real, reactance=samples.imag,
+    radii_m=[.2e-6, 1.2e-6, 4e-6], conductivity=58e6, max_error_ratio=1e-8)
+text = doc.dumps()
+assert normalize_saved(text) == text
+output = execute_saved(text, max_evaluations=len(frequency))
+assert output['status'] == 'complete' and output['result']['accepted']
+```
+
+The common execution budget must cover every input frequency before fitting.
+A completed but incompatible candidate still has execution `status='complete'`
+and result `accepted=False`; these fields have different meanings. Rank,
+conditioning, optimization and input errors propagate without a fabricated
+result. Duplicate/unknown keys, nonfinite numbers and incompatible versions
+are rejected. Fit results use the existing `causal-huray` model object for
+transmission-line v2 or later; transmission-line v1 retains its older RMS
+contract. The fitting document does not itself perform a geometry solve or
+change any line mesh/validity gate.

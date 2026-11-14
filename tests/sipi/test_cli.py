@@ -31,7 +31,7 @@ def test_every_input_validates_canonically_without_fields(tmp_path, monkeypatch,
         captured = capsys.readouterr()
         assert captured.out == doc.dumps() + '\n' and captured.err == ''
         count += 1
-    assert count == 111
+    assert count == 115
 
 
 @pytest.mark.parametrize('doc', [lumped, cross])

@@ -215,7 +215,7 @@ def test_shared_byte_limits_and_unsupported_diagnostics_before_fields(monkeypatc
         normalize_saved(text, max_input_bytes=len(text.encode())-1)
     with pytest.raises(ValueError, match='diagnostics require'):
         execute_saved(text, diagnostics=['modes'])
-    assert 'sipi.template-section/1' in saved_schemas() and len(saved_schemas()) == 111
+    assert 'sipi.template-section/1' in saved_schemas() and len(saved_schemas()) == 115
 
 
 def test_existing_goal_and_study_inputs_reuse_template_parameters_exactly_without_solving(monkeypatch):
