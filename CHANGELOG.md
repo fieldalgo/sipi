@@ -1,5 +1,8 @@
 # Changelog
 
+- Fit nonnegative causal sphere area ratios at explicit fixed radii from surface-impedance samples, retaining residuals and identifiability gates.
+  표면 임피던스 표본에서 명시적 고정 반경의 인과적 구 면적 비율을 피팅하고 잔차·식별성 기준을 보존합니다.
+
 - Save named signal, return, nonmetal and core permeabilities in strict volume-line v4, with fresh-mesh material assignment.
   엄격한 volume-line v4에 신호·귀환·비금속·코어 투자율을 저장하고 새 메시마다 재료를 배정합니다.
 

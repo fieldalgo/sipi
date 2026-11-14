@@ -156,3 +156,5 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 전류 적분을 그대로 기록합니다. 이 비교는 보고용입니다. 두 이차 메시의
 작은 변화가 정확도를 보증하거나 기존 P1 플럭스·저항·외곽 검사를 대체하지
 않습니다. 이차 요소 도구는 시험 의존성이며 제품에서 선택하는 솔버가 아닙니다.
+
+[고정 반경 표면 모델 피팅](roughness_fit.md)은 명시적 복소 표면 임피던스를 입력받고 불일치 자료를 보존합니다.

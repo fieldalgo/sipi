@@ -17,6 +17,14 @@ from .network import _real, _scalar
 __all__ = ['CausalHuray', 'GroissRMS', 'CannonballHuray']
 
 
+def _sphere_response(radius, delta):
+    """Unit causal sphere response, without subtracting the smooth limit."""
+    scale = np.maximum(radius, delta)
+    a, d = radius/scale, delta/scale
+    q = (1+1j)*a
+    return q/(d+q)
+
+
 @dataclass(frozen=True)
 class GroissRMS:
     """Noncausal frequency-domain correction for a good-conductor half-space.
@@ -91,10 +99,7 @@ class CausalHuray:
         for radius, ratio in zip(self.radii_m, self.surface_ratios):
             # Normalize before division: even extreme finite a/delta must not
             # overflow, square to infinity or produce an indeterminate inf/inf.
-            scale = np.maximum(radius, delta)
-            a, d = radius/scale, delta/scale
-            q = (1+1j)*a
-            result += (1.5*ratio)*(q/(d+q))
+            result += (1.5*ratio)*_sphere_response(radius, delta)
         if not np.all(np.isfinite(result)):
             raise ValueError('Huray response cannot be represented')
         return result

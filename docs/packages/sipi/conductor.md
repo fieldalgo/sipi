@@ -189,3 +189,5 @@ current integral for both coarse and fine meshes. They are report-only: a small
 change between two quadratic meshes is not an accuracy certificate, and does
 not replace the existing P1 flux, resistance or exterior-boundary checks. The
 quadratic tool is a test dependency, not a selectable production solver.
+
+[Fixed-radius surface-model fitting](roughness_fit.md) accepts explicit complex surface-impedance samples and retains incompatible data.
