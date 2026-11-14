@@ -370,3 +370,6 @@ __all__ += ['FEMShapeLineQuantityDesignDocument']
 from .fem_shape_resolution import (FEMShapeResolutionFailure, FEMShapeResolutionAssessment,
                                    assess_fem_shape_line_resolution)
 __all__ += ['FEMShapeResolutionFailure', 'FEMShapeResolutionAssessment', 'assess_fem_shape_line_resolution']
+
+from .fem_shape_resolution_document import FEMShapeResolutionDocument
+__all__ += ['FEMShapeResolutionDocument']

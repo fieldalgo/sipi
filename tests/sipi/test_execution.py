@@ -569,6 +569,8 @@ def documents():
     base.append(fem_shape_study())
     from test_fem_shape_goal_document import document as fem_shape_goal
     base.append(fem_shape_goal())
+    from test_fem_shape_resolution_document import document as fem_shape_resolution
+    base.append(fem_shape_resolution())
     return base
 
 

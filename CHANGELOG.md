@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit saved finite FEM resolution requests with preserved per-entry comparisons and partial current evidence.
+
 - Add explicit finite FEM-current mesh and open-domain assessments with per-entry SI allowances and complete failure evidence.
 
 - Preserve the two larger independent P2 observations in audited reference records while retaining live FEM currents, derivative checks and original numerical criteria.
