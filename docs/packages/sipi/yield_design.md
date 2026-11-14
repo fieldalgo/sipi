@@ -98,3 +98,5 @@ FEM replay. This is a statistical composition of existing field studies; it
 introduces no field discretization. Existing mesh/material/model errors are not
 included in the confidence interval. It is not measured manufacturing yield,
 a new physical-accuracy validation, or an application/platform acceptance.
+
+[Explicit yield-design/4](layered_selection.md) adds fixed layered-metal study candidates.

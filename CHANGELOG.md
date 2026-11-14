@@ -1,5 +1,8 @@
 # Changelog
 
+- Add explicit yield-design/4 for fixed coated candidates with unchanged simultaneous confidence bounds, unresolved rows and cost ordering.
+  동시 신뢰구간·미해결 행·비용 순서를 유지하며 고정 도금 후보를 위한 명시 yield-design/4를 추가합니다.
+
 - Connect fixed layered metals to explicit line-quantity-design/4, preserving prior versions, failed attempts and selected/refined target gates.
   이전 버전과 실패 시도 및 선택·세분 목표 조건을 보존하며 고정 도금 재료를 명시 line-quantity-design/4에 연결합니다.
 

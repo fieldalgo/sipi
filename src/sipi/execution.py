@@ -139,6 +139,7 @@ _REGISTRY = {
     'sipi.yield-design/1': YieldDesignDocument,
     'sipi.yield-design/2': YieldDesignDocument,
     'sipi.yield-design/3': YieldDesignDocument,
+    'sipi.yield-design/4': YieldDesignDocument,
     'sipi.dielectric-fit/1': DebyeFitDocument,
     'sipi.roughness-fit/1': HurayFitDocument,
     'sipi.shunt-loss-inference/1': ShuntLossInferenceDocument,

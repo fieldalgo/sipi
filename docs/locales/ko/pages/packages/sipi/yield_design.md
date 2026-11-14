@@ -84,3 +84,5 @@ Bonferroni 합집합 상한에 의해 어느 구간이라도 명시 분포의 �
 snapshot·재료 provenance·실제 FEM replay를 검사합니다. 기존 field study의 통계적 조합이며
 새 이산화는 없습니다. 메시·재료·모델 오차는 신뢰구간에 포함되지 않습니다.
 실측 제조수율·새 물리 정확도·앱/플랫폼 검증 완료를 뜻하지 않습니다.
+
+[명시 yield-design/4](layered_selection.md)는 고정 도금 재료의 공차 후보를 추가합니다.

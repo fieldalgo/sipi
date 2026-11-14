@@ -517,6 +517,8 @@ def documents():
     base.extend((layered_study_document(), layered_yield_document()))
     from test_layered_goal import document as layered_goal
     base.append(layered_goal())
+    from test_layered_selection import document as layered_selection
+    base.append(layered_selection())
     return base
 
 

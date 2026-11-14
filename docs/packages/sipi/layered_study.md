@@ -57,3 +57,5 @@ binomial interval bounds and unchanged legacy values. These composition checks
 do not replace the local coating model's field/mesh/outer validity checks.
 
 [한국어](../../locales/ko/pages/packages/sipi/layered_study.md)
+
+[Explicit yield-design/4](layered_selection.md) compares a fixed set of coated candidates with simultaneous yield bounds.

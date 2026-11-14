@@ -50,3 +50,5 @@ study/1..3은 계속 line/6을 생성합니다. yield/1은 study/1..2, yield/2�
 검사합니다. 이러한 연결 검증은 도금 국소 모델의 전계·메시·외곽 검증을 대신하지 않습니다.
 
 [명시 goal/4](layered_goal.md)는 고정 도금층의 단일 변수 목표 역산을 연결합니다.
+
+[명시 yield-design/4](layered_selection.md)는 동시 수율 구간으로 고정 도금 후보군을 비교합니다.
