@@ -158,7 +158,7 @@ def _loop(ring, thin):
 
 
 def polygon_domain(section, far_size, *, solids=None, bounds=None, metal_size=None,
-                   dielectric_interfaces=True):
+                   dielectric_interfaces=True, metal_cores=None):
     """Partition exact polygons into disjoint, conforming meshine regions.
 
     With solids supplied, include their interiors and padded vacuum for the
@@ -198,5 +198,10 @@ def polygon_domain(section, far_size, *, solids=None, bounds=None, metal_size=No
         add('__sipi_vacuum', envelope.difference(metal))
     if volume:
         for i, trace in enumerate(solids):
-            add(f'__sipi_metal_{i}', trace_shape(trace), metal_size)
+            core = None if metal_cores is None else metal_cores.get(i)
+            if core is None:
+                add(f'__sipi_metal_{i}', trace_shape(trace), metal_size)
+            else:
+                add(f'__sipi_metal_{i}', trace_shape(trace).difference(core), metal_size)
+                add(f'__sipi_core_{i}', core, metal_size)
     return domain

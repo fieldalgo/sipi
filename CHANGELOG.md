@@ -1,5 +1,8 @@
 # Changelog
 
+- Mesh explicit core/coating interfaces inside finite 2D traces while retaining their common current constraints and finished outer geometry.
+  유한 2D trace 안의 코어·도금 계면을 정합 메시로 만들고 공통 전류 제약과 완성 외곽을 보존합니다.
+
 - Save named signal/return conductivities in volume-line v2, preserving v1 scalar inputs and reusing the common execution/circuit path.
   volume-line v2에 신호 이름별·귀환 전도도를 저장하며 v1 스칼라 입력과 공통 실행·회로 경로를 보존합니다.
 

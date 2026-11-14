@@ -9,6 +9,7 @@ The existing dielectric-only cross-section mesh is not changed or reused.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections.abc import Mapping
 from types import MappingProxyType
 
 import numpy as np
@@ -16,7 +17,7 @@ from galerkin import from_mesher
 from meshine import Domain, generate
 
 from .crosssection import CrossSection, Trace
-from .polygons import polygon_domain
+from .polygons import PolygonTrace, polygon_domain, trace_shape
 from .conductor_diffusion import conductor_impedance, _indices
 from .network import _scalar
 
@@ -32,6 +33,7 @@ class MeshedConductors:
     magnetic_boundary: np.ndarray
     settings: dict
     layer_triangles: dict | None = None
+    core_triangles: dict | None = None
 
     def __post_init__(self):
         def readonly(name,value,size,allow_empty=False):
@@ -50,6 +52,9 @@ class MeshedConductors:
         if self.layer_triangles is not None:
             object.__setattr__(self,'layer_triangles',MappingProxyType(
                 {k:readonly(k,v,self.mesh.num_triangles,True) for k,v in self.layer_triangles.items()}))
+        if self.core_triangles is not None:
+            object.__setattr__(self,'core_triangles',MappingProxyType(
+                {k:readonly(k,v,self.mesh.num_triangles) for k,v in self.core_triangles.items()}))
 
     def impedance(self, frequency, *, conductivity, relative_permeability=1.0, keep_fields=False):
         return conductor_impedance(self.mesh,frequency,signals=self.signals,ground=self.ground,
@@ -59,7 +64,7 @@ class MeshedConductors:
 
 def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
                            far_size, grade=.2, min_angle=28.0,
-                           dielectric_interfaces=False):
+                           dielectric_interfaces=False, metal_cores=None):
     """Build a conforming volume mesh including finite trace/reference metal.
 
     Finite rectangular, centred tapered and simple polygon traces are supported.
@@ -73,6 +78,10 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
     depth. Relative permeability is uniform; dielectric layer eps is not used.
     dielectric_interfaces=True also resolves the finite dielectric box/layers
     and records their triangle sets; the exterior remains nonconducting space.
+    Optional metal_cores maps existing trace names to simple polygon vertices
+    strictly inside that trace. These interfaces split material regions while
+    retaining one current group for the whole conductor. The trace is the
+    finished outer metal boundary; no plating thickness is inferred.
     """
     if type(dielectric_interfaces) is not bool:
         raise ValueError('dielectric_interfaces must be boolean')
@@ -85,6 +94,19 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
         raise ValueError('need far_size >= metal_size and 0 < min_angle < 34')
     if any(trace.thickness <= 0 for trace in section.traces):
         raise ValueError('volume current diffusion requires finite-thickness traces')
+    cores = {}
+    if metal_cores is not None:
+        if not isinstance(metal_cores,Mapping):
+            raise ValueError('metal_cores must map trace names to core polygon vertices')
+        traces = {trace.name:trace for trace in section.traces}
+        if not set(metal_cores) <= set(traces):
+            raise ValueError('metal core names must identify existing traces')
+        for name,vertices in metal_cores.items():
+            core = PolygonTrace(name,vertices)
+            outer = trace_shape(traces[name])
+            if not outer.contains(core._shape) or not outer.boundary.disjoint(core._shape):
+                raise ValueError('metal core must lie strictly inside its trace without boundary contact')
+            cores[name] = core
     thickness,padding,metal_size,far_size,min_angle = (
         values[k] for k in ('ground_thickness','padding','metal_size','far_size','min_angle'))
     w,h = section.width,section.height
@@ -137,10 +159,12 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
             if np.max(hi-lo) > tolerance:
                 region(name,lo,hi,y0,y1)
 
-    if section.polygonal:
+    if section.polygonal or cores:
         domain = polygon_domain(section, far_size, solids=solids, metal_size=metal_size,
                                 bounds=(xmin,ymin,xmax,ymax),
-                                dielectric_interfaces=dielectric_interfaces)
+                                dielectric_interfaces=dielectric_interfaces,
+                                metal_cores={i:cores[t.name]._shape for i,t in enumerate(section.traces)
+                                             if t.name in cores})
     else:
         # Slabs preserve all polygon interfaces, including tapered faces and plate
         # T-junctions. Unlike holes, the metal interiors are themselves regions.
@@ -162,11 +186,11 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
 
     mesh = from_mesher(generate(domain,'outer',size_fn=size_fn,min_angle=min_angle,candidate_order='stable'))
     labels = np.asarray(mesh.region_names)[mesh.regions]
-    if section.polygonal:
-        signals = {trace.name:np.flatnonzero(labels == f'__sipi_metal_{i}')
+    if section.polygonal or cores:
+        signals = {trace.name:np.flatnonzero(np.isin(labels,[f'__sipi_metal_{i}',f'__sipi_core_{i}']))
                    for i,trace in enumerate(solids) if not trace.ground}
-        ground = np.flatnonzero(np.isin(labels,[f'__sipi_metal_{i}'
-                                                for i,t in enumerate(solids) if t.ground]))
+        ground = np.flatnonzero(np.isin(labels,[label for i,t in enumerate(solids) if t.ground
+                                               for label in (f'__sipi_metal_{i}',f'__sipi_core_{i}')]))
         layers = ({material.name:np.flatnonzero(labels == f'__sipi_dielectric_{i}')
                    for i,material in enumerate(section.materials)} if dielectric_interfaces else None)
     else:
@@ -174,5 +198,10 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
         ground = np.flatnonzero(labels == 'reference')
         layers = ({layer.name:np.flatnonzero(labels == f'dielectric-{i}')
                    for i,layer in enumerate(section.layers)} if dielectric_interfaces else None)
-    return MeshedConductors(mesh,signals,ground,mesh.boundary['outer'],
-        dict(values,grade=grade,dielectric_interfaces=dielectric_interfaces),layers)
+    settings = dict(values,grade=grade,dielectric_interfaces=dielectric_interfaces)
+    core_ids = None
+    if cores:
+        settings['metal_cores'] = MappingProxyType({name:core.vertices for name,core in cores.items()})
+        core_ids = {t.name:np.flatnonzero(labels == f'__sipi_core_{i}')
+                    for i,t in enumerate(section.traces) if t.name in cores}
+    return MeshedConductors(mesh,signals,ground,mesh.boundary['outer'],settings,layers,core_ids)

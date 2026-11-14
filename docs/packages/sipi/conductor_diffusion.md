@@ -205,3 +205,5 @@ cells, maximum R/L/Z errors are 1.3471%, .34470%, .088602%; the final gate is
 1%. Enlarging the exterior from 3 to 6 mm changes Z by less than 1e-9 relative.
 These checks establish the explicit piecewise model, not measured plating,
 automatically generated foil roughness or temperature-dependent material fits.
+
+[Explicit core/coating interfaces](metal_cores.md) provide conforming internal metal regions for spatial conductivity.
