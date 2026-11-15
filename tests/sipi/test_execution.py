@@ -630,6 +630,8 @@ def documents():
     base.append(face_resolution())
     from test_two_ground_face_sampled_pair_study import document as face_grid_study
     base.append(face_grid_study())
+    from test_two_ground_face_sampled_pair_yield import document as face_grid_yield
+    base.append(face_grid_yield())
     return base
 
 

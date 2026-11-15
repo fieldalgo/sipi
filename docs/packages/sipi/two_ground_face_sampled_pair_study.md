@@ -82,3 +82,5 @@ assertions. Synthetic checks cover independent modal/statistical references,
 64frequencies, correlations, failed phases, preserved face/coating laws,
 material bindings, budgets and CLI restoration. This does not qualify arbitrary
 boxes, all materials, continuous bands, measured accuracy or other platforms.
+
+[Joint IID acceptance across the grid](two_ground_face_sampled_pair_yield.md)

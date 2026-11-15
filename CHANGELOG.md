@@ -1,5 +1,7 @@
 # Changelog
 
+- Connect face-metal frequency-grid studies to joint IID limits and conservative unknown-trial confidence envelopes.
+
 - Add face-metal manufacturing samples across finite frequency grids with atomic failed rows and retained material/current evidence.
 
 - Save explicit face-metal resolution plans and retain validated partial failures in version-2 execution records.

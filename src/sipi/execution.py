@@ -42,6 +42,7 @@ from .two_ground_face_pair_study import TwoGroundFaceForwardPairStudyDocument
 from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
 from .two_ground_face_pair_yield import TwoGroundFaceForwardPairYieldDocument
 from .two_ground_sampled_pair_yield import TwoGroundSampledForwardPairYieldDocument
+from .two_ground_face_sampled_pair_yield import TwoGroundFaceSampledForwardPairYieldDocument
 from .two_ground_sampled_pair_selection import TwoGroundSampledForwardPairSelectionDocument
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .two_ground_face_line_study import TwoGroundFaceLineQuantityStudyDocument
@@ -199,6 +200,7 @@ _REGISTRY = {
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
     'sipi.two-ground-face-forward-pair-yield/1': TwoGroundFaceForwardPairYieldDocument,
     'sipi.two-ground-sampled-forward-pair-yield/1': TwoGroundSampledForwardPairYieldDocument,
+    'sipi.two-ground-face-sampled-forward-pair-yield/1': TwoGroundFaceSampledForwardPairYieldDocument,
     'sipi.two-ground-sampled-forward-pair-selection/1': TwoGroundSampledForwardPairSelectionDocument,
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.two-ground-face-line-quantity-study/1': TwoGroundFaceLineQuantityStudyDocument,
