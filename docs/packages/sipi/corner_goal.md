@@ -36,7 +36,7 @@ The refined result is still mandatory when a line is requested.
 failed parameter/stage and resolved corner-section input. Neither this wrapper
 nor its exception increases mesh or evaluation limits. Existing `seek_impedance`
 and saved design schemas keep their original mesh contract; a saved corner goal
-is a separate future contract.
+uses the explicit [corner design document](corner_goal_document.md).
 
 Actual geometry-width and uniform-material searches check both target
 residuals, explicit refinement, independent quadratic capacitance and the

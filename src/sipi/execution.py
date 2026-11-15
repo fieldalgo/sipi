@@ -17,6 +17,7 @@ from .document import CrossSectionDocument, _unique_object
 from .template_document import TemplateSectionDocument
 from .corner_document import CornerCrossSectionDocument
 from .corner_study import CornerImpedanceStudyDocument
+from .corner_goal_document import CornerImpedanceDesignDocument
 from .quasistatic_line_document import QuasistaticLineDocument
 from .study import ImpedanceStudyDocument
 from .design_document import ImpedanceDesignDocument
@@ -173,6 +174,7 @@ _REGISTRY = {
     'sipi.template-section/1': TemplateSectionDocument,
     'sipi.corner-cross-section/1': CornerCrossSectionDocument,
     'sipi.corner-impedance-study/1': CornerImpedanceStudyDocument,
+    'sipi.corner-impedance-design/1': CornerImpedanceDesignDocument,
     'sipi.quasistatic-line/1': QuasistaticLineDocument,
     **{f'sipi.impedance-study/{v}': ImpedanceStudyDocument for v in (1, 2, 3, 4)},
     **{f'sipi.impedance-design/{v}': ImpedanceDesignDocument for v in (1, 2, 3, 4)},
@@ -692,10 +694,11 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                          for row in exc.history]))
             if exc.source_evaluation is not None:
                 out['error']['source_evaluation'] = exc.source_evaluation
-    elif isinstance(doc, (ImpedanceDesignDocument, ApertureDesignDocument)):
-        if data['max_evaluations'] > budget:
+    elif isinstance(doc, (ImpedanceDesignDocument, ApertureDesignDocument, CornerImpedanceDesignDocument)):
+        goal_data = data['design'] if isinstance(doc, CornerImpedanceDesignDocument) else data
+        if goal_data['max_evaluations'] > budget:
             raise ValueError('saved goal budget exceeds max_evaluations before any solve')
-        value, unit = ('impedance', 'ohm') if isinstance(doc, ImpedanceDesignDocument) else ('capacitance', 'F/m')
+        value, unit = ('impedance', 'ohm') if isinstance(doc, (ImpedanceDesignDocument, CornerImpedanceDesignDocument)) else ('capacitance', 'F/m')
         try:
             out['result'] = _design(doc.solve(), value, unit)
         except (GoalSeekError, CapacitanceGoalError) as exc:
