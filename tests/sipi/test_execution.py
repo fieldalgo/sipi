@@ -579,6 +579,8 @@ def documents():
     base.append(corner_study())
     from test_corner_goal_document import document as corner_goal
     base.append(corner_goal())
+    from test_corner_fem_line import document as corner_fem_line
+    base.append(corner_fem_line())
     return base
 
 

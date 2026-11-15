@@ -391,3 +391,6 @@ __all__ += ['seek_corner_impedance']
 
 from .corner_goal_document import CornerImpedanceDesignDocument
 __all__ += ['CornerImpedanceDesignDocument']
+
+from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
+__all__ += ["CornerFEMShapeTransmissionLineDocument"]

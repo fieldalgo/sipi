@@ -151,23 +151,27 @@ class FEMShapeTransmissionLineDocument:
     def cross_section(self): return CrossSectionDocument.from_dict(self.to_dict()['cross_section'])
 
     def analyze(self):
-        data = self.to_dict(); cross = self.cross_section; section = cross.section
-        factors = None; mesh_observation = None; stage = 'material-admission'
-        try:
-            materials = {name: dielectric_from_dict(value) for name, value in data['materials'].items()}
-            f, samples = _material_samples(section, data['frequency_hz'], materials)
-            stage = 'conductor-admission'; conductors, reference, _, _ = _metals(data)
-            names, _, metals, depth, correction, zs = _boundary_samples(section, f, conductors, reference, data['ground_thickness_m'])
-            stage = 'mesh'; field = section.mesh(**cross.mesh_options); mesh_observation = _mesh_record(field)
-            if tuple(field.signals) != names: raise ValueError('mesh changed signal order')
-            stage = 'current'; factors = fem_shape_current_factors(field.mesh, field.signals, field.ground)
-            if factors.names != names: raise ValueError('current solve changed signal order')
-            stage = 'conductor'; loss = _boundary_from_factors(factors, f, metals, depth, correction, zs)
-            stage = 'dielectric'; dielectric = _dispersive_from_mesh(field, f, samples, c0=factors.C0)
-            stage = 'network'; network = rlgc_network(f, R=loss.R, L=dielectric.L+loss.L_internal,
-                G=dielectric.G, C=dielectric.C, length=data['length_m'], z_ref=data['reference_ohms'], names=names)
-            return FEMShapeTransmissionLineResult(dielectric, loss, network, self.dumps(), cross.mesh_options,
-                factors, json.dumps(mesh_observation, allow_nan=False))
-        except Exception as exc:
-            raise FEMShapeLineError(exc, stage=stage, input_json=self.dumps(), factors=factors,
-                mesh_observation=mesh_observation) from exc
+        return _analyze_fem_shape_line(self, self.cross_section, self.to_dict())
+
+
+def _analyze_fem_shape_line(document, cross, data):
+    section = cross.section
+    factors = None; mesh_observation = None; stage = 'material-admission'
+    try:
+        materials = {name: dielectric_from_dict(value) for name, value in data['materials'].items()}
+        f, samples = _material_samples(section, data['frequency_hz'], materials)
+        stage = 'conductor-admission'; conductors, reference, _, _ = _metals(data)
+        names, _, metals, depth, correction, zs = _boundary_samples(section, f, conductors, reference, data['ground_thickness_m'])
+        stage = 'mesh'; field = section.mesh(**cross.mesh_options); mesh_observation = _mesh_record(field)
+        if tuple(field.signals) != names: raise ValueError('mesh changed signal order')
+        stage = 'current'; factors = fem_shape_current_factors(field.mesh, field.signals, field.ground)
+        if factors.names != names: raise ValueError('current solve changed signal order')
+        stage = 'conductor'; loss = _boundary_from_factors(factors, f, metals, depth, correction, zs)
+        stage = 'dielectric'; dielectric = _dispersive_from_mesh(field, f, samples, c0=factors.C0)
+        stage = 'network'; network = rlgc_network(f, R=loss.R, L=dielectric.L+loss.L_internal,
+            G=dielectric.G, C=dielectric.C, length=data['length_m'], z_ref=data['reference_ohms'], names=names)
+        return FEMShapeTransmissionLineResult(dielectric, loss, network, document.dumps(), cross.mesh_options,
+            factors, json.dumps(mesh_observation, allow_nan=False))
+    except Exception as exc:
+        raise FEMShapeLineError(exc, stage=stage, input_json=document.dumps(), factors=factors,
+            mesh_observation=mesh_observation) from exc

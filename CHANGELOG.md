@@ -1,5 +1,7 @@
 # Changelog
 
+- Add an explicit saved corner target for FEM shape line calculations, preserving current checks and failure history.
+
 - Save explicit corner-controlled impedance goals with retained search, refinement and mesh-limit evidence.
 
 - Add explicit corner-controlled impedance goals with frozen-input four-control refinement and preserved mesh-limit evidence.
