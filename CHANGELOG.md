@@ -1,5 +1,10 @@
 # Changelog
 
+- Separate CCL calculation/search results and errors in a compact workbench; explain
+  unbracketed targets with actual boundary widths/impedances without changing inputs.
+- CCL 작업 화면의 계산/탐색 결과·오류를 분리하고, 목표 구간 실패 시 실제 양 끝
+  선폭·임피던스를 안내합니다. 입력과 수치 기준은 변경하지 않습니다.
+
 - Use unit-aware decimal arrow increments in the CCL preview while preserving precise typed and saved dimensions.
   CCL 프리뷰 화살표에 단위별 소수 증분을 적용하고 직접 입력·저장된 정밀 치수를 보존합니다.
 
