@@ -1,5 +1,7 @@
 # Changelog
 
+- Compare joint face-metal frequency-grid acceptance across explicit resolutions, retaining disagreements as unresolved original trials.
+
 - Select fixed face-metal frequency-grid candidates with simultaneous joint IID confidence bounds and complete attempt accounting.
 
 - Connect face-metal frequency-grid studies to joint IID limits and conservative unknown-trial confidence envelopes.

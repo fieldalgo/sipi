@@ -80,3 +80,5 @@ Zcc50–52ohm으로 고정했고 uniform 네 표본·seed19·신뢰도0.95·요�
 연속 주파수·선택 편향·실측 생산 수율·브라우저/플랫폼 검증을 포함하지 않는다.
 
 [고정 후보군 선택](two_ground_face_sampled_pair_selection.md)
+
+[수치 해상도 교차 판정](two_ground_face_sampled_resolution_yield.md)
