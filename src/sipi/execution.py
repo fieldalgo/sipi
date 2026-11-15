@@ -71,6 +71,7 @@ from .shape_face_panel_line import (ShapeFacePanelTransmissionLineDocument, Shap
     shape_face_current_record)
 from .shape_panel_resolution_document import ShapePanelResolutionDocument
 from .adaptive_shape_panel_resolution_document import AdaptiveShapePanelResolutionDocument
+from .adaptive_two_ground_face_resolution_document import AdaptiveTwoGroundFaceResolutionDocument
 from .volume_line import VolumeLineDocument
 from .lumped import LumpedNetworkDocument
 from .assembly_document import NetworkAssemblyDocument
@@ -227,6 +228,7 @@ _REGISTRY = {
     'sipi.corner-fem-shape-line-quantity-design/1': CornerFEMShapeLineQuantityDesignDocument,
     'sipi.shape-panel-resolution/1': ShapePanelResolutionDocument,
     'sipi.adaptive-shape-panel-resolution/1': AdaptiveShapePanelResolutionDocument,
+    'sipi.adaptive-two-ground-face-resolution/1': AdaptiveTwoGroundFaceResolutionDocument,
     'sipi.line-resolution/1': LineResolutionDocument,
     'sipi.line-resolution/2': LineResolutionDocument,
     'sipi.panel-resolution/1': PanelResolutionDocument,
@@ -582,6 +584,16 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             surface_impedance_ohms=_array(profile.impedance),
             skin_depth_m=_array(profile.skin_depth),
             reference_plane_m=profile.reference_plane_m, cutoff_rms=profile.cutoff_rms)
+    elif isinstance(doc, AdaptiveTwoGroundFaceResolutionDocument):
+        result = doc.analyze(max_evaluations=budget)
+        out['result'] = result.to_dict()
+        if result.failure is not None:
+            out['status'] = 'failed'
+            out['error'] = out['result']['failure']
+        elif not result.completed:
+            out['status'] = 'failed'
+            out['error'] = dict(kind='ResolutionBudgetExceeded',stage='budget',input=data,
+                message='adaptive two-ground face resolution stopped within the available evaluation budget',details=None)
     elif isinstance(doc, AdaptiveShapePanelResolutionDocument):
         assessment = doc.analyze(max_evaluations=budget)
         record = assessment.to_dict()

@@ -181,7 +181,10 @@ def _prepared(data):
     elif output['status']=='failed':
         error=output['error']
         if data['schema']=='sipi.execution-record/2' and output['result'] is not None:
-            _partial_resolution_failure(output,request['input'])
+            if request['input']['schema']=='sipi.adaptive-two-ground-face-resolution/1':
+                _two_ground_face_adaptive_partial_failure(output,request['input'],controls['max_evaluations'])
+            else:
+                _partial_resolution_failure(output,request['input'])
         elif (output['result'] is not None or not isinstance(error,dict)
                 or not isinstance(error.get('type'),str) or not error['type']
                 or not isinstance(error.get('message'),str)):
@@ -318,3 +321,114 @@ def _two_ground_face_partial_resolution_failure(output,source):
             raise ValueError('partial two-ground-face history must retain the exact planned prefix')
         if not isinstance(row.get('current_solver'),dict) or not isinstance(row.get('dielectric_mesh'),dict):
             raise ValueError('completed two-ground-face history requires current and mesh evidence')
+
+def _two_ground_face_adaptive_partial_failure(output,source,max_evaluations):
+    """Bind partial adaptive evidence to the exact planned prefix and caller budget.
+
+    This validates structure and control flow, not the truth of recorded fields.
+    """
+    from .adaptive_two_ground_face_resolution import (TwoGroundFaceResolutionRefinement,
+        _adaptive_two_ground_face_inputs)
+    from .two_ground_face_panel_line import TwoGroundFacePanelTransmissionLineDocument as Line
+    from .line_resolution import ResolutionTolerance
+    from .line_resolution_document import _API
+    result,error=output['result'],output['error']
+    _keys(result,('completed','accepted','tolerances','evaluations','comparisons','failure',
+        'stop_reason','refinement_levels','expected_outer_evaluations','outer_completed',
+        'selected_evaluation_index','scope'),where='partial adaptive face resolution')
+    _keys(error,('stage','input','kind','message','details'),where='partial adaptive face error')
+    if (result['completed'] is not False or result['accepted'] is not False or
+        result['outer_completed'] is not False or result['selected_evaluation_index'] is not None or
+        result['scope']!='two-ground-face-adaptive-finite-resolution-not-absolute-accuracy' or
+        _canonical(result['tolerances'])!=_canonical(source['tolerances']) or
+        any(not isinstance(error[k],str) or not error[k] for k in ('stage','kind')) or
+        not isinstance(error['message'],str)):
+        raise ValueError('partial adaptive face flags, tolerances or selection are inconsistent')
+    steps=[TwoGroundFaceResolutionRefinement(step['refined_panel'],
+        [Line.from_dict(v) for v in step['outer_lines']]) for step in source['refinements']]
+    limit,_,plans=_adaptive_two_ground_face_inputs(Line.from_dict(source['line']),steps,
+        {_API[k]:ResolutionTolerance(**v) for k,v in source['tolerances'].items()},
+        source['refinement_factor'],min(source['max_solves'],max_evaluations))
+    level=_integer('refinement_levels',result['refinement_levels'],0,len(plans))
+    count_outer=len(plans[0])-4
+    if _integer('expected_outer_evaluations',result['expected_outer_evaluations'],1,12)!=count_outer:
+        raise ValueError('partial adaptive face outer count differs from the plan')
+    stages=[('base',plans[0][0][1],())]
+    for n,plan in enumerate(plans[:level],1):
+        indices=[3*(n-1)]
+        for name,doc,refs in plan[1:4]:
+            stages.append((f'level:{n}:{name}',doc,tuple((indices[i],f'level:{n}:{label}') for i,label in refs)))
+            indices.append(len(stages)-1)
+    if level>=2:
+        stages.extend((name,doc,((3*level,name),)) for name,doc,_ in plans[level-1][4:])
+    for key in ('evaluations','comparisons'):
+        if not isinstance(result[key],list) or any(not isinstance(row,dict) for row in result[key]):
+            raise ValueError('partial adaptive face history must retain object rows')
+    evaluations,comparisons=result['evaluations'],result['comparisons']
+    if len(evaluations)>limit:
+        raise ValueError('partial adaptive face history exceeds the caller budget')
+    if result['failure'] is None:
+        if (result['stop_reason']!='budget-exhausted' or error['kind']!='ResolutionBudgetExceeded' or
+            error['stage']!='budget' or error['details'] is not None or
+            _canonical(error['input'])!=_canonical(source) or not 2<=level<len(plans) or
+            len(evaluations)!=1+3*level or len(comparisons)!=4*level or
+            len(evaluations)+count_outer>limit or len(evaluations)+3+count_outer<=limit):
+            raise ValueError('adaptive face budget exhaustion must retain its exact reserved prefix')
+        stages=stages[:1+3*level]
+    else:
+        if result['stop_reason']!='field-failed' or _canonical(result['failure'])!=_canonical(error):
+            raise ValueError('partial adaptive face failure must match the original error')
+        if level and 1+3*level+count_outer>limit:
+            raise ValueError('failed adaptive face level must have reserved its whole step and outer checks')
+        stage=error['stage'];names=[s for s,_,_ in stages]
+        if (stage not in names or (stage=='base' and level!=0) or
+            (stage.startswith('level:') and not stage.startswith(f'level:{level}:')) or
+            (stage.startswith('outer:') and level<2)):
+            raise ValueError('failure must occur at the declared adaptive face level')
+        index=names.index(stage)
+        if _canonical(error['input'])!=_canonical(stages[index][1].to_dict()):
+            raise ValueError('failure input must match its planned adaptive face stage')
+        prior=sum(len(refs) for _,_,refs in stages[:index])
+        if len(evaluations)==index:
+            valid=len(comparisons)==prior
+        elif len(evaluations)==index+1:
+            valid=prior<=len(comparisons)<prior+len(stages[index][2])
+        else:valid=False
+        if not valid:
+            raise ValueError('partial adaptive face history must end at its original failed operation')
+        details=error['details']
+        if error['kind']=='TwoGroundFacePanelLineError':
+            _keys(details,('type','message','stage','cause_type','input','current_solver','dielectric_mesh'),
+                  where='adaptive face typed cause')
+            if (details['type']!=error['kind'] or details['message']!=error['message'] or
+                _canonical(details['input'])!=_canonical(error['input']) or
+                any(not isinstance(details[k],str) or not details[k] for k in ('stage','cause_type'))):
+                raise ValueError('adaptive face typed cause must retain the original failure and input')
+        elif details is not None:
+            raise ValueError('untyped adaptive face failure cannot carry typed details')
+    for row,(stage,doc,_) in zip(evaluations,stages):
+        if row.get('stage')!=stage or _canonical(row.get('input'))!=_canonical(doc.to_dict()):
+            raise ValueError('partial adaptive face evaluations must retain the exact planned prefix')
+        if not isinstance(row.get('current_solver'),dict) or not isinstance(row.get('dielectric_mesh'),dict):
+            raise ValueError('completed adaptive face evaluations need current and mesh evidence')
+    expected=[(label,reference,i) for i,(_,_,refs) in enumerate(stages[:len(evaluations)])
+              for reference,label in refs]
+    if len(comparisons)>len(expected):raise ValueError('extra adaptive face comparisons')
+    for row,(label,reference,index) in zip(comparisons,expected):
+        _keys(row,('stage','reference_index','evaluation_index','accepted','differences','allowances'),
+              where='partial adaptive face comparison')
+        if (row['stage']!=label or _integer('reference_index',row['reference_index'],0,31)!=reference or
+            _integer('evaluation_index',row['evaluation_index'],0,31)!=index or
+            not isinstance(row['accepted'],bool) or
+            not isinstance(row['differences'],dict) or not isinstance(row['allowances'],dict) or
+            set(row['differences'])!=set(source['tolerances']) or set(row['allowances'])!=set(source['tolerances'])):
+            raise ValueError('adaptive face comparisons must retain their planned references and quantities')
+    consecutive=0
+    for n in range(1,level+1):
+        batch=comparisons[4*(n-1):4*n]
+        if len(batch)<4:break
+        consecutive=consecutive+1 if all(row['accepted'] for row in batch) else 0
+        if consecutive>=2 and (n<level or result['failure'] is None):
+            raise ValueError('adaptive face history cannot advance past two accepted levels')
+    if error['stage'].startswith('outer:') and consecutive<2:
+        raise ValueError('adaptive face outer work needs two accepted levels')

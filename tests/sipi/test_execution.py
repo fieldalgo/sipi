@@ -636,6 +636,8 @@ def documents():
     base.append(face_grid_selection())
     from test_two_ground_face_sampled_resolution_yield_document import document as face_resolution_yield
     base.append(face_resolution_yield())
+    from test_adaptive_two_ground_face_resolution_document import document as adaptive_face_resolution
+    base.append(adaptive_face_resolution())
     return base
 
 

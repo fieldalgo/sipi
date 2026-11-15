@@ -1,5 +1,7 @@
 # Changelog
 
+- Save bounded face-metal refinement plans and validate partial histories against exact planned prefixes and caller step/outer reservations.
+
 - Add explicit bounded face-metal volume/panel refinement plans with two consecutive passes, reserved outer checks and retained typed failures.
 
 - Save face-metal frequency-resolution acceptance plans with complete budgets, unknown-row retention and shared execution/project replay.

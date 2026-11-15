@@ -88,3 +88,5 @@ These are finite agreement checks on the stated cases, not a discretization-erro
 bound, asymptotic convergence proof, measured accuracy certificate, continuous-band
 guarantee or platform qualification. A shared systematic error can remain despite
 agreement. Original numerical tolerances and existing methods are unchanged.
+
+[Saved bounded plans and partial evidence](adaptive_two_ground_face_resolution_document.md)
