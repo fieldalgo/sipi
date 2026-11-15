@@ -21,6 +21,9 @@ else:
 MAX_BODY = 256 * 1024
 MAX_SECONDS = 300
 STATIC = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js',
+          '/pair-preview.html': 'pair-preview.html',
+          '/pair-preview.js': 'pair-preview.js',
+          '/pair-preview.css': 'pair-preview.css',
           '/saved.html': 'saved.html', '/saved.js': 'saved.js',
           '/saved-examples.js': 'saved-examples.js',
           '/material-results.js': 'material-results.js',
