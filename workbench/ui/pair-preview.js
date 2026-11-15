@@ -57,9 +57,50 @@ function input(action) {
   }
   return {action, template: $('template').value, parameters: p, ...(mesh ? {mesh: {...mesh}} : {})};
 }
+// Keep step="any": imported and optimized dimensions need not lie on a step grid.
+// These controls change a value only after an explicit button or arrow-key action.
+function numberControls() {
+  const increments = {width: .01, gap: .01, height: .01, thickness: .001,
+    eps_r: .1, box_width: .1, air_height: .1, lower: .01, upper: .01,
+    target: 1, tolerance: .01};
+  for (const [id, increment] of Object.entries(increments)) {
+    const element = $(id), label = element.closest('label');
+    element.setAttribute('aria-label', label.textContent.trim());
+    const wrapper = document.createElement('span'); wrapper.className = 'number-control';
+    element.before(wrapper); wrapper.append(element);
+    const arrows = document.createElement('span'); arrows.className = 'number-arrows';
+    wrapper.append(arrows);
+    const nudge = direction => {
+      if (element.disabled || element.value === '' || !Number.isFinite(element.valueAsNumber)) return;
+      let value = Number((element.valueAsNumber + direction * increment).toPrecision(15));
+      if (element.min !== '') value = Math.max(Number(element.min), value);
+      if (element.max !== '') value = Math.min(Number(element.max), value);
+      if (value === element.valueAsNumber) return;
+      element.value = String(value);
+      element.dispatchEvent(new Event('input', {bubbles: true}));
+    };
+    for (const [direction, action, symbol] of [[1, 'Increase', '▲'], [-1, 'Decrease', '▼']]) {
+      const button = document.createElement('button'); button.type = 'button';
+      button.dataset.direction = action; button.dataset.increment = String(increment);
+      button.setAttribute('aria-controls', id); button.textContent = symbol;
+      button.addEventListener('click', () => {nudge(direction); element.focus({preventScroll: true});});
+      arrows.append(button);
+    }
+    element.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+      event.preventDefault(); nudge(event.key === 'ArrowUp' ? 1 : -1);
+    });
+  }
+}
 function controls() {
   const strip = $('template').value === 'coupled_stripline';
   $('height-label').textContent = strip ? 'Plane spacing · mm' : 'Substrate height · mm';
+  $('height').setAttribute('aria-label', $('height-label').textContent);
+  for (const button of document.querySelectorAll('.number-arrows button')) {
+    const label = $(button.getAttribute('aria-controls')).getAttribute('aria-label');
+    const description = `${button.dataset.direction} ${label} by ${button.dataset.increment}`;
+    button.setAttribute('aria-label', description); button.title = description;
+  }
   $('air-field').hidden = strip;
   $('air_height').required = !strip;
 }
@@ -155,4 +196,4 @@ $('cancel').addEventListener('click',async()=>{
   try{await transport.cancel();status('Calculation cancelled. No result retained.');}
   catch(error){status(error.message,true);}finally{lock(false);}
 });
-controls(); draw(); comparison();
+numberControls(); controls(); draw(); comparison();
