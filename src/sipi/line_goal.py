@@ -135,7 +135,7 @@ def seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eval
 
 def _seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_evaluations=40,
                         document_type=TransmissionLineDocument, design_type=LineQuantityDesign,
-                        error_type=LineQuantityGoalError, refine_input=None, decorate_error=None):
+                        error_type=LineQuantityGoalError, refine_input=None, decorate_error=None, input_metadata=None):
     """Shared bounded search; optional adapters do not change the original path."""
     if not callable(factory):
         raise TypeError('factory must be callable')
@@ -186,6 +186,7 @@ def _seek_line_quantity(factory, bounds, target, *, quantity, tolerance, max_eva
                     data = refine_input(data)
                 doc = document_type.from_dict(data)
             text = doc.dumps(); data = doc.to_dict()
+            if input_metadata is not None: data = input_metadata(data)
             frequency = data['frequency_hz']
             names = tuple(t.name for t in doc.cross_section.section.traces if not t.ground)
             if (len(frequency) != 1 or frequency[0] <= 0 or

@@ -1,5 +1,7 @@
 # Changelog
 
+- Seek FEM line quantities with explicit corner resolution and frozen four-control refinement.
+
 - Preserve explicit corner resolution in FEM line quantity samples and their saved failure records.
 
 - Add an explicit saved corner target for FEM shape line calculations, preserving current checks and failure history.

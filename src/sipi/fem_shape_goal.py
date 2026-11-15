@@ -87,6 +87,10 @@ def seek_fem_shape_line_quantity(factory, bounds, target, *, quantity, tolerance
         tolerance=tolerance, max_evaluations=max_evaluations,
         document_type=FEMShapeTransmissionLineDocument, design_type=FEMShapeLineQuantityDesign,
         error_type=FEMShapeLineQuantityGoalError, refine_input=_refine, decorate_error=_decorate)
+    return _checked_refinement(result, quantity)
+
+
+def _checked_refinement(result, quantity):
     change = abs(result.refined_value-result.value)
     relative = change/result.refined_value if result.refined_value else (0. if change == 0 else float('inf'))
     if relative > .005:
