@@ -597,6 +597,8 @@ def documents():
     base.append(two_ground_yield())
     from test_two_ground_line_study import document as two_ground_quantity_study
     base.append(two_ground_quantity_study())
+    from test_two_ground_line_goal_document import document as two_ground_quantity_design
+    base.append(two_ground_quantity_design())
     return base
 
 

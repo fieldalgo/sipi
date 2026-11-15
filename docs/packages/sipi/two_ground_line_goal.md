@@ -70,3 +70,6 @@ sqrt(Z/Y) and sqrt(ZY) check selected and refined fields. Control tests verify
 scalar and paired roots, frozen axes, all failed stages, reserved budgets,
 zero attenuation and joint-versus-single convergence. Existing scalar/FEM/corner
 goal regression and exact source/installed artifacts remain separate checks.
+
+Use a [saved design](two_ground_line_goal_document.md) to persist template,
+geometry/material bindings, target and budget through the common execution API.

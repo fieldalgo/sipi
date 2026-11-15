@@ -38,6 +38,8 @@ from .two_ground_pair_goal_document import TwoGroundForwardPairDesignDocument
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
 from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
+from .two_ground_line_goal_document import TwoGroundLineQuantityDesignDocument
+from .two_ground_line_goal import TwoGroundLineQuantityGoalError
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
@@ -176,6 +178,7 @@ _REGISTRY = {
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
+    'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
     'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
@@ -668,6 +671,13 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 out['error']['cause_details'] = exc.__cause__.to_dict()
             if isinstance(doc, TwoGroundForwardPairDesignDocument) and isinstance(exc.__cause__, TwoGroundPanelLineError):
                 out['error']['cause_details'] = exc.__cause__.to_dict()
+    elif isinstance(doc, TwoGroundLineQuantityDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved two-ground goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except TwoGroundLineQuantityGoalError as exc:
+            out.update(status='failed', error=exc.to_dict())
     elif isinstance(doc, (FEMShapeLineQuantityDesignDocument, CornerFEMShapeLineQuantityDesignDocument)):
         goal_data = data['design'] if isinstance(doc, CornerFEMShapeLineQuantityDesignDocument) else data
         if goal_data['max_evaluations'] > budget:

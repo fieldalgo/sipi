@@ -370,6 +370,11 @@
 
 ## [Unreleased]
 
+- Add strict saved one-variable two-ground line goals with field-free endpoint/
+  midpoint/refinement preflight and common execution/request/record/project
+  support. Preserve the direct algorithm, budgets, numerical gates and failures.
+
+
 - Add explicit two-ground one-variable line goals with bounded bisection,
   reserved volume/panel/joint refinement, fixed current controls and preserved
   partial field evidence. Existing goal methods and criteria remain unchanged.
