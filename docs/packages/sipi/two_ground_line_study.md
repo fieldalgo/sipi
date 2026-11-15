@@ -61,3 +61,6 @@ relative0.01 and absolute0. Complex sqrt(Z/Y) and sqrt(ZY) independently check
 scalar impedance and propagation at every level. These checks do not establish
 outer convergence, empirical loss accuracy, every template/frequency or another
 platform. Volume/dielectric refinement remains a separate line-extraction gate.
+
+A [one-variable goal](two_ground_line_goal.md) uses the same line quantities
+and requires separate volume, panel and joint refinements.

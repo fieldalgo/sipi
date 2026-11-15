@@ -370,6 +370,11 @@
 
 ## [Unreleased]
 
+- Add explicit two-ground one-variable line goals with bounded bisection,
+  reserved volume/panel/joint refinement, fixed current controls and preserved
+  partial field evidence. Existing goal methods and criteria remain unchanged.
+
+
 - Add explicit two-ground scalar/selected-pair line-quantity studies with saved
   inputs, ordered geometry/material samples and retained failures/current/mesh
   records. Reuse the existing quantity diagnostic and sampling loop with explicit
