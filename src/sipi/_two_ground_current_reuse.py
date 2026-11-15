@@ -1,6 +1,6 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Bounded, private current reuse inside one synchronous paired goal request."""
+"""Bounded, private current reuse inside one synchronous two-ground request."""
 from collections import OrderedDict
 from contextlib import contextmanager
 from contextvars import ContextVar

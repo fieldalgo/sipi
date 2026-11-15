@@ -36,3 +36,5 @@
 [유한 격자 목표](two_ground_sampled_pair_goal_document.md)를 참고하세요.
 
 [English](../../../../../packages/sipi/two_ground_mesh_reuse.md)
+
+제조 표본 요청도 각각 독립적인 임시 범위를 사용합니다. [표본 요청 재사용](two_ground_study_reuse.md)을 참고하세요.

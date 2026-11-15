@@ -67,3 +67,5 @@ and requires separate volume, panel and joint refinements.
 
 For a fixed iid distribution, [quantity acceptance](two_ground_line_yield.md)
 retains every unknown row in its confidence envelope.
+
+Manufacturing requests also have independent temporary scopes; see [study reuse](two_ground_study_reuse.md).

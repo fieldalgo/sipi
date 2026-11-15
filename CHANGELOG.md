@@ -1,5 +1,7 @@
 # Changelog
 
+- Reuse bounded geometry calculations within two-ground material studies while retaining every sampled row, field evaluation and failure.
+
 - Reuse detached, bounded two-ground meshes within paired goal requests while preserving every attempt, refinement and failure record.
 
 - Reuse identical two-ground vacuum-current factors within bounded paired-goal requests while preserving attempts, failure history and numerical checks.

@@ -4,6 +4,9 @@
 from dataclasses import dataclass
 import json
 
+from ._two_ground_current_reuse import _current_reuse_scope
+from ._two_ground_mesh_reuse import _mesh_reuse_scope
+
 from ._validation import _json_copy, _keys, _unique_object
 from .study import ImpedanceStudyDocument
 from .fem_shape_study import (FEMShapeLineQuantityStudy, FEMShapeLineQuantityStudyRow,
@@ -77,7 +80,8 @@ class TwoGroundLineQuantityStudyDocument:
     def samples(self):return ImpedanceStudyDocument.from_dict(self._data['study']).samples()
 
     def analyze(self, *, max_evaluations=128):
-        return _analyze_fem_shape_study(self, max_evaluations=max_evaluations,
-            line_factory=lambda study,parameters,evaluation,data:_line_from_inputs(data,parameters,evaluation),
-            row_type=TwoGroundLineQuantityStudyRow, result_type=TwoGroundLineQuantityStudy,
-            cause_class=TwoGroundPanelLineError)
+        with _current_reuse_scope(), _mesh_reuse_scope():
+            return _analyze_fem_shape_study(self, max_evaluations=max_evaluations,
+                line_factory=lambda study,parameters,evaluation,data:_line_from_inputs(data,parameters,evaluation),
+                row_type=TwoGroundLineQuantityStudyRow, result_type=TwoGroundLineQuantityStudy,
+                cause_class=TwoGroundPanelLineError)

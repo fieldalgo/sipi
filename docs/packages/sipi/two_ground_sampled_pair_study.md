@@ -77,3 +77,5 @@ there is no fallback current method. Linux source and installed checks, browser
 Worker, macOS and Windows acceptance are separate evidence.
 
 [Joint acceptance across all sampled frequencies](two_ground_sampled_pair_yield.md).
+
+Manufacturing requests also have independent temporary scopes; see [study reuse](two_ground_study_reuse.md).

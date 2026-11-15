@@ -39,3 +39,5 @@ contracts and limitations. Reuse neither certifies absolute accuracy nor removes
 independent panel, volume, outer-domain or measurement validation requirements.
 
 Identical successful meshes are reused only inside one paired request; see [mesh reuse](two_ground_mesh_reuse.md) for snapshot isolation and resource bounds.
+
+Manufacturing requests also have independent temporary scopes; see [study reuse](two_ground_study_reuse.md).

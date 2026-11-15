@@ -4,6 +4,9 @@
 from dataclasses import dataclass
 import json
 
+from ._two_ground_current_reuse import _current_reuse_scope
+from ._two_ground_mesh_reuse import _mesh_reuse_scope
+
 from ._validation import _json_copy, _keys, _unique_object
 from .study import ImpedanceStudyDocument
 from .panel_pair_study import PanelForwardPairStudy, PanelForwardPairStudyRow, _run_panel_pair_study
@@ -92,7 +95,8 @@ class TwoGroundForwardPairStudyDocument:
         return ImpedanceStudyDocument.from_dict(self._data['study']).samples()
 
     def analyze(self, *, max_evaluations=128):
-        return _run_panel_pair_study(self, max_evaluations=max_evaluations,
-            make_line=_line_from_inputs, physical_line=lambda doc:doc,
-            row_factory=_study_row, result_factory=TwoGroundForwardPairStudy,
-            input_text=self.dumps)
+        with _current_reuse_scope(), _mesh_reuse_scope():
+            return _run_panel_pair_study(self, max_evaluations=max_evaluations,
+                make_line=_line_from_inputs, physical_line=lambda doc:doc,
+                row_factory=_study_row, result_factory=TwoGroundForwardPairStudy,
+                input_text=self.dumps)

@@ -4,6 +4,9 @@
 from dataclasses import dataclass
 import json
 
+from ._two_ground_current_reuse import _current_reuse_scope
+from ._two_ground_mesh_reuse import _mesh_reuse_scope
+
 import numpy as np
 
 from ._validation import _json_copy, _keys, _unique_object
@@ -115,7 +118,8 @@ class TwoGroundSampledForwardPairStudyDocument:
         return ImpedanceStudyDocument.from_dict(self._data['study']).samples()
 
     def analyze(self, *, max_evaluations=128):
-        return _run_sampled_panel_study(self, max_evaluations=max_evaluations,
-            make_line=_sampled_line, physical_line=lambda doc: doc,
-            row_factory=_sampled_row, result_factory=TwoGroundSampledForwardPairStudy,
-            input_text=self.dumps)
+        with _current_reuse_scope(), _mesh_reuse_scope():
+            return _run_sampled_panel_study(self, max_evaluations=max_evaluations,
+                make_line=_sampled_line, physical_line=lambda doc: doc,
+                row_factory=_sampled_row, result_factory=TwoGroundSampledForwardPairStudy,
+                input_text=self.dumps)

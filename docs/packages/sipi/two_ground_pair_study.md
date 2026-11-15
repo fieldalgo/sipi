@@ -64,3 +64,5 @@ keeps failed rows in the probability bounds.
 
 [Finite-frequency studies](two_ground_sampled_pair_study.md) keep each manufactured
 sample fixed across an explicit grid, with atomic failed rows.
+
+Manufacturing requests also have independent temporary scopes; see [study reuse](two_ground_study_reuse.md).

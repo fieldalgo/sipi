@@ -39,3 +39,5 @@ See [current reuse](two_ground_current_reuse.md),
 [finite-grid goals](two_ground_sampled_pair_goal_document.md).
 
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_mesh_reuse.md)
+
+Manufacturing requests also have independent temporary scopes; see [study reuse](two_ground_study_reuse.md).
