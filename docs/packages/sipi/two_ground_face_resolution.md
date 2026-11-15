@@ -88,3 +88,5 @@ These finite cases do not establish adequacy of default modes on arbitrary
 large boxes, continuous-band or measured accuracy, all manufacturing geometries,
 or browser/platform acceptance. Original failed observations and thresholds
 remain unchanged.
+
+[Save a face-metal assessment and partial record](two_ground_face_resolution_document.md)

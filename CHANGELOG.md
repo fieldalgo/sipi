@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit face-metal resolution plans and retain validated partial failures in version-2 execution records.
+
 - Add explicit face-metal volume, panel and outer-domain assessments with retained per-entry limits and partial failures.
 
 - Connect finite-frequency face-metal paired goals to strict saved inputs, shared execution and restored CLI records.

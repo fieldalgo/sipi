@@ -52,6 +52,7 @@ from .two_ground_line_goal import TwoGroundLineQuantityGoalError
 from .two_ground_line_yield import TwoGroundLineQuantityYieldDocument
 from .two_ground_face_line_yield import TwoGroundFaceLineQuantityYieldDocument
 from .two_ground_resolution_document import TwoGroundResolutionDocument
+from .two_ground_face_resolution_document import TwoGroundFaceResolutionDocument
 from .two_ground_sampled_pair_study import TwoGroundSampledForwardPairStudyDocument
 from .two_ground_sampled_pair_goal_document import TwoGroundSampledForwardPairDesignDocument
 from .two_ground_face_sampled_pair_goal_document import TwoGroundFaceSampledForwardPairDesignDocument
@@ -205,6 +206,7 @@ _REGISTRY = {
     'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,
     'sipi.two-ground-face-line-quantity-yield/1': TwoGroundFaceLineQuantityYieldDocument,
     'sipi.two-ground-resolution/1': TwoGroundResolutionDocument,
+    'sipi.two-ground-face-resolution/1': TwoGroundFaceResolutionDocument,
     'sipi.two-ground-sampled-forward-pair-study/1': TwoGroundSampledForwardPairStudyDocument,
     'sipi.two-ground-sampled-forward-pair-design/1': TwoGroundSampledForwardPairDesignDocument,
     'sipi.two-ground-face-sampled-forward-pair-design/1': TwoGroundFaceSampledForwardPairDesignDocument,

@@ -78,3 +78,5 @@ absolute + relative*max(abs(a),abs(b))로 검사하며 작은 원소의 하한�
 
 이 유한 사례는 임의 큰 상자에서 기본 모드 수의 적합성·연속대역/실측 정확도·모든
 제조 기하·브라우저/플랫폼 수락을 증명하지 않는다. 이전 실패 관측과 기준은 유지한다.
+
+[면별 금속 평가·부분실패 기록 저장](two_ground_face_resolution_document.md)
