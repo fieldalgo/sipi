@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit two-ground face-metal manufacturing samples with paired launch values, retained invalid rows and descriptive all-success statistics.
+
 - Add a strict saved two-ground face-metal pair-goal schema with field-free corner admission, retained failure records and shared request/project/CLI execution.
 
 - Connect explicit two-ground face-metal lines to bounded paired forward-impedance goals, retaining frozen volume/panel checks and original failure accounting.

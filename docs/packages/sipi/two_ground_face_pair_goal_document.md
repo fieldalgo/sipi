@@ -63,3 +63,5 @@ text = document.dumps()
 assert TwoGroundFaceForwardPairDesignDocument.loads(text).dumps() == text
 # Field calculations are explicit: result = document.solve()
 ```
+
+[Manufacturing samples with fixed face laws](two_ground_face_pair_study.md)

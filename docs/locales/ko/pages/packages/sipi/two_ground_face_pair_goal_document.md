@@ -58,3 +58,5 @@ text = document.dumps()
 assert TwoGroundFaceForwardPairDesignDocument.loads(text).dumps() == text
 # Field calculations are explicit: result = document.solve()
 ```
+
+[고정 면별 금속의 제조 표본](two_ground_face_pair_study.md)
