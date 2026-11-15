@@ -19,7 +19,7 @@ _DIGEST=re.compile(r'[0-9a-f]{64}')
 _KINDS=('wheel','source-archive','wasm','executable','runtime')
 _DEFAULT_LIMIT=8*1024*1024
 _PARTIAL_RESOLUTION_SCHEMAS=('sipi.line-resolution/1','sipi.line-resolution/2',
-    'sipi.panel-resolution/1','sipi.adaptive-panel-resolution/1','sipi.fem-shape-resolution/1','sipi.fem-shape-adaptive-resolution/1')
+    'sipi.panel-resolution/1','sipi.adaptive-panel-resolution/1','sipi.fem-shape-resolution/1','sipi.fem-shape-adaptive-resolution/1','sipi.corner-fem-shape-resolution/1')
 
 
 def _canonical(value):
@@ -68,7 +68,7 @@ def _partial_resolution_failure(output,source):
     level='refinement_levels' if schema=='sipi.adaptive-panel-resolution/1' else 'mesh_levels'
     keys+=('stop_reason',level,'expected_outer_evaluations','outer_completed','selected_evaluation_index') if adaptive else ('expected_evaluations',)
     _keys(result,keys,where='partial resolution result')
-    fem = schema in ('sipi.fem-shape-resolution/1','sipi.fem-shape-adaptive-resolution/1')
+    fem = schema in ('sipi.fem-shape-resolution/1','sipi.fem-shape-adaptive-resolution/1','sipi.corner-fem-shape-resolution/1')
     _keys(error,('stage','input','kind','message')+(('details',) if fem else ()),where='partial resolution error')
     if fem:
         details = error['details']

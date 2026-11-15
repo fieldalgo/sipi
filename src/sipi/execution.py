@@ -33,6 +33,7 @@ from .panel_line import PanelTransmissionLineDocument
 from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeLineError
 from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
+from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
 from .shape_panel_line import (ShapePanelTransmissionLineDocument, ShapePanelLineError,
                                shape_current_record)
@@ -165,6 +166,7 @@ _REGISTRY = {
     'sipi.fem-shape-transmission-line/1': FEMShapeTransmissionLineDocument,
     'sipi.corner-fem-shape-transmission-line/1': CornerFEMShapeTransmissionLineDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
+    'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
     'sipi.fem-shape-line-quantity-study/1': FEMShapeLineQuantityStudyDocument,
     'sipi.corner-fem-shape-line-quantity-study/1': CornerFEMShapeLineQuantityStudyDocument,
@@ -580,7 +582,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             out['status'] = 'failed'
             out['error'] = dict(kind='ResolutionBudgetExceeded',stage='budget',input=data,
                 message='adaptive resolution stopped before completion within the available evaluation budget')
-    elif isinstance(doc, (FEMShapeResolutionDocument,FEMShapeAdaptiveResolutionDocument)):
+    elif isinstance(doc, (FEMShapeResolutionDocument,CornerFEMShapeResolutionDocument,FEMShapeAdaptiveResolutionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.failure is not None:

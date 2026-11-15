@@ -1,5 +1,7 @@
 # Changelog
 
+- Retain explicit corner resolution through finite FEM mesh and open-domain assessments.
+
 - Save corner-controlled FEM line quantity goals with original search, refinement and execution budgets.
 
 - Seek FEM line quantities with explicit corner resolution and frozen four-control refinement.

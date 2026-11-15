@@ -403,3 +403,7 @@ __all__ += ["CornerFEMShapeLineQuantityDesign", "seek_corner_fem_shape_line_quan
 
 from .corner_fem_goal_document import CornerFEMShapeLineQuantityDesignDocument
 __all__ += ["CornerFEMShapeLineQuantityDesignDocument"]
+
+from .corner_fem_resolution import assess_corner_fem_shape_line_resolution
+from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
+__all__ += ["assess_corner_fem_shape_line_resolution", "CornerFEMShapeResolutionDocument"]

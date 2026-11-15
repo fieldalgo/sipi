@@ -55,6 +55,10 @@ def assess_fem_shape_line_resolution(line,*,outer_documents,tolerances,refinemen
     absolute accuracy, asymptotic convergence or empirical-validity certificates.
     """
     tolerances,stages=_fem_resolution_inputs(line,outer_documents,tolerances,refinement_factor,max_solves)
+    return _assess_fem_shape_resolution(tolerances, stages)
+
+
+def _assess_fem_shape_resolution(tolerances, stages):
     evaluations=[];comparisons=[]
     for stage,doc in stages:
         text=doc.dumps()

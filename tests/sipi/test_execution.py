@@ -585,6 +585,8 @@ def documents():
     base.append(corner_fem_study())
     from test_corner_fem_goal_document import document as corner_fem_goal
     base.append(corner_fem_goal())
+    from test_corner_fem_resolution_document import document as corner_resolution
+    base.append(corner_resolution())
     return base
 
 
