@@ -86,3 +86,20 @@ permittivity by 0.1; target impedance by 1 ohm; and target tolerance by 0.01 ohm
 The controls respect each field's minimum. You can still type any valid decimal;
 opening a design or receiving a calculated width does not round it onto a step grid.
 Changing a value invalidates the current result as before.
+
+## Task-specific results
+
+The compact workbench places the cross-section inputs beside two distinct tasks.
+**Check current dimensions (02)** shows single-calculation status, results and
+errors. **Find a width for your target (03)** keeps search progress, cancellation,
+selected width, refinement and search errors beside the target fields. A successful
+search applies its exact selected width to the cross-section inputs; its result
+stays in section 03. The file controls have their own status message.
+
+If the target is not bracketed, section 03 lists the two actual boundary widths
+in mm and their differential impedances in ohms. It suggests reviewing the range,
+target or stackup without changing your inputs. The two boundary samples do not
+prove that another range can reach the target. Raw search history remains available
+under failure details. Any edit or new action clears stale result/error messages;
+the explicitly retained A snapshot remains available. Numerical search and
+refinement criteria are unchanged.
