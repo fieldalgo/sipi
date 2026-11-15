@@ -58,3 +58,5 @@ the revision in `dependencies.json`. Missing capability produces a failed
 receipt, never a fallback. Existing extraction defaults remain unchanged.
 Finite-domain refinement is not outer-boundary convergence, empirical accuracy,
 production yield or browser/Windows qualification. Existing schemas are unchanged.
+
+[Identical current factors are reused within a request](two_ground_current_reuse.md); line attempts and numerical criteria remain unchanged.

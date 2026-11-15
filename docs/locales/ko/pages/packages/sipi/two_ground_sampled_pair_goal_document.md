@@ -69,3 +69,5 @@ assert normalize_saved(text) == text
 소스·설치 artifact 검증은 브라우저·macOS·Windows·공개 배포 수락을 대신하지
 않습니다. 정확히 고정한 공유 수치 기능이 필요하며 다른 장 계산법으로 우회하지
 않습니다.
+
+[요청 안에서 동일 전류 계수를 재사용](two_ground_current_reuse.md)하며 선로 시도 수와 수치 기준은 유지합니다.

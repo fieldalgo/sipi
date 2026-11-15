@@ -3,6 +3,8 @@
 """Bounded paired goals across explicit two-ground frequency grids."""
 from dataclasses import dataclass
 
+from ._two_ground_current_reuse import _current_reuse_scope
+
 from .sampled_panel_pair_goal import (SampledPanelPairRefinement, SampledPanelForwardPairDesign,
                                      _seek_sampled_panel_pair_goal)
 from .two_ground_pair_goal import _refinements
@@ -60,8 +62,9 @@ def seek_two_ground_sampled_forward_pair_impedances(factory, bounds, frequencies
     No continuous-band, outer-domain, global optimum, uniqueness or absolute
     accuracy guarantee follows. A factory callable is not serialized.
     """
-    return _seek_sampled_panel_pair_goal(factory, bounds, frequencies, targets,
-        tolerances=tolerances, initial=initial, max_evaluations=max_evaluations,
-        document_type=TwoGroundPanelTransmissionLineDocument, refinements=_refinements,
-        physical_line=lambda doc: doc, settings=lambda doc: doc.current_options,
-        refinement_type=TwoGroundSampledPairRefinement, design_type=TwoGroundSampledForwardPairDesign)
+    with _current_reuse_scope():
+        return _seek_sampled_panel_pair_goal(factory, bounds, frequencies, targets,
+            tolerances=tolerances, initial=initial, max_evaluations=max_evaluations,
+            document_type=TwoGroundPanelTransmissionLineDocument, refinements=_refinements,
+            physical_line=lambda doc: doc, settings=lambda doc: doc.current_options,
+            refinement_type=TwoGroundSampledPairRefinement, design_type=TwoGroundSampledForwardPairDesign)

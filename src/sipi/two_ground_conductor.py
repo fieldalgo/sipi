@@ -11,6 +11,7 @@ import numpy as np
 from .boundary_conductor import SurfaceMetal, _remaining_dimension
 from .constants import epsilon_0
 from .crosssection import CrossSection
+from ._two_ground_current_reuse import _reuse_current_factors
 from .face_conductor import ReferenceSurfaceMetals, _reference_parts
 from .network import _frequencies, _scalar, rlgc_network
 from .panel_conductor import PanelCurrentFactors
@@ -106,7 +107,14 @@ def two_ground_current_factors(section, *, panels_per_edge=32, ground_modes=128,
     """
     checked, count, modes, degree, polygons = _current_arguments(
         section, panels_per_edge, ground_modes, interpolation_degree)
-    shared = _solver()(polygons, width=checked.width, height=checked.height,
+    solver = _solver()
+    return _reuse_current_factors(checked, polygons, (count, modes, degree), solver,
+        lambda: _solve_current_factors(checked, count, modes, degree, polygons, solver))
+
+
+def _solve_current_factors(checked, count, modes, degree, polygons, solver):
+    """Original vacuum solve, reduction and checks; no material or cache policy."""
+    shared = solver(polygons, width=checked.width, height=checked.height,
                        panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
     signal = [i for i, t in enumerate(checked.traces) if not t.ground]
     grounded = [i for i, t in enumerate(checked.traces) if t.ground]

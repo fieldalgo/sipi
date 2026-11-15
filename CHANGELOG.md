@@ -1,5 +1,7 @@
 # Changelog
 
+- Reuse identical two-ground vacuum-current factors within bounded paired-goal requests while preserving attempts, failure history and numerical checks.
+
 - Compare fixed two-ground frequency-grid candidates with simultaneous joint bounds, complete row budgets and retained uncertainty.
 
 - Add explicit two-ground joint iid acceptance over finite frequency grids, preserving unresolved rows and exact stored execution.

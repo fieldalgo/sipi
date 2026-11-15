@@ -73,3 +73,5 @@ changed to match the selected geometry.
 Source and installed-artifact validation do not establish browser, macOS, Windows
 or public deployment acceptance. The explicitly pinned shared numerical
 capability is required; there is no fallback to another field method.
+
+[Identical current factors are reused within a request](two_ground_current_reuse.md); line attempts and numerical criteria remain unchanged.
