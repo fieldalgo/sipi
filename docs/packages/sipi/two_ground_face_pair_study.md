@@ -64,3 +64,5 @@ infinite-domain, arbitrary-shape, browser/platform or measured qualification.
 [Scalar or single launched-pair quantity samples](two_ground_face_line_study.md)
 
 [IID acceptance and unresolved samples](two_ground_face_yield.md)
+
+[Manufacturing samples on a finite frequency grid](two_ground_face_sampled_pair_study.md)

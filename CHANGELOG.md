@@ -1,5 +1,7 @@
 # Changelog
 
+- Add face-metal manufacturing samples across finite frequency grids with atomic failed rows and retained material/current evidence.
+
 - Save explicit face-metal resolution plans and retain validated partial failures in version-2 execution records.
 
 - Add explicit face-metal volume, panel and outer-domain assessments with retained per-entry limits and partial failures.

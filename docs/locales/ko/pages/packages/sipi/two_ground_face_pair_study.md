@@ -56,3 +56,5 @@ R/L/C0 상대 변화 0.01과 독립 행렬 제곱근 전방 행렬 1e-10으로 �
 [스칼라·단일 쌍 여기의 표본](two_ground_face_line_study.md)
 
 [IID 합격 평가와 미해결 표본](two_ground_face_yield.md)
+
+[유한 주파수격자 제조 표본](two_ground_face_sampled_pair_study.md)

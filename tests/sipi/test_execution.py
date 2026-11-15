@@ -628,6 +628,8 @@ def documents():
     base.append(face_grid_goal())
     from test_two_ground_face_resolution_document import document as face_resolution
     base.append(face_resolution())
+    from test_two_ground_face_sampled_pair_study import document as face_grid_study
+    base.append(face_grid_study())
     return base
 
 
