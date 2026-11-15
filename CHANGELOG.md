@@ -1,5 +1,7 @@
 # Changelog
 
+- Keep two-ground manufacturing samples fixed across finite frequency grids, preserving failed rows, dispersive materials and saved execution records.
+
 - Separate the section factory catalog from impedance studies while retaining factory identities, legacy aliases and saved section documents.
 
 - Separate shared document validators from domain and execution modules while preserving saved inputs, errors and legacy helper imports.

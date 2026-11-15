@@ -603,6 +603,8 @@ def documents():
     from test_two_ground_line_yield import document as two_ground_quantity_yield
     base.append(two_ground_quantity_yield())
     base.append(two_ground_resolution())
+    from test_two_ground_sampled_pair_study import document as two_ground_sampled_study
+    base.append(two_ground_sampled_study())
     return base
 
 
