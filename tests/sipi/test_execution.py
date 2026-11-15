@@ -611,6 +611,8 @@ def documents():
     base.append(two_ground_grid_yield())
     from test_two_ground_sampled_pair_selection import document as two_ground_grid_selection
     base.append(two_ground_grid_selection())
+    from test_two_ground_face_panel_line import document as two_ground_face_document
+    base.append(two_ground_face_document())
     return base
 
 

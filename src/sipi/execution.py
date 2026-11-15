@@ -34,6 +34,7 @@ from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeLineError
 from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument, TwoGroundPanelLineError
 from .two_ground_conductor import TwoGroundConductorLoss
+from .two_ground_face_panel_line import TwoGroundFacePanelTransmissionLineDocument
 from .two_ground_pair_goal_document import TwoGroundForwardPairDesignDocument
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
 from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
@@ -180,6 +181,7 @@ _REGISTRY = {
     'sipi.fem-shape-transmission-line/1': FEMShapeTransmissionLineDocument,
     'sipi.corner-fem-shape-transmission-line/1': CornerFEMShapeTransmissionLineDocument,
     'sipi.two-ground-panel-transmission-line/1': TwoGroundPanelTransmissionLineDocument,
+    'sipi.two-ground-face-panel-transmission-line/1': TwoGroundFacePanelTransmissionLineDocument,
     'sipi.two-ground-forward-pair-design/1': TwoGroundForwardPairDesignDocument,
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
@@ -803,7 +805,10 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                         current_flux_error=loss.factors.current_error)
             if isinstance(result.conductor, (ShapeReferenceConductorLoss, ShapeFaceConductorLoss)):
                 out['result']['conductor_boundaries']['surface_current_factors_per_m'] = _array(result.conductor.boundary_parts)
-            if isinstance(doc, TwoGroundPanelTransmissionLineDocument):
+            if isinstance(doc, TwoGroundFacePanelTransmissionLineDocument):
+                out['result']['current_solver'] = result.current_record()
+                out['result']['dielectric_mesh'] = result.mesh_record()
+            elif isinstance(doc, TwoGroundPanelTransmissionLineDocument):
                 out['result']['current_solver'] = result.current_record()
                 out['result']['dielectric_mesh'] = result.mesh_record()
                 out['result']['conductor_boundaries'].update(

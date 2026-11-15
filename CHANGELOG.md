@@ -1,5 +1,7 @@
 # Changelog
 
+- Add a separate versioned two-ground face-line document and host execution records, preserving face currents, material admission and the actual dielectric mesh.
+
 - Add explicit two-ground face currents and local metal laws with retained whole-boundary evidence.
 
 - Use a verified shared small-angle scalar-length baseline while retaining original mesh criteria and historical runtime references.

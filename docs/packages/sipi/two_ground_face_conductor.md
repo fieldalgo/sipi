@@ -121,3 +121,5 @@ the same 2% independent and 1% refinement checks. Reference replay does not
 rerun the independent solver and is not measured-material calibration. Existing
 whole-surface criteria and the original insufficient-resolution observations
 remain unchanged.
+
+[Face-specific saved two-ground line](two_ground_face_panel_line.md)
