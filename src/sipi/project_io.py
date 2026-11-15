@@ -8,7 +8,7 @@ from pathlib import Path
 import stat
 import tempfile
 
-from .execution import _integer
+from ._validation import _integer
 from .execution_record import _DIGEST, _matches
 from .project import SavedProject
 

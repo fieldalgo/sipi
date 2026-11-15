@@ -5,9 +5,7 @@ from dataclasses import dataclass,field
 import hashlib
 import json
 import re
-from .circuit_document import _json_copy
-from .document import _keys,_unique_object
-from .execution import _integer,_reject_number,_float
+from ._validation import _json_copy, _keys, _unique_object, _integer, _reject_number, _float
 from .execution_request import SavedExecutionRequest
 
 __all__ = ['SavedExecutionRecord']

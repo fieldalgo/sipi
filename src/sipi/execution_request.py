@@ -5,8 +5,9 @@ from dataclasses import dataclass, field
 import hashlib
 import json
 
+from ._validation import _integer
 from sipi.execution import (
-    _integer, _load, execute_saved,
+    _load, execute_saved,
     TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument,
 )
 

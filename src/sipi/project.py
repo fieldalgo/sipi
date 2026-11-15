@@ -4,9 +4,7 @@
 from dataclasses import dataclass, field
 import json
 
-from .circuit_document import _json_copy
-from .document import _keys, _unique_object
-from .execution import _integer, _reject_number, _float
+from ._validation import _json_copy, _keys, _unique_object, _integer, _reject_number, _float
 from .execution_request import SavedExecutionRequest
 from .execution_record import SavedExecutionRecord, _canonical, _digest, _matches, _RUN, _DIGEST
 

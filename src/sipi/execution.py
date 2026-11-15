@@ -9,11 +9,11 @@ does not bound a field solve's memory or time.
 from __future__ import annotations
 
 import json
-import math
 
 import numpy as np
 
-from .document import CrossSectionDocument, _unique_object
+from ._validation import _unique_object, _integer, _reject_number, _float
+from .document import CrossSectionDocument
 from .template_document import TemplateSectionDocument
 from .corner_document import CornerCrossSectionDocument
 from .corner_study import CornerImpedanceStudyDocument
@@ -269,25 +269,6 @@ _REGISTRY = {
 def saved_schemas():
     """Return supported input schema names, independent of their ordering."""
     return tuple(sorted(_REGISTRY))
-
-
-def _integer(name, value, minimum, maximum=None):
-    if (isinstance(value, bool) or not isinstance(value, int) or value < minimum
-            or (maximum is not None and value > maximum)):
-        raise ValueError(f'{name} must be an integer >= {minimum}'
-                         + ('' if maximum is None else f' and <= {maximum}'))
-    return value
-
-
-def _reject_number(value):
-    raise ValueError(f'nonfinite JSON number: {value}')
-
-
-def _float(value):
-    result = float(value)
-    if not math.isfinite(result):
-        _reject_number(value)
-    return result
 
 
 def _load(text, max_input_bytes):

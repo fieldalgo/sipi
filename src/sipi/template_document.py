@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from inspect import signature
 import json
 
-from .circuit_document import _json_copy
-from .document import CrossSectionDocument, _keys, _unique_object
+from ._validation import _json_copy, _keys, _unique_object
+from .document import CrossSectionDocument
 from .sampling import _scalar
 from .study import _TEMPLATES
 

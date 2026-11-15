@@ -12,30 +12,12 @@ import json
 
 import numpy as np
 
-from .document import _keys, _unique_object
+from ._validation import _keys, _unique_object, _json_copy
 from .network import LineNetwork, rlgc_network
 from .termination import Crosstalk, TerminatedNetwork, loaded_crosstalk, terminate_network
 from .touchstone import loads_touchstone
 
 __all__ = ['CircuitDocument', 'CircuitResult']
-
-
-def _json_copy(value):
-    try:
-        text = json.dumps(value, allow_nan=False)
-        def check_keys(item):
-            if isinstance(item, dict):
-                if any(not isinstance(key, str) for key in item):
-                    raise ValueError('JSON object keys must be strings')
-                for child in item.values():
-                    check_keys(child)
-            elif isinstance(item, (list, tuple)):
-                for child in item:
-                    check_keys(child)
-        check_keys(value)
-        return json.loads(text)
-    except (TypeError, ValueError) as exc:
-        raise ValueError('circuit input must contain only finite JSON values') from exc
 
 
 def _network_input(data):

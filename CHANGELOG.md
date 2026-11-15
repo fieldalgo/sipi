@@ -1,5 +1,7 @@
 # Changelog
 
+- Separate shared document validators from domain and execution modules while preserving saved inputs, errors and legacy helper imports.
+
 - Retain explicit corner resolution through finite FEM mesh and open-domain assessments.
 
 - Save corner-controlled FEM line quantity goals with original search, refinement and execution budgets.

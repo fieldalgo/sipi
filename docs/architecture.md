@@ -2,7 +2,7 @@
 
 [한국어](architecture.ko.md)
 
-Status: responsibility and extraction design, inspected against `fb3abe6`.
+Status: responsibility design plus an initial shared-validation extraction.
 This document does not create a distribution, namespace, repository, web route
 or release. The existing `sipi` imports, CLI and versioned documents remain
 unchanged. SIPI is the product; transmission-line design is its first focused
@@ -80,13 +80,12 @@ that the package can already be extracted:
    propagation in `network.py`. `ports3d.py` imports them. Extracting the entire
    module as a line-only dependency would make a 3D consumer depend on that
    distribution merely to represent network results.
-3. `template_document.py` uses JSON helpers from `circuit_document.py` and a
-   template registry from `study.py`. Separate neutral validation and template
-   registration before attempting an independent section-document API.
-4. `project.py` and `execution_record.py` use private helpers from circuit,
-   section-document and execution modules. `project_io.py` imports an integer
-   validator from `execution.py`. Move neutral helpers in a small, separately
-   verified step; do not duplicate validation rules.
+3. `template_document.py` now obtains JSON helpers directly from the internal
+   `_validation.py`, but still uses the template registry from `study.py`.
+   Template registration remains to be separated before a section-only API.
+4. `project.py`, `execution_record.py`, `project_io.py` and execution requests
+   obtain neutral validators from `_validation.py`. Product request/record
+   composition and domain-specific validation remain in their existing modules.
 5. `execution_request.py` imports concrete line document types through
    `execution.py`, whose registry imports many physical models. Domain providers
    should eventually declare their supported documents and admission metadata;
@@ -118,7 +117,7 @@ new dependency or promise an independently installable line package based on
 this document. A possible future line distribution name and import path are
 deliberately undecided. Separate packages may still share a repository.
 
-1. Document ownership and current cross-boundary dependencies (this step).
+1. Document ownership and current cross-boundary dependencies.
 2. Extract neutral validation and data contracts without changing results or
    public imports. Check existing serialization and failure behavior.
 3. Separate shared network representation from line propagation, then expose a
@@ -133,5 +132,14 @@ deliberately undecided. Separate packages may still share a repository.
    Package separation does not remove the one-EXE, offline calculation and
    default-browser requirements. Do not add a browser engine to the bundle.
 
-This step changes documentation only. It does not implement steps 2–6, merge a
-branch, change dependency pins or establish release readiness.
+The initial part of step 2 moves eight existing JSON/object/name/finite-number
+and integer validators unchanged into an internal standard-library-only module.
+The prior `document`, `circuit_document` and `execution` helper paths remain
+aliases. Existing error text, including the historical circuit-labelled
+JSON-copy error, is preserved. Callers still own byte limits, domain semantics,
+serialization settings and schema dispatch; these are not unified or weakened.
+
+The validator file can load on its own without numerical packages or the product
+registry. Importing `sipi` still runs the broad package initializer. This is not
+an independent line distribution, lazy package facade or full implementation of
+steps 2–6. Numerical algorithms, dependency pins and release status are unchanged.

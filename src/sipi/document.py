@@ -5,8 +5,8 @@
 from __future__ import annotations
 
 import json
-import math
-from numbers import Real
+
+from ._validation import _keys, _number, _name, _unique_object
 
 from .crosssection import CrossSection, Layer, Trace
 from .polygons import PolygonTrace, DielectricRegion, _vertices
@@ -22,25 +22,6 @@ def _trace(row):
     return PolygonTrace(**values) if row.get('kind') == 'polygon' else Trace(**values)
 
 
-def _keys(value, required, optional=(), *, where):
-    if not isinstance(value, dict):
-        raise ValueError(f'{where} must be an object')
-    if set(value) - set(required) - set(optional) or set(required) - set(value):
-        raise ValueError(f'{where} has missing or unknown fields')
-
-
-def _number(value, where):
-    if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value):
-        raise ValueError(f'{where} must be a finite real number')
-    return float(value)
-
-
-def _name(value, where):
-    if not isinstance(value, str) or not value.strip():
-        raise ValueError(f'{where} must be a nonempty string')
-    return value
-
-
 def _mesh(value):
     _keys(value, (), ('edge_size', 'far_size', 'grade', 'min_angle'), where='mesh')
     result = {k: _number(v, 'mesh.'+k) for k, v in value.items()}
@@ -52,15 +33,6 @@ def _mesh(value):
     if 'min_angle' in result and not 0 < result['min_angle'] < 34:
         raise ValueError('mesh.min_angle must be in (0, 34) degrees')
     return result
-
-
-def _unique_object(pairs):
-    out = {}
-    for key, value in pairs:
-        if key in out:
-            raise ValueError(f'duplicate JSON field: {key}')
-        out[key] = value
-    return out
 
 
 class CrossSectionDocument:
