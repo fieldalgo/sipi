@@ -1,5 +1,7 @@
 # Changelog
 
+- Preserve explicit corner resolution in FEM line quantity samples and their saved failure records.
+
 - Add an explicit saved corner target for FEM shape line calculations, preserving current checks and failure history.
 
 - Save explicit corner-controlled impedance goals with retained search, refinement and mesh-limit evidence.

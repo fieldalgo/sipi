@@ -122,26 +122,32 @@ class FEMShapeLineQuantityStudyDocument:
     def samples(self): return ImpedanceStudyDocument.from_dict(self._data['study']).samples()
 
     def analyze(self, *, max_evaluations=128):
-        budget = _integer(max_evaluations, 2, 10000)
-        data = self.to_dict(); study = data['study']; samples = self.samples()
-        if len(samples) > budget: raise ValueError('sample count exceeds max_evaluations before any solve')
-        rows = []
-        for index, values in enumerate(samples):
-            parameters_json = material_json = input_json = details = None
-            line = None; value = None; phase = 'parameters'; error_type = error = None
-            try:
-                parameters = _parameters(study, values); parameters_json = _json(parameters)
-                phase = 'materials'; evaluation = _sample_material(study, values); material_json = _json(evaluation)
-                phase = 'input'; doc = _line(study, parameters, evaluation, data); input_json = doc.dumps()
-                phase = 'extraction'; line = doc.analyze()
-                names = tuple(trace.name for trace in doc.cross_section.section.traces if not trace.ground)
-                phase = 'diagnostic'; value = _quantity(line, names, evaluation['frequency_hz'], data['quantity'])
-                phase = 'complete'
-            except Exception as exc:
-                value = None; error_type = type(exc).__name__; error = str(exc)
-                if isinstance(exc, FEMShapeLineError): details = _json(exc.to_dict())
-            rows.append(FEMShapeLineQuantityStudyRow(index, tuple(map(float, values)), parameters_json,
-                material_json, input_json, value, phase, error_type, error, line, details))
-        summary = _summary([row.value for row in rows]) if all(row.complete for row in rows) else None
-        return FEMShapeLineQuantityStudy(self.dumps(), data['quantity'],
-            tuple(v['name'] for v in study['sampling']['variables']), tuple(rows), summary)
+        return _analyze_fem_shape_study(self, max_evaluations=max_evaluations)
+
+
+def _analyze_fem_shape_study(document, *, max_evaluations=128, data=None, line_factory=None):
+    budget = _integer(max_evaluations, 2, 10000)
+    data = document.to_dict() if data is None else data
+    factory = _line if line_factory is None else line_factory
+    study = data['study']; samples = document.samples()
+    if len(samples) > budget: raise ValueError('sample count exceeds max_evaluations before any solve')
+    rows = []
+    for index, values in enumerate(samples):
+        parameters_json = material_json = input_json = details = None
+        line = None; value = None; phase = 'parameters'; error_type = error = None
+        try:
+            parameters = _parameters(study, values); parameters_json = _json(parameters)
+            phase = 'materials'; evaluation = _sample_material(study, values); material_json = _json(evaluation)
+            phase = 'input'; doc = factory(study, parameters, evaluation, data); input_json = doc.dumps()
+            phase = 'extraction'; line = doc.analyze()
+            names = tuple(trace.name for trace in doc.cross_section.section.traces if not trace.ground)
+            phase = 'diagnostic'; value = _quantity(line, names, evaluation['frequency_hz'], data['quantity'])
+            phase = 'complete'
+        except Exception as exc:
+            value = None; error_type = type(exc).__name__; error = str(exc)
+            if isinstance(exc, FEMShapeLineError): details = _json(exc.to_dict())
+        rows.append(FEMShapeLineQuantityStudyRow(index, tuple(map(float, values)), parameters_json,
+            material_json, input_json, value, phase, error_type, error, line, details))
+    summary = _summary([row.value for row in rows]) if all(row.complete for row in rows) else None
+    return FEMShapeLineQuantityStudy(document.dumps(), data['quantity'],
+        tuple(v['name'] for v in study['sampling']['variables']), tuple(rows), summary)
