@@ -76,3 +76,13 @@ before closing the page. No HTML from user labels is interpreted.
 Browser acceptance also changes dielectric permittivity in each template,
 checks immutable A/exact B exports, notes, selected geometry, stale-result
 handling, explicit clear, and rendering of markup-like labels as plain text.
+
+## Numeric input arrows
+
+Use the up/down buttons or ArrowUp/ArrowDown for small changes: trace width,
+gap, substrate height/plane spacing and width-search bounds change by 0.01 mm;
+copper thickness by 0.001 mm; box width and air height by 0.1 mm; relative
+permittivity by 0.1; target impedance by 1 ohm; and target tolerance by 0.01 ohm.
+The controls respect each field's minimum. You can still type any valid decimal;
+opening a design or receiving a calculated width does not round it onto a step grid.
+Changing a value invalidates the current result as before.
