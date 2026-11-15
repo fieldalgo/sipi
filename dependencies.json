@@ -1,7 +1,7 @@
 {
   "development_source": {
     "repository": "fieldalgo/openphysics",
-    "commit": "7abf7ff4ee8b435505621a25ed79e171403b4102"
+    "commit": "d49e796b088c21bd633305500c0b0a3897ee0357"
   },
   "packages": [
     "galerkin",

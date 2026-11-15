@@ -1,7 +1,10 @@
 # Isolated mesh candidate diagnostics
 
 This unshipped developer study compares original meshine with a four-call
-scalar-length candidate. It leaves `dependencies.json` unchanged.
+scalar-length candidate at the frozen manifest revision. Running this study
+does not edit `dependencies.json`. The current product baseline is recorded
+separately there; do not replace this historical manifest or its references
+with a newer dependency revision.
 `manifest.json` records the exact shared commit, package/test file hashes,
 reviewable patch, candidate source hash, inputs and runtime reference.
 Wrong commits, changed bytes and existing output directories are rejected.

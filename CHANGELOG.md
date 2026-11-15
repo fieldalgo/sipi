@@ -1,5 +1,7 @@
 # Changelog
 
+- Use a verified shared small-angle scalar-length baseline while retaining original mesh criteria and historical runtime references.
+
 - Reuse bounded geometry calculations within two-ground material studies while retaining every sampled row, field evaluation and failure.
 
 - Reuse detached, bounded two-ground meshes within paired goal requests while preserving every attempt, refinement and failure record.
