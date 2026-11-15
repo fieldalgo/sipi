@@ -1,5 +1,7 @@
 # Changelog
 
+- Select fixed face-metal frequency-grid candidates with simultaneous joint IID confidence bounds and complete attempt accounting.
+
 - Connect face-metal frequency-grid studies to joint IID limits and conservative unknown-trial confidence envelopes.
 
 - Add face-metal manufacturing samples across finite frequency grids with atomic failed rows and retained material/current evidence.

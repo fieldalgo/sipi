@@ -89,3 +89,5 @@ minimum-probability decisions and failed CLI restoration.
 The interval is conditional on IID draws from the stated model. It does not
 cover wrong distributions, field/model error, continuous frequencies, selection
 bias, measured production yield or browser/platform qualification.
+
+[Fixed-family selection](two_ground_face_sampled_pair_selection.md)

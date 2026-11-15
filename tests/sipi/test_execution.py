@@ -632,6 +632,8 @@ def documents():
     base.append(face_grid_study())
     from test_two_ground_face_sampled_pair_yield import document as face_grid_yield
     base.append(face_grid_yield())
+    from test_two_ground_face_sampled_pair_selection import document as face_grid_selection
+    base.append(face_grid_selection())
     return base
 
 
