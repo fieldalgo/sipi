@@ -60,3 +60,5 @@ forward matrix at 1e-10. The two diagonal corners separately check mesh halving
 and finite widths 8/16/32 mm at 256 panels with original 0.01 limits. The associated
 record identifies actual results. This is finite selected-case evidence, not
 infinite-domain, arbitrary-shape, browser/platform or measured qualification.
+
+[Scalar or single launched-pair quantity samples](two_ground_face_line_study.md)

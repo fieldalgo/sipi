@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit two-ground face-metal scalar impedance, attenuation and single launched-pair quantity samples with retained failed rows.
+
 - Add explicit two-ground face-metal manufacturing samples with paired launch values, retained invalid rows and descriptive all-success statistics.
 
 - Add a strict saved two-ground face-metal pair-goal schema with field-free corner admission, retained failure records and shared request/project/CLI execution.
