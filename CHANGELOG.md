@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit bounded face-metal volume/panel refinement plans with two consecutive passes, reserved outer checks and retained typed failures.
+
 - Save face-metal frequency-resolution acceptance plans with complete budgets, unknown-row retention and shared execution/project replay.
 
 - Compare joint face-metal frequency-grid acceptance across explicit resolutions, retaining disagreements as unresolved original trials.

@@ -90,3 +90,5 @@ or browser/platform acceptance. Original failed observations and thresholds
 remain unchanged.
 
 [Save a face-metal assessment and partial record](two_ground_face_resolution_document.md)
+
+[Bounded consecutive refinement](adaptive_two_ground_face_resolution.md)
