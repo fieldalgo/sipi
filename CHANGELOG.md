@@ -1,5 +1,7 @@
 # Changelog
 
+- Seek two-ground paired impedances across explicit frequency grids with frozen refinements, retained failures and unchanged numerical gates.
+
 - Keep two-ground manufacturing samples fixed across finite frequency grids, preserving failed rows, dispersive materials and saved execution records.
 
 - Separate the section factory catalog from impedance studies while retaining factory identities, legacy aliases and saved section documents.

@@ -55,3 +55,6 @@ with .1ohm tolerances,128→256 panels and a64-attempt limit. The accompanying
 record states whether this unchanged study passed. Independent matrix-square-root
 forward impedances check the selected and refined extracted RLGC. A bounded
 numerical pass is not general geometry or platform qualification.
+
+[Finite-frequency goals](two_ground_sampled_pair_goal.md) apply both launch targets
+at every explicitly supplied frequency, with the same reserved refinements.
