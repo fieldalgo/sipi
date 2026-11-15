@@ -605,6 +605,8 @@ def documents():
     base.append(two_ground_resolution())
     from test_two_ground_sampled_pair_study import document as two_ground_sampled_study
     base.append(two_ground_sampled_study())
+    from test_two_ground_sampled_pair_goal_document import document as two_ground_sampled_design
+    base.append(two_ground_sampled_design())
     return base
 
 

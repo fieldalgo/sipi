@@ -84,3 +84,6 @@ to the optimizer result.
 The pinned shared development capability is required, without a fallback solver.
 Exact source and installed artifacts, browser Worker and macOS/Windows validation
 remain separate acceptance evidence.
+
+A [saved goal document](two_ground_sampled_pair_goal_document.md) connects
+explicit template/material variables to the same finite-grid search.

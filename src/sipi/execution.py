@@ -43,6 +43,7 @@ from .two_ground_line_goal import TwoGroundLineQuantityGoalError
 from .two_ground_line_yield import TwoGroundLineQuantityYieldDocument
 from .two_ground_resolution_document import TwoGroundResolutionDocument
 from .two_ground_sampled_pair_study import TwoGroundSampledForwardPairStudyDocument
+from .two_ground_sampled_pair_goal_document import TwoGroundSampledForwardPairDesignDocument
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
@@ -185,6 +186,7 @@ _REGISTRY = {
     'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,
     'sipi.two-ground-resolution/1': TwoGroundResolutionDocument,
     'sipi.two-ground-sampled-forward-pair-study/1': TwoGroundSampledForwardPairStudyDocument,
+    'sipi.two-ground-sampled-forward-pair-design/1': TwoGroundSampledForwardPairDesignDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
     'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
@@ -645,7 +647,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 material_evaluation=(None if exc.material_evaluation_json is None
                                      else json.loads(exc.material_evaluation_json)),
                 history=[row.to_dict() for row in exc.history]))
-    elif isinstance(doc, (SampledPanelForwardPairDesignDocument, ShapeSampledPanelForwardPairDesignDocument)):
+    elif isinstance(doc, (SampledPanelForwardPairDesignDocument, ShapeSampledPanelForwardPairDesignDocument, TwoGroundSampledForwardPairDesignDocument)):
         goal_data = data['design'] if isinstance(doc, ShapeSampledPanelForwardPairDesignDocument) else data
         if goal_data['max_evaluations'] > budget:
             raise ValueError('saved goal batch budget exceeds max_evaluations before any solve')
@@ -659,6 +661,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 input=None if exc.input_json is None else json.loads(exc.input_json),
                 history=[row.to_dict() for row in exc.history]))
             if isinstance(doc, ShapeSampledPanelForwardPairDesignDocument) and isinstance(exc.__cause__, ShapePanelLineError):
+                out['error']['cause_details'] = exc.__cause__.to_dict()
+            if isinstance(doc, TwoGroundSampledForwardPairDesignDocument) and isinstance(exc.__cause__, TwoGroundPanelLineError):
                 out['error']['cause_details'] = exc.__cause__.to_dict()
     elif isinstance(doc, (ForwardPairDesignDocument, PanelForwardPairDesignDocument, ShapePanelForwardPairDesignDocument, TwoGroundForwardPairDesignDocument)):
         goal_data = doc.goal_input if isinstance(doc, (PanelForwardPairDesignDocument, ShapePanelForwardPairDesignDocument, TwoGroundForwardPairDesignDocument)) else data

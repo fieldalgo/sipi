@@ -1,5 +1,7 @@
 # Changelog
 
+- Save two-ground paired targets on finite frequency grids with strict admission, frozen refinements and complete failure history.
+
 - Seek two-ground paired impedances across explicit frequency grids with frozen refinements, retained failures and unchanged numerical gates.
 
 - Keep two-ground manufacturing samples fixed across finite frequency grids, preserving failed rows, dispersive materials and saved execution records.
