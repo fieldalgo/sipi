@@ -72,3 +72,5 @@ SI 딕셔너리이다.
 별도 검사이다.
 
 [면별 금속을 유지하는 쌍 선로 역산](two_ground_face_pair_goal.md)
+
+[유한 체적·패널·외곽 일치 평가](two_ground_face_resolution.md)

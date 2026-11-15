@@ -81,3 +81,5 @@ before using a result for engineering decisions. Native/Worker parity and
 packaged-platform qualification are separate checks.
 
 [Paired forward-impedance goal with face laws](two_ground_face_pair_goal.md)
+
+[Assess finite volume, panel and outer agreement](two_ground_face_resolution.md)

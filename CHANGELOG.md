@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit face-metal volume, panel and outer-domain assessments with retained per-entry limits and partial failures.
+
 - Connect finite-frequency face-metal paired goals to strict saved inputs, shared execution and restored CLI records.
 
 - Add explicit face-metal paired goals across finite frequency grids with unchanged per-frequency target and independent refinement gates.
