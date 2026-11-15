@@ -95,3 +95,5 @@ Face laws and coatings remain attached to their named physical boundaries
 through every frozen refinement. Only the dielectric mesh context is reused;
 no whole-boundary current cache substitutes for face-current evaluation. The
 prior whole-boundary API and its numerical criteria remain unchanged.
+
+[Save a face-metal finite-frequency goal](two_ground_face_sampled_pair_goal_document.md)

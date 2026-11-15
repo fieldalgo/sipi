@@ -624,6 +624,8 @@ def documents():
     from test_two_ground_face_line_yield import document as face_line_yield
     from test_two_ground_face_pair_yield import document as face_pair_yield
     base.extend([face_line_yield(), face_pair_yield()])
+    from test_two_ground_face_sampled_pair_goal_document import document as face_grid_goal
+    base.append(face_grid_goal())
     return base
 
 

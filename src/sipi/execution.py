@@ -54,6 +54,7 @@ from .two_ground_face_line_yield import TwoGroundFaceLineQuantityYieldDocument
 from .two_ground_resolution_document import TwoGroundResolutionDocument
 from .two_ground_sampled_pair_study import TwoGroundSampledForwardPairStudyDocument
 from .two_ground_sampled_pair_goal_document import TwoGroundSampledForwardPairDesignDocument
+from .two_ground_face_sampled_pair_goal_document import TwoGroundFaceSampledForwardPairDesignDocument
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
@@ -206,6 +207,7 @@ _REGISTRY = {
     'sipi.two-ground-resolution/1': TwoGroundResolutionDocument,
     'sipi.two-ground-sampled-forward-pair-study/1': TwoGroundSampledForwardPairStudyDocument,
     'sipi.two-ground-sampled-forward-pair-design/1': TwoGroundSampledForwardPairDesignDocument,
+    'sipi.two-ground-face-sampled-forward-pair-design/1': TwoGroundFaceSampledForwardPairDesignDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
     'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,

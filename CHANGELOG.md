@@ -1,5 +1,7 @@
 # Changelog
 
+- Connect finite-frequency face-metal paired goals to strict saved inputs, shared execution and restored CLI records.
+
 - Add explicit face-metal paired goals across finite frequency grids with unchanged per-frequency target and independent refinement gates.
 
 - Connect face-metal scalar and paired IID studies to inclusive acceptance limits and conservative unknown-row confidence envelopes.
