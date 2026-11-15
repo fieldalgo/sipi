@@ -593,6 +593,8 @@ def documents():
     base.append(two_ground_goal())
     from test_two_ground_pair_study import document as two_ground_study
     base.append(two_ground_study())
+    from test_two_ground_pair_yield import document as two_ground_yield
+    base.append(two_ground_yield())
     return base
 
 

@@ -33,3 +33,6 @@ Ic=0, Id=0의 별도 여기 조건에서 차동·공통 순방향 특성 임피�
 `dependencies.json`의 정확한 공유 리비전이 제공하는 `galerkin.laplace_two_ground`가
 필요합니다. 기능이 없으면 명시적으로 실패하며 다른 전류 계산법을
 대신 사용하지 않습니다. 브라우저·macOS·Windows 검증은 Linux 검사와 별개입니다.
+
+균등·정규 iid 표본의 [동시 규격 평가](two_ground_pair_yield.md)는 실패 행도
+확률 구간의 분모에 보존합니다.

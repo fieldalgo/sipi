@@ -98,10 +98,18 @@ def assess_panel_pair_yield(study, *, acceptance, confidence=.95, minimum_yield=
     allowed. Structural sample/row checks do not authenticate manually built
     field results. No field solve occurs during this assessment.
     """
+    return _assess_pair_yield(study, acceptance=acceptance, confidence=confidence,
+        minimum_yield=minimum_yield, study_type=PanelForwardPairStudy,
+        source_type=PanelForwardPairStudyDocument, assessment_type=PanelPairYieldAssessment)
+
+
+def _assess_pair_yield(study, *, acceptance, confidence, minimum_yield,
+                       study_type, source_type, assessment_type):
+    """Shared iid row/event checks with an explicit source contract and result type."""
     limits, level, target = _acceptance(acceptance, confidence, minimum_yield)
-    if not isinstance(study, PanelForwardPairStudy):
-        raise ValueError('yield assessment requires a PanelForwardPairStudy')
-    source = PanelForwardPairStudyDocument.loads(study.input_json)
+    if not isinstance(study, study_type):
+        raise ValueError('yield assessment requires a '+study_type.__name__)
+    source = source_type.loads(study.input_json)
     data = source.to_dict(); sampling = data['study']['sampling']
     if sampling['kind'] not in ('uniform', 'normal'):
         raise ValueError('joint yield requires iid uniform or normal samples, not sweep/corners')
@@ -132,7 +140,7 @@ def assess_panel_pair_yield(study, *, acceptance, confidence=.95, minimum_yield=
                 raise ValueError('unresolved row must retain its failed phase, error and no pair values')
             labels.append('unresolved')
     bounds = _interval(labels.count('pass'), labels.count('unresolved'), len(labels), level)
-    return PanelPairYieldAssessment(study, limits, level, target, tuple(labels), bounds)
+    return assessment_type(study, limits, level, target, tuple(labels), bounds)
 
 
 class PanelForwardPairYieldDocument:

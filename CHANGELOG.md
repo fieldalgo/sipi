@@ -370,6 +370,12 @@
 
 ## [Unreleased]
 
+- Add saved joint acceptance for explicit two-ground iid manufacturing samples,
+  preserving unknown rows and the existing exact binomial confidence envelope.
+  Share the original paired statistical validator without changing its public
+  schemas, calculation or refusal rules.
+
+
 - Add explicit two-ground surface currents with separate signal/top/bottom metal
   laws, matched dielectric RLGC, saved line execution, bounded paired impedance
   design and ordered manufacturing studies. Require the exact shared Laplace

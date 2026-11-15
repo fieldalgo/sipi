@@ -58,3 +58,6 @@ The explicit shared `galerkin.laplace_two_ground` capability is required. This
 uses the exact shared development revision in `dependencies.json`. Missing
 capability fails explicitly; no other current method is substituted. Browser,
 macOS and Windows qualification are separate from these Linux checks.
+
+For iid uniform/normal samples, [joint acceptance](two_ground_pair_yield.md)
+keeps failed rows in the probability bounds.
