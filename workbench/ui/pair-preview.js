@@ -6,11 +6,43 @@ const browser = document.documentElement.dataset.runtime === 'browser';
 const transport = browser ? new BrowserTransport() : new LocalTransport();
 const supported = ['coupled_microstrip', 'coupled_stripline'];
 const fields = ['width', 'gap', 'height', 'thickness', 'eps_r', 'box_width', 'air_height'];
-let parameters = null, mesh = null, latest = null, baseline = null, busy = false, generation = 0;
+let parameters = null, mesh = null, latest = null, baseline = null, busy = false, generation = 0, activeArea = 'analysis';
 const changed = new Set();
 $('runtime-note').textContent = browser ? 'Calculations run in this browser. Design files are not uploaded. The first calculation loads the local engine assets.' : 'Local review build: calculations run on this computer through the SIPI engine. Design files are not uploaded.';
-function status(message, error = false) { $('status').textContent = message; $('status').classList.toggle('error', error); }
-function invalidate() { latest = null; $('result').hidden = true; $('failure').hidden = true; comparison(); }
+function status(message, error = false, area = activeArea) {
+  const element = $(area === 'design' ? 'design-status' : area === 'file' ? 'file-status' : 'status');
+  element.hidden = !message; element.textContent = message; element.classList.toggle('error', error);
+}
+function invalidate() {
+  latest = null; $('result').hidden = true; $('failure').hidden = true; $('range-feedback').hidden = true;
+  status('Calculate impedance to check the current dimensions.', false, 'analysis');
+  status('Set a target and width range, then find width.', false, 'design');
+  status('', false, 'file'); comparison();
+}
+function showRangeFailure(error, request) {
+  if (request?.action !== 'design' || !error.message.includes('not bracketed') || !Array.isArray(error.history)) return false;
+  const endpoints = error.history.filter(point => point.stage === 'search' && Number.isFinite(point.parameter) && Number.isFinite(point.impedance));
+  if (endpoints.length !== 2) return false;
+  const [a, b] = [...endpoints].sort((a, b) => a.parameter - b.parameter);
+  const low = Math.min(a.impedance, b.impedance), high = Math.max(a.impedance, b.impedance);
+  status(`Target ${request.design.target} Ω is outside the boundary results (${low.toFixed(3)}–${high.toFixed(3)} Ω). No width was selected.`, true);
+  $('range-rows').replaceChildren();
+  for (const point of [a, b]) {
+    const row = document.createElement('tr');
+    for (const value of [String(Number((point.parameter * 1e3).toPrecision(10))), point.impedance.toFixed(3)]) {
+      const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
+    }
+    $('range-rows').append(row);
+  }
+  let advice = 'Try a different width range or review the target and stackup.';
+  if (a.impedance > b.impedance) {
+    if (request.design.target > high) advice = 'Try a smaller minimum width, or review the target and stackup.';
+    else if (request.design.target < low) advice = 'Try a larger maximum width, or review the target and stackup.';
+  }
+  $('range-guidance').textContent = `${advice} These are the two boundary samples, not a guarantee that another range can reach the target. Your inputs have not been changed.`;
+  $('range-feedback').hidden = false;
+  return true;
+}
 function lock(value) {
   busy = value;
   for (const element of document.querySelectorAll('button,input,select')) element.disabled = value;
@@ -137,8 +169,13 @@ function download(name, value) {
 async function run(action, extra={}) {
   if(busy) return;
   invalidate(); const version=++generation;
+  activeArea = action === 'design' ? 'design' : action.startsWith('template-') ? 'file' : 'analysis';
+  const output = $(activeArea === 'design' ? 'design-output' : 'analysis-output');
+  output.append($('cancel'), $('result'), $('failure'));
+  if (activeArea === 'file') $('file-status').after($('cancel'));
+  let request;
   try {
-    const request = action==='template-open' ? {action,...extra} : input(action);
+    request = action==='template-open' ? {action,...extra} : input(action);
     if(action==='design') {
       if(!$('goal').reportValidity()) throw new Error('Check target and width bounds.');
       request.design={target:Number($('target').value),bounds:[Number($('lower').value)*1e-3,Number($('upper').value)*1e-3],tolerance:Number($('tolerance').value)};
@@ -159,23 +196,27 @@ async function run(action, extra={}) {
       $('z-diff').textContent=result.line.z_diff.toFixed(3); $('z-common').textContent=result.line.z_common.toFixed(3);
       $('refinement').textContent=result.design ? `Selected width ${(result.design.width*1e3).toPrecision(7)} mm. Initial ${result.design.impedance.toFixed(5)} Ω; refined ${result.design.refined_impedance.toFixed(5)} Ω. Both meet the requested target tolerance.` : 'Single mesh result. Mesh and outer-boundary convergence have not been checked by this calculation.';
       $('details').textContent=JSON.stringify({engine:result.engine,mesh:result.document.mesh,line:result.line,design:result.design},null,2);
-      $('result').hidden=false; status('Calculation complete. Review model limits before using the result.');
+      $('width-result').hidden = !result.design;
+      if (result.design) $('chosen-width').textContent = String(Number((result.design.width * 1e3).toPrecision(10)));
+      $('result').hidden=false;
+      status(result.design ? 'Width found. Initial and refined target checks passed.' : 'Impedance calculated for the current dimensions.');
+      if (result.design) status('Selected width applied. The search result is in section 03 below.', false, 'analysis');
     }
   } catch(error) {
     if(version!==generation) return;
-    invalidate(); status(error.message,true);
+    invalidate(); if (!showRangeFailure(error, request)) status(error.message,true);
     if(error.history) {$('failure-data').textContent=JSON.stringify(error.history,null,2);$('failure').hidden=false;}
   } finally {if(version===generation) lock(false);}
 }
 $('inputs').addEventListener('submit',event=>{event.preventDefault();run('analyze');});
 $('goal').addEventListener('submit',event=>{event.preventDefault();run('design');});
-for(const id of [...fields,'target','lower','upper','tolerance','material-label','material-note']) $(id).addEventListener('input',()=>{++generation;changed.add(id);invalidate();draw();status('Inputs changed. Calculate to update the result.');});
-$('template').addEventListener('change',()=>{++generation;parameters=null;mesh=null;changed.clear();invalidate();$('height').value=$('template').value==='coupled_stripline'?'1':'0.2';controls();draw();status('Structure changed. Calculate to update the result.');});
+for(const id of [...fields,'target','lower','upper','tolerance','material-label','material-note']) $(id).addEventListener('input',()=>{++generation;changed.add(id);invalidate();draw();status('Inputs changed. Calculate to update the result.', false, 'analysis');status('Inputs changed. Find width to update the search result.', false, 'design');});
+$('template').addEventListener('change',()=>{++generation;parameters=null;mesh=null;changed.clear();invalidate();$('height').value=$('template').value==='coupled_stripline'?'1':'0.2';controls();draw();status('Structure changed. Calculate to update the result.', false, 'analysis');});
 $('save').addEventListener('click',()=>run('template-document'));
 $('open').addEventListener('click',()=>$('file').click());
 $('file').addEventListener('change',async()=>{
   const file=$('file').files[0]; $('file').value=''; if(!file || busy) return;
-  const version=++generation; invalidate();
+  const version=++generation; invalidate(); activeArea='file';
   if(file.size>200*1024){status('Design files must be at most 200 KiB.',true);return;}
   status('Reading design…');
   try{const text=await file.text();if(version===generation && !busy) await run('template-open',{text});}

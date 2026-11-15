@@ -96,6 +96,9 @@ try {
     await writeFile(join(output,'calculations.json'),JSON.stringify(records,null,2));
     // Keep the ordinary example target; verify both actual mesh gates.
     await click('design');await idle();
+    assert.equal(await cdp.evaluate('document.querySelector("#result").parentElement.id'),'design-output');
+    assert.equal(await cdp.evaluate('document.querySelector("#width-result").hidden'),false);
+    assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false);
     assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),false,await cdp.evaluate('document.querySelector("#status").textContent'));
     await click('export');const goal=await readDownload('sipi-pair-calculation.json');await rm(join(downloads,'sipi-pair-calculation.json'));
     assert.ok(Math.abs(goal.result.design.impedance-100)<=.1);
@@ -122,7 +125,7 @@ try {
     const inputPath=join(profile,'pair-input.json');await writeFile(inputPath,JSON.stringify(saved));
     const root=await cdp.call('DOM.getDocument');const file=await cdp.call('DOM.querySelector',{nodeId:root.root.nodeId,selector:'#file'});
     await cdp.call('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[inputPath]});
-    await until(()=>cdp.evaluate('document.querySelector("#status").textContent.startsWith("Design opened")'),'reopen');
+    await until(()=>cdp.evaluate('document.querySelector("#file-status").textContent.startsWith("Design opened")'),'reopen');
     assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
     assert.equal(await cdp.evaluate('document.querySelector("#material-label").value'),'Imported design — material not identified');
     await click('calculate');await idle();await click('export');const reopened=await readDownload('sipi-pair-calculation.json');await rm(join(downloads,'sipi-pair-calculation.json'));
@@ -131,6 +134,18 @@ try {
     records.push({template,kind:'reopened',...reopened});
   }
   await writeFile(join(output,'calculations.json'),JSON.stringify(records,null,2));
+  // A rejected target is a search-local failure with actual boundary evidence.
+  await edit('target',1000);await click('design');await idle();
+  assert.equal(await cdp.evaluate('document.querySelector("#design-status").classList.contains("error")'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),false);
+  assert.equal(await cdp.evaluate('document.querySelector("#failure").parentElement.id'),'design-output');
+  assert.equal(await cdp.evaluate('document.querySelector("#range-feedback").hidden'),false);
+  const endpoints=await cdp.evaluate('JSON.parse(document.querySelector("#failure-data").textContent)');
+  const shown=await cdp.evaluate('[...document.querySelectorAll("#range-rows tr")].map(row=>[...row.cells].map(cell=>cell.textContent))');
+  assert.equal(shown.length,2);
+  endpoints.forEach((point,i)=>{assert.equal(Number(shown[i][0]),point.parameter*1e3);assert.equal(shown[i][1],point.impedance.toFixed(3));});
+  await edit('target',100);
+  assert.equal(await cdp.evaluate('document.querySelector("#range-feedback").hidden'),true);
   await edit('thickness',2);await click('calculate');await idle();
   assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
@@ -146,7 +161,7 @@ try {
   const unsupportedPath=join(profile,'unsupported.json');await writeFile(unsupportedPath,unsupportedSaved.document_text);
   const doc=await cdp.call('DOM.getDocument');const fileInput=await cdp.call('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'#file'});
   await cdp.call('DOM.setFileInputFiles',{nodeId:fileInput.nodeId,files:[unsupportedPath]});
-  await until(()=>cdp.evaluate('document.querySelector("#status").classList.contains("error")'),'unsupported settings refusal');
+  await until(()=>cdp.evaluate('document.querySelector("#file-status").classList.contains("error")'),'unsupported settings refusal');
   assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
   await click('calculate');await idle();assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),false);
   await cdp.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
