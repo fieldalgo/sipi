@@ -125,7 +125,9 @@ class FEMShapeLineQuantityStudyDocument:
         return _analyze_fem_shape_study(self, max_evaluations=max_evaluations)
 
 
-def _analyze_fem_shape_study(document, *, max_evaluations=128, data=None, line_factory=None):
+def _analyze_fem_shape_study(document, *, max_evaluations=128, data=None, line_factory=None,
+        row_type=FEMShapeLineQuantityStudyRow, result_type=FEMShapeLineQuantityStudy,
+        cause_class=FEMShapeLineError):
     budget = _integer(max_evaluations, 2, 10000)
     data = document.to_dict() if data is None else data
     factory = _line if line_factory is None else line_factory
@@ -145,9 +147,9 @@ def _analyze_fem_shape_study(document, *, max_evaluations=128, data=None, line_f
             phase = 'complete'
         except Exception as exc:
             value = None; error_type = type(exc).__name__; error = str(exc)
-            if isinstance(exc, FEMShapeLineError): details = _json(exc.to_dict())
-        rows.append(FEMShapeLineQuantityStudyRow(index, tuple(map(float, values)), parameters_json,
+            if isinstance(exc, cause_class): details = _json(exc.to_dict())
+        rows.append(row_type(index, tuple(map(float, values)), parameters_json,
             material_json, input_json, value, phase, error_type, error, line, details))
     summary = _summary([row.value for row in rows]) if all(row.complete for row in rows) else None
-    return FEMShapeLineQuantityStudy(document.dumps(), data['quantity'],
+    return result_type(document.dumps(), data['quantity'],
         tuple(v['name'] for v in study['sampling']['variables']), tuple(rows), summary)

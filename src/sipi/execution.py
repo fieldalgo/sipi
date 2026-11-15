@@ -37,6 +37,7 @@ from .two_ground_conductor import TwoGroundConductorLoss
 from .two_ground_pair_goal_document import TwoGroundForwardPairDesignDocument
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
 from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
+from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
@@ -174,6 +175,7 @@ _REGISTRY = {
     'sipi.two-ground-forward-pair-design/1': TwoGroundForwardPairDesignDocument,
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
+    'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
     'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
@@ -604,7 +606,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         out['result'] = result.to_dict()
         if result.unresolved:
             out['status'] = 'incomplete'
-    elif isinstance(doc, (CornerFEMShapeLineQuantityStudyDocument, FEMShapeLineQuantityStudyDocument, LineQuantityStudyDocument, PanelForwardPairStudyDocument, SampledPanelForwardPairStudyDocument, ShapePanelForwardPairStudyDocument, ShapeSampledPanelForwardPairStudyDocument, TwoGroundForwardPairStudyDocument)):
+    elif isinstance(doc, (CornerFEMShapeLineQuantityStudyDocument, FEMShapeLineQuantityStudyDocument, LineQuantityStudyDocument, PanelForwardPairStudyDocument, SampledPanelForwardPairStudyDocument, ShapePanelForwardPairStudyDocument, ShapeSampledPanelForwardPairStudyDocument, TwoGroundForwardPairStudyDocument, TwoGroundLineQuantityStudyDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.failed:

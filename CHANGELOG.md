@@ -370,6 +370,12 @@
 
 ## [Unreleased]
 
+- Add explicit two-ground scalar/selected-pair line-quantity studies with saved
+  inputs, ordered geometry/material samples and retained failures/current/mesh
+  records. Reuse the existing quantity diagnostic and sampling loop with explicit
+  adapters; keep existing study schemas and numerical gates unchanged.
+
+
 - Add saved joint acceptance for explicit two-ground iid manufacturing samples,
   preserving unknown rows and the existing exact binomial confidence envelope.
   Share the original paired statistical validator without changing its public

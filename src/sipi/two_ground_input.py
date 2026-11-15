@@ -13,8 +13,11 @@ from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument
 def _line_from_inputs(data, parameters, evaluation):
     study = data['study']
     section = _TEMPLATES[study['template']](**parameters)
-    if sum(not trace.ground for trace in section.traces) != 2:
-        raise ValueError('two-ground paired source requires exactly two signals')
+    count = 2 if study['quantity'] == 'z_diff_forward' else 1
+    if sum(not trace.ground for trace in section.traces) != count:
+        message = ('two-ground paired source requires exactly two signals' if count == 2
+                   else 'two-ground scalar source requires exactly one signal')
+        raise ValueError(message)
     return TwoGroundPanelTransmissionLineDocument(
         CrossSectionDocument(section, mesh=study['mesh']), [evaluation['frequency_hz']],
         materials=_models(evaluation), conductors=data['conductors'],
@@ -29,9 +32,9 @@ def _line_from_values(data, values=None):
     return _line_from_inputs(data, parameters, evaluation)
 
 
-def _source_inputs(data):
+def _source_inputs(data, *, paired=True):
     _keys(data['panel'], ('panels_per_edge', 'ground_modes', 'interpolation_degree'), where='panel controls')
-    source = dict(study=_source_study(data['study'], paired=True),
+    source = dict(study=_source_study(data['study'], paired=paired),
                   conductors=data['conductors'], reference=data['reference'],
                   ground_thickness_m=data['ground_thickness_m'], panel=data['panel'])
     nominal = _line_from_values(source).to_dict()

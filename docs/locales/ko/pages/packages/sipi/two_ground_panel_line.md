@@ -45,3 +45,6 @@ L_external*C0=mu0*epsilon0*I 및 별도 구현한 행렬 지수·포트 파 변�
 실행파일은 바꾸지 않는다.
 
 별도 [저장 실행](two_ground_execution.md)는 host·요청·기록·CLI 전달을 추가한다.
+
+[선로 물리량 공차](two_ground_line_study.md)는 단선 임피던스·감쇠 또는 쌍의 한 여기량을
+기하·재료 표본에 연결합니다.

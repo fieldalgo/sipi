@@ -72,3 +72,6 @@ support. No existing input schema, threshold, fixture, failed result, default
 solver, public deployment or Windows executable is changed.
 
 The separate [saved execution](two_ground_execution.md) adds host/request/record/CLI transport.
+
+[Line-quantity sampling](two_ground_line_study.md) connects scalar impedance,
+attenuation or a selected paired launch to ordered geometry/material draws.
