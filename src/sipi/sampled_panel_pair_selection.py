@@ -95,36 +95,8 @@ class SampledPanelForwardPairSelectionDocument:
                           acceptance=acceptance, minimum_yield=minimum_yield, confidence=confidence))
 
     def _assign(self, data):
-        _keys(data, ('schema', 'candidates', 'cost_unit', 'acceptance', 'confidence', 'minimum_yield'),
-              where='panel pair selection')
-        if data['schema'] != _SCHEMA:
-            raise ValueError('unsupported panel-forward-pair-selection schema')
-        cost_unit = _text('cost_unit', data['cost_unit'])
-        raw = data['candidates']
-        if not isinstance(raw, list) or not 1 <= len(raw) <= 32:
-            raise ValueError('candidates must be a list of 1..32 fixed entries')
-        _candidate_confidence(data['confidence'], len(raw))
-        candidates, names, frequencies = [], set(), set()
-        for entry in raw:
-            _keys(entry, ('name', 'cost', 'study'), where='paired yield candidate')
-            name = _text('candidate name', entry['name'])
-            if name in names:
-                raise ValueError('candidate names must be unique')
-            names.add(name)
-            cost = _scalar('candidate cost', entry['cost'], zero=True)
-            study = SampledPanelForwardPairStudyDocument.from_dict(entry['study']).to_dict()
-            source = study['study']
-            if source['sampling']['kind'] not in ('uniform', 'normal'):
-                raise ValueError('paired candidates require iid uniform or normal sampling')
-            frequencies.add(tuple(study['frequency_hz']))
-            candidates.append(dict(name=name, cost=cost, study=study))
-        if len(frequencies) != 1:
-            raise ValueError('all candidates must use the exact same ordered frequency grid')
-        limits, confidence, target = _acceptance(data['acceptance'], data['confidence'], data['minimum_yield'], len(next(iter(frequencies))))
-        if target is None:
-            raise ValueError('paired selection requires minimum_yield')
-        self._data = dict(schema=_SCHEMA, candidates=candidates, cost_unit=cost_unit,
-                          acceptance=limits, minimum_yield=target, confidence=confidence)
+        self._data = _sampled_selection_data(data, schema=_SCHEMA,
+            source_type=SampledPanelForwardPairStudyDocument)
 
     @classmethod
     def from_dict(cls, data):
@@ -143,18 +115,60 @@ class SampledPanelForwardPairSelectionDocument:
         return json.loads(self.dumps())
 
     def analyze(self, *, max_evaluations=128):
-        budget = _integer(max_evaluations, 2, 10000); data = self._data
-        total = sum(c['study']['study']['sampling']['count'] for c in data['candidates'])
-        if total > budget:
-            raise ValueError('all candidate samples exceed max_evaluations before any solve')
-        level = _candidate_confidence(data['confidence'], len(data['candidates']))
-        documents = [SampledPanelForwardPairStudyDocument.from_dict(c['study']) for c in data['candidates']]
-        for document in documents:
-            document.samples()
-        candidates = []
-        for candidate, document in zip(data['candidates'], documents):
-            study = document.analyze(max_evaluations=budget)
-            assessment = assess_sampled_panel_pair_yield(study, acceptance=data['acceptance'],
-                confidence=level, minimum_yield=data['minimum_yield'])
-            candidates.append(SampledPanelPairCandidateAssessment(candidate['name'], candidate['cost'], assessment))
-        return SampledPanelPairSelectionResult(self.dumps(), tuple(candidates), level)
+        return _analyze_sampled_selection(self._data, self.dumps, max_evaluations=max_evaluations,
+            source_type=SampledPanelForwardPairStudyDocument, assess=assess_sampled_panel_pair_yield,
+            candidate_type=SampledPanelPairCandidateAssessment, result_type=SampledPanelPairSelectionResult)
+
+
+def _sampled_selection_data(data, *, schema, source_type):
+    """Validate one fixed family with an explicit physical source contract."""
+    _keys(data, ('schema', 'candidates', 'cost_unit', 'acceptance', 'confidence', 'minimum_yield'),
+          where='panel pair selection')
+    if data['schema'] != schema:
+        raise ValueError('unsupported panel-forward-pair-selection schema')
+    cost_unit = _text('cost_unit', data['cost_unit'])
+    raw = data['candidates']
+    if not isinstance(raw, list) or not 1 <= len(raw) <= 32:
+        raise ValueError('candidates must be a list of 1..32 fixed entries')
+    _candidate_confidence(data['confidence'], len(raw))
+    candidates, names, frequencies = [], set(), set()
+    for entry in raw:
+        _keys(entry, ('name', 'cost', 'study'), where='paired yield candidate')
+        name = _text('candidate name', entry['name'])
+        if name in names:
+            raise ValueError('candidate names must be unique')
+        names.add(name)
+        cost = _scalar('candidate cost', entry['cost'], zero=True)
+        study = source_type.from_dict(entry['study']).to_dict()
+        source = study['study']
+        if source['sampling']['kind'] not in ('uniform', 'normal'):
+            raise ValueError('paired candidates require iid uniform or normal sampling')
+        frequencies.add(tuple(study['frequency_hz']))
+        candidates.append(dict(name=name, cost=cost, study=study))
+    if len(frequencies) != 1:
+        raise ValueError('all candidates must use the exact same ordered frequency grid')
+    limits, confidence, target = _acceptance(data['acceptance'], data['confidence'], data['minimum_yield'], len(next(iter(frequencies))))
+    if target is None:
+        raise ValueError('paired selection requires minimum_yield')
+    return dict(schema=schema, candidates=candidates, cost_unit=cost_unit,
+                      acceptance=limits, minimum_yield=target, confidence=confidence)
+
+
+def _analyze_sampled_selection(data, input_json_factory, *, max_evaluations, source_type,
+                               assess, candidate_type, result_type):
+    """Reuse fixed-family allocation and ordered evaluation without resampling."""
+    budget = _integer(max_evaluations, 2, 10000)
+    total = sum(c['study']['study']['sampling']['count'] for c in data['candidates'])
+    if total > budget:
+        raise ValueError('all candidate samples exceed max_evaluations before any solve')
+    level = _candidate_confidence(data['confidence'], len(data['candidates']))
+    documents = [source_type.from_dict(c['study']) for c in data['candidates']]
+    for document in documents:
+        document.samples()
+    candidates = []
+    for candidate, document in zip(data['candidates'], documents):
+        study = document.analyze(max_evaluations=budget)
+        assessment = assess(study, acceptance=data['acceptance'],
+            confidence=level, minimum_yield=data['minimum_yield'])
+        candidates.append(candidate_type(candidate['name'], candidate['cost'], assessment))
+    return result_type(input_json_factory(), tuple(candidates), level)

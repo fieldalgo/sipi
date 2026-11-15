@@ -1,5 +1,7 @@
 # Changelog
 
+- Compare fixed two-ground frequency-grid candidates with simultaneous joint bounds, complete row budgets and retained uncertainty.
+
 - Add explicit two-ground joint iid acceptance over finite frequency grids, preserving unresolved rows and exact stored execution.
 
 - Save two-ground paired targets on finite frequency grids with strict admission, frozen refinements and complete failure history.

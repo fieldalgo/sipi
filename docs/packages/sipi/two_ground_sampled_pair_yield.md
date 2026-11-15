@@ -74,3 +74,5 @@ inversion, all unknown completions, opposing frequency failures, unchanged
 original event validation, strict stored input, execution/record/project replay,
 and a fixed four-draw Debye grid at 2, 3.5 and 5 GHz. Source and exact installed
 artifacts are checked separately. Linux evidence does not qualify other platforms.
+
+[Compare a fixed family with simultaneous bounds](two_ground_sampled_pair_selection.md).

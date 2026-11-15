@@ -68,3 +68,5 @@ assert TwoGroundSampledForwardPairYieldDocument.loads(assessment.dumps()).dumps(
 입력·실행·기록·프로젝트 복원, 2/3.5/5 GHz Debye 모델 네 표본을 검사합니다.
 소스와 정확한 설치 산출물을 별도로 검증하며 Linux 근거를 다른 플랫폼으로
 확대하지 않습니다.
+
+[동시 신뢰구간으로 고정 후보 비교](two_ground_sampled_pair_selection.md).

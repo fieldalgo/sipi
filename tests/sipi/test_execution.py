@@ -609,6 +609,8 @@ def documents():
     base.append(two_ground_sampled_design())
     from test_two_ground_sampled_pair_yield import document as two_ground_grid_yield
     base.append(two_ground_grid_yield())
+    from test_two_ground_sampled_pair_selection import document as two_ground_grid_selection
+    base.append(two_ground_grid_selection())
     return base
 
 
