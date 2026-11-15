@@ -135,3 +135,14 @@ PCB 세분 실패 3건이 남았습니다. 실제 메시 재계산과 한계는
 [도체 관측 기록](locales/ko/pages/packages/sipi/conductor.md)을 참고하세요.
 이 결과는 선택한 시험과 정확한 해당 커밋의 근거이며 이후 커밋의 전체 회귀
 상태를 뜻하지 않습니다.
+
+## 명시적 양면 접지 개발 기능
+
+`dependencies.json`의 공유 리비전은 범용 양면 Laplace 경계 기능을 제공합니다.
+금속 법칙·유전체 추출·[저장 선로](locales/ko/pages/packages/sipi/two_ground_panel_line.md)·
+[쌍 역산](locales/ko/pages/packages/sipi/two_ground_pair_goal_document.md)·
+[제조 공차](locales/ko/pages/packages/sipi/two_ground_pair_study.md)는 SIPI가 소유합니다.
+현재 개발 리비전은 로컬 공동 개발 브랜치에만 있을 수 있으므로 해당 패키지 wheel을
+명시적으로 빌드합니다. 공유 브랜치가 공개되기 전에는 공개 CI가 이를 가져올 수 있다고
+가정하지 않습니다. 기존 계산이 이 방법으로 자동 전환되지 않습니다. 소스·설치본 검증은
+명시한 조건과 플랫폼만을 다룹니다.

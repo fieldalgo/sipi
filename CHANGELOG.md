@@ -370,6 +370,13 @@
 
 ## [Unreleased]
 
+- Add explicit two-ground surface currents with separate signal/top/bottom metal
+  laws, matched dielectric RLGC, saved line execution, bounded paired impedance
+  design and ordered manufacturing studies. Require the exact shared Laplace
+  capability in `dependencies.json`; retain existing extraction defaults,
+  numerical gates and all failed rows. See the bilingual development guide.
+
+
 - Add explicit separate bottom-plane and grounded-trace surface metals using retained ungrouped shape-current energy matrices.
 
 - Save explicit adaptive shape-current refinement plans and retain completed, unaccepted and partial executions through common requests and receipts.

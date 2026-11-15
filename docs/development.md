@@ -159,3 +159,15 @@ Linux and Windows; macOS retained three original PCB refinement failures.
 See the [conductor observations](packages/sipi/conductor.md) for the actual-mesh
 replay and its limits. These results describe this selected suite and exact
 commit, not the full regression status of later commits.
+
+## Explicit two-ground development capability
+
+The shared revision in `dependencies.json` supplies the generic two-ground
+Laplace boundary capability. SIPI owns the metal laws, dielectric extraction,
+[saved line](packages/sipi/two_ground_panel_line.md),
+[paired goal](packages/sipi/two_ground_pair_goal_document.md) and
+[manufacturing study](packages/sipi/two_ground_pair_study.md).
+The current development revision may exist only on a local coordinated branch;
+build its package wheels explicitly. Do not assume public CI can fetch it before
+the shared branch is available. No existing calculation silently selects this
+method. Source/installed tests establish only their stated cases and platform.
