@@ -613,6 +613,8 @@ def documents():
     base.append(two_ground_grid_selection())
     from test_two_ground_face_panel_line import document as two_ground_face_document
     base.append(two_ground_face_document())
+    from test_two_ground_face_pair_goal_document import document as face_pair_goal
+    base.append(face_pair_goal())
     return base
 
 

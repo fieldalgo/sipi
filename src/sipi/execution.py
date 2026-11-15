@@ -36,6 +36,7 @@ from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument, TwoGr
 from .two_ground_conductor import TwoGroundConductorLoss
 from .two_ground_face_panel_line import TwoGroundFacePanelTransmissionLineDocument
 from .two_ground_pair_goal_document import TwoGroundForwardPairDesignDocument
+from .two_ground_face_pair_goal_document import TwoGroundFaceForwardPairDesignDocument
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
 from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
 from .two_ground_sampled_pair_yield import TwoGroundSampledForwardPairYieldDocument
@@ -183,6 +184,7 @@ _REGISTRY = {
     'sipi.two-ground-panel-transmission-line/1': TwoGroundPanelTransmissionLineDocument,
     'sipi.two-ground-face-panel-transmission-line/1': TwoGroundFacePanelTransmissionLineDocument,
     'sipi.two-ground-forward-pair-design/1': TwoGroundForwardPairDesignDocument,
+    'sipi.two-ground-face-forward-pair-design/1': TwoGroundFaceForwardPairDesignDocument,
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
     'sipi.two-ground-sampled-forward-pair-yield/1': TwoGroundSampledForwardPairYieldDocument,

@@ -1,5 +1,7 @@
 # Changelog
 
+- Add a strict saved two-ground face-metal pair-goal schema with field-free corner admission, retained failure records and shared request/project/CLI execution.
+
 - Connect explicit two-ground face-metal lines to bounded paired forward-impedance goals, retaining frozen volume/panel checks and original failure accounting.
 
 - Add a separate versioned two-ground face-line document and host execution records, preserving face currents, material admission and the actual dielectric mesh.

@@ -58,3 +58,5 @@ and frequency sensitivity. It does not certify arbitrary geometry, infinite
 outer-domain convergence, uniqueness, global optimality, measured accuracy or
 new platform support. The underlying [face-current references](two_ground_face_conductor.md)
 retain their own narrower geometry and material scope.
+
+[Saved paired-goal document](two_ground_face_pair_goal_document.md)
