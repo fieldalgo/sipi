@@ -1,5 +1,8 @@
 # Changelog
 
+- Use unit-aware decimal arrow increments in the CCL preview while preserving precise typed and saved dimensions.
+  CCL 프리뷰 화살표에 단위별 소수 증분을 적용하고 직접 입력·저장된 정밀 치수를 보존합니다.
+
 - Retain explicit corner resolution through finite FEM mesh and open-domain assessments.
 
 - Save corner-controlled FEM line quantity goals with original search, refinement and execution budgets.
