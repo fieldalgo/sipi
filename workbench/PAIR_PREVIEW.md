@@ -50,3 +50,29 @@ invalid geometry, cancellation/restart, mobile overflow and external requests.
 These checks verify this workflow, not all parameter values or all browsers.
 Numerical parity, independent physical references and redistribution review
 remain separate requirements before public use.
+
+## CCL condition comparison
+
+The initial dimensions and permittivity are illustrative, not a supplier grade.
+Material labels and source/measurement notes are user-provided context only;
+they do not select a material law, frequency, temperature or loss model.
+After calculating, **Keep result as A · start B** freezes that complete record
+and leaves its inputs ready for editing. Change permittivity or stackup inputs,
+then calculate or search a width for B. The table shows both selected geometries,
+calculation types and target checks; a width search displays the selected width,
+not the initial search width. Differences can reflect geometry, mesh and target
+settings as well as material changes, and do not qualify a material.
+
+Editing, opening, failures and cancellation clear B but retain A until explicit
+replacement/clear or page reload. A is an in-memory snapshot, not autosaved.
+**Export A/B records** downloads a `sipi.preview-comparison/1` report with `a`
+and `b`, each holding the original request, complete engine result and material
+label/notes. It is a report, not an engine input or reopenable project. The
+existing editable design schema is unchanged and does not store these labels,
+notes, target settings or A/B results. On design reopen, material identity is
+reset to unidentified; enter context and recalculate. Save the comparison report
+before closing the page. No HTML from user labels is interpreted.
+
+Browser acceptance also changes dielectric permittivity in each template,
+checks immutable A/exact B exports, notes, selected geometry, stale-result
+handling, explicit clear, and rendering of markup-like labels as plain text.

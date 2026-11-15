@@ -87,6 +87,12 @@ try {
     await click('export');const nominal=await readDownload('sipi-pair-calculation.json');await rm(join(downloads,'sipi-pair-calculation.json'));
     assert.equal(nominal.request.template,template);assert.ok(nominal.result.line.z_diff>0 && nominal.result.line.z_common>0);
     records.push({template,kind:'nominal',...nominal});
+    await click('keep-a');
+    assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
+    assert.equal(await cdp.evaluate('document.querySelector("#export-comparison").disabled'),true);
+    await edit('material-label','B <img src=x onerror=alert(1)>');
+    await edit('material-note','Illustrative comparison; no supplier qualification');
+    await edit('eps_r',template==='coupled_microstrip'?3.8:4.2);
     await writeFile(join(output,'calculations.json'),JSON.stringify(records,null,2));
     // Keep the ordinary example target; verify both actual mesh gates.
     await click('design');await idle();
@@ -97,17 +103,28 @@ try {
     assert.equal(goal.result.document.traces[0].width,goal.result.design.width);
     assert.equal(goal.request.parameters.gap,nominal.request.parameters.gap);
     records.push({template,kind:'goal',...goal});
+    await click('export-comparison');const comparison=await readDownload('sipi-pair-comparison.json');await rm(join(downloads,'sipi-pair-comparison.json'));
+    assert.equal(comparison.schema,'sipi.preview-comparison/1');
+    assert.deepEqual(comparison.a,nominal);assert.deepEqual(comparison.b,goal);
+    assert.equal(comparison.b.material.label,'B <img src=x onerror=alert(1)>');
+    assert.equal(await cdp.evaluate('document.querySelectorAll("#comparison-rows img").length'),0);
+    assert.ok(await cdp.evaluate('document.querySelector("#comparison-rows").textContent.includes("B <img")'));
+    assert.ok(await cdp.evaluate('document.querySelectorAll("#comparison-rows .changed").length')>0);
+    await writeFile(join(output,template+'-comparison.json'),JSON.stringify(comparison,null,2));
     await writeFile(join(output,'calculations.json'),JSON.stringify(records,null,2));
     await writeFile(join(output,template+'.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
     await click('save');await idle();const saved=await readDownload('sipi-pair-design.json');await rm(join(downloads,'sipi-pair-design.json'));
     assert.equal(saved.schema,'sipi.template-section/1');assert.equal(saved.parameters.width,goal.result.design.width);
     assert.deepEqual(saved.cross_section,goal.result.document);
     await edit('width',.31);assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
+    assert.equal(await cdp.evaluate('document.querySelector("#export-comparison").disabled'),true);
+    assert.ok(await cdp.evaluate('document.querySelector("#comparison-rows").textContent.includes("Awaiting calculation")'));
     const inputPath=join(profile,'pair-input.json');await writeFile(inputPath,JSON.stringify(saved));
     const root=await cdp.call('DOM.getDocument');const file=await cdp.call('DOM.querySelector',{nodeId:root.root.nodeId,selector:'#file'});
     await cdp.call('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[inputPath]});
     await until(()=>cdp.evaluate('document.querySelector("#status").textContent.startsWith("Design opened")'),'reopen');
     assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
+    assert.equal(await cdp.evaluate('document.querySelector("#material-label").value'),'Imported design — material not identified');
     await click('calculate');await idle();await click('export');const reopened=await readDownload('sipi-pair-calculation.json');await rm(join(downloads,'sipi-pair-calculation.json'));
     assert.deepEqual(reopened.result.document,saved.cross_section);
     assert.deepEqual(reopened.result.line,goal.result.line);
@@ -117,8 +134,11 @@ try {
   await edit('thickness',2);await click('calculate');await idle();
   assert.equal(await cdp.evaluate('document.querySelector("#status").classList.contains("error")'),true);
   assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#export-comparison").disabled'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#comparison-results").hidden'),false);
   await edit('thickness',.035);await click('calculate');await click('cancel');await idle();
   assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#export-comparison").disabled'),true);
   await click('calculate');await idle();assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),false);
   // Opening a valid engine document outside the narrow preview must not drop settings.
   const unsupported={...records[0].request,action:'template-document',parameters:{...records[0].request.parameters,tan_delta:.02}};
@@ -133,9 +153,13 @@ try {
   assert.ok(await cdp.evaluate('document.documentElement.scrollWidth<=innerWidth'),'No horizontal mobile overflow');
   assert.ok(await cdp.evaluate('[...document.querySelectorAll("input")].filter(x=>x.offsetParent).every(x=>x.getBoundingClientRect().right<=innerWidth)'),'Visible input fields fit on mobile');
   await writeFile(join(output,'mobile.png'),Buffer.from((await cdp.call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true})).data,'base64'));
+  await click('clear-a');assert.equal(await cdp.evaluate('document.querySelector("#comparison-results").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#export-comparison").disabled'),true);
+  await edit('material-note','Changed after calculation');assert.equal(await cdp.evaluate('document.querySelector("#keep-a").disabled'),true);
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   if(webRoot){assert.ok(workerTargets.length);assert.equal(apiRequests.length,0);}
   await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',checks:['two real pair calculations','two 100 ohm goals and independent refined target','exact geometry/mesh save and reopen','identical reopened line','edit invalidation','invalid geometry refusal','cancel and restart','mobile overflow','no external requests'],records:records.length,errors,remoteRequests,workerTargets},null,2));
+  await writeFile(join(output,'comparison-checks.json'),JSON.stringify({status:'passed',checks:['immutable A and exact B exports for both templates','selected search geometry retained','material notes bound to calculation','untrusted labels rendered as text','stale B hidden after edits/failure/cancel','A retained until explicit clear','reopen resets unidentified material context']},null,2));
   console.log('Pair preview browser acceptance passed.');
 } catch(error) {
   let application=null;try{application=await cdp?.evaluate('({status:document.querySelector("#status")?.textContent,resultHidden:document.querySelector("#result")?.hidden})');}catch{}

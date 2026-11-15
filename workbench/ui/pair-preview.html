@@ -1,20 +1,23 @@
 <!doctype html>
 <html lang="en" data-runtime="local">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SIPI · Differential pair preview</title><link rel="stylesheet" href="./pair-preview.css"><script type="module" src="./pair-preview.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>FieldAlgo SIPI · CCL stackup preview</title><link rel="stylesheet" href="./pair-preview.css"><script type="module" src="./pair-preview.js"></script></head>
 <body>
 <header><a class="brand" href="./">FieldAlgo <span>/ SIPI</span></a><span class="badge">DEVELOPMENT PREVIEW</span></header>
 <main>
-  <section class="intro"><p class="eyebrow">PCB TRANSMISSION LINE DESIGN</p><h1>From stackup<br>to trace width.</h1><p>Explore a differential pair. See its impedance.<br>Find a width for your target, keeping the gap fixed.</p></section>
+  <section class="intro"><p class="eyebrow">CCL MATERIAL &amp; STACKUP DESIGN</p><h1>Your material.<br>Your target impedance.</h1><p>Enter dielectric properties and stackup dimensions.<br>Calculate, find a trace width, and compare two conditions.</p></section>
   <div class="workspace">
     <section class="panel"><h2><span>01</span> Define the cross-section</h2>
       <form id="inputs">
+        <label>Material / condition label<input id="material-label" type="text" value="Example dielectric — not a supplier grade" maxlength="120" required></label>
+        <label>Material source / measurement conditions<input id="material-note" type="text" placeholder="Optional: source, test frequency, method, temperature" maxlength="500"></label>
+        <p class="hint">Enter your own material data. The initial values are illustrative, not a verified CCL grade. This model uses a constant dielectric permittivity; notes do not change the calculation.</p>
         <label>Structure<select id="template"><option value="coupled_microstrip">Differential microstrip</option><option value="coupled_stripline">Differential stripline</option></select></label>
         <div class="fields">
           <label>Trace width · mm<input id="width" type="number" value="0.3" min="0.000001" step="any" required></label>
           <label>Edge-to-edge gap · mm<input id="gap" type="number" value="0.2" min="0.000001" step="any" required></label>
           <label><span id="height-label">Substrate height · mm</span><input id="height" type="number" value="0.2" min="0.000001" step="any" required></label>
           <label>Copper thickness · mm<input id="thickness" type="number" value="0.035" min="0" step="any" required></label>
-          <label>Relative permittivity · εr<input id="eps_r" type="number" value="4" min="1" step="any" required></label>
+          <label>Dielectric relative permittivity · εr (Dk)<input id="eps_r" type="number" value="4" min="1" step="any" required></label>
         </div>
         <details><summary>Calculation boundaries</summary><p class="hint">Finite insulating side boundaries. Change these separately to assess boundary sensitivity.</p><div class="fields"><label>Box width · mm<input id="box_width" type="number" value="8" min="0.000001" step="any" required></label><label id="air-field">Air height · mm<input id="air_height" type="number" value="2" min="0.000001" step="any" required></label></div></details>
         <button id="calculate" type="submit" class="primary">Calculate impedance →</button>
@@ -29,6 +32,13 @@
     </section>
     <section class="panel target"><h2><span>03</span> Find the trace width</h2><p>Both traces change width together. The edge-to-edge gap stays fixed.</p><form id="goal"><div class="fields goal-fields"><label>Differential target · Ω<input id="target" type="number" value="100" min="0.01" step="any" required></label><label>Minimum width · mm<input id="lower" type="number" value="0.1" min="0.000001" step="any" required></label><label>Maximum width · mm<input id="upper" type="number" value="0.6" min="0.000001" step="any" required></label><label>Target tolerance · Ω<input id="tolerance" type="number" value="0.1" min="0.001" step="any" required></label></div><button id="design" class="primary" type="submit">Find width →</button></form><p class="hint">The initial and separately refined result must both meet the target tolerance. This does not establish outer-boundary convergence.</p></section>
   </div>
+  <section class="panel comparison" aria-labelledby="comparison-heading">
+    <h2 id="comparison-heading"><span>04</span> Compare material &amp; stackup conditions</h2>
+    <p>Calculate a condition, keep it as A, then edit the copied inputs and calculate B. Both columns retain their own material labels, dimensions and calculation records.</p>
+    <div class="files"><button id="keep-a" disabled>Keep result as A · start B</button><button id="clear-a" disabled>Clear A</button><button id="export-comparison" disabled>Export A/B records ↓</button></div>
+    <p id="comparison-status" role="status">Calculate a condition to start a comparison.</p>
+    <div id="comparison-results" hidden><div class="table-scroll"><table><thead><tr><th scope="col">Condition</th><th scope="col">A · saved baseline</th><th scope="col">B · latest calculation</th></tr></thead><tbody id="comparison-rows"></tbody></table></div><p class="hint">Differences reflect all listed input and calculation changes, not only the material. Each record retains its own resolved mesh and search settings. A comparison does not establish convergence, manufacturing tolerance or material qualification.</p></div>
+  </section>
   <section class="pilot"><div><p class="eyebrow">BUILD WITH US</p><h2>Have a stackup you need to evaluate?</h2><p>Tell us about your design workflow and the cross-sections you need.<br>No design files are required for an initial conversation.</p></div><a href="mailto:dev@fieldalgo.com?subject=SIPI%20pilot%20enquiry">Discuss a pilot ↗</a></section>
   <section class="scope"><h2>A focused engineering preview.</h2><p>Equal rectangular traces, one uniform substrate, ideal ground planes and lossless quasi-static modes. Stripline traces are centred between the planes. Solder mask, roughness, vias, connectors, manufacturing yield and compliance assessment are outside this preview.</p><p>Check mesh and boundary sensitivity and independently validate results before manufacturing. This development build has not been qualified for public browser use.</p><p id="runtime-note"></p></section>
 </main><footer>FieldAlgo / SIPI · Development preview · <a href="./notices.txt">Third-party notices</a></footer>

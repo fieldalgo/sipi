@@ -6,15 +6,46 @@ const browser = document.documentElement.dataset.runtime === 'browser';
 const transport = browser ? new BrowserTransport() : new LocalTransport();
 const supported = ['coupled_microstrip', 'coupled_stripline'];
 const fields = ['width', 'gap', 'height', 'thickness', 'eps_r', 'box_width', 'air_height'];
-let parameters = null, mesh = null, latest = null, busy = false, generation = 0;
+let parameters = null, mesh = null, latest = null, baseline = null, busy = false, generation = 0;
 const changed = new Set();
 $('runtime-note').textContent = browser ? 'Calculations run in this browser. Design files are not uploaded. The first calculation loads the local engine assets.' : 'Local review build: calculations run on this computer through the SIPI engine. Design files are not uploaded.';
 function status(message, error = false) { $('status').textContent = message; $('status').classList.toggle('error', error); }
-function invalidate() { latest = null; $('result').hidden = true; $('failure').hidden = true; }
+function invalidate() { latest = null; $('result').hidden = true; $('failure').hidden = true; comparison(); }
 function lock(value) {
   busy = value;
   for (const element of document.querySelectorAll('button,input,select')) element.disabled = value;
   $('cancel').disabled = false; $('cancel').hidden = !value;
+  comparison();
+}
+function condition(record) {
+  const p = {...record.request.parameters};
+  if (record.result.design) p.width = record.result.design.width;
+  const mm = value => `${(value * 1e3).toPrecision(8)} mm`;
+  return [record.material.label, record.material.note || 'Not specified', record.request.template,
+    String(p.eps_r), mm(p.width), mm(p.gap), mm(p.thickness),
+    mm(p.plane_spacing ?? p.substrate_height), mm(p.box_width),
+    p.air_height === undefined ? 'Not applicable' : mm(p.air_height),
+    record.request.action === 'design' ? `Width search: ${record.request.design.target} Ω ± ${record.request.design.tolerance} Ω` : 'Single calculation',
+    `${record.result.line.z_diff.toFixed(5)} Ω`, `${record.result.line.z_common.toFixed(5)} Ω`,
+    record.result.design ? 'Separate refined target check passed; outer convergence not checked' : 'Single mesh; convergence not checked'];
+}
+function comparison() {
+  $('keep-a').disabled = busy || !latest;
+  $('clear-a').disabled = busy || !baseline;
+  $('export-comparison').disabled = busy || !baseline || !latest;
+  $('comparison-results').hidden = !baseline;
+  $('comparison-status').textContent = baseline ? (latest ? 'A and B are completed calculations. Changed values are highlighted.' : 'A is retained. Edit the copied inputs and calculate to produce B.') : 'Calculate a condition to start a comparison.';
+  $('comparison-rows').replaceChildren();
+  if (!baseline) return;
+  const labels = ['Material / condition', 'Source / measurement notes', 'Structure', 'Relative permittivity', 'Selected trace width', 'Edge-to-edge gap', 'Copper thickness', 'Substrate height / plane spacing', 'Box width', 'Air height', 'Calculation', 'Differential impedance', 'Common impedance', 'Checks'];
+  const a = condition(baseline), b = latest ? condition(latest) : null;
+  labels.forEach((label, i) => {
+    const row = document.createElement('tr');
+    const heading = document.createElement('th'); heading.scope = 'row'; heading.textContent = label; row.append(heading);
+    for (const value of [a[i], b ? b[i] : 'Awaiting calculation']) { const cell = document.createElement('td'); cell.textContent = value; row.append(cell); }
+    if (b && a[i] !== b[i]) row.classList.add('changed');
+    $('comparison-rows').append(row);
+  });
 }
 function key(id) { return id === 'height' ? ($('template').value === 'coupled_stripline' ? 'plane_spacing' : 'substrate_height') : id; }
 function input(action) {
@@ -75,7 +106,7 @@ async function run(action, extra={}) {
     lock(true); status(action==='design'?'Searching widths, then checking a separate refined mesh…':'Working…');
     const result=await transport.run(request);
     if(version!==generation) return;
-    if(action==='template-open') {acceptEditable(result); status('Design opened. Calculate to produce a fresh result.');}
+    if(action==='template-open') {acceptEditable(result); $('material-label').value='Imported design — material not identified'; $('material-note').value=''; status('Design opened. Add material context and calculate to produce a fresh result.');}
     else if(action==='template-document') {download('sipi-pair-design.json',result.document_text); status('Editable design saved. Target-search settings are not part of this input file.');}
     else {
       if(![result.line?.z_diff,result.line?.z_common].every(Number.isFinite)) throw new Error('The engine did not return finite symmetric-mode impedances.');
@@ -83,7 +114,7 @@ async function run(action, extra={}) {
         parameters={...request.parameters,width:result.design.width}; mesh={...result.document.mesh}; changed.clear();
         $('width').value=String(parameters.width*1e3); draw();
       }
-      latest={request,result};
+      latest={request,result,material:{label:$('material-label').value,note:$('material-note').value}};
       $('z-diff').textContent=result.line.z_diff.toFixed(3); $('z-common').textContent=result.line.z_common.toFixed(3);
       $('refinement').textContent=result.design ? `Selected width ${(result.design.width*1e3).toPrecision(7)} mm. Initial ${result.design.impedance.toFixed(5)} Ω; refined ${result.design.refined_impedance.toFixed(5)} Ω. Both meet the requested target tolerance.` : 'Single mesh result. Mesh and outer-boundary convergence have not been checked by this calculation.';
       $('details').textContent=JSON.stringify({engine:result.engine,mesh:result.document.mesh,line:result.line,design:result.design},null,2);
@@ -97,7 +128,7 @@ async function run(action, extra={}) {
 }
 $('inputs').addEventListener('submit',event=>{event.preventDefault();run('analyze');});
 $('goal').addEventListener('submit',event=>{event.preventDefault();run('design');});
-for(const id of [...fields,'target','lower','upper','tolerance']) $(id).addEventListener('input',()=>{++generation;changed.add(id);invalidate();draw();status('Inputs changed. Calculate to update the result.');});
+for(const id of [...fields,'target','lower','upper','tolerance','material-label','material-note']) $(id).addEventListener('input',()=>{++generation;changed.add(id);invalidate();draw();status('Inputs changed. Calculate to update the result.');});
 $('template').addEventListener('change',()=>{++generation;parameters=null;mesh=null;changed.clear();invalidate();$('height').value=$('template').value==='coupled_stripline'?'1':'0.2';controls();draw();status('Structure changed. Calculate to update the result.');});
 $('save').addEventListener('click',()=>run('template-document'));
 $('open').addEventListener('click',()=>$('file').click());
@@ -110,9 +141,18 @@ $('file').addEventListener('change',async()=>{
   catch(error){if(version===generation){invalidate();status(error.message,true);}}
 });
 $('export').addEventListener('click',()=>{if(latest) download('sipi-pair-calculation.json',latest);});
+$('keep-a').addEventListener('click',()=>{
+  if (!latest || busy) return;
+  baseline=structuredClone(latest); invalidate();
+  status('A retained. Inputs are copied for B. Change material or stackup conditions, then calculate.');
+});
+$('clear-a').addEventListener('click',()=>{baseline=null;comparison();});
+$('export-comparison').addEventListener('click',()=>{
+  if (baseline && latest && !busy) download('sipi-pair-comparison.json', {schema:'sipi.preview-comparison/1',a:baseline,b:latest});
+});
 $('cancel').addEventListener('click',async()=>{
   ++generation; invalidate(); $('cancel').disabled=true;
   try{await transport.cancel();status('Calculation cancelled. No result retained.');}
   catch(error){status(error.message,true);}finally{lock(false);}
 });
-controls(); draw();
+controls(); draw(); comparison();
