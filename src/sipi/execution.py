@@ -120,6 +120,7 @@ from .shape_panel_pair_yield import ShapePanelForwardPairYieldDocument
 from .shape_sampled_panel_pair_yield import ShapeSampledPanelForwardPairYieldDocument
 from .panel_resolution_yield_document import PanelResolutionYieldDocument
 from .sampled_panel_resolution_yield_document import SampledPanelResolutionYieldDocument
+from .two_ground_face_sampled_resolution_yield_document import TwoGroundFaceSampledResolutionYieldDocument
 from .sampled_panel_pair_yield import SampledPanelForwardPairYieldDocument
 from .panel_pair_selection import PanelForwardPairSelectionDocument
 from .sampled_panel_pair_selection import SampledPanelForwardPairSelectionDocument
@@ -183,6 +184,7 @@ _REGISTRY = {
     'sipi.panel-forward-pair-yield/2': PanelForwardPairYieldDocument,
     'sipi.panel-resolution-yield/1': PanelResolutionYieldDocument,
     'sipi.sampled-panel-resolution-yield/1': SampledPanelResolutionYieldDocument,
+    'sipi.two-ground-face-sampled-resolution-yield/1': TwoGroundFaceSampledResolutionYieldDocument,
     'sipi.panel-forward-pair-selection/1': PanelForwardPairSelectionDocument,
     'sipi.sampled-panel-forward-pair-selection/1': SampledPanelForwardPairSelectionDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,

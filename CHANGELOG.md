@@ -1,5 +1,7 @@
 # Changelog
 
+- Save face-metal frequency-resolution acceptance plans with complete budgets, unknown-row retention and shared execution/project replay.
+
 - Compare joint face-metal frequency-grid acceptance across explicit resolutions, retaining disagreements as unresolved original trials.
 
 - Select fixed face-metal frequency-grid candidates with simultaneous joint IID confidence bounds and complete attempt accounting.

@@ -88,3 +88,5 @@ refinement, outer-box variation, adaptive sampling or platform qualification.
 Synthetic tests exhaust two/three-resolution truth tables and unknown completions,
 retain one denominator up to eight resolutions, reject changed physics and other
 current methods, preserve original failures, and check immutable results.
+
+[Saved resolution assessment](two_ground_face_sampled_resolution_yield_document.md)
