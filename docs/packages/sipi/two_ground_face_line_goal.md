@@ -76,3 +76,5 @@ resolution does not qualify the default 128 modes there. Tests also retain the
 original four-quantity roots, failed stages, budgets and convergence gates.
 These selected checks are not an infinite-domain, browser, cross-platform or
 measured-accuracy certificate; consult exact artifact records for results.
+
+[Save a face-metal goal](two_ground_face_line_goal_document.md)

@@ -45,6 +45,8 @@ from .two_ground_sampled_pair_selection import TwoGroundSampledForwardPairSelect
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .two_ground_face_line_study import TwoGroundFaceLineQuantityStudyDocument
 from .two_ground_line_goal_document import TwoGroundLineQuantityDesignDocument
+from .two_ground_face_line_goal_document import TwoGroundFaceLineQuantityDesignDocument
+from .two_ground_face_line_goal import TwoGroundFaceLineQuantityGoalError
 from .two_ground_line_goal import TwoGroundLineQuantityGoalError
 from .two_ground_line_yield import TwoGroundLineQuantityYieldDocument
 from .two_ground_resolution_document import TwoGroundResolutionDocument
@@ -195,6 +197,7 @@ _REGISTRY = {
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.two-ground-face-line-quantity-study/1': TwoGroundFaceLineQuantityStudyDocument,
     'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
+    'sipi.two-ground-face-line-quantity-design/1': TwoGroundFaceLineQuantityDesignDocument,
     'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,
     'sipi.two-ground-resolution/1': TwoGroundResolutionDocument,
     'sipi.two-ground-sampled-forward-pair-study/1': TwoGroundSampledForwardPairStudyDocument,
@@ -693,6 +696,13 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 out['error']['cause_details'] = exc.__cause__.to_dict()
             if isinstance(doc, TwoGroundForwardPairDesignDocument) and isinstance(exc.__cause__, TwoGroundPanelLineError):
                 out['error']['cause_details'] = exc.__cause__.to_dict()
+    elif isinstance(doc, TwoGroundFaceLineQuantityDesignDocument):
+        if data['max_evaluations'] > budget:
+            raise ValueError('saved two-ground face goal budget exceeds max_evaluations before any solve')
+        try:
+            out['result'] = doc.solve().to_dict()
+        except TwoGroundFaceLineQuantityGoalError as exc:
+            out.update(status='failed', error=exc.to_dict())
     elif isinstance(doc, TwoGroundLineQuantityDesignDocument):
         if data['max_evaluations'] > budget:
             raise ValueError('saved two-ground goal budget exceeds max_evaluations before any solve')

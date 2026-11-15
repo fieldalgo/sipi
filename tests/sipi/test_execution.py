@@ -619,6 +619,8 @@ def documents():
     base.append(face_pair_study())
     from test_two_ground_face_line_study import document as face_line_study
     base.append(face_line_study())
+    from test_two_ground_face_line_goal_document import document as face_line_goal
+    base.append(face_line_goal())
     return base
 
 
