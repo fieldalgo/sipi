@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit one-parameter two-ground face-metal goals with independent volume, panel and joint refinement checks.
+
 - Add explicit two-ground face-metal scalar impedance, attenuation and single launched-pair quantity samples with retained failed rows.
 
 - Add explicit two-ground face-metal manufacturing samples with paired launch values, retained invalid rows and descriptive all-success statistics.

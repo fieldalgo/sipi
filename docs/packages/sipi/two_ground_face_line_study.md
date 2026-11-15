@@ -76,3 +76,5 @@ Those 8 mm boxes use 128 ground modes. Separate endpoint mesh-halving and finite
 qualify the default at that larger box. Refer to associated records for actual
 results. Finite selected cases do not establish infinite-domain, arbitrary-shape,
 browser, cross-platform or measured qualification.
+
+[One-parameter face-metal goals](two_ground_face_line_goal.md)

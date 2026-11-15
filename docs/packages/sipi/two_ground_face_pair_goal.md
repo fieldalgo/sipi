@@ -60,3 +60,5 @@ new platform support. The underlying [face-current references](two_ground_face_c
 retain their own narrower geometry and material scope.
 
 [Saved paired-goal document](two_ground_face_pair_goal_document.md)
+
+[One-parameter face-metal goals](two_ground_face_line_goal.md)

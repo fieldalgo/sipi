@@ -51,3 +51,5 @@ tan_delta 0.003, 중앙 높이의 두께 50 μm 도체, 2 GHz다. 첫 신호의 
 기반 [면별 전류 독립 근거](two_ground_face_conductor.md)는 더 제한된 원래 기하·재료 범위를 유지한다.
 
 [쌍 선로 목표 저장 문서](two_ground_face_pair_goal_document.md)
+
+[면별 금속 단일 변수 목표](two_ground_face_line_goal.md)
