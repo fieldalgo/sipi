@@ -1,5 +1,9 @@
 # Development
 
+See [product and calculation boundaries](architecture.md) for responsibility
+ownership and the proposed order of extracting a headless line library.
+The existing package/API remains unchanged.
+
 See [isolated mesh candidate diagnostics](../tools/mesh_diagnostics/README.md)
 for exact-source original/candidate builds, installed payload checks and
 cross-platform refinement traces. The product dependency pin and original
