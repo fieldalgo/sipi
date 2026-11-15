@@ -72,3 +72,18 @@ assert current.receipt['execution']['status'] == 'complete'
 ```
 
 [English](RECORDING.md)
+
+## 해상도 계산의 부분 실패 보존
+
+지원하는 해상도 계산이 부분 결과를 만든 뒤 실패하면 공통 기록 helper가
+`sipi.execution-record/2`를 명시적으로 선택합니다. 원 receipt, 실패 상세와
+이미 완료한 계산을 보존하며 재열기나 프로젝트 첨부는 다시 계산하지 않습니다.
+적응 세분의 예산 소진도 같은 경로입니다. 완료됐지만 수치 기준을 넘은 비교는
+계산 예외가 아니라 완료/미수락 결과입니다.
+
+complete/incomplete 결과와 결과가 null인 실패는 version1을 유지합니다.
+코어의 기존 검증기가 미지원 부분 결과나 잘못된 실패 정보를 계속 거부합니다.
+버전 선택으로 200KiB 제한, provenance 검사나 취소 규칙을 완화하지 않고
+결과를 자르지 않습니다. native·browser-source·frozen-bundle 공급자가 같은
+helper를 사용하지만 단위/native 설치 검사를 새 브라우저나 Windows 빌드
+검증으로 확대하지 않습니다.

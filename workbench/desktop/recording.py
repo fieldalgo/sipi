@@ -21,8 +21,12 @@ def _admit(request):
 
 
 def _record_result(request, receipt, artifacts, manifest_text):
+    execution = receipt.get('execution') if isinstance(receipt, dict) else None
+    partial_failure = (isinstance(execution, dict) and execution.get('status') == 'failed'
+                       and execution.get('result') is not None)
+    schema = 'sipi.execution-record/2' if partial_failure else 'sipi.execution-record/1'
     record = SavedExecutionRecord(request, receipt, run_id='run:'+uuid.uuid4().hex,
-                                  artifacts=artifacts, max_record_bytes=200*1024)
+                                  artifacts=artifacts, max_record_bytes=200*1024, schema=schema)
     return dict(record_text=record.dumps(), runtime_manifest_text=manifest_text)
 
 

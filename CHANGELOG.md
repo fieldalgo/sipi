@@ -370,6 +370,8 @@
 
 ## [Unreleased]
 
+- Preserve supported partial resolution failures in recorded workbench runs using explicit record version2; other receipt shapes retain version1.
+
 - Extend two-ground finite resolution checks to three registered coupled geometries using existing independent references.
 
 - Add saved two-ground finite volume/panel/joint/outer assessments, retaining exact planned inputs and typed partial records.

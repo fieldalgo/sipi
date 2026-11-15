@@ -141,8 +141,19 @@ def test_growth_tamper_and_invalid_edits_leave_original_intact():
     assert base.dumps()==before and base.design_ids==('a',)
 
 
-def test_readable_core_input_without_a_form_is_preserved():
+def test_readable_supported_core_input_is_preserved():
     text=TemplateSectionDocument('layered_broadside_stripline',dict(width=.0005,thickness=.000035,gap=.0002,lower_height=.0004,upper_height=.0006,lower_eps_r=4,gap_eps_r=3,upper_eps_r=4)).dumps()
+    project=saved(create(text))
+    assert project.prepare('a').source_text==text
+    opened=execute(dict(action='template-open',text=project.prepare('a').source_text))
+    assert opened['template']=='layered_broadside_stripline' and opened['document_text']==text
+
+
+def test_readable_core_input_without_a_form_is_preserved():
+    text=TemplateSectionDocument('asymmetric_layered_broadside_stripline',dict(
+        lower_width=.0004,upper_width=.0007,gap=.00025,lower_height=.00035,
+        upper_height=.00055,lower_thickness=.000025,upper_thickness=.000045,
+        offset=.00015,lower_eps_r=3.,gap_eps_r=4.,upper_eps_r=5.)).dumps()
     project=saved(create(text))
     assert project.prepare('a').source_text==text
     with pytest.raises(ValueError,match='no editable form'):

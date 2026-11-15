@@ -79,3 +79,19 @@ assert current.receipt['execution']['status'] == 'complete'
 ```
 
 [한국어](RECORDING.ko.md)
+
+## Retaining partial resolution failures
+
+When a supported resolution calculation fails after producing partial results,
+the shared recording helper explicitly uses `sipi.execution-record/2`. It keeps
+the original receipt, failure details and completed evaluations; reopening or
+attaching the record does not calculate again. Adaptive budget exhaustion uses
+the same route. A completed but unaccepted numerical comparison is still a
+completed calculation, not an exception.
+
+Complete/incomplete results and failed receipts with a null result keep
+version1. The core record validator still rejects unsupported partial-result
+sources or malformed failure metadata. Version selection does not relax the
+200KiB record limit, provenance checks or cancellation rules, and no output is
+truncated. Native, browser-source and frozen-bundle providers share this helper;
+unit/native installed checks do not establish a new browser or Windows build.
