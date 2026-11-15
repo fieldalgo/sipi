@@ -101,8 +101,8 @@ def two_ground_current_factors(section, *, panels_per_edge=32, ground_modes=128,
     Dielectric metadata does not enter the vacuum current solve. This is a
     homogeneous magnetic-exterior model, not anisotropic or spatially magnetic
     field extraction. Independently refine panels and finite outer dimensions.
-    The original shared dependency pin and existing extraction defaults stay
-    unchanged; an absent capability raises RuntimeError without fallback.
+    Existing extraction defaults stay unchanged. The pinned shared capability
+    is required; an absent capability raises RuntimeError without fallback.
     """
     checked, count, modes, degree, polygons = _current_arguments(
         section, panels_per_edge, ground_modes, interpolation_degree)

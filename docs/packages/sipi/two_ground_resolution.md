@@ -82,3 +82,24 @@ lines, two frequencies, all six matrix quantities, relative.01 and absolute0.
 It is compared in source and exact installed wheels. This finite scalar case
 does not establish convergence of every paired/manufacturing geometry,
 asymptotic convergence, measured loss accuracy or new platform support.
+
+## Registered coupled-line checks
+
+Three additional finite cases use the existing 8mm-wide symmetric,
+close-spaced and asymmetric pair inputs and their archived independent P4
+references. Preserve their two ground planes, different signal metals and the
+positive signal's explicit coating. At 2/5GHz, compare 64/128 panels, 128/256
+ground modes, separate half-size volume settings, and widths16/32mm with
+512/1024 modes. The asymmetric case retains interpolation degree14; the other
+two retain degree12. Every selected entry of all six quantities must satisfy
+relative.01 and absolute0 on every comparison axis.
+
+Each actual line is also checked against uniform-medium identities and
+independent matrix-exponential port-wave conversion. The joint result uses the
+original P4 capacitance allowance5e-4 and resistance/internal-inductance
+allowance.01, with no absolute floor. The symmetric wider-box results use the
+same archived P4 references; those16/32mm references are coarse and do not
+establish new reference convergence. Original reference arrays, fixtures and
+tolerances remain unchanged. The full inputs/current/mesh/comparison record
+is emitted before assertions. This finite set does not qualify every coupled
+geometry, continuous frequency band or measured accuracy.

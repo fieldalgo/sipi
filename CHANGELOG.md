@@ -370,6 +370,8 @@
 
 ## [Unreleased]
 
+- Extend two-ground finite resolution checks to three registered coupled geometries using existing independent references.
+
 - Add saved two-ground finite volume/panel/joint/outer assessments, retaining exact planned inputs and typed partial records.
 
 - Add saved iid two-ground line-quantity acceptance with inclusive limits, retained unknown rows and exact confidence envelopes.
