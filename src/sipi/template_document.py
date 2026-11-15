@@ -8,7 +8,7 @@ import json
 from ._validation import _json_copy, _keys, _unique_object
 from .document import CrossSectionDocument
 from .sampling import _scalar
-from .study import _TEMPLATES
+from ._template_registry import _TEMPLATES
 
 __all__ = ['TemplateSectionDocument']
 

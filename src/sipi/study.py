@@ -11,7 +11,7 @@ from types import MappingProxyType
 
 import numpy as np
 
-from . import templates
+from ._template_registry import _TEMPLATES
 from .sampling import _numbers, _scalar, _integer, _copy, _validate_sampling, _sample_values
 from .document import CrossSectionDocument, _keys, _unique_object
 from .corner_document import CornerCrossSectionDocument
@@ -21,39 +21,6 @@ from .impedance_material import (_material_input, _validate_material_input,
 
 __all__ = ['ImpedanceStudyDocument', 'StudyRow', 'ImpedanceStudy']
 
-_TEMPLATES = {name: getattr(templates, name) for name in
-              ('layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar',
-               'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip',
-               'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar',
-               'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip',
-               'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar',
-               'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar',
-               'microstrip', 'stripline', 'coupled_microstrip', 'asymmetric_coupled_microstrip', 'grounded_coplanar',
-               'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
-               'asymmetric_coupled_stripline',
-               'asymmetric_coupled_layered_stripline',
-               'asymmetric_coupled_layered_coplanar_stripline',
-               'asymmetric_coupled_grounded_coplanar',
-               'asymmetric_coupled_unbacked_coplanar',
-               'asymmetric_coupled_coated_grounded_coplanar',
-               'asymmetric_coupled_coated_unbacked_coplanar',
-               'asymmetric_coupled_coated_microstrip',
-               'asymmetric_coupled_conformal_coated_microstrip',
-               'asymmetric_coupled_conformal_coated_grounded_coplanar',
-               'asymmetric_coupled_conformal_coated_unbacked_coplanar',
-               'asymmetric_coupled_coplanar_stripline',
-               'coated_microstrip', 'offset_stripline', 'coupled_stripline', 'broadside_stripline',
-               'coupled_grounded_coplanar', 'layered_stripline', 'coupled_layered_stripline',
-               'layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'tapered_layered_broadside_stripline', 'split_gap_broadside_stripline',
-               'coplanar_stripline', 'coupled_coplanar_stripline',
-               'layered_coplanar_stripline', 'coupled_layered_coplanar_stripline',
-               'coupled_coated_microstrip', 'coated_grounded_coplanar',
-               'coupled_coated_grounded_coplanar', 'unbacked_coplanar',
-               'coupled_unbacked_coplanar', 'coated_unbacked_coplanar',
-               'coupled_coated_unbacked_coplanar', 'conformal_coated_microstrip',
-               'coupled_conformal_coated_microstrip', 'conformal_coated_grounded_coplanar',
-               'coupled_conformal_coated_grounded_coplanar', 'conformal_coated_unbacked_coplanar',
-               'coupled_conformal_coated_unbacked_coplanar')}
 _ASYMMETRIC_HORIZONTAL_PAIRS = frozenset(('asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_microstrip', 'asymmetric_coupled_microstrip', 'asymmetric_coupled_stripline',
                                         'asymmetric_coupled_layered_stripline',
                'asymmetric_coupled_layered_coplanar_stripline',

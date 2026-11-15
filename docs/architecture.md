@@ -2,7 +2,7 @@
 
 [한국어](architecture.ko.md)
 
-Status: responsibility design plus an initial shared-validation extraction.
+Status: responsibility design plus initial shared-validation and template-registry extractions.
 This document does not create a distribution, namespace, repository, web route
 or release. The existing `sipi` imports, CLI and versioned documents remain
 unchanged. SIPI is the product; transmission-line design is its first focused
@@ -80,9 +80,10 @@ that the package can already be extracted:
    propagation in `network.py`. `ports3d.py` imports them. Extracting the entire
    module as a line-only dependency would make a 3D consumer depend on that
    distribution merely to represent network results.
-3. `template_document.py` now obtains JSON helpers directly from the internal
-   `_validation.py`, but still uses the template registry from `study.py`.
-   Template registration remains to be separated before a section-only API.
+3. `template_document.py` obtains JSON helpers from `_validation.py` and section
+   factories from `_template_registry.py`. It no longer imports `study.py` for
+   that catalog. Studies retain their existing `_TEMPLATES` alias; domain
+   preparation still uses the geometry, sampling and numerical dependencies.
 4. `project.py`, `execution_record.py`, `project_io.py` and execution requests
    obtain neutral validators from `_validation.py`. Product request/record
    composition and domain-specific validation remain in their existing modules.
@@ -143,3 +144,12 @@ The validator file can load on its own without numerical packages or the product
 registry. Importing `sipi` still runs the broad package initializer. This is not
 an independent line distribution, lazy package facade or full implementation of
 steps 2–6. Numerical algorithms, dependency pins and release status are unchanged.
+
+A further step separates the explicit 72-factory section catalog from study
+execution. Registration order, factory identity and signatures stay unchanged;
+the catalog is not a plugin API or a host/UI support declaration. An isolated
+internal load bypasses the public initializer and constructs/reloads the existing
+42 reference section documents while rejecting study, circuit and product
+imports. This checks the module boundary with real geometry dependencies, not
+a separately installable package or a solver-free import. Public `import sipi`
+continues to load the existing facade.
