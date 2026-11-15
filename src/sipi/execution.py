@@ -41,6 +41,7 @@ from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .two_ground_line_goal_document import TwoGroundLineQuantityDesignDocument
 from .two_ground_line_goal import TwoGroundLineQuantityGoalError
 from .two_ground_line_yield import TwoGroundLineQuantityYieldDocument
+from .two_ground_resolution_document import TwoGroundResolutionDocument
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
@@ -181,6 +182,7 @@ _REGISTRY = {
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
     'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,
+    'sipi.two-ground-resolution/1': TwoGroundResolutionDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
     'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
@@ -579,7 +581,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
             out['status'] = 'failed'
             out['error'] = dict(kind='ResolutionBudgetExceeded',stage='budget',input=data,
                 message='adaptive resolution stopped before completion within the available evaluation budget')
-    elif isinstance(doc, (FEMShapeResolutionDocument,CornerFEMShapeResolutionDocument,FEMShapeAdaptiveResolutionDocument)):
+    elif isinstance(doc, (FEMShapeResolutionDocument,CornerFEMShapeResolutionDocument,FEMShapeAdaptiveResolutionDocument,TwoGroundResolutionDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.failure is not None:

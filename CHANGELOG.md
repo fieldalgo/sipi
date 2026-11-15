@@ -370,6 +370,8 @@
 
 ## [Unreleased]
 
+- Add saved two-ground finite volume/panel/joint/outer assessments, retaining exact planned inputs and typed partial records.
+
 - Add saved iid two-ground line-quantity acceptance with inclusive limits, retained unknown rows and exact confidence envelopes.
 
 - Add strict saved one-variable two-ground line goals with field-free endpoint/

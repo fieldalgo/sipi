@@ -78,6 +78,7 @@ def network_equal(output, expected):
 
 
 def documents():
+    from test_two_ground_resolution_document import document as two_ground_resolution
     from galerkin.mesh3d import box_mesh
     from sipi import GaussianConductivityProfile, ConductivityProfileDocument
     from sipi.capacitance3d_document import Capacitance3DDocument
@@ -601,6 +602,7 @@ def documents():
     base.append(two_ground_quantity_design())
     from test_two_ground_line_yield import document as two_ground_quantity_yield
     base.append(two_ground_quantity_yield())
+    base.append(two_ground_resolution())
     return base
 
 

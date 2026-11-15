@@ -75,3 +75,6 @@ The separate [saved execution](two_ground_execution.md) adds host/request/record
 
 [Line-quantity sampling](two_ground_line_study.md) connects scalar impedance,
 attenuation or a selected paired launch to ordered geometry/material draws.
+
+[Finite resolution assessment](two_ground_resolution.md) separates volume, panel,
+joint and explicit outer-width observations with selected SI allowances.
