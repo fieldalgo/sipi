@@ -62,3 +62,5 @@ retain their own narrower geometry and material scope.
 [Saved paired-goal document](two_ground_face_pair_goal_document.md)
 
 [One-parameter face-metal goals](two_ground_face_line_goal.md)
+
+[Face-metal goals at multiple frequencies](two_ground_face_sampled_pair_goal.md)

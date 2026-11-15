@@ -53,3 +53,5 @@ tan_delta 0.003, 중앙 높이의 두께 50 μm 도체, 2 GHz다. 첫 신호의 
 [쌍 선로 목표 저장 문서](two_ground_face_pair_goal_document.md)
 
 [면별 금속 단일 변수 목표](two_ground_face_line_goal.md)
+
+[여러 주파수의 면별 금속 목표](two_ground_face_sampled_pair_goal.md)

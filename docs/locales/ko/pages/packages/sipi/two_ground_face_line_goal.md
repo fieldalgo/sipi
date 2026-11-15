@@ -70,3 +70,5 @@ sqrt(ZY)를 상대 1e-12로 확인한다. 동결한 선택 기하는 패널 256�
 실제 결과는 정확한 artifact 기록을 따른다.
 
 [면별 금속 목표 저장](two_ground_face_line_goal_document.md)
+
+[여러 주파수의 면별 금속 목표](two_ground_face_sampled_pair_goal.md)

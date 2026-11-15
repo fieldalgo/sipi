@@ -78,3 +78,5 @@ These selected checks are not an infinite-domain, browser, cross-platform or
 measured-accuracy certificate; consult exact artifact records for results.
 
 [Save a face-metal goal](two_ground_face_line_goal_document.md)
+
+[Face-metal goals at multiple frequencies](two_ground_face_sampled_pair_goal.md)
