@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit corner-controlled impedance goals with frozen-input four-control refinement and preserved mesh-limit evidence.
+
 - Apply saved explicit corner controls to geometry and material samples while preserving failed rows and original study behavior.
 
 - Save explicit corner mesh targets with original geometry snapshots and shared execution records.

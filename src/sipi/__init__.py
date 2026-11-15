@@ -385,3 +385,6 @@ __all__ += ['CornerCrossSectionDocument']
 
 from .corner_study import CornerImpedanceStudyDocument
 __all__ += ['CornerImpedanceStudyDocument']
+
+from .corner_goal import seek_corner_impedance
+__all__ += ['seek_corner_impedance']

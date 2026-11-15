@@ -14,6 +14,7 @@ from meshine import MeshSizeLimitError
 
 from .crosssection import CrossSection
 from .document import CrossSectionDocument
+from .corner_document import CornerCrossSectionDocument
 from .impedance_material import (_material_input, _analyze_material, _frequency,
                                  _MaterialMeshReuse)
 from .quasistatic import LineParameters
@@ -44,7 +45,7 @@ class ImpedanceDesign:
     impedance: float
     refined_impedance: float
     quantity: str
-    document: CrossSectionDocument
+    document: CrossSectionDocument | CornerCrossSectionDocument
     history: tuple[DesignEvaluation, ...]
     material_evaluation_json: str | None = None
 
@@ -139,6 +140,18 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
     mesh; refinement builds its own mesh. History and max_evaluations count
     evaluated search/refinement points, not mesh builds or factorizations.
     """
+    return _seek_impedance(factory, bounds, target, quantity=quantity, tolerance=tolerance,
+        mesh=mesh, max_evaluations=max_evaluations, frequency=frequency, materials=materials,
+        material_factory=material_factory, return_line=return_line, search_tolerance=search_tolerance)
+
+
+def _seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
+                    mesh=None, max_evaluations=40, frequency=None, materials=None,
+                    material_factory=None, return_line=False, search_tolerance=None,
+                    document_factory=None, refinement_keys=('edge_size', 'far_size', 'grade')):
+    """Share the bounded search while keeping snapshot/refinement policies explicit."""
+    if document_factory is None:
+        document_factory = CrossSectionDocument
     if type(return_line) is not bool:
         raise ValueError('return_line must be a boolean')
     if not callable(factory):
@@ -176,7 +189,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
             yield
         except MeshSizeLimitError as exc:
             section = document.section
-            failed = CrossSectionDocument(section,
+            failed = document_factory(section,
                 mesh=section.mesh_settings(**document.mesh_options))
             material_json = (None if evaluated_material is None else
                              json.dumps(evaluated_material, sort_keys=True, allow_nan=False))
@@ -189,7 +202,7 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
         if len(history) >= max_evaluations-1:
             raise GoalSeekError('evaluation limit reached before target convergence', history)
         section = factory(parameter)
-        doc = CrossSectionDocument(section, mesh=options)
+        doc = document_factory(section, mesh=options)
         evaluated_material = (material if material_factory is None else
                               _material_input(frequency, material_factory(parameter)))
         with preserve_mesh_failure(parameter, 'search', doc, evaluated_material):
@@ -239,9 +252,9 @@ def seek_impedance(factory, bounds, target, *, quantity='z0', tolerance=0.1,
 
     section = doc.section
     fine = section.mesh_settings(**doc.mesh_options)
-    for key in ('edge_size', 'far_size', 'grade'):
+    for key in refinement_keys:
         fine[key] /= 2
-    refined_doc = CrossSectionDocument(section, mesh=fine)
+    refined_doc = document_factory(section, mesh=fine)
     with preserve_mesh_failure(x, 'refinement', refined_doc, selected_material):
         refined_line = (section.analyze(**fine) if selected_material is None
                         else _analyze_material(refined_doc, selected_material, quantity,
