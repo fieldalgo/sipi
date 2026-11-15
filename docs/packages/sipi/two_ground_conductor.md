@@ -73,3 +73,6 @@ grounded-trace and distinct-foil checks establish algebraic transformations and
 surface-law identities only; they do not imply new mesh or outer convergence.
 The study scope remains finite, with no measurement, all-geometry accuracy,
 new platform, browser or EXE qualification.
+
+For explicit bottom/top/left/right trace laws, use the separate
+[face-resolved API](two_ground_face_conductor.md).

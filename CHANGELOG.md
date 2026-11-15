@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit two-ground face currents and local metal laws with retained whole-boundary evidence.
+
 - Use a verified shared small-angle scalar-length baseline while retaining original mesh criteria and historical runtime references.
 
 - Reuse bounded geometry calculations within two-ground material studies while retaining every sampled row, field evaluation and failure.
