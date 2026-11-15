@@ -40,6 +40,7 @@ from .two_ground_face_pair_goal_document import TwoGroundFaceForwardPairDesignDo
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
 from .two_ground_face_pair_study import TwoGroundFaceForwardPairStudyDocument
 from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
+from .two_ground_face_pair_yield import TwoGroundFaceForwardPairYieldDocument
 from .two_ground_sampled_pair_yield import TwoGroundSampledForwardPairYieldDocument
 from .two_ground_sampled_pair_selection import TwoGroundSampledForwardPairSelectionDocument
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
@@ -49,6 +50,7 @@ from .two_ground_face_line_goal_document import TwoGroundFaceLineQuantityDesignD
 from .two_ground_face_line_goal import TwoGroundFaceLineQuantityGoalError
 from .two_ground_line_goal import TwoGroundLineQuantityGoalError
 from .two_ground_line_yield import TwoGroundLineQuantityYieldDocument
+from .two_ground_face_line_yield import TwoGroundFaceLineQuantityYieldDocument
 from .two_ground_resolution_document import TwoGroundResolutionDocument
 from .two_ground_sampled_pair_study import TwoGroundSampledForwardPairStudyDocument
 from .two_ground_sampled_pair_goal_document import TwoGroundSampledForwardPairDesignDocument
@@ -192,6 +194,7 @@ _REGISTRY = {
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,
     'sipi.two-ground-face-forward-pair-study/1': TwoGroundFaceForwardPairStudyDocument,
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
+    'sipi.two-ground-face-forward-pair-yield/1': TwoGroundFaceForwardPairYieldDocument,
     'sipi.two-ground-sampled-forward-pair-yield/1': TwoGroundSampledForwardPairYieldDocument,
     'sipi.two-ground-sampled-forward-pair-selection/1': TwoGroundSampledForwardPairSelectionDocument,
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
@@ -199,6 +202,7 @@ _REGISTRY = {
     'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
     'sipi.two-ground-face-line-quantity-design/1': TwoGroundFaceLineQuantityDesignDocument,
     'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,
+    'sipi.two-ground-face-line-quantity-yield/1': TwoGroundFaceLineQuantityYieldDocument,
     'sipi.two-ground-resolution/1': TwoGroundResolutionDocument,
     'sipi.two-ground-sampled-forward-pair-study/1': TwoGroundSampledForwardPairStudyDocument,
     'sipi.two-ground-sampled-forward-pair-design/1': TwoGroundSampledForwardPairDesignDocument,

@@ -78,3 +78,5 @@ results. Finite selected cases do not establish infinite-domain, arbitrary-shape
 browser, cross-platform or measured qualification.
 
 [One-parameter face-metal goals](two_ground_face_line_goal.md)
+
+[IID acceptance and unresolved samples](two_ground_face_yield.md)

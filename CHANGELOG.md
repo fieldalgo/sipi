@@ -1,5 +1,7 @@
 # Changelog
 
+- Connect face-metal scalar and paired IID studies to inclusive acceptance limits and conservative unknown-row confidence envelopes.
+
 - Add strict saved two-ground face-metal single-quantity designs with shared execution, CLI and restored records.
 
 - Add explicit one-parameter two-ground face-metal goals with independent volume, panel and joint refinement checks.

@@ -54,3 +54,5 @@ R/L/C0 상대 변화 0.01과 독립 행렬 제곱근 전방 행렬 1e-10으로 �
 임의 형상·브라우저/플랫폼·실측 인증이 아니다.
 
 [스칼라·단일 쌍 여기의 표본](two_ground_face_line_study.md)
+
+[IID 합격 평가와 미해결 표본](two_ground_face_yield.md)
