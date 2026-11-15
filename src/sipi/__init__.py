@@ -400,3 +400,6 @@ __all__ += ["CornerFEMShapeLineQuantityStudyDocument"]
 
 from .corner_fem_goal import CornerFEMShapeLineQuantityDesign, seek_corner_fem_shape_line_quantity
 __all__ += ["CornerFEMShapeLineQuantityDesign", "seek_corner_fem_shape_line_quantity"]
+
+from .corner_fem_goal_document import CornerFEMShapeLineQuantityDesignDocument
+__all__ += ["CornerFEMShapeLineQuantityDesignDocument"]

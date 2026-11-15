@@ -1,5 +1,7 @@
 # Changelog
 
+- Save corner-controlled FEM line quantity goals with original search, refinement and execution budgets.
+
 - Seek FEM line quantities with explicit corner resolution and frozen four-control refinement.
 
 - Preserve explicit corner resolution in FEM line quantity samples and their saved failure records.
