@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit two-ground joint iid acceptance over finite frequency grids, preserving unresolved rows and exact stored execution.
+
 - Save two-ground paired targets on finite frequency grids with strict admission, frozen refinements and complete failure history.
 
 - Seek two-ground paired impedances across explicit frequency grids with frozen refinements, retained failures and unchanged numerical gates.

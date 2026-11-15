@@ -103,9 +103,18 @@ def assess_sampled_panel_pair_yield(study, *, acceptance, confidence=.95, minimu
     interval envelopes unknown labels, not model/numerical errors or post-selection.
     Exact source/grid/sample/value checks do not authenticate manually built fields.
     """
-    if not isinstance(study, SampledPanelForwardPairStudy):
-        raise ValueError('yield assessment requires a SampledPanelForwardPairStudy')
-    source = SampledPanelForwardPairStudyDocument.loads(study.input_json)
+    return _assess_sampled_pair_yield(study, acceptance=acceptance, confidence=confidence,
+        minimum_yield=minimum_yield, study_type=SampledPanelForwardPairStudy,
+        source_type=SampledPanelForwardPairStudyDocument, row_type=SampledPanelForwardPairStudyRow,
+        assessment_type=SampledPanelPairYieldAssessment)
+
+
+def _assess_sampled_pair_yield(study, *, acceptance, confidence, minimum_yield,
+                               study_type, source_type, row_type, assessment_type):
+    """Shared field-free event validation with explicit source and row contracts."""
+    if not isinstance(study, study_type):
+        raise ValueError('yield assessment requires a '+study_type.__name__)
+    source = source_type.loads(study.input_json)
     data = source.to_dict(); sampling = data['study']['sampling']
     if (any(isinstance(f, (bool, np.bool_)) for f in study.frequencies)
             or study.frequencies != tuple(data['frequency_hz'])):
@@ -118,7 +127,7 @@ def assess_sampled_panel_pair_yield(study, *, acceptance, confidence=.95, minimu
         raise ValueError('study must retain its variables and every planned row')
     samples = source.samples(); labels = []
     for index, row in enumerate(study.rows):
-        if (not isinstance(row, SampledPanelForwardPairStudyRow) or type(row.index) is not int
+        if (not isinstance(row, row_type) or type(row.index) is not int
                 or row.index != index or not isinstance(row.sample_values, tuple)
                 or any(isinstance(value, (bool, np.bool_)) for value in row.sample_values)
                 or not np.array_equal(row.sample_values, samples[index])):
@@ -142,7 +151,7 @@ def assess_sampled_panel_pair_yield(study, *, acceptance, confidence=.95, minimu
                 raise ValueError('unresolved row must retain its failed phase, error and no pair values')
             labels.append('unresolved')
     bounds = _interval(labels.count('pass'), labels.count('unresolved'), len(labels), level)
-    return SampledPanelPairYieldAssessment(study, limits, level, target, tuple(labels), bounds)
+    return assessment_type(study, limits, level, target, tuple(labels), bounds)
 
 
 class SampledPanelForwardPairYieldDocument:

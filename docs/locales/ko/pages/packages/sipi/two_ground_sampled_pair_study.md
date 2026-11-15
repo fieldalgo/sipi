@@ -71,3 +71,5 @@ R·내부/외부 L·C·G·C0의 모든 행렬 항에서 상대 0.01·절대 0 �
 `dependencies.json`의 명시 공유 개발 기능이 필요하며 대체 전류 계산법으로
 우회하지 않습니다. Linux 소스·설치본, 브라우저 Worker, macOS·Windows 검증은
 각각 별개입니다.
+
+[모든 지정 주파수의 공동 합격 평가](two_ground_sampled_pair_yield.md).

@@ -75,3 +75,5 @@ evidence of heterogeneous dielectric mesh convergence.
 The explicit shared development capability in `dependencies.json` is required;
 there is no fallback current method. Linux source and installed checks, browser
 Worker, macOS and Windows acceptance are separate evidence.
+
+[Joint acceptance across all sampled frequencies](two_ground_sampled_pair_yield.md).
