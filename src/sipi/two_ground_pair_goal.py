@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import json
 
 from ._two_ground_current_reuse import _current_reuse_scope
+from ._two_ground_mesh_reuse import _mesh_reuse_scope
 
 from .panel_pair_goal import PanelPairRefinement, PanelForwardPairDesign, _seek_panel_pair_goal
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument, TwoGroundPanelTransmissionLineResult
@@ -77,7 +78,7 @@ def seek_two_ground_forward_pair_impedances(factory, bounds, targets, *, toleran
     memory. Outer-domain adequacy, uniqueness, global optimum and empirical
     accuracy are separate questions. This API does not serialize a callable.
     """
-    with _current_reuse_scope():
+    with _current_reuse_scope(), _mesh_reuse_scope():
         return _seek_panel_pair_goal(factory, bounds, targets, tolerances=tolerances,
             initial=initial, max_evaluations=max_evaluations,
             document_type=TwoGroundPanelTransmissionLineDocument, refinements=_refinements,

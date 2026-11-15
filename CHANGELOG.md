@@ -1,5 +1,7 @@
 # Changelog
 
+- Reuse detached, bounded two-ground meshes within paired goal requests while preserving every attempt, refinement and failure record.
+
 - Reuse identical two-ground vacuum-current factors within bounded paired-goal requests while preserving attempts, failure history and numerical checks.
 
 - Compare fixed two-ground frequency-grid candidates with simultaneous joint bounds, complete row budgets and retained uncertainty.

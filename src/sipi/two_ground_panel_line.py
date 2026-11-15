@@ -4,6 +4,7 @@
 from dataclasses import dataclass
 import json
 
+from ._two_ground_mesh_reuse import _reuse_mesh
 from .document import CrossSectionDocument, _keys, _unique_object
 from .dielectric import dielectric_from_dict, dielectric_to_dict, _material_samples, _dispersive_from_mesh
 from .fem_shape_line import _mesh_record
@@ -151,7 +152,7 @@ class TwoGroundPanelTransmissionLineDocument:
                 ground_thickness=data['ground_thickness_m'], **options)
             factors = loss.factors
             stage = 'mesh'
-            meshed = section.mesh(**cross.mesh_options)
+            meshed = _reuse_mesh(cross, section)
             mesh_observation = _mesh_record(meshed)
             if tuple(meshed.signals) != factors.names:
                 raise ValueError('dielectric mesh changed two-ground signal order')

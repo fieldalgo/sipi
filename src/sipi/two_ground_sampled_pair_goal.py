@@ -4,6 +4,7 @@
 from dataclasses import dataclass
 
 from ._two_ground_current_reuse import _current_reuse_scope
+from ._two_ground_mesh_reuse import _mesh_reuse_scope
 
 from .sampled_panel_pair_goal import (SampledPanelPairRefinement, SampledPanelForwardPairDesign,
                                      _seek_sampled_panel_pair_goal)
@@ -62,7 +63,7 @@ def seek_two_ground_sampled_forward_pair_impedances(factory, bounds, frequencies
     No continuous-band, outer-domain, global optimum, uniqueness or absolute
     accuracy guarantee follows. A factory callable is not serialized.
     """
-    with _current_reuse_scope():
+    with _current_reuse_scope(), _mesh_reuse_scope():
         return _seek_sampled_panel_pair_goal(factory, bounds, frequencies, targets,
             tolerances=tolerances, initial=initial, max_evaluations=max_evaluations,
             document_type=TwoGroundPanelTransmissionLineDocument, refinements=_refinements,

@@ -30,3 +30,5 @@
 물리 계약과 한계는 [단일 주파수 역산](two_ground_pair_goal_document.md)과
 [유한 주파수 역산](two_ground_sampled_pair_goal_document.md)을 참조합니다. 재사용으로
 절대 정확도를 인증하거나 독립 패널·체적·외곽·실측 검증을 대신하지 않습니다.
+
+같은 역산 요청 안에서만 성공한 동일 메시를 재사용합니다. 복사본 격리와 자원 한도는 [메시 재사용](two_ground_mesh_reuse.md)을 참고하세요.

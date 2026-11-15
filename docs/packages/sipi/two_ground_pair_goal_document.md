@@ -60,3 +60,5 @@ Finite-domain refinement is not outer-boundary convergence, empirical accuracy,
 production yield or browser/Windows qualification. Existing schemas are unchanged.
 
 [Identical current factors are reused within a request](two_ground_current_reuse.md); line attempts and numerical criteria remain unchanged.
+
+Identical successful meshes are reused only inside one paired request; see [mesh reuse](two_ground_mesh_reuse.md) for snapshot isolation and resource bounds.
