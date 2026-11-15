@@ -40,6 +40,7 @@ from .two_ground_pair_yield import TwoGroundForwardPairYieldDocument
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .two_ground_line_goal_document import TwoGroundLineQuantityDesignDocument
 from .two_ground_line_goal import TwoGroundLineQuantityGoalError
+from .two_ground_line_yield import TwoGroundLineQuantityYieldDocument
 from .fem_shape_resolution_document import FEMShapeResolutionDocument
 from .corner_fem_resolution_document import CornerFEMShapeResolutionDocument
 from .fem_shape_adaptive_document import FEMShapeAdaptiveResolutionDocument
@@ -179,6 +180,7 @@ _REGISTRY = {
     'sipi.two-ground-forward-pair-yield/1': TwoGroundForwardPairYieldDocument,
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
+    'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,
     'sipi.fem-shape-resolution/1': FEMShapeResolutionDocument,
     'sipi.corner-fem-shape-resolution/1': CornerFEMShapeResolutionDocument,
     'sipi.fem-shape-adaptive-resolution/1': FEMShapeAdaptiveResolutionDocument,
@@ -604,7 +606,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     elif isinstance(doc, NortonCircuitDocument):
         out['result'] = _norton_circuit(doc.analyze(max_evaluations=budget))
     elif isinstance(doc, (ImpedanceYieldDocument, YieldDesignDocument, LineQuantityYieldDocument,
-                          PanelForwardPairYieldDocument, ShapePanelForwardPairYieldDocument, ShapeSampledPanelForwardPairYieldDocument, PanelResolutionYieldDocument, SampledPanelResolutionYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument, SampledPanelForwardPairSelectionDocument, TwoGroundForwardPairYieldDocument)):
+                          PanelForwardPairYieldDocument, ShapePanelForwardPairYieldDocument, ShapeSampledPanelForwardPairYieldDocument, PanelResolutionYieldDocument, SampledPanelResolutionYieldDocument, PanelForwardPairSelectionDocument, SampledPanelForwardPairYieldDocument, SampledPanelForwardPairSelectionDocument, TwoGroundForwardPairYieldDocument, TwoGroundLineQuantityYieldDocument)):
         result = doc.analyze(max_evaluations=budget)
         out['result'] = result.to_dict()
         if result.unresolved:

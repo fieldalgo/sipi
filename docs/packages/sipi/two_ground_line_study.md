@@ -64,3 +64,6 @@ platform. Volume/dielectric refinement remains a separate line-extraction gate.
 
 A [one-variable goal](two_ground_line_goal.md) uses the same line quantities
 and requires separate volume, panel and joint refinements.
+
+For a fixed iid distribution, [quantity acceptance](two_ground_line_yield.md)
+retains every unknown row in its confidence envelope.

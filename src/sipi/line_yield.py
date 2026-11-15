@@ -77,14 +77,24 @@ def assess_line_yield(study, *, minimum=None, maximum=None, confidence=.95, mini
     Counts, order and exact regenerated sample vectors are checked. These
     structural checks do not authenticate manually constructed solver results.
     """
+    return _assess_line_yield(study, minimum=minimum, maximum=maximum,
+        confidence=confidence, minimum_yield=minimum_yield, study_type=LineQuantityStudy,
+        source_type=LineQuantityStudyDocument, assessment_type=LineYieldAssessment,
+        source_schemas=('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2',
+                        'sipi.line-quantity-study/3', 'sipi.line-quantity-study/4'),
+        schema_error='yield assessment requires line-quantity-study/1, /2, /3 or /4')
+
+
+def _assess_line_yield(study, *, minimum, maximum, confidence, minimum_yield,
+        study_type, source_type, assessment_type, source_schemas, schema_error):
+    """Original scalar iid checks with explicit source and result contracts."""
     low, high, level, target = _criteria(minimum, maximum, confidence, minimum_yield,
                                         quantity_name='line quantity')
-    if not isinstance(study, LineQuantityStudy):
-        raise ValueError('yield assessment requires a LineQuantityStudy')
-    source = LineQuantityStudyDocument.loads(study.input_json); data = source.to_dict()
-    if data['schema'] not in ('sipi.line-quantity-study/1', 'sipi.line-quantity-study/2',
-                              'sipi.line-quantity-study/3', 'sipi.line-quantity-study/4'):
-        raise ValueError('yield assessment requires line-quantity-study/1, /2, /3 or /4')
+    if not isinstance(study, study_type):
+        raise ValueError('yield assessment requires a '+study_type.__name__)
+    source = source_type.loads(study.input_json); data = source.to_dict()
+    if data['schema'] not in source_schemas:
+        raise ValueError(schema_error)
     sampling = data['study']['sampling']
     if sampling['kind'] not in ('uniform', 'normal'):
         raise ValueError('yield assessment requires iid uniform or normal samples, not sweep/corners')
@@ -109,7 +119,7 @@ def assess_line_yield(study, *, minimum=None, maximum=None, confidence=.95, mini
                 raise ValueError('unresolved row must retain its failed phase, error and no value')
             labels.append('unresolved')
     bounds = _interval(labels.count('pass'), labels.count('unresolved'), len(labels), level)
-    return LineYieldAssessment(study, low, high, level, target, tuple(labels), bounds)
+    return assessment_type(study, low, high, level, target, tuple(labels), bounds)
 
 
 class LineQuantityYieldDocument:

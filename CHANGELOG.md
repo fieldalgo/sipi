@@ -370,6 +370,8 @@
 
 ## [Unreleased]
 
+- Add saved iid two-ground line-quantity acceptance with inclusive limits, retained unknown rows and exact confidence envelopes.
+
 - Add strict saved one-variable two-ground line goals with field-free endpoint/
   midpoint/refinement preflight and common execution/request/record/project
   support. Preserve the direct algorithm, budgets, numerical gates and failures.
