@@ -1,0 +1,155 @@
+{
+  "scope": "Selected finite two-ground face-metal goal; frozen geometry for independent frequency/panel/outer checks",
+  "source_parent": "1bbde489a1d99c9cf3cf48c71e84287363adc5ab",
+  "goal_xml_sha256": "694b6cf1e1ab898cc20a9b63cc9d0d5030cfeb36362d00c1e4abd532f9d436d4",
+  "parameters": [
+    0.0004332151867390037,
+    0.0002897712967322132
+  ],
+  "targets_ohm": [
+    90.0,
+    44.5
+  ],
+  "tolerances_ohm": [
+    0.1,
+    0.1
+  ],
+  "evaluations": 33,
+  "input": {
+    "conductors": {
+      "negative": {
+        "bottom": {
+          "conductivity": 45000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        },
+        "left": {
+          "conductivity": 35000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        },
+        "right": {
+          "conductivity": 58000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        },
+        "top": {
+          "conductivity": 21000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        }
+      },
+      "positive": {
+        "bottom": {
+          "conductivity": 58000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        },
+        "left": {
+          "conductivity": 21000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        },
+        "right": {
+          "conductivity": 45000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        },
+        "top": {
+          "conductivity": 35000000.0,
+          "relative_permeability": 1.0,
+          "roughness": {
+            "kind": "smooth"
+          }
+        }
+      }
+    },
+    "cross_section": {
+      "box": {
+        "bottom": "ground",
+        "sides": "open",
+        "top": "ground",
+        "width": 0.008
+      },
+      "layers": [
+        {
+          "eps_r": 4.0,
+          "name": "uniform",
+          "tan_delta": 0.003,
+          "thickness": 0.002
+        }
+      ],
+      "length_unit": "m",
+      "mesh": {
+        "edge_size": 5e-06,
+        "far_size": 0.0001,
+        "grade": 0.05
+      },
+      "schema": "sipi.cross-section/1",
+      "traces": [
+        {
+          "ground": false,
+          "name": "positive",
+          "thickness": 5e-05,
+          "width": 0.0004332151867390037,
+          "x": -0.0003614932417356085,
+          "y": 0.000975
+        },
+        {
+          "ground": false,
+          "name": "negative",
+          "thickness": 5e-05,
+          "width": 0.0004332151867390037,
+          "x": 0.0003614932417356085,
+          "y": 0.000975
+        }
+      ]
+    },
+    "frequency_hz": [
+      2000000000.0
+    ],
+    "ground_thickness_m": 3.5e-05,
+    "length_m": 0.0,
+    "materials": {},
+    "panel": {
+      "ground_modes": 128,
+      "interpolation_degree": 16,
+      "panels_per_edge": 128
+    },
+    "reference": {
+      "bottom": {
+        "conductivity": 58000000.0,
+        "relative_permeability": 1.0,
+        "roughness": {
+          "kind": "smooth"
+        }
+      },
+      "conductors": {},
+      "kind": "surfaces",
+      "sides": null,
+      "top": {
+        "conductivity": 58000000.0,
+        "relative_permeability": 1.0,
+        "roughness": {
+          "kind": "smooth"
+        }
+      }
+    },
+    "reference_ohms": 50.0,
+    "schema": "sipi.two-ground-face-panel-transmission-line/1"
+  }
+}

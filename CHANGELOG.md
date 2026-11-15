@@ -1,5 +1,7 @@
 # Changelog
 
+- Connect explicit two-ground face-metal lines to bounded paired forward-impedance goals, retaining frozen volume/panel checks and original failure accounting.
+
 - Add a separate versioned two-ground face-line document and host execution records, preserving face currents, material admission and the actual dielectric mesh.
 
 - Add explicit two-ground face currents and local metal laws with retained whole-boundary evidence.
