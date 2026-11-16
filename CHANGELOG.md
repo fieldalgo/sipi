@@ -430,6 +430,8 @@
 
 ## [Unreleased]
 
+- Add an explicit versioned corner-power face transmission-line document with matched dielectric fields, typed failures and saved execution/replay. Existing line schemas remain unchanged.
+
 - Preserve supported partial resolution failures in recorded workbench runs using explicit record version2; other receipt shapes retain version1.
 
 - Extend two-ground finite resolution checks to three registered coupled geometries using existing independent references.

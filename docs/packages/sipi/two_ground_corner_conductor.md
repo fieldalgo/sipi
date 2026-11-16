@@ -91,3 +91,7 @@ measurement, roughness calibration, other-platform or browser qualification.
 Refine panels and outer bounds for each requested quantity. A three-active
 reference and a fixed-ground reduction did not meet their separate gates;
 those scopes are excluded rather than inferred from these passing cases.
+
+## Saved corner-power line
+
+The separate [corner-power face line](two_ground_corner_face_panel_line.md) stores this explicit current method, matched dielectric fields and network results.

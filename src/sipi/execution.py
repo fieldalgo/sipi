@@ -35,6 +35,7 @@ from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument, TwoGroundPanelLineError
 from .two_ground_conductor import TwoGroundConductorLoss
 from .two_ground_face_panel_line import TwoGroundFacePanelTransmissionLineDocument
+from .two_ground_corner_face_panel_line import TwoGroundCornerFacePanelTransmissionLineDocument
 from .two_ground_pair_goal_document import TwoGroundForwardPairDesignDocument
 from .two_ground_face_pair_goal_document import TwoGroundFaceForwardPairDesignDocument
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
@@ -197,6 +198,7 @@ _REGISTRY = {
     'sipi.corner-fem-shape-transmission-line/1': CornerFEMShapeTransmissionLineDocument,
     'sipi.two-ground-panel-transmission-line/1': TwoGroundPanelTransmissionLineDocument,
     'sipi.two-ground-face-panel-transmission-line/1': TwoGroundFacePanelTransmissionLineDocument,
+    'sipi.two-ground-corner-face-panel-transmission-line/1': TwoGroundCornerFacePanelTransmissionLineDocument,
     'sipi.two-ground-forward-pair-design/1': TwoGroundForwardPairDesignDocument,
     'sipi.two-ground-face-forward-pair-design/1': TwoGroundFaceForwardPairDesignDocument,
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,
