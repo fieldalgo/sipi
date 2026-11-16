@@ -123,3 +123,5 @@ whole-surface criteria and the original insufficient-resolution observations
 remain unchanged.
 
 [Face-specific saved two-ground line](two_ground_face_panel_line.md)
+
+A separate [all-active corner-power method](two_ground_corner_conductor.md) retains integrable corner densities for one or two signals; both APIs keep their existing defaults, and the corner method excludes grounded traces.

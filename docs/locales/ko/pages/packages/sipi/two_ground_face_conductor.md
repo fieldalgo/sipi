@@ -108,3 +108,5 @@ Gram은 별도로 보존한다. 접지 도체는 원래 전체 커패시턴스 �
 변경하지 않습니다.
 
 [면별 금속을 저장하는 양면 접지 선로](two_ground_face_panel_line.md)
+
+별도 [all-active corner-power 방법](two_ground_corner_conductor.md)은 신호1~2개의 적분 가능한 모서리 밀도를 유지한다. 기존 API 기본값은 유지되며 corner 방법은 고정접지 trace를 제외한다.
