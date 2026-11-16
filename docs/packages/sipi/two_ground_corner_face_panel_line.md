@@ -58,3 +58,7 @@ staged failures and real saved replay. Current accuracy evidence is limited
 to the two independently qualified P3 cases described in the current adapter.
 This does not qualify arbitrary geometry, dielectric-interface corner laws,
 fixed-ground traces, measured foils, browser execution or additional platforms.
+
+## Explicit finite comparisons
+
+Use the separate [finite-resolution function](two_ground_corner_face_resolution.md) to compare current panels, dielectric mesh and wider side boundaries with explicit per-quantity allowances.
