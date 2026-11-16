@@ -42,3 +42,7 @@ asymptotic convergence proof or measured-foil qualification. Default line
 controls alone do not establish agreement. Independent current and network
 references remain required alongside these comparisons; a failed observation
 must not be replaced by a passing geometry or relaxed allowance.
+
+## Saved comparison input
+
+The separate [saved comparison document](two_ground_corner_face_resolution_document.md) retains explicit controls, finite disagreement and partial failure evidence through saved execution and projects.

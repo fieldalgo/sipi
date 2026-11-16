@@ -62,6 +62,8 @@ def _partial_resolution_failure(output,source):
         return _two_ground_partial_resolution_failure(output,source)
     if schema=='sipi.two-ground-face-resolution/1':
         return _two_ground_face_partial_resolution_failure(output,source)
+    if schema=='sipi.two-ground-corner-face-resolution/1':
+        return _two_ground_corner_face_partial_resolution_failure(output,source)
     result,error=output['result'],output['error']
     if schema not in _PARTIAL_RESOLUTION_SCHEMAS or not isinstance(result,dict):
         raise ValueError('partial failed result requires a supported resolution input')
@@ -432,3 +434,52 @@ def _two_ground_face_adaptive_partial_failure(output,source,max_evaluations):
             raise ValueError('adaptive face history cannot advance past two accepted levels')
     if error['stage'].startswith('outer:') and consecutive<2:
         raise ValueError('adaptive face outer work needs two accepted levels')
+
+
+def _two_ground_corner_face_partial_resolution_failure(output,source):
+    """Bind the explicit two-ground-corner-face failure to its field-free planned prefix."""
+    from .two_ground_corner_face_panel_line import TwoGroundCornerFacePanelTransmissionLineDocument as Line
+    from .two_ground_corner_face_resolution import _two_ground_corner_face_resolution_inputs
+    from .line_resolution import ResolutionTolerance
+    from .line_resolution_document import _API
+    result,error=output['result'],output['error']
+    _keys(result,('completed','accepted','tolerances','evaluations','comparisons','failure',
+                 'expected_evaluations','scope'),where='partial two-ground-corner-face resolution result')
+    _keys(error,('stage','input','kind','message','details'),where='partial two-ground-corner-face resolution error')
+    if (result['completed'] is not False or result['accepted'] is not False or
+        result['scope']!='two-ground-corner-face-finite-resolution-not-absolute-accuracy' or
+        _canonical(result['tolerances'])!=_canonical(source['tolerances']) or
+        _canonical(result['failure'])!=_canonical(error) or
+        any(not isinstance(error[k],str) or not error[k] for k in ('stage','kind')) or
+        not isinstance(error['message'],str)):
+        raise ValueError('partial two-ground-corner-face flags, limits or failure are inconsistent')
+    details=error['details']
+    if error['kind']=='TwoGroundCornerFacePanelLineError':
+        _keys(details,('type','message','stage','cause_type','input','current_solver','dielectric_mesh'),where='two-ground-corner-face resolution cause')
+        if (details['type']!=error['kind'] or details['message']!=error['message'] or
+            _canonical(details['input'])!=_canonical(error['input']) or
+            any(not isinstance(details[k],str) or not details[k] for k in ('stage','cause_type'))):
+            raise ValueError('two-ground-corner-face typed cause must match the original input and failure')
+    elif details is not None:
+        raise ValueError('untyped two-ground-corner-face failure cannot carry typed details')
+    _,stages=_two_ground_corner_face_resolution_inputs(Line.from_dict(source['line']),source['refined_panel'],
+        [Line.from_dict(v) for v in source['outer_lines']],
+        {_API[k]:ResolutionTolerance(**v) for k,v in source['tolerances'].items()},
+        source['refinement_factor'],source['max_solves'])
+    names=[stage for stage,_,_ in stages]
+    if error['stage'] not in names:raise ValueError('failure stage must belong to the planned two-ground-corner-face evaluations')
+    index=names.index(error['stage'])
+    if _canonical(error['input'])!=_canonical(stages[index][1].to_dict()):
+        raise ValueError('failure input must match its planned two-ground-corner-face stage')
+    if _integer('expected_evaluations',result['expected_evaluations'],1,16)!=len(stages):
+        raise ValueError('partial two-ground-corner-face result must retain its planned count')
+    for key in ('evaluations','comparisons'):
+        if not isinstance(result[key],list) or any(not isinstance(row,dict) for row in result[key]):
+            raise ValueError('partial two-ground-corner-face history must retain object rows')
+    if len(result['evaluations']) not in (index,index+1):
+        raise ValueError('partial two-ground-corner-face history must end at its failed stage')
+    for i,row in enumerate(result['evaluations']):
+        if row.get('stage')!=names[i] or _canonical(row.get('input'))!=_canonical(stages[i][1].to_dict()):
+            raise ValueError('partial two-ground-corner-face history must retain the exact planned prefix')
+        if not isinstance(row.get('current_solver'),dict) or not isinstance(row.get('dielectric_mesh'),dict):
+            raise ValueError('completed two-ground-corner-face history requires current and mesh evidence')

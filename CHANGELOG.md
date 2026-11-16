@@ -430,6 +430,8 @@
 
 ## [Unreleased]
 
+- Add a separate saved corner-face resolution contract with explicit finite allowances and planned-prefix validation of partial execution records.
+
 - Add explicit finite corner-face line comparisons across current panels, dielectric mesh and wider domains, retaining typed failures and entrywise allowances.
 
 - Add an explicit versioned corner-power face transmission-line document with matched dielectric fields, typed failures and saved execution/replay. Existing line schemas remain unchanged.
