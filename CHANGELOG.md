@@ -430,6 +430,8 @@
 
 ## [Unreleased]
 
+- Add an explicit bounded corner-face line quantity goal with separate volume, panel and joint refinement gates.
+
 - Add a separate saved corner-face resolution contract with explicit finite allowances and planned-prefix validation of partial execution records.
 
 - Add explicit finite corner-face line comparisons across current panels, dielectric mesh and wider domains, retaining typed failures and entrywise allowances.

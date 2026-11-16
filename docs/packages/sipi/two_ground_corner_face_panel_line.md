@@ -62,3 +62,7 @@ fixed-ground traces, measured foils, browser execution or additional platforms.
 ## Explicit finite comparisons
 
 Use the separate [finite-resolution function](two_ground_corner_face_resolution.md) to compare current panels, dielectric mesh and wider side boundaries with explicit per-quantity allowances.
+
+## Bounded design
+
+Use the separate [one-parameter goal adapter](two_ground_corner_face_line_goal.md) to retain target checks and three independently required refinements.
