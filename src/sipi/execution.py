@@ -48,6 +48,7 @@ from .two_ground_sampled_pair_selection import TwoGroundSampledForwardPairSelect
 from .two_ground_face_sampled_pair_selection import TwoGroundFaceSampledForwardPairSelectionDocument
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .two_ground_face_line_study import TwoGroundFaceLineQuantityStudyDocument
+from .two_ground_corner_face_line_study import TwoGroundCornerFaceLineQuantityStudyDocument
 from .two_ground_line_goal_document import TwoGroundLineQuantityDesignDocument
 from .two_ground_face_line_goal_document import TwoGroundFaceLineQuantityDesignDocument
 from .two_ground_face_line_goal import TwoGroundFaceLineQuantityGoalError
@@ -212,6 +213,7 @@ _REGISTRY = {
     'sipi.two-ground-face-sampled-forward-pair-selection/1': TwoGroundFaceSampledForwardPairSelectionDocument,
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.two-ground-face-line-quantity-study/1': TwoGroundFaceLineQuantityStudyDocument,
+    'sipi.two-ground-corner-face-line-quantity-study/1': TwoGroundCornerFaceLineQuantityStudyDocument,
     'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
     'sipi.two-ground-face-line-quantity-design/1': TwoGroundFaceLineQuantityDesignDocument,
     'sipi.two-ground-line-quantity-yield/1': TwoGroundLineQuantityYieldDocument,

@@ -60,3 +60,7 @@ R/L/G/C와 네트워크, 정확한 입력, 실제 유전체 메시 및 불변 �
 ## 유계 설계
 
 별도 [단일 변수 역산](two_ground_corner_face_line_goal.md)은 목표 검사와 독립된 세분 검사 세 가지를 보존합니다.
+
+## 제조 입력 표본
+
+별도 [저장 선로 study](two_ground_corner_face_line_study.md)는 기하·재료 표본, 물리 면별 법칙과 실패 행을 보존합니다.

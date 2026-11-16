@@ -430,6 +430,8 @@
 
 ## [Unreleased]
 
+- Add explicit saved corner-current line samples with ordered geometry/material inputs, finite budgets and retained failure evidence.
+
 - Add an explicit bounded corner-face line quantity goal with separate volume, panel and joint refinement gates.
 
 - Add a separate saved corner-face resolution contract with explicit finite allowances and planned-prefix validation of partial execution records.

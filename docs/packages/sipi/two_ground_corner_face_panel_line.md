@@ -66,3 +66,7 @@ Use the separate [finite-resolution function](two_ground_corner_face_resolution.
 ## Bounded design
 
 Use the separate [one-parameter goal adapter](two_ground_corner_face_line_goal.md) to retain target checks and three independently required refinements.
+
+## Manufacturing samples
+
+The separate [saved line study](two_ground_corner_face_line_study.md) preserves geometry/material samples, physical face laws and failed rows.

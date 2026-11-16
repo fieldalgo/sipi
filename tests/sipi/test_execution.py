@@ -642,6 +642,8 @@ def documents():
     base.append(corner_face_line())
     from test_two_ground_corner_face_resolution_document import document as corner_face_resolution
     base.append(corner_face_resolution())
+    from test_two_ground_corner_face_line_study import document as corner_face_line_study
+    base.append(corner_face_line_study())
     return base
 
 
