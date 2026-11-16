@@ -36,3 +36,7 @@ schema는 이 단위에 포함하지 않습니다.
 검증이며 실측 포일이나 다른 플랫폼의 정확도를 확정하지 않습니다.
 
 [English](../../../../../packages/sipi/two_ground_corner_face_line_goal.md)
+
+## 목표 입력 저장
+
+[별도 저장 목표](two_ground_corner_face_line_goal_document.md)는 callable을 직렬화하지 않고 입력 구간 하나·목표·예산을 이 직접 API에 연결합니다.

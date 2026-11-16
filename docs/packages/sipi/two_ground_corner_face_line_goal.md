@@ -42,3 +42,7 @@ and degree24. Every returned field is checked against scalar `sqrt(Z/Y)` and
 artifacts; they do not establish measured-foil or another-platform accuracy.
 
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_corner_face_line_goal.md)
+
+## Saved goal input
+
+The [separate saved goal](two_ground_corner_face_line_goal_document.md) binds one source interval, target and budget to this direct adapter without serializing a callable.

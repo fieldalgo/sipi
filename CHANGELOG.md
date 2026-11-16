@@ -430,6 +430,8 @@
 
 ## [Unreleased]
 
+- Add a separate saved corner-current line goal with field-free factory preflight and a typed failure route in common execution.
+
 - Add explicit saved corner-current line samples with ordered geometry/material inputs, finite budgets and retained failure evidence.
 
 - Add an explicit bounded corner-face line quantity goal with separate volume, panel and joint refinement gates.
