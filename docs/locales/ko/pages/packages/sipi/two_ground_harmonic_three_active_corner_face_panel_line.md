@@ -42,3 +42,7 @@ current_record의 kind는 two-ground-harmonic-corner-faces-three-active,
 수락을 뜻하지 않는다.
 
 [English](../../../../../packages/sipi/two_ground_harmonic_three_active_corner_face_panel_line.md)
+
+## 유한 해상도 비교
+
+[명시적 비교](two_ground_harmonic_three_active_corner_face_resolution.md)는 전류·유전체·외곽 변화를 따로 비교하고 완료한 결과를 보존합니다.

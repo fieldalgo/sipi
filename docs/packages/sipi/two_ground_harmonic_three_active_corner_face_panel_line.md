@@ -56,3 +56,7 @@ adapter. This does not qualify fixed guards, arbitrary geometry, dielectric
 interface corner laws, physical coupons, browser execution or other platforms.
 
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_harmonic_three_active_corner_face_panel_line.md)
+
+## Finite-resolution comparisons
+
+The [explicit assessment](two_ground_harmonic_three_active_corner_face_resolution.md) separates current, volume and outer-domain changes while retaining all completed results.
