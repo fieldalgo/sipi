@@ -46,6 +46,11 @@ def _arguments(section, panels_per_edge, ground_modes, interpolation_degree):
 def _extract(checked, count, modes, degree, polygons):
     shared = _solver()(polygons, width=checked.width, height=checked.height,
         panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
+    return _extract_result(checked, polygons, shared, 'two-ground-corner-power-all-active')
+
+
+def _extract_result(checked, polygons, shared, method):
+    """Convert an admitted shared result without changing its active basis."""
     whole = shared.whole
     names = tuple(t.name for t in checked.traces)
     n = len(names)
@@ -61,7 +66,7 @@ def _extract(checked, count, modes, degree, polygons):
         'panel_count', 'condition_bound', 'reciprocity_error', 'residual_error',
         'current_error', 'matrix_refinement_error', 'ground_refinement_error',
         'minimum_scaled_eigenvalue')}
-    diagnostics.update(ground_voltage_error=0., method='two-ground-corner-power-all-active')
+    diagnostics.update(ground_voltage_error=0., method=method)
     labels = tuple('signal:'+name for name in names)+('reference:bottom', 'reference:top')
     base = TwoGroundCurrentFactors(names, grouped_parts, grouped_currents,
         epsilon_0*whole.capacitance_per_permittivity, (), diagnostics, labels, parts, currents)

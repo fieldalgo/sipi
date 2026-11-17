@@ -95,3 +95,5 @@ those scopes are excluded rather than inferred from these passing cases.
 ## Saved corner-power line
 
 The separate [corner-power face line](two_ground_corner_face_panel_line.md) stores this explicit current method, matched dielectric fields and network results.
+
+For an explicit two-mode density discretization with a smaller physical-panel budget, see [linear corner-density currents](two_ground_linear_corner_conductor.md). Existing functions here retain their defaults and selection.

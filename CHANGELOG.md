@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit linear corner-density current and surface-loss APIs with pre-solve physical panel budgets; retain existing defaults and saved schemas.
+
 - Connect explicit all-active corner-power currents to whole/face surface-metal loss, preserving direct current bases, strict scope and independent P3 checks. Existing defaults and saved documents remain unchanged.
 
 - Save bounded face-metal refinement plans and validate partial histories against exact planned prefixes and caller step/outer reservations.
