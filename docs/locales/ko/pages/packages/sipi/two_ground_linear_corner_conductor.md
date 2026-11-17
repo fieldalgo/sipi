@@ -56,3 +56,5 @@ factors = two_ground_linear_corner_face_current_factors(
 세분해 확인해야 합니다.
 
 별도 [저장 면별 전송선](two_ground_linear_corner_face_panel_line.md)은 이 명시적 전류 방법을 동일 기하 유전체와 실행 재생에 연결합니다.
+
+별도 [세 활성 도체 조화기저 전류 어댑터](two_ground_harmonic_three_active_corner_conductor.md)는 고유 입력 범위·물리 패널 한도·방법 식별을 유지한다.

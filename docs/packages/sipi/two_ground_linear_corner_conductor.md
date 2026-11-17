@@ -63,3 +63,5 @@ coverage. Refine both panel resolution and the finite outer domain for each
 quantity used in a design.
 
 The separate [saved face line](two_ground_linear_corner_face_panel_line.md) connects this explicit current method to matched dielectric fields and execution replay.
+
+The separate [three-active harmonic current adapter](two_ground_harmonic_three_active_corner_conductor.md) keeps its own admission, physical panel budget and method identity.
