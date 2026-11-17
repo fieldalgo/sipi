@@ -44,3 +44,5 @@ retention and admission before fields. It does not qualify fixed guards,
 other geometries, measured accuracy, browser execution or another platform.
 
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_harmonic_three_active_corner_face_resolution.md)
+
+The [saved assessment](two_ground_harmonic_three_active_corner_face_resolution_document.md) preserves explicit inputs and complete or partial finite-comparison evidence through requests, records and projects.

@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit three-active finite-resolution comparisons with SI allowances, typed partial-result binding and unchanged direct assessment payloads.
+
 - Add direct three-active harmonic-current finite-resolution assessments with separate volume, current and outer comparisons, bounded reuse and retained failures.
 
 - Save explicit three-active harmonic face-current lines with matched RLGC, six-port networks and typed partial execution evidence. / 세 활성 도체의 조화기저 면 전류 선로를 일치 RLGC·6포트 망·단계별 실행 근거와 별도 저장한다.

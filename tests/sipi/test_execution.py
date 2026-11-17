@@ -656,6 +656,8 @@ def documents():
     base.append(linear_corner_goal())
     from test_two_ground_harmonic_three_active_corner_face_panel_line import document as harmonic_three_line
     base.append(harmonic_three_line())
+    from test_two_ground_harmonic_three_active_corner_face_resolution_document import document as harmonic_three_resolution
+    base.append(harmonic_three_resolution())
     return base
 
 

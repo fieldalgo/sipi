@@ -66,6 +66,7 @@ from .two_ground_resolution_document import TwoGroundResolutionDocument
 from .two_ground_face_resolution_document import TwoGroundFaceResolutionDocument
 from .two_ground_corner_face_resolution_document import TwoGroundCornerFaceResolutionDocument
 from .two_ground_linear_corner_face_resolution_document import TwoGroundLinearCornerFaceResolutionDocument
+from .two_ground_harmonic_three_active_corner_face_resolution_document import TwoGroundHarmonicThreeActiveCornerFaceResolutionDocument
 from .two_ground_sampled_pair_study import TwoGroundSampledForwardPairStudyDocument
 from .two_ground_face_sampled_pair_study import TwoGroundFaceSampledForwardPairStudyDocument
 from .two_ground_sampled_pair_goal_document import TwoGroundSampledForwardPairDesignDocument
@@ -235,6 +236,7 @@ _REGISTRY = {
     'sipi.two-ground-face-resolution/1': TwoGroundFaceResolutionDocument,
     'sipi.two-ground-corner-face-resolution/1': TwoGroundCornerFaceResolutionDocument,
     'sipi.two-ground-linear-corner-face-resolution/1': TwoGroundLinearCornerFaceResolutionDocument,
+    'sipi.two-ground-harmonic-three-active-corner-face-resolution/1': TwoGroundHarmonicThreeActiveCornerFaceResolutionDocument,
     'sipi.two-ground-sampled-forward-pair-study/1': TwoGroundSampledForwardPairStudyDocument,
     'sipi.two-ground-face-sampled-forward-pair-study/1': TwoGroundFaceSampledForwardPairStudyDocument,
     'sipi.two-ground-sampled-forward-pair-design/1': TwoGroundSampledForwardPairDesignDocument,
