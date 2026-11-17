@@ -56,3 +56,7 @@ interface corner laws, physical coupons, browser execution or other platforms.
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_linear_corner_face_panel_line.md)
 
 The explicit [finite-resolution route](two_ground_linear_corner_face_resolution.md) compares current, volume and side-width effects with retained evidence.
+
+## Bounded design
+
+The [direct linear-current goal](two_ground_linear_corner_face_line_goal.md) searches one parameter with separate frozen volume, panel and joint refinements.

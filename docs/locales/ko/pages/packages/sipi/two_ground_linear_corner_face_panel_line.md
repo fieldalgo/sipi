@@ -50,3 +50,7 @@
 [English](../../../../../packages/sipi/two_ground_linear_corner_face_panel_line.md)
 
 명시적 [유한 해상도 경로](two_ground_linear_corner_face_resolution.md)는 전류·체적·측면 폭을 근거와 함께 비교합니다.
+
+## 유계 역산
+
+[직접 선형 전류 역산](two_ground_linear_corner_face_line_goal.md)은 변수 하나를 찾고 입력을 고정한 유전체·패널·공동 세분 검사를 각각 수행합니다.

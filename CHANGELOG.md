@@ -1,5 +1,7 @@
 # Changelog
 
+- Add an explicit linear corner-density face-line goal adapter with unchanged bounded-search, target and independent refinement criteria; exact current/mesh reuse remains request-local.
+
 - Add explicit saved linear corner-current finite comparisons, typed partial receipts and exact bounded request-local field reuse.
 
 - Save explicit linear corner-density face-line inputs and preserve current/mesh evidence through RLGC, typed failures and execution replay.
