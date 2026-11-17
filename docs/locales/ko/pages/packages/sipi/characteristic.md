@@ -109,3 +109,5 @@ python -m pytest -q -s tests/sipi/test_characteristic_matrix.py tests/sipi/test_
 
 [스칼라 모드 전파](propagation.md) · [네트워크](network.md) ·
 [저장 선로](line_model.md) · [English](../../../../../packages/sipi/characteristic.md)
+
+[명시적 진행파 전류 입력](forward_profile.md)은 전체 결합을 보존하며 지정한 입력의 위치별 전압·전류·전달 전력과 도체·유전체 손실을 계산합니다.

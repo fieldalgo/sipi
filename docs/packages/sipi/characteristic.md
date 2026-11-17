@@ -120,3 +120,5 @@ new operating-system support or a browser/portable interface.
 
 [Scalar mode propagation](propagation.md) · [Networks](network.md) ·
 [Saved lines](line_model.md) · [한국어](../../locales/ko/pages/packages/sipi/characteristic.md)
+
+[Explicit forward-current profiles](forward_profile.md) retain full coupling and report position-dependent voltage, current, transmitted power and conductor/dielectric dissipation for a specified launch.

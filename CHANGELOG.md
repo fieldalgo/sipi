@@ -1,5 +1,7 @@
 # Changelog
 
+- Evaluate explicit multiconductor forward-current launches with full coupled voltage/current profiles and separate conductor/dielectric power dissipation.
+
 - Save explicit three-active finite-resolution comparisons with SI allowances, typed partial-result binding and unchanged direct assessment payloads.
 
 - Add direct three-active harmonic-current finite-resolution assessments with separate volume, current and outer comparisons, bounded reuse and retained failures.
