@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit saved linear corner-current finite comparisons, typed partial receipts and exact bounded request-local field reuse.
+
 - Save explicit linear corner-density face-line inputs and preserve current/mesh evidence through RLGC, typed failures and execution replay.
 
 - Add explicit linear corner-density current and surface-loss APIs with pre-solve physical panel budgets; retain existing defaults and saved schemas.

@@ -48,3 +48,5 @@
 모서리·실물 쿠폰·브라우저·다른 플랫폼 지원의 근거로 확대하지 않습니다.
 
 [English](../../../../../packages/sipi/two_ground_linear_corner_face_panel_line.md)
+
+명시적 [유한 해상도 경로](two_ground_linear_corner_face_resolution.md)는 전류·체적·측면 폭을 근거와 함께 비교합니다.

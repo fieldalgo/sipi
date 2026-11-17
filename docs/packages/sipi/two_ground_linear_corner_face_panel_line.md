@@ -54,3 +54,5 @@ adapter. This does not qualify fixed guards, arbitrary geometry, dielectric
 interface corner laws, physical coupons, browser execution or other platforms.
 
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_linear_corner_face_panel_line.md)
+
+The explicit [finite-resolution route](two_ground_linear_corner_face_resolution.md) compares current, volume and side-width effects with retained evidence.

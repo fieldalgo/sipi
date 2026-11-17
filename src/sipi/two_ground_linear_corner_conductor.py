@@ -5,6 +5,7 @@ from importlib import import_module
 from inspect import signature
 import numpy as np
 
+from ._two_ground_current_reuse import _reuse_current_factors
 from .face_conductor import ReferenceSurfaceMetals, FaceConductorLoss, _face_samples
 from .two_ground_conductor import TwoGroundConductorLoss, _loss_samples
 from .two_ground_corner_conductor import _arguments as _corner_arguments, _extract_result
@@ -35,9 +36,13 @@ def _arguments(section, panels_per_edge, ground_modes, interpolation_degree):
 
 
 def _extract(checked, count, modes, degree, polygons):
-    shared = _solver()(polygons, width=checked.width, height=checked.height,
-        panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
-    return _extract_result(checked, polygons, shared, 'two-ground-linear-corner-power-all-active')
+    solver = _solver()
+    def compute():
+        shared = solver(polygons, width=checked.width, height=checked.height,
+            panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
+        return _extract_result(checked, polygons, shared, 'two-ground-linear-corner-power-all-active')
+    return _reuse_current_factors(checked, polygons,
+        ('linear-corner-faces', count, modes, degree), solver, compute)
 
 
 def two_ground_linear_corner_face_current_factors(section, *, panels_per_edge=32,

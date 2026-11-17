@@ -648,6 +648,8 @@ def documents():
     base.append(corner_face_line_goal())
     from test_two_ground_linear_corner_face_panel_line import document as linear_corner_face_line
     base.append(linear_corner_face_line())
+    from test_two_ground_linear_corner_face_resolution_document import document as linear_corner_resolution
+    base.append(linear_corner_resolution())
     return base
 
 
