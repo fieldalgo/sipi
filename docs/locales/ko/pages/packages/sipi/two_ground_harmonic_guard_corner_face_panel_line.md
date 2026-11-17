@@ -40,3 +40,7 @@ SI 저장 입력에는 단면 문서·유전체 메시 제어, 양의 주파수,
 
 [가드 전류 어댑터](two_ground_harmonic_guard_corner_conductor.md) ·
 [English](../../../../../packages/sipi/two_ground_harmonic_guard_corner_face_panel_line.md)
+
+## 유한 해상도 비교
+
+[명시적 비교](two_ground_harmonic_guard_corner_face_resolution.md)는 전류·유전체·외곽 변화를 따로 비교하고 완료한 결과를 보존합니다.

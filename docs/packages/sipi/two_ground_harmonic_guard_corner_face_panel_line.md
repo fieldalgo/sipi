@@ -51,3 +51,7 @@ measured-material qualification or another-platform validation by itself.
 
 [Guard current adapter](two_ground_harmonic_guard_corner_conductor.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_harmonic_guard_corner_face_panel_line.md)
+
+## Finite-resolution comparisons
+
+The [explicit assessment](two_ground_harmonic_guard_corner_face_resolution.md) separates current, volume and outer-domain changes while retaining all completed results.
