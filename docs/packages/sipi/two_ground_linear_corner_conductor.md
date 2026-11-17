@@ -61,3 +61,5 @@ changes. A passing finite refinement comparison is not absolute accuracy,
 physical measurement validation, other-platform support or complete 2D
 coverage. Refine both panel resolution and the finite outer domain for each
 quantity used in a design.
+
+The separate [saved face line](two_ground_linear_corner_face_panel_line.md) connects this explicit current method to matched dielectric fields and execution replay.

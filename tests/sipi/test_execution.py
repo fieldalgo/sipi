@@ -646,6 +646,8 @@ def documents():
     base.append(corner_face_line_study())
     from test_two_ground_corner_face_line_goal_document import document as corner_face_line_goal
     base.append(corner_face_line_goal())
+    from test_two_ground_linear_corner_face_panel_line import document as linear_corner_face_line
+    base.append(linear_corner_face_line())
     return base
 
 

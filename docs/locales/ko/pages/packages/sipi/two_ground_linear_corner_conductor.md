@@ -54,3 +54,5 @@ factors = two_ground_linear_corner_face_current_factors(
 해상도 간 일치는 절대 정확도·실측 검증·다른 플랫폼·2D 전체 완성을
 뜻하지 않습니다. 설계에 사용하는 각 양에 대해 패널과 외곽을 독립적으로
 세분해 확인해야 합니다.
+
+별도 [저장 면별 전송선](two_ground_linear_corner_face_panel_line.md)은 이 명시적 전류 방법을 동일 기하 유전체와 실행 재생에 연결합니다.

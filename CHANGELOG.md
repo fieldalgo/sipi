@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit linear corner-density face-line inputs and preserve current/mesh evidence through RLGC, typed failures and execution replay.
+
 - Add explicit linear corner-density current and surface-loss APIs with pre-solve physical panel budgets; retain existing defaults and saved schemas.
 
 - Connect explicit all-active corner-power currents to whole/face surface-metal loss, preserving direct current bases, strict scope and independent P3 checks. Existing defaults and saved documents remain unchanged.
