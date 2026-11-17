@@ -37,6 +37,7 @@ from .two_ground_conductor import TwoGroundConductorLoss
 from .two_ground_face_panel_line import TwoGroundFacePanelTransmissionLineDocument
 from .two_ground_corner_face_panel_line import TwoGroundCornerFacePanelTransmissionLineDocument
 from .two_ground_linear_corner_face_panel_line import TwoGroundLinearCornerFacePanelTransmissionLineDocument
+from .two_ground_harmonic_three_active_corner_face_panel_line import TwoGroundHarmonicThreeActiveCornerFacePanelTransmissionLineDocument
 from .two_ground_pair_goal_document import TwoGroundForwardPairDesignDocument
 from .two_ground_face_pair_goal_document import TwoGroundFaceForwardPairDesignDocument
 from .two_ground_pair_study import TwoGroundForwardPairStudyDocument
@@ -209,6 +210,7 @@ _REGISTRY = {
     'sipi.two-ground-face-panel-transmission-line/1': TwoGroundFacePanelTransmissionLineDocument,
     'sipi.two-ground-corner-face-panel-transmission-line/1': TwoGroundCornerFacePanelTransmissionLineDocument,
     'sipi.two-ground-linear-corner-face-panel-transmission-line/1': TwoGroundLinearCornerFacePanelTransmissionLineDocument,
+    'sipi.two-ground-harmonic-three-active-corner-face-panel-transmission-line/1': TwoGroundHarmonicThreeActiveCornerFacePanelTransmissionLineDocument,
     'sipi.two-ground-forward-pair-design/1': TwoGroundForwardPairDesignDocument,
     'sipi.two-ground-face-forward-pair-design/1': TwoGroundFaceForwardPairDesignDocument,
     'sipi.two-ground-forward-pair-study/1': TwoGroundForwardPairStudyDocument,

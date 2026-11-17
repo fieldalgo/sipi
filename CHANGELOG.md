@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit three-active harmonic face-current lines with matched RLGC, six-port networks and typed partial execution evidence. / 세 활성 도체의 조화기저 면 전류 선로를 일치 RLGC·6포트 망·단계별 실행 근거와 별도 저장한다.
+
 - Add a separate three-active harmonic corner-current and surface-loss adapter with exact physical face conversion and bounded scoped reuse. / 세 활성 도체의 코너 조화기저 전류·표면 손실에 정확한 면 변환과 유계 범위 재사용을 별도로 연결했다.
 
 - Save bounded linear-current face-line quantity goals with strict preflight, independent refinements, typed failed receipts and request/project/CLI replay.

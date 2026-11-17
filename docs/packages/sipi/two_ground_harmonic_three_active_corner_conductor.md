@@ -50,3 +50,5 @@ qualification. Three-signal target design requires its own quantity contract.
 
 [Linear one/two-active currents](two_ground_linear_corner_conductor.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_harmonic_three_active_corner_conductor.md)
+
+The separate [saved three-active face line](two_ground_harmonic_three_active_corner_face_panel_line.md) connects matched dielectric fields and a six-port network with retained execution evidence.
