@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit linear-current face-line manufacturing sample documents with ordered inputs, scoped reuse, typed failed rows and descriptive-only summaries.
+
 - Add an explicit linear corner-density face-line goal adapter with unchanged bounded-search, target and independent refinement criteria; exact current/mesh reuse remains request-local.
 
 - Add explicit saved linear corner-current finite comparisons, typed partial receipts and exact bounded request-local field reuse.

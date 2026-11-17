@@ -50,6 +50,7 @@ from .two_ground_face_sampled_pair_selection import TwoGroundFaceSampledForwardP
 from .two_ground_line_study import TwoGroundLineQuantityStudyDocument
 from .two_ground_face_line_study import TwoGroundFaceLineQuantityStudyDocument
 from .two_ground_corner_face_line_study import TwoGroundCornerFaceLineQuantityStudyDocument
+from .two_ground_linear_corner_face_line_study import TwoGroundLinearCornerFaceLineQuantityStudyDocument
 from .two_ground_line_goal_document import TwoGroundLineQuantityDesignDocument
 from .two_ground_face_line_goal_document import TwoGroundFaceLineQuantityDesignDocument
 from .two_ground_corner_face_line_goal_document import TwoGroundCornerFaceLineQuantityDesignDocument
@@ -219,6 +220,7 @@ _REGISTRY = {
     'sipi.two-ground-line-quantity-study/1': TwoGroundLineQuantityStudyDocument,
     'sipi.two-ground-face-line-quantity-study/1': TwoGroundFaceLineQuantityStudyDocument,
     'sipi.two-ground-corner-face-line-quantity-study/1': TwoGroundCornerFaceLineQuantityStudyDocument,
+    'sipi.two-ground-linear-corner-face-line-quantity-study/1': TwoGroundLinearCornerFaceLineQuantityStudyDocument,
     'sipi.two-ground-line-quantity-design/1': TwoGroundLineQuantityDesignDocument,
     'sipi.two-ground-face-line-quantity-design/1': TwoGroundFaceLineQuantityDesignDocument,
     'sipi.two-ground-corner-face-line-quantity-design/1': TwoGroundCornerFaceLineQuantityDesignDocument,

@@ -60,3 +60,7 @@ The explicit [finite-resolution route](two_ground_linear_corner_face_resolution.
 ## Bounded design
 
 The [direct linear-current goal](two_ground_linear_corner_face_line_goal.md) searches one parameter with separate frozen volume, panel and joint refinements.
+
+## Manufacturing samples
+
+The [linear-current quantity study](two_ground_linear_corner_face_line_study.md) retains every ordered sample, failed row and descriptive summary with explicit physical face laws.

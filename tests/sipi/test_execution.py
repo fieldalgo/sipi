@@ -650,6 +650,8 @@ def documents():
     base.append(linear_corner_face_line())
     from test_two_ground_linear_corner_face_resolution_document import document as linear_corner_resolution
     base.append(linear_corner_resolution())
+    from test_two_ground_linear_corner_face_line_study import document as linear_corner_study
+    base.append(linear_corner_study())
     return base
 
 

@@ -54,3 +54,7 @@
 ## 유계 역산
 
 [직접 선형 전류 역산](two_ground_linear_corner_face_line_goal.md)은 변수 하나를 찾고 입력을 고정한 유전체·패널·공동 세분 검사를 각각 수행합니다.
+
+## 제조 입력 표본
+
+[선형 전류 계산량 study](two_ground_linear_corner_face_line_study.md)는 명시적인 물리 면별 법칙과 함께 모든 표본·실패 행·기술 통계를 보존합니다.
