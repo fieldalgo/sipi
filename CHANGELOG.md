@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit fixed-potential guard face-current lines with matched RLGC, four-port networks and typed partial execution evidence. / 고정 전위 가드의 면 전류 선로를 일치 RLGC·4포트 망·단계별 실행 근거와 별도 저장한다.
+
 - Add explicit two-active fixed-potential guard currents and surface loss, retaining induced guard currents and all physical faces. / 두 활성 도체와 고정 전위 가드의 전류·표면 손실을 연결하고 유도 가드 전류와 모든 물리 면을 보존했다.
 
 - Evaluate explicit multiconductor forward-current launches with full coupled voltage/current profiles and separate conductor/dielectric power dissipation.

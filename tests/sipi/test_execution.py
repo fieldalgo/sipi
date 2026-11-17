@@ -658,6 +658,8 @@ def documents():
     base.append(harmonic_three_line())
     from test_two_ground_harmonic_three_active_corner_face_resolution_document import document as harmonic_three_resolution
     base.append(harmonic_three_resolution())
+    from test_two_ground_harmonic_guard_corner_face_panel_line import document as harmonic_guard_line
+    base.append(harmonic_guard_line())
     return base
 
 

@@ -54,3 +54,5 @@ R과 내부 L은 기존 복소 표면 임피던스와 물리 전류 Gram을 사�
 
 [세 활성 도체 어댑터](two_ground_harmonic_three_active_corner_conductor.md) ·
 [English](../../../../../packages/sipi/two_ground_harmonic_guard_corner_conductor.md)
+
+별도 [고정 전위 가드 저장 선로](two_ground_harmonic_guard_corner_face_panel_line.md)는 같은 유전체 전계와4포트 망을 실행 근거와 연결한다.

@@ -63,3 +63,5 @@ certify arbitrary geometry, measurements or an untested operating system.
 
 [Three-active adapter](two_ground_harmonic_three_active_corner_conductor.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_harmonic_guard_corner_conductor.md)
+
+The separate [saved fixed-guard face line](two_ground_harmonic_guard_corner_face_panel_line.md) connects matched dielectric fields and a four-port network with retained execution evidence.
