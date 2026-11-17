@@ -52,3 +52,5 @@ qualification. Three-signal target design requires its own quantity contract.
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_harmonic_three_active_corner_conductor.md)
 
 The separate [saved three-active face line](two_ground_harmonic_three_active_corner_face_panel_line.md) connects matched dielectric fields and a six-port network with retained execution evidence.
+
+The separate [two-active fixed-potential guard adapter](two_ground_harmonic_guard_corner_conductor.md) keeps its own admission, physical panel budget and method identity.

@@ -44,3 +44,5 @@ Trace·절대 정확도·실측·다른 플랫폼 수락도 뜻하지 않는다.
 [English](../../../../../packages/sipi/two_ground_harmonic_three_active_corner_conductor.md)
 
 별도 [세 활성 도체 저장 선로](two_ground_harmonic_three_active_corner_face_panel_line.md)는 같은 유전체 전계와6포트 망을 실행 근거와 연결한다.
+
+별도 [두 활성 도체·고정 전위 가드 어댑터](two_ground_harmonic_guard_corner_conductor.md)는 고유 입력 범위·물리 패널 한도·방법 식별을 유지한다.

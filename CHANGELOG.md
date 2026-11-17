@@ -1,5 +1,7 @@
 # Changelog
 
+- Add explicit two-active fixed-potential guard currents and surface loss, retaining induced guard currents and all physical faces. / 두 활성 도체와 고정 전위 가드의 전류·표면 손실을 연결하고 유도 가드 전류와 모든 물리 면을 보존했다.
+
 - Evaluate explicit multiconductor forward-current launches with full coupled voltage/current profiles and separate conductor/dielectric power dissipation.
 
 - Save explicit three-active finite-resolution comparisons with SI allowances, typed partial-result binding and unchanged direct assessment payloads.
