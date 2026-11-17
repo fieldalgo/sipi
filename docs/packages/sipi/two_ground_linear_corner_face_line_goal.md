@@ -48,3 +48,7 @@ artifacts; they do not establish measured-foil or another-platform accuracy.
 Exact geometry and current controls identify current solutions reused inside this call; dielectric meshes have their separate exact-input scope. Admission precedes cache access. Every document still applies its own metal and frequency laws. Attempt counts and records are unchanged, and scopes are cleared on exit. Existing corner solvers and saved schemas keep their original methods.
 
 `panels_per_edge` counts cubic subdivisions per edge. The physical panel count per edge is that value minus six, with two density modes per physical panel. The 512 physical-panel and 1024 density-mode limits remain unchanged.
+
+## Saved goal input
+
+The [separate saved linear-current goal](two_ground_linear_corner_face_line_goal_document.md) binds one source interval, target and budget to this direct adapter without serializing a callable.

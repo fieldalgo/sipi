@@ -652,6 +652,8 @@ def documents():
     base.append(linear_corner_resolution())
     from test_two_ground_linear_corner_face_line_study import document as linear_corner_study
     base.append(linear_corner_study())
+    from test_two_ground_linear_corner_face_line_goal_document import document as linear_corner_goal
+    base.append(linear_corner_goal())
     return base
 
 

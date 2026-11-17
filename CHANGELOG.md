@@ -1,5 +1,7 @@
 # Changelog
 
+- Save bounded linear-current face-line quantity goals with strict preflight, independent refinements, typed failed receipts and request/project/CLI replay.
+
 - Add explicit linear-current face-line manufacturing sample documents with ordered inputs, scoped reuse, typed failed rows and descriptive-only summaries.
 
 - Add an explicit linear corner-density face-line goal adapter with unchanged bounded-search, target and independent refinement criteria; exact current/mesh reuse remains request-local.
