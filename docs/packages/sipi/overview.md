@@ -257,9 +257,10 @@ Python 3.12, pinned environment.
 ## As a geometry document
 
 `sipi.geometry_v1.to_geometry_v1(section)` writes a cross-section as a version 1
-geometry block of the [simcase geometry document](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/packages/simcase/geometry_document.md),
-with its materials, conductors and box flags alongside. It is a plain dictionary and
-adds no dependency. See [the adapters](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/packages/simcase/geometry_reader.md#adapters-from-sipi-and-meshine).
+geometry block of the [simcase geometry document](https://github.com/fieldalgo/openphysics/blob/11705b9e68b32091eb40b13b438b7be3584c8550/docs/packages/simcase/geometry_document.md), in
+format 0.3 (one component with `length_unit` `"m"` and `depth` null), with its
+materials (`relative_permittivity`, `loss_tangent`), conductors and box flags
+alongside. It is a plain dictionary and adds no dependency. See [the adapters](https://github.com/fieldalgo/openphysics/blob/11705b9e68b32091eb40b13b438b7be3584c8550/docs/packages/simcase/geometry_reader.md#adapters-from-sipi-and-meshine).
 
 ## Not implemented
 

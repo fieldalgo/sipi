@@ -183,7 +183,7 @@ OpenPhysics main을 병합한 것이다. 이전 공유 커밋과 SIPI의 이전 
 `assemble_load`, `solve_dirichlet`, 3D 강성·모서리 행렬)을 `galerkin.kernels`에서
 가져온다. IR drop 풀이는 SI 인자 이름을 쓰고 각 싱크를 들어오는 전류 밀도, 즉 이전
 나가는 값의 정확한 부호 반전으로 넘긴다. galerkin 커패시턴스 교차 검사는
-`relative_permittivity`를 넘긴다. SIPI 공개 이름·입력·결과는 바뀌지 않는다.
+`relative_permittivity`를 넘긴다. SIPI 계산 공개 이름·입력·결과는 바뀌지 않는다. 형상 어댑터 `to_geometry_v1`만 고정한 simcase가 읽는 형식 0.3 부분을 쓴다([개요](packages/sipi/overview.md)).
 
 이전·새 고정 wheel에서 예제 스크립트 16개의 출력은 바이트 단위로 같았고 시험 수집
 node ID도 같았다. 저장된 scikit-fem 비교 스크립트는 기록된 해시를 유지하며 기록된

@@ -214,7 +214,9 @@ the assembly and solve kernels (`assemble_stiffness`, `assemble_mass`,
 `galerkin.kernels`. The IR-drop solve uses the SI argument names and passes
 each sink as an inward current density, the exact negation of the previous
 outward value. The galerkin capacitance cross-check passes
-`relative_permittivity`. Public SIPI names, inputs and results are unchanged.
+`relative_permittivity`. Public SIPI calculation names, inputs and results are unchanged; only the
+geometry adapter `to_geometry_v1` writes the format 0.3 parts the pinned simcase
+reads ([overview](packages/sipi/overview.md)).
 
 With the previous and the new pinned wheels, the 16 example scripts printed
 byte-identical output and the test collection kept the same node IDs. The

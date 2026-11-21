@@ -1,5 +1,7 @@
 # Changelog
 
+- `sipi.geometry_v1.to_geometry_v1` writes format 0.3 parts for the pinned simcase reader: the component declares `length_unit` `"m"` and `depth` null, there is no `units` part, and materials use `relative_permittivity` and `loss_tangent`. / `to_geometry_v1`이 고정한 simcase 읽기에 맞게 형식 0.3 부분을 쓴다: 구성 요소가 `length_unit` `"m"`, `depth` null을 밝히고 `units` 부분이 없으며 재료는 `relative_permittivity`·`loss_tangent`를 쓴다.
+
 - Pin the shared galerkin/meshine revision that includes the units and naming steps L2/L3 and use `galerkin.kernels` and the SI argument names; example output is byte-identical. / 단위·이름 L2·L3가 들어간 공유 galerkin/meshine 리비전으로 고정하고 `galerkin.kernels`와 SI 인자 이름을 쓴다. 예제 출력은 바이트 단위로 같다.
 
 - Add direct fixed-guard harmonic-current finite-resolution assessments with separate volume, current and outer comparisons, bounded reuse and retained failures.
