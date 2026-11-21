@@ -39,3 +39,5 @@ Python 기능이며, 평가용 저장 스키마를 추가하거나 기존 입력
 실측 정확도, 브라우저 실행, 다른 운영체제의 검증을 뜻하지 않습니다.
 
 [English](../../../../../packages/sipi/two_ground_harmonic_guard_corner_face_resolution.md)
+
+[저장 비교](two_ground_harmonic_guard_corner_face_resolution_document.md)는 요청·기록·프로젝트에서 명시적 입력과 전체 또는 일부 유한 비교 근거를 보존합니다.
