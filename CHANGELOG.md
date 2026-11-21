@@ -1,5 +1,7 @@
 # Changelog
 
+- Save explicit fixed-guard finite-resolution comparisons with SI allowances, typed partial-result binding and unchanged direct assessment payloads.
+
 - Add direct fixed-guard harmonic-current finite-resolution assessments with separate volume, current and outer comparisons, bounded reuse and retained failures.
 
 - Save explicit fixed-potential guard face-current lines with matched RLGC, four-port networks and typed partial execution evidence. / 고정 전위 가드의 면 전류 선로를 일치 RLGC·4포트 망·단계별 실행 근거와 별도 저장한다.
