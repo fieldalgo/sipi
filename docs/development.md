@@ -203,3 +203,21 @@ unchanged. The independent shared checks cover one short/long geometric pair
 in both source orders, with 60/80-digit reference integration and geometric
 invariants. This arithmetic correction does not qualify new physical models,
 arbitrary section accuracy or additional platforms.
+
+## Units and naming in the pinned dependency
+
+The pinned shared revision merges OpenPhysics main with the units and naming
+batch steps L2 and L3 under the existing shared development branch, keeping
+every earlier shared commit and SIPI's previous pin as ancestors. SIPI imports
+the assembly and solve kernels (`assemble_stiffness`, `assemble_mass`,
+`assemble_load`, `solve_dirichlet`, the 3D stiffness and edge matrices) from
+`galerkin.kernels`. The IR-drop solve uses the SI argument names and passes
+each sink as an inward current density, the exact negation of the previous
+outward value. The galerkin capacitance cross-check passes
+`relative_permittivity`. Public SIPI names, inputs and results are unchanged.
+
+With the previous and the new pinned wheels, the 16 example scripts printed
+byte-identical output and the test collection kept the same node IDs. The
+stored scikit-fem comparison script keeps its recorded hash and runs against
+its recorded product commit. This dependency update does not qualify a new
+physical model, platform or published package.

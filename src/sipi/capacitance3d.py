@@ -11,7 +11,7 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse.linalg import splu
 from galerkin.mesh3d import Mesh3D
-from galerkin.assembly3d import assemble_stiffness_3d
+from galerkin.kernels import assemble_stiffness_3d
 
 from .constants import epsilon_0
 

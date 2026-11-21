@@ -13,7 +13,8 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse.linalg import splu
-from galerkin.edge3d import EdgeSpace3D, assemble_curlcurl_3d, assemble_edge_mass_3d
+from galerkin.edge3d import EdgeSpace3D
+from galerkin.kernels import assemble_curlcurl_3d, assemble_edge_mass_3d
 from galerkin.core.spaces import edge_ids
 
 from .capacitance3d import _snapshot, _node_set, _readonly

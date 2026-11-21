@@ -39,7 +39,8 @@ import math
 import numpy as np
 from .constants import SPEED_OF_LIGHT, epsilon_0, mu_0
 
-from galerkin import Mesh, assemble_stiffness, solve_dirichlet, element_gradient
+from galerkin import Mesh, element_gradient
+from galerkin.kernels import assemble_stiffness, solve_dirichlet
 
 __all__ = ["LineParameters", "capacitance_matrix", "line_parameters"]
 

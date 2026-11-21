@@ -1,5 +1,7 @@
 # Changelog
 
+- Pin the shared galerkin/meshine revision that includes the units and naming steps L2/L3 and use `galerkin.kernels` and the SI argument names; example output is byte-identical. / 단위·이름 L2·L3가 들어간 공유 galerkin/meshine 리비전으로 고정하고 `galerkin.kernels`와 SI 인자 이름을 쓴다. 예제 출력은 바이트 단위로 같다.
+
 - Add direct fixed-guard harmonic-current finite-resolution assessments with separate volume, current and outer comparisons, bounded reuse and retained failures.
 
 - Save explicit fixed-potential guard face-current lines with matched RLGC, four-port networks and typed partial execution evidence. / 고정 전위 가드의 면 전류 선로를 일치 RLGC·4포트 망·단계별 실행 근거와 별도 저장한다.

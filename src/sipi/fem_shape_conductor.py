@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 import numpy as np
-from galerkin import Mesh, assemble_stiffness, solve_dirichlet, element_gradient
+from galerkin import Mesh, element_gradient
+from galerkin.kernels import assemble_stiffness, solve_dirichlet
 from galerkin.electrostatics import capacitance_matrix
 
 from .constants import epsilon_0
@@ -260,7 +261,7 @@ def fem_shape_current_factors(mesh, signals, ground):
                     for sign in (-1, 1):
                         request = (e, g, level, sign, delta)
                         moved = Mesh(mesh.nodes+sign*delta*velocities[e, g], mesh.triangles.copy(), mesh.boundary)
-                        cap = np.asarray(capacitance_matrix(moved, permittivity=1., conductors=signals, ground=ground))/epsilon_0
+                        cap = np.asarray(capacitance_matrix(moved, relative_permittivity=1., conductors=signals, ground=ground))/epsilon_0
                         sample = FEMShapeSample(e, g, level, sign, delta, cap); samples.append(sample)
                         fd[e, g, level] += -sign*(p.T@cap@p)/(2*delta)
         request = None; stage = 'checks'

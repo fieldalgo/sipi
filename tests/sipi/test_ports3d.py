@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 from galerkin.mesh import annulus_mesh
 from galerkin.mesh3d import Mesh3D
-from galerkin.assembly import assemble_stiffness
+from galerkin.kernels import assemble_stiffness
 from galerkin.edge3d import EdgeSpace3D
 from galerkin.core.spaces import edge_ids
 from meshine.mesh import TriMesh
