@@ -73,7 +73,7 @@ ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 ## Continuous validation
 
 The validation workflow runs source and installed-artifact regression in separate
-Linux, macOS and Windows jobs, with three partitions per suite. Each job retains
+Linux, macOS and Windows jobs, with eight partitions per suite. Each job retains
 a six-hour limit. Whole test modules are assigned by a stable SHA-256 of their
 relative path, keeping module fixtures together. All cases are collected before
 selection; a partition does not relax numerical criteria or mark omitted cases
@@ -100,10 +100,10 @@ does not establish validation of a newer branch head.
 `tools/pytest_shard.py` is an opt-in validation plugin, not a runtime dependency.
 The ordinary local pytest and installed-check commands remain unpartitioned.
 For an individual source partition, append `-p tools.pytest_shard
---sipi-shard-count=3 --sipi-shard-index=0
+--sipi-shard-count=8 --sipi-shard-index=0
 --sipi-shard-report=.validation/source-shard.json` to the source command above;
-use indices 0, 1 and 2 in separate runs with fresh report paths. For the installed
-runner, use `--shard-count=3 --shard-index=0`; it copies the plugin outside the
+use indices 0 to 7 in separate runs with fresh report paths. For the installed
+runner, use `--shard-count=8 --shard-index=0`; it copies the plugin outside the
 checkout and still audits all four wheels and clears PYTHONPATH.
 
 The manifest retains every original node ID, its collection hash, the selected
@@ -118,6 +118,11 @@ fails that check even when its other partitions pass. Check names include the
 partition index; required-check configuration must be reviewed before integration.
 This scheduling change does not fix existing numerical failures, certify a new
 platform or guarantee that future test growth fits the time limit.
+With three partitions, the largest partition held 4.7 hours of recorded
+test time on Linux, and runner speed varied enough that Linux and Windows
+jobs exceeded six hours and were cancelled. With eight, the same module
+times give at most 2.1 hours per partition; the hash assignment is not
+time-balanced, so later growth must be checked again.
 
 The paired surface-conductor and Cannonball refinement tests record
 `conductor_refinement` JSON in their JUnit testcase properties before checking
