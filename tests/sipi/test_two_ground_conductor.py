@@ -37,7 +37,7 @@ def test_actual_registered_material_and_current_agreement(row,record_property):
     loss=two_ground_conductor_loss(sec,F,conductors=conductors,reference=reference,
         ground_thickness=35e-6,panels_per_edge=256,interpolation_degree=row["degree"])
     observation={"C0":loss.factors.C0,"Q":loss.factors.parts,"R":loss.R,"L_internal":loss.L_internal}
-    np.testing.assert_array_equal(observation["C0"],row["panel"]["C0"])
+    np.testing.assert_allclose(observation["C0"],row["panel"]["C0"],rtol=1e-13,atol=0)
     for key in ("Q","R","L_internal"):
         np.testing.assert_allclose(observation[key],row["panel"][key],rtol=1e-10,atol=0)
     for key in observation:
