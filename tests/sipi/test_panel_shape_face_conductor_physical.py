@@ -115,7 +115,7 @@ def test_numerical_refusal_keeps_original_evidence(observed,monkeypatch,kind):
             n=len(r.trace_names);level=i//(8*n);face=(i%(8*n))//2;sign=-1 if i%2==0 else 1
             desired=r.step_parts[level].copy();old=desired[0].copy();desired[0]=-old;desired[1]+=2*old
             signal=[j for j,g in enumerate(r.trace_ground) if not g];css=base[np.ix_(signal,signal)]
-            raw=np.zeros_like(base);raw[np.ix_(signal,signal)]=css@desired[face]@css
+            raw=np.zeros_like(base);block=css@desired[face]@css;raw[np.ix_(signal,signal)]=(block+block.T)/2
             cap=base-sign*(r.base.step_m/(2**level))*raw
         return cap
     case,r,calls=replay(monkeypatch,observed,change)
