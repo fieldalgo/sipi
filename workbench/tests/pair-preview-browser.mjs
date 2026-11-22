@@ -74,7 +74,18 @@ try {
   const target=new URL(url);target.pathname='/pair-preview.html';
   await cdp.call('Page.navigate',{url:target.href});
   await until(()=>cdp.evaluate('!!document.querySelector("#section rect")'),'preview drawing');
-  assert.equal(await cdp.evaluate('document.querySelector(".pilot a").getAttribute("href")'),'mailto:dev@fieldalgo.com?subject=SIPI%20pilot%20enquiry');
+  // Presets replace the complete input geometry and invalidate stale results.
+  assert.equal(await cdp.evaluate('document.querySelectorAll("[data-preset]").length'),4);
+  await cdp.evaluate('document.querySelector("[data-preset=thin]").click()');
+  assert.deepEqual(await cdp.evaluate('Object.fromEntries(["template","width","gap","height","thickness","eps_r"].map(id=>[id,document.getElementById(id).value]))'),
+    {template:'coupled_stripline',width:'0.16',gap:'0.16',height:'0.6',thickness:'0.018',eps_r:'3.8'});
+  assert.equal(await cdp.evaluate('document.querySelector("#air-field").hidden'),true);
+  await cdp.evaluate('document.querySelector("[data-dimension=width]").dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}))');
+  assert.equal(await cdp.evaluate('document.activeElement.id'),'width');
+  await cdp.evaluate('document.querySelector("#width").dispatchEvent(new KeyboardEvent("keydown",{key:"ArrowUp",bubbles:true}))');
+  assert.equal(await cdp.evaluate('document.querySelector("#width").value'),'0.17');
+  assert.equal(await cdp.evaluate('document.querySelector("#preset-state").textContent'),'Custom dimensions');
+  await cdp.evaluate('document.querySelector("[data-preset=surface]").click()');
   const edit=async(id,value)=>cdp.evaluate(`document.getElementById(${JSON.stringify(id)}).value=${JSON.stringify(String(value))};document.getElementById(${JSON.stringify(id)}).dispatchEvent(new Event('input'))`);
   const click=async id=>cdp.evaluate(`document.getElementById(${JSON.stringify(id)}).click()`);
   const idle=async()=>until(()=>cdp.evaluate('!document.querySelector("#calculate").disabled'),'calculation complete',300000);

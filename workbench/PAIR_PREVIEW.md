@@ -31,9 +31,7 @@ record before saving inputs. Reopening keeps exact SI values and saved mesh,
 and requires a fresh calculation. Unsupported shapes/material settings are
 refused, not silently removed. Editing, failed opening, cancellation or a failed
 calculation hides the prior result. A cancelled task must finish stopping before
-another can start. The pilot link opens the existing company email address in the user's mail client.
-It does not send email or attach designs automatically. No collection server,
-telemetry or design upload is added.
+another can start. No collection server, telemetry or design upload is added.
 
 Run the real Chromium acceptance from the repository root:
 
@@ -90,16 +88,39 @@ Changing a value invalidates the current result as before.
 ## Task-specific results
 
 The compact workbench places the cross-section inputs beside two distinct tasks.
-**Check current dimensions (02)** shows single-calculation status, results and
-errors. **Find a width for your target (03)** keeps search progress, cancellation,
+**Impedance result** shows single-calculation status, results and
+errors. **Find trace width** keeps search progress, cancellation,
 selected width, refinement and search errors beside the target fields. A successful
 search applies its exact selected width to the cross-section inputs; its result
-stays in section 03. The file controls have their own status message.
+stays beside the target controls. The file controls have their own status message.
 
-If the target is not bracketed, section 03 lists the two actual boundary widths
+If the target is not bracketed, the width-search panel lists the two actual boundary widths
 in mm and their differential impedances in ohms. It suggests reviewing the range,
 target or stackup without changing your inputs. The two boundary samples do not
 prove that another range can reach the target. Raw search history remains available
 under failure details. Any edit or new action clears stale result/error messages;
 the explicitly retained A snapshot remains available. Numerical search and
 refinement criteria are unchanged.
+
+## Structure presets and drawing
+
+The left library contains four original examples: Surface pair and Compact surface
+(microstrip), Buried pair and Thin core pair (centred stripline). Selecting one loads
+all cross-section dimensions, Dk and calculation boundaries, resets the imported or
+search-resolved mesh to automatic, and resets material context to an example.
+It clears the latest result and errors while retaining baseline A and the current
+width target, bounds and tolerance. Presets are illustrative starting points, not
+supplier grades or promises of a particular impedance. No third-party drawings,
+model identifiers or material libraries are included.
+
+Select W, S, H, T or εr on the cross-section to focus its input. The controls also
+accept Tab followed by Enter or Space. Inputs and drawing highlight together.
+Geometry edits and a successful width search change the preset label to **Custom
+dimensions**. Opening a saved design also uses that label and retains its exact
+values and mesh. A preset click is an explicit replacement of the current geometry.
+
+The bounded drawing proportions keep dimension labels readable; it is a schematic,
+not a scaled layout or a fabrication coupon. W is each trace width, S the edge-to-edge
+gap, H the substrate height or total ground-plane spacing, and T copper thickness.
+For stripline the traces remain centred between the planes. The full workbench
+continues to provide the broader set of supported engine structures.
