@@ -8,6 +8,53 @@ const supported = ['coupled_microstrip', 'coupled_stripline'];
 const fields = ['width', 'gap', 'height', 'thickness', 'eps_r', 'box_width', 'air_height'];
 let parameters = null, mesh = null, latest = null, baseline = null, busy = false, generation = 0, activeArea = 'analysis';
 const changed = new Set();
+// Original illustrative inputs; these are not vendor grades or impedance guarantees.
+const presets = [
+  {id:'surface', name:'Surface pair', family:'Surface routing', template:'coupled_microstrip', width:.3, gap:.2, height:.2, thickness:.035, eps_r:4, box_width:8, air_height:2},
+  {id:'compact', name:'Compact surface', family:'Surface routing', template:'coupled_microstrip', width:.18, gap:.15, height:.12, thickness:.018, eps_r:4.1, box_width:8, air_height:2},
+  {id:'buried', name:'Buried pair', family:'Internal routing', template:'coupled_stripline', width:.3, gap:.2, height:1, thickness:.035, eps_r:4, box_width:8, air_height:2},
+  {id:'thin', name:'Thin core pair', family:'Internal routing', template:'coupled_stripline', width:.16, gap:.16, height:.6, thickness:.018, eps_r:3.8, box_width:8, air_height:2},
+];
+let activePreset = 'surface', focusedDimension = null;
+function presetState() {
+  const current = presets.find(p => p.id === activePreset);
+  $('preset-state').textContent = current ? current.name : 'Custom dimensions';
+  for (const button of document.querySelectorAll('[data-preset]')) button.setAttribute('aria-pressed', String(button.dataset.preset === activePreset));
+}
+function applyPreset(preset) {
+  if (busy) return;
+  ++generation; parameters=null; mesh=null; changed.clear(); activePreset=preset.id;
+  $('template').value=preset.template;
+  for (const id of fields) $(id).value=String(preset[id]);
+  $('material-label').value='Example dielectric — not a supplier grade'; $('material-note').value='';
+  invalidate(); controls(); draw(); presetState();
+  status(`${preset.name} loaded. Calculate to check these example dimensions.`, false, 'analysis');
+}
+function presetControls() {
+  let family = '';
+  for (const p of presets) {
+    if (p.family !== family) {const heading=document.createElement('p');heading.className='preset-group';heading.textContent=p.family;$('presets').append(heading);family=p.family;}
+    const strip = p.template === 'coupled_stripline', compact = p.id === 'compact' || p.id === 'thin';
+    const button=document.createElement('button');button.type='button';button.className='preset';button.dataset.preset=p.id;
+    button.setAttribute('aria-label',`Load ${p.name} preset`);
+    button.innerHTML=`<svg viewBox="0 0 190 80" aria-hidden="true"><rect x="20" y="${strip?15:39}" width="150" height="${strip?48:24}" fill="#e2ebd8" stroke="#b3c5a6"/><path d="M20 65h150${strip?'M20 14h150':''}" stroke="#687c64" stroke-width="5"/><path d="M${compact?62:52} ${strip?39:36}h${compact?24:32}m${compact?18:22} 0h${compact?24:32}" stroke="#bb722b" stroke-width="${compact?5:7}"/></svg><strong>${p.name}</strong><small>H ${p.height} mm · Dk ${p.eps_r}</small>`;
+    button.addEventListener('click',()=>applyPreset(p));$('presets').append(button);
+  }
+  presetState();
+}
+function focusDimension(id) {
+  if (busy) return;
+  focusedDimension=id;
+  $(id).focus({preventScroll:true});$(id).select();
+  $(id).scrollIntoView({behavior:'auto',block:'nearest'});
+}
+function dimensionState() {
+  for (const element of document.querySelectorAll('[data-dimension]')) {
+    element.classList.toggle('active',element.dataset.dimension===focusedDimension);
+    element.setAttribute('aria-disabled',String(busy));element.setAttribute('tabindex',busy?'-1':'0');
+  }
+  for (const id of fields) $(id).closest('label').classList.toggle('field-active',id===focusedDimension);
+}
 $('runtime-note').textContent = browser ? 'Calculations run in this browser. Design files are not uploaded. The first calculation loads the local engine assets.' : 'Local review build: calculations run on this computer through the SIPI engine. Design files are not uploaded.';
 function status(message, error = false, area = activeArea) {
   const element = $(area === 'design' ? 'design-status' : area === 'file' ? 'file-status' : 'status');
@@ -47,7 +94,7 @@ function lock(value) {
   busy = value;
   for (const element of document.querySelectorAll('button,input,select')) element.disabled = value;
   $('cancel').disabled = false; $('cancel').hidden = !value;
-  comparison();
+  dimensionState(); comparison();
 }
 function condition(record) {
   const p = {...record.request.parameters};
@@ -97,7 +144,8 @@ function numberControls() {
     target: 1, tolerance: .01};
   for (const [id, increment] of Object.entries(increments)) {
     const element = $(id), label = element.closest('label');
-    element.setAttribute('aria-label', label.textContent.trim());
+    const name=label.textContent.replace(/^(W|S|H|T|εr)(?=[A-Z])/,'').trim();
+    element.setAttribute('aria-label', ['width','gap','height','thickness'].includes(id) ? `${name} · mm` : name);
     const wrapper = document.createElement('span'); wrapper.className = 'number-control';
     element.before(wrapper); wrapper.append(element);
     const arrows = document.createElement('span'); arrows.className = 'number-arrows';
@@ -126,29 +174,67 @@ function numberControls() {
 }
 function controls() {
   const strip = $('template').value === 'coupled_stripline';
-  $('height-label').textContent = strip ? 'Plane spacing · mm' : 'Substrate height · mm';
-  $('height').setAttribute('aria-label', $('height-label').textContent);
+  $('height-label').textContent = strip ? 'Plane spacing' : 'Substrate height';
+  $('height').setAttribute('aria-label', `${$('height-label').textContent} · mm`);
   for (const button of document.querySelectorAll('.number-arrows button')) {
     const label = $(button.getAttribute('aria-controls')).getAttribute('aria-label');
     const description = `${button.dataset.direction} ${label} by ${button.dataset.increment}`;
     button.setAttribute('aria-label', description); button.title = description;
   }
+  $('section-heading').textContent = strip ? 'Differential stripline' : 'Differential microstrip';
   $('air-field').hidden = strip;
   $('air_height').required = !strip;
 }
 function draw() {
   const strip = $('template').value === 'coupled_stripline';
-  const width = Number($('width').value), gap = Number($('gap').value), height = Number($('height').value), thickness = Number($('thickness').value);
-  const svg = $('section'); svg.replaceChildren();
-  const node = (tag, attrs, text) => { const n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k,v] of Object.entries(attrs)) n.setAttribute(k, String(v)); if (text) n.textContent = text; svg.append(n); };
-  if (![width,gap,height,thickness].every(Number.isFinite) || width <= 0 || gap <= 0 || height <= 0 || thickness < 0) { node('text',{x:24,y:120},'Enter valid dimensions to draw the schematic.'); return; }
-  const scale = Math.min(400/(2*width+gap),150/(height+thickness)), bottom=225, top=bottom-height*scale, x=320-(2*width+gap)*scale/2;
-  node('rect',{x:24,y:top,width:592,height:height*scale,class:'dielectric'});
-  node('line',{x1:24,y1:bottom,x2:616,y2:bottom,class:'ground'});
-  if(strip) node('line',{x1:24,y1:top,x2:616,y2:top,class:'ground'});
-  const y=strip ? bottom-(height+thickness)*scale/2 : top-thickness*scale;
-  for(const tx of [x,x+(width+gap)*scale]) node('rect',{x:tx,y,width:width*scale,height:Math.max(2,thickness*scale),class:'copper'});
-  node('text',{x:26,y:254},strip ? 'Centred pair · uniform dielectric · two ground planes' : 'Air above · uniform substrate · lower ground plane');
+  const width=Number($('width').value), gap=Number($('gap').value), height=Number($('height').value), thickness=Number($('thickness').value);
+  const svg=$('section');svg.replaceChildren();
+  const compact=svg.getBoundingClientRect().width<520;
+  svg.setAttribute('viewBox',compact?'0 0 460 420':'0 0 800 420');svg.classList.toggle('compact',compact);
+  const center=compact?250:400, boardLeft=compact?74:110, boardRight=compact?420:690;
+  const node=(tag,attrs,text,parent=svg)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs)) n.setAttribute(k,String(v));if(text!==undefined)n.textContent=text;parent.append(n);return n;};
+  if (![width,gap,height,thickness].every(Number.isFinite) || width<=0 || gap<=0 || height<=0 || thickness<0) {node('text',{x:80,y:200,fill:'#58687c'},'Enter valid dimensions to draw the cross-section.');return;}
+  if (strip && thickness>=height) {node('text',{x:80,y:200,fill:'#893724'},'Copper thickness must be less than plane spacing.');return;}
+  // Diagram proportions are deliberately bounded for readable dimension targets.
+  // Values below are displayed from the inputs; no solver geometry is changed.
+  const span=compact?190:260;
+  const traceWidth=Math.max(compact?58:75,Math.min(compact?100:160,span*width/(2*width+gap))), traceGap=Math.max(compact?50:62,Math.min(compact?70:130,span*gap/(2*width+gap)));
+  const left=center-traceWidth-traceGap/2, right=center+traceGap/2;
+  const top=strip?112:210, bottom=330, copperHeight=Math.max(8,Math.min(28,(strip?218:120)*thickness/height));
+  const traceY=strip?(top+bottom-copperHeight)/2:top-copperHeight;
+  node('rect',{x:boardLeft,y:top,width:boardRight-boardLeft,height:bottom-top,class:'dielectric'});
+  node('rect',{x:boardLeft,y:bottom,width:boardRight-boardLeft,height:7,class:'ground'});
+  if(strip)node('rect',{x:boardLeft,y:top-7,width:boardRight-boardLeft,height:7,class:'ground'});
+  for(const x of [left,right])node('rect',{x,y:traceY,width:traceWidth,height:copperHeight,class:'copper'});
+  node('text',{x:left+traceWidth/2,y:traceY+copperHeight+22,'text-anchor':'middle',class:'trace-label'},'Signal +');
+  node('text',{x:right+traceWidth/2,y:traceY+copperHeight+22,'text-anchor':'middle',class:'trace-label'},'Signal −');
+  node('text',{x:boardLeft+10,y:bottom+27,class:'layer-label'},'Ground plane');
+  if(strip)node('text',{x:boardLeft+10,y:top-19,class:'layer-label'},'Ground plane');
+  else node('text',{x:boardLeft+10,y:132,class:'layer-label'},'Air');
+  const fmt=id=>Number($(id).value).toLocaleString('en-US',{maximumSignificantDigits:8,useGrouping:false});
+  const dimension=(id,text,cx,cy,w=112)=>{
+    const labelHeight=compact?48:36;
+    const g=node('g',{class:'dimension','data-dimension':id,role:'button',tabindex:'0','aria-label':`Edit ${id==='eps_r'?'relative permittivity':id==='height'?(strip?'plane spacing':'substrate height'):id==='gap'?'trace gap':id==='thickness'?'copper thickness':'trace width'}`});
+    g.addEventListener('click',()=>focusDimension(id));g.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();focusDimension(id);}});
+    node('rect',{x:cx-w/2,y:cy-labelHeight/2,width:w,height:labelHeight,rx:5,class:'dim-label'},undefined,g);
+    node('text',{x:cx,y:cy+5},text,g);return g;
+  };
+  const horizontal=(id,label,x1,x2,y)=>{
+    for(const x of [x1,x2])node('line',{x1:x,y1:y-6,x2:x,y2:traceY-5,class:'extension'});
+    const g=dimension(id,label,(x1+x2)/2,y-24);
+    const line=node('path',{d:`M${x1} ${y}H${x2} M${x1+5} ${y-5}l-5 5 5 5 M${x2-5} ${y-5}l5 5-5 5`,class:'dim-line'},undefined,g);g.prepend(line);
+  };
+  horizontal('width',`W  ${fmt('width')}`,left,left+traceWidth,strip?62:91);
+  horizontal('gap',`S  ${fmt('gap')}`,left+traceWidth,right,strip?165:145);
+  for(const y of [top,bottom])node('line',{x1:compact?47:72,y1:y,x2:boardLeft,y2:y,class:'extension'});
+  const hx=compact?47:76;
+  const hg=dimension('height',`H  ${fmt('height')}`,hx,(top+bottom)/2,compact?90:106);
+  const hl=node('path',{d:`M${hx} ${top}V${bottom} M${hx-5} ${top+5}l5-5 5 5 M${hx-5} ${bottom-5}l5 5 5-5`,class:'dim-line'},undefined,hg);hg.prepend(hl);
+  const tx=compact?388:673,ty=compact?78:(strip?196:158),elbow=compact?408:610;
+  const tg=dimension('thickness',`T  ${fmt('thickness')}`,tx,ty,120);
+  const tl=node('path',{d:`M${right+traceWidth} ${traceY+copperHeight/2}H${elbow}V${ty}H${tx}`,class:'dim-line'},undefined,tg);tg.prepend(tl);
+  dimension('eps_r',`εr  ${fmt('eps_r')}`,compact?338:544,strip?293:288,96);
+  dimensionState();
 }
 function acceptEditable(value) {
   if (!supported.includes(value.template)) throw new Error('This preview opens only symmetric microstrip or stripline pairs.');
@@ -157,6 +243,7 @@ function acceptEditable(value) {
   const defaults={tan_delta:0,top_width:null,...(value.template==='coupled_stripline'?{trace_height:null}:{})};
   if(Object.keys(p).some(k=>!allowed.includes(k) && (!Object.hasOwn(defaults,k) || p[k]!==defaults[k]))) throw new Error('This design has settings outside the preview. Open it in the full workbench.');
   if(allowed.some(k=>!Number.isFinite(p[k]))) throw new Error('This preview requires explicit dimensions and calculation boundaries.');
+  activePreset=null; presetState();
   $('template').value=value.template;
   parameters={...p}; mesh={...value.document.mesh}; changed.clear();
   for(const id of fields) if(key(id) in p) $(id).value=String(p[key(id)]/(id==='eps_r'?1:1e-3));
@@ -190,7 +277,7 @@ async function run(action, extra={}) {
       if(![result.line?.z_diff,result.line?.z_common].every(Number.isFinite)) throw new Error('The engine did not return finite symmetric-mode impedances.');
       if(result.design) {
         parameters={...request.parameters,width:result.design.width}; mesh={...result.document.mesh}; changed.clear();
-        $('width').value=String(parameters.width*1e3); draw();
+        $('width').value=String(parameters.width*1e3); activePreset=null; presetState(); draw();
       }
       latest={request,result,material:{label:$('material-label').value,note:$('material-note').value}};
       $('z-diff').textContent=result.line.z_diff.toFixed(3); $('z-common').textContent=result.line.z_common.toFixed(3);
@@ -200,7 +287,7 @@ async function run(action, extra={}) {
       if (result.design) $('chosen-width').textContent = String(Number((result.design.width * 1e3).toPrecision(10)));
       $('result').hidden=false;
       status(result.design ? 'Width found. Initial and refined target checks passed.' : 'Impedance calculated for the current dimensions.');
-      if (result.design) status('Selected width applied. The search result is in section 03 below.', false, 'analysis');
+      if (result.design) status('Selected width applied. See the result in Find trace width.', false, 'analysis');
     }
   } catch(error) {
     if(version!==generation) return;
@@ -208,10 +295,11 @@ async function run(action, extra={}) {
     if(error.history) {$('failure-data').textContent=JSON.stringify(error.history,null,2);$('failure').hidden=false;}
   } finally {if(version===generation) lock(false);}
 }
+$('inputs').addEventListener('invalid',event=>{const details=event.target.closest('details');if(details)details.open=true;},true);
 $('inputs').addEventListener('submit',event=>{event.preventDefault();run('analyze');});
 $('goal').addEventListener('submit',event=>{event.preventDefault();run('design');});
-for(const id of [...fields,'target','lower','upper','tolerance','material-label','material-note']) $(id).addEventListener('input',()=>{++generation;changed.add(id);invalidate();draw();status('Inputs changed. Calculate to update the result.', false, 'analysis');status('Inputs changed. Find width to update the search result.', false, 'design');});
-$('template').addEventListener('change',()=>{++generation;parameters=null;mesh=null;changed.clear();invalidate();$('height').value=$('template').value==='coupled_stripline'?'1':'0.2';controls();draw();status('Structure changed. Calculate to update the result.', false, 'analysis');});
+for(const id of [...fields,'target','lower','upper','tolerance','material-label','material-note']) $(id).addEventListener('input',()=>{++generation;changed.add(id);if(fields.includes(id)){activePreset=null;presetState();}invalidate();draw();status('Inputs changed. Calculate to update the result.', false, 'analysis');status('Inputs changed. Find width to update the search result.', false, 'design');});
+$('template').addEventListener('change',()=>{++generation;parameters=null;mesh=null;changed.clear();activePreset=null;presetState();invalidate();$('height').value=$('template').value==='coupled_stripline'?'1':'0.2';controls();draw();status('Structure changed. Calculate to update the result.', false, 'analysis');});
 $('save').addEventListener('click',()=>run('template-document'));
 $('open').addEventListener('click',()=>$('file').click());
 $('file').addEventListener('change',async()=>{
@@ -237,4 +325,10 @@ $('cancel').addEventListener('click',async()=>{
   try{await transport.cancel();status('Calculation cancelled. No result retained.');}
   catch(error){status(error.message,true);}finally{lock(false);}
 });
-numberControls(); controls(); draw(); comparison();
+for(const id of fields) {
+  $(id).addEventListener('focus',()=>{focusedDimension=id;dimensionState();});
+  $(id).addEventListener('blur',()=>{focusedDimension=null;dimensionState();});
+}
+let lastDrawingWidth=0;
+new ResizeObserver(entries=>{const width=entries[0].contentRect.width;if(width!==lastDrawingWidth){lastDrawingWidth=width;draw();}}).observe($('section').parentElement);
+numberControls(); presetControls(); controls(); draw(); comparison();

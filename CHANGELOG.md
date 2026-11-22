@@ -1,5 +1,9 @@
 # Changelog
 
+- Add an original PCB preset library and clickable cross-section dimensions to the pair
+  workbench, with a readable dimension inspector and separate calculation/width results.
+  PCB 단면 예시 프리셋과 클릭 가능한 치수선을 추가하고 입력·계산·선폭 역산 화면을 재구성합니다.
+
 - Separate CCL calculation/search results and errors in a compact workbench; explain
   unbracketed targets with actual boundary widths/impedances without changing inputs.
 - CCL 작업 화면의 계산/탐색 결과·오류를 분리하고, 목표 구간 실패 시 실제 양 끝
