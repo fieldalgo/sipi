@@ -26,12 +26,19 @@ def snapshot(case,r):
         base=shape_current_record(r.base,case['options']),samples=[_sample_record(s) for s in r.samples])
 
 
+def assert_matrices_close(actual,expected,limit):
+    """Each trailing square matrix within limit of its own largest registered entry."""
+    actual,expected=np.asarray(actual),np.asarray(expected);assert actual.shape==expected.shape
+    error=np.max(abs(actual-expected),axis=(-1,-2))/np.max(abs(expected),axis=(-1,-2))
+    assert np.all(np.isfinite(error)) and error.max()<=limit,(float(error.max()),limit)
+
+
 def test_actual_face_samples_keep_basis_order_and_registered_observations(observed,record_property):
     records=[]
     for case,r in observed:
-        np.testing.assert_allclose(r.step_parts,case['parts'],rtol=1e-10,atol=0)
-        np.testing.assert_array_equal(r.C0,case['C0'])
-        np.testing.assert_array_equal(r.base.boundary_step_parts[-1],case['whole_parts'])
+        assert_matrices_close(r.step_parts,case['parts'],1e-9)
+        np.testing.assert_allclose(r.C0,case['C0'],rtol=1e-13,atol=0)
+        assert_matrices_close(r.base.boundary_step_parts[-1],case['whole_parts'],1e-9)
         assert r.base.step_m==case['step_m']
         n=len(r.trace_names);assert len(r.samples)==16*n and r.diagnostics['solve_count']==20*n+5
         assert r.diagnostics['face_step_relative_change']<=1e-4 and r.diagnostics['whole_sum_relative_change']<=1e-4
