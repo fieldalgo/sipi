@@ -35,7 +35,7 @@ def line(roughness=None, **changes):
     return TransmissionLineDocument(**args)
 
 
-@pytest.mark.parametrize('omega_tau',np.logspace(-6,6,7))
+@pytest.mark.parametrize('omega_tau',np.logspace(-6,6,7),ids=[f'1e{e:g}' for e in np.linspace(-6,6,7)])
 def test_causal_factor_against_independent_positive_relaxation_integral(omega_tau):
     # Spectral representation of q/(1+q): integrate stable first-order
     # responses with positive weights, not another evaluation of sqrt(s).

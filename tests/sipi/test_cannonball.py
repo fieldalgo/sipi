@@ -48,7 +48,7 @@ def relaxation(z):
             + 1j*quad(lambda t: integrand(t).imag, 0, np.pi/2, epsabs=1e-12, epsrel=1e-12)[0])
 
 
-@pytest.mark.parametrize('omega_tau', np.logspace(-6, 6, 7))
+@pytest.mark.parametrize('omega_tau', np.logspace(-6, 6, 7), ids=[f'1e{e:g}' for e in np.linspace(-6, 6, 7)])
 def test_complex_surface_law_against_independent_relaxation_integral(omega_tau):
     # Published radius mapping, independent integral rather than complex sqrt.
     radius = .06*3e-6

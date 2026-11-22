@@ -20,7 +20,7 @@ F=np.array([1e9,4e9,10e9])
 MESH=dict(edge_size=5e-6,far_size=.2e-3,grade=.1)
 
 
-@pytest.mark.parametrize('x',np.logspace(-2,1,9))
+@pytest.mark.parametrize('x',np.logspace(-2,1,9),ids=[f'1e{e:g}' for e in np.linspace(-2,1,9)])
 def test_factor_matches_independent_weibull_tail_integral(x):
     # The correction above one is a Weibull survival probability. Integrate
     # its density, independently of the implementation's log-domain formula.
