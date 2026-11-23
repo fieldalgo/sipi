@@ -49,6 +49,34 @@ touchstone = result.network.touchstone()
 [`frequency_line.py`](https://github.com/fieldalgo/sipi/blob/main/examples/sipi/frequency_line.py).
 파일 쓰기는 호출자가 결정하며 `dumps()`는 문자열만 반환합니다.
 
+## 도체 전류 방법 고르기
+
+`surface`와 `surface-boundaries` 기록은 P1 부피 메시에서 표면 전류를 구합니다.
+2026-11-22·23 측정에서 이 P1 계수는 느리게 수렴했고, 두 microstrip·grounded coplanar·
+stripline에서 기본 메시 설정일 때 경계 패널 값보다 12–19% 낮았습니다(네 배 세밀한 메시에서
+10–15%). C0는 4e-4 안에서 일치했습니다. [도체 손실](conductor.md)을 참고하세요. 기존 문서와
+결과는 바뀌지 않습니다. 아래 접지와 열린 위·옆 경계를 가진 단면이면 R과 내부 L에
+[패널 선로](panel_line.md)를 우선 쓰세요. 금속을 `surface-boundaries`로 적고(모든 경계에 같은
+금속을 주면 `surface`와 같은 결과) 문서를 감쌉니다.
+
+```python
+from sipi.panel_line import PanelTransmissionLineDocument
+
+copper = dict(conductivity=58e6, relative_permeability=1., roughness=dict(kind='smooth'))
+volume = TransmissionLineDocument(geometry, [1e9, 4e9], materials={}, length=.03,
+    schema='sipi.transmission-line/3',
+    conductor=dict(kind='surface-boundaries', ground_thickness=35e-6,
+                   conductors={name: copper for name in ('positive', 'negative')}, reference=copper))
+panel = PanelTransmissionLineDocument(volume, panels_per_edge=128, ground_modes=512,
+                                      interpolation_degree=14)
+result = panel.analyze()
+```
+
+위 결합 microstrip과 표시한 메시에서 `surface-boundaries`는 `surface`의 R을 1.5e-16 안에서
+재현했고, 패널 선로의 1 GHz 대각 R은 1.24배 컸으며 C는 같았습니다. 패널 선로 문서대로 패널과
+부피 해상도를 따로 확인하세요. 위아래 접지(stripline) 단면은
+[두 접지 패널 선로](two_ground_panel_line.md)를 씁니다.
+
 ## 입력 스키마
 
 `sipi.transmission-line/1`은 아래 필드가 **정확히 모두** 필요합니다.

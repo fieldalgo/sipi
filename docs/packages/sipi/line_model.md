@@ -47,6 +47,38 @@ touchstone = result.network.touchstone()
 The example is illustrative, not a measured material/copper fit. A runnable
 version is [`frequency_line.py`](https://github.com/fieldalgo/sipi/blob/main/examples/sipi/frequency_line.py).
 
+## Choosing the conductor-current method
+
+The `surface` and `surface-boundaries` records compute surface currents from
+the P1 volume mesh. Measurements on 2026-11-22 and 2026-11-23 found that this
+P1 factor converges slowly and was 12–19% below the boundary-panel value with
+default mesh settings for two microstrips, a grounded coplanar line and a
+stripline (10–15% at four times finer meshes), while C0 agreed within 4e-4;
+see [conductor loss](conductor.md). The existing documents and their results
+are unchanged. Where the section has a bottom ground and open top and sides,
+prefer a [panel line](panel_line.md) for R and internal L: express the metal as
+`surface-boundaries` (the same metal on every boundary reproduces `surface`)
+and wrap the document.
+
+```python
+from sipi.panel_line import PanelTransmissionLineDocument
+
+copper = dict(conductivity=58e6, relative_permeability=1., roughness=dict(kind='smooth'))
+volume = TransmissionLineDocument(geometry, [1e9, 4e9], materials={}, length=.03,
+    schema='sipi.transmission-line/3',
+    conductor=dict(kind='surface-boundaries', ground_thickness=35e-6,
+                   conductors={name: copper for name in ('positive', 'negative')}, reference=copper))
+panel = PanelTransmissionLineDocument(volume, panels_per_edge=128, ground_modes=512,
+                                      interpolation_degree=14)
+result = panel.analyze()
+```
+
+For the coupled microstrip above with the mesh shown, `surface-boundaries`
+reproduced the `surface` R to 1.5e-16, and the panel line gave a diagonal R
+1.24 times larger at 1 GHz with the same C. Check panel and volume resolution
+separately, as the panel-line page describes. A two-ground (stripline) section
+uses the [two-ground panel line](two_ground_panel_line.md).
+
 ## Input schema
 
 `sipi.transmission-line/1` has **exactly** these required fields:
