@@ -209,6 +209,18 @@ in both source orders, with 60/80-digit reference integration and geometric
 invariants. This arithmetic correction does not qualify new physical models,
 arbitrary section accuracy or additional platforms.
 
+## Wall-scaled panel boxes in the pinned dependency
+
+The pinned shared revision no longer refuses a panel conductor cluster nearer
+the side/top walls than its extent. Such clusters, in both the bottom-ground
+and two-ground solvers, interpolate the wall and plane images on boxes no
+wider than each conductor's distance to them, with the same 1e-10 check;
+more than 256 boxes is refused before a field solve. Clusters admitted before
+give bit-identical results. Panel diagnostics add `smooth_interpolation_boxes`
+only when boxes were used. On the near-wall execution line of the tests,
+panel C0 differed from an independent P2 volume solution by 4.4e-4 on its
+saved 731-node mesh and by 5.8e-5 on the 3076-node default mesh.
+
 ## Two-ground interpolation boxes in the pinned dependency
 
 The pinned shared revision repeats a failed one-box interpolation check of the

@@ -100,15 +100,23 @@ def test_perfect_v7_keeps_prior_panel_arrays_exact():
     assert candidate.conductor is None
 
 
-def test_both_versions_keep_panel_clearance_refusal():
-    line=inexpensive_line()
+def test_both_versions_compute_a_wall_near_cluster_on_wall_scaled_boxes():
+    # This section is nearer the side/top walls than its extent; the pinned
+    # shared solver interpolates on wall-scaled boxes instead of refusing it.
+    from quadratic_conductor import quadratic_surface_factors
+    line=inexpensive_line();c0=[]
     for version in (1,2):
         raw=line.to_dict()
         if version==2:raw['schema']='sipi.transmission-line/7'
         doc=PanelTransmissionLineDocument(TransmissionLineDocument.from_dict(raw),
             schema=f'sipi.panel-transmission-line/{version}')
-        with pytest.raises(ValueError,match='cluster extent'):
-            doc.analyze()
+        factors=doc.analyze().current_factors
+        assert factors.diagnostics['smooth_interpolation_boxes']>1 and factors.diagnostics['matrix_refinement_error']<=1e-10
+        c0.append(factors.C0)
+    np.testing.assert_array_equal(c0[0],c0[1])
+    meshed=line.cross_section.section.mesh()  # default controls, finer than the saved coarse mesh
+    reference=np.asarray(quadratic_surface_factors(meshed.mesh,meshed.signals,meshed.ground)['C0'])
+    assert abs(reference[0,0]/c0[0][0,0]-1)<5e-4  # independent P2 volume (5.8e-5 on Linux)
 
 
 def test_versions_keep_nested_contracts_separate():

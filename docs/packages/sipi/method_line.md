@@ -52,10 +52,11 @@ The P1 volume-mesh surface currents converge slowly. On two microstrips, a
 grounded coplanar line and a stripline, P1 was 12–19% below the panel value
 with default mesh settings while C0 agreed within 4e-4
 ([conductor loss](conductor.md)). The panel method is not available for every
-section: with typical inputs and the templates' default boxes, 30 of 72
+section: with typical inputs and the templates' default boxes, 51 of 72
 templates compute panel currents with the pinned shared revision (20 before
-its two-ground interpolation change admitted ten coupled, layered and
-broadside striplines). Sections without a bottom ground (18), those too close
-to the side or top walls (21) and three layered coplanar striplines outside
-the width/height range are refused. Existing transmission-line documents and their results are
+its interpolation-box changes, which admitted ten coupled, layered and
+broadside striplines and the 21 grounded coplanar and coplanar-stripline
+sections nearer the walls than their extent). Sections without a bottom
+ground (18) and three layered coplanar striplines outside the width/height
+range are refused. Existing transmission-line documents and their results are
 unchanged.

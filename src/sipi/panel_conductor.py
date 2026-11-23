@@ -87,6 +87,9 @@ def panel_surface_current_factors(section, *, panels_per_edge=32, ground_modes=5
         'panel_count','condition_bound','reciprocity_error','residual_error','current_error',
         'matrix_refinement_error','ground_refinement_error']}
     diagnostics['ground_voltage_error'] = ground_voltage_error
+    boxes = getattr(shared, 'smooth_interpolation_boxes', 1)  # results without the field used one box
+    if boxes > 1:  # reported only for clusters nearer the walls than their extent
+        diagnostics['smooth_interpolation_boxes'] = boxes
     return PanelCurrentFactors(factors.names, factors.parts, factors.current_integrals, factors.C0,
                                tuple(checked.traces[i].name for i in grounded), diagnostics)
 

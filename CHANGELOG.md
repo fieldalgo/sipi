@@ -1,5 +1,7 @@
 # Changelog
 
+- Pin the shared revision whose panel solvers compute conductor clusters nearer the walls than their extent on wall-scaled boxes instead of refusing them: grounded coplanar and coplanar-stripline sections in default boxes now have panel currents (51 of 72 templates with typical inputs, from 30); earlier results are bit-identical and panel diagnostics add `smooth_interpolation_boxes` only when boxes were used. / 벽에 자신의 크기보다 가까운 도체 군집을 거부하지 않고 벽 거리 상자로 계산하는 공유 리비전으로 고정한다: 기본 상자의 grounded coplanar·coplanar stripline 단면이 panel 전류를 가진다(전형 입력 템플릿 72개 중 51개, 이전 30개). 이전 결과는 비트 단위로 같고, 상자를 쓴 경우에만 패널 진단에 `smooth_interpolation_boxes`가 더해진다.
+
 - Pin the shared revision whose two-ground panel solver repeats a failed one-box interpolation check on plane-scaled boxes: coupled, layered and broadside striplines that were refused now solve, earlier results are bit-identical, and two-ground current diagnostics add `smooth_interpolation_boxes` and `single_box_matrix_error` only when the repeat was used. / 두 접지 패널 해법이 실패한 단일 상자 보간 검사를 평면 거리 기준 상자에서 다시 하는 공유 리비전으로 고정한다: 거절되던 결합·적층·broadside stripline이 계산되고, 이전 결과는 비트 단위로 같으며, 재검사를 쓴 경우에만 두 접지 전류 진단에 두 키가 더해진다.
 
 - Add `sipi.method-transmission-line/1`: a saved line whose conductor-current method (`panel` or `volume-p1`) is required and recorded; it runs the existing panel, two-ground panel or transmission-line document unchanged and refuses rather than falls back. / 도체 전류 방법(`panel` 또는 `volume-p1`)을 반드시 적고 기록하는 저장 선로 `sipi.method-transmission-line/1`을 추가했다. 기존 panel·두 접지 panel·전송선 문서를 그대로 실행하며 대체하지 않고 거절한다.

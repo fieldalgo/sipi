@@ -102,14 +102,28 @@ def test_panel_refusals_have_no_fallback(kind, conductor, match):
     assert Method(source, current_method='volume-p1').equivalent_document().dumps() == source.dumps()
 
 
-def test_shared_kernel_wall_refusal_happens_in_analyze_without_fallback(monkeypatch):
+def test_wall_near_grounded_coplanar_uses_the_panel_kernel_without_volume_fallback(monkeypatch):
     doc = Method(TransmissionLineDocument(CrossSectionDocument(grounded_coplanar(width=.3e-3, gap=.2e-3,
         ground_width=1e-3, substrate_height=.2e-3, eps_r=4, thickness=35e-6), mesh=MESH), [1e9],
         materials={}, conductor=ROUGH, length=.02, schema='sipi.transmission-line/2'),
         current_method='panel', panel=PANEL)
     import sipi.line_model as volume
     monkeypatch.setattr(volume, '_surface_from_mesh', lambda *a, **k: pytest.fail('volume fallback'))
-    with pytest.raises(ValueError, match='one cluster extent away'):
+    result = doc.analyze()
+    assert result.current_factors.diagnostics['smooth_interpolation_boxes'] > 1
+    assert result.R[0, 0, 0] > 0
+
+
+def test_kernel_refusals_happen_in_analyze_without_fallback(monkeypatch):
+    # A box wider than four times its height is outside the panel kernel's
+    # admitted aspect ratio; the refusal propagates unchanged.
+    wide = CrossSectionDocument(microstrip(width=.3e-3, substrate_height=.2e-3, eps_r=4, thickness=35e-6,
+                                           box_width=8e-3, air_height=.3e-3), mesh=MESH)
+    doc = Method(TransmissionLineDocument(wide, [1e9], materials={}, conductor=ROUGH, length=.02,
+                                          schema='sipi.transmission-line/2'), current_method='panel', panel=PANEL)
+    import sipi.line_model as volume
+    monkeypatch.setattr(volume, '_surface_from_mesh', lambda *a, **k: pytest.fail('volume fallback'))
+    with pytest.raises(ValueError, match='width/height'):
         doc.analyze()
 
 
