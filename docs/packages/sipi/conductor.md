@@ -152,6 +152,26 @@ discretization observations, not a measured reference, a certified error bound,
 or replacement acceptance criteria. In particular, the P1/panel difference
 remains much larger than the successive P1 mesh change.
 
+A four-level study on 2026-11-22 (each of edge, far and grade halved; Linux,
+the same geometry) measured how slowly this P1 factor converges. The first
+diagonal was 1404.945, 1464.699, 1519.646 and 1570.054 /m with 19610,
+75158, 296525 and 1182640 nodes (the last run outside the 300000-point
+product mesher limit). Successive differences 59.75, 54.95 and 50.41 /m give
+an observed order of about 0.12. The panel path gave 1744.857 /m, and the
+vacuum C0 of the two paths agreed to 5.6e-5. On the same meshes, an
+independent scikit-fem P2 reference gave 1546.896, 1559.606 and
+1597.804 /m. The P1 factor was therefore 19.5% and 16.1% below the panel
+value on the two meshes of the refinement test and still 10.0% below it at
+1.18 million nodes, while the test's mesh change was about 4%.
+
+For this rectangular section, the 5% mesh-change check therefore does not
+bound the loss error, and the P1 resistance may be 10 to 20% low on
+ordinary meshes. Prefer the [boundary-panel path](panel_conductor.md) where
+its geometry applies, and treat P1 results with this limitation. These are
+observations for one geometry, not a general error bound or a measured
+reference; other sections are being compared separately. The original
+tests, meshes and limits are unchanged.
+
 This common-metal adapter does not model DC/low-frequency transition or
 interior skin/proximity diffusion. Those belong to the separate
 [finite-metal diffusion model](conductor_diffusion.md). Distinct metals and

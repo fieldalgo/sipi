@@ -1,5 +1,7 @@
 # Changelog
 
+- Document that the P1 surface-current loss factor converges slowly (observed order about 0.12) and was 10–20% below the boundary-panel value for the coupled-microstrip refinement case; the 5% mesh-change check does not bound that error. / P1 표면 전류 손실 계수가 느리게 수렴하며(관측 차수 약 0.12) 결합 마이크로스트립 세분 사례에서 경계 패널 값보다 10–20% 낮았고, 5% 메시 변화 검사가 그 오차를 제한하지 않음을 문서화했다.
+
 - Save explicit fixed-guard finite-resolution comparisons with SI allowances, typed partial-result binding and unchanged direct assessment payloads.
 
 - `sipi.geometry_v1.to_geometry_v1` writes format 0.3 parts for the pinned simcase reader: the component declares `length_unit` `"m"` and `depth` null, there is no `units` part, and materials use `relative_permittivity` and `loss_tangent`. / `to_geometry_v1`이 고정한 simcase 읽기에 맞게 형식 0.3 부분을 쓴다: 구성 요소가 `length_unit` `"m"`, `depth` null을 밝히고 `units` 부분이 없으며 재료는 `relative_permittivity`·`loss_tangent`를 쓴다.
