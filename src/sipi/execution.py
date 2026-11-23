@@ -30,6 +30,7 @@ from .line_resolution_document import LineResolutionDocument, resolution_record
 from .panel_resolution_document import PanelResolutionDocument
 from .adaptive_panel_resolution_document import AdaptivePanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
+from .method_line import MethodTransmissionLineDocument
 from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeLineError
 from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument, TwoGroundPanelLineError
@@ -202,6 +203,7 @@ _REGISTRY = {
     'sipi.two-ground-face-sampled-resolution-yield/1': TwoGroundFaceSampledResolutionYieldDocument,
     'sipi.panel-forward-pair-selection/1': PanelForwardPairSelectionDocument,
     'sipi.sampled-panel-forward-pair-selection/1': SampledPanelForwardPairSelectionDocument,
+    'sipi.method-transmission-line/1': MethodTransmissionLineDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
     'sipi.shape-panel-transmission-line/1': ShapePanelTransmissionLineDocument,
@@ -557,6 +559,19 @@ def _periodic_mixed_circuit(result):
         harmonics=harmonics, mean_power_w=mean)
 
 
+def _execute_method(doc, data, max_input_bytes, budget, diagnostics):
+    """Run the existing document a method line selects and record the selection."""
+    inner = doc.equivalent_document().dumps()
+    nested = execute_saved(inner, max_input_bytes=max(max_input_bytes, len(inner.encode('utf-8'))),
+                           max_evaluations=budget, diagnostics=diagnostics)
+    out = dict(schema='sipi.execution/1', input=data, status=nested['status'],
+               result=nested['result'], error=nested['error'])
+    if out['result'] is not None:
+        out['result']['current_method'] = dict(method=doc.current_method,
+                                               equivalent_schema=json.loads(inner)['schema'])
+    return json.loads(json.dumps(out, ensure_ascii=False, allow_nan=False))
+
+
 def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnostics=()):
     """Run a strict saved document and return a finite sipi.execution/1 dict.
 
@@ -566,6 +581,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     their separate frequency count is capped at 64 by the saved input contract.
     Bounded TEM-port 3D counts one evaluation per frequency before field work.
     Panel lines count frequencies before any panel or volume field solve.
+    Method lines run the existing document their method selects, with the same limits.
     Conductivity profiles count frequencies before constitutive integration.
     Lossless startup counts required forward delay terms before waveforms,
     separately from its saved hard cap and output sample count.
@@ -597,6 +613,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         raise ValueError('saved shape-reference line frequency count exceeds max_evaluations before any field solve')
     if isinstance(doc, CornerFEMShapeTransmissionLineDocument) and len(data['line']['frequency_hz']) > budget:
         raise ValueError('saved corner FEM line frequency count exceeds max_evaluations before any field solve')
+    if isinstance(doc, MethodTransmissionLineDocument):
+        return _execute_method(doc, data, max_input_bytes, budget, diagnostics)
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line, volume-line or panel-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)

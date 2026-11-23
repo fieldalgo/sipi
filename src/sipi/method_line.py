@@ -1,0 +1,163 @@
+# Copyright 2026 Yongha Kim (FieldAlgo)
+# SPDX-License-Identifier: Apache-2.0
+"""Saved transmission lines with an explicitly selected conductor-current method.
+
+``sipi.method-transmission-line/1`` wraps a canonical transmission-line
+document and records which existing calculation supplies the surface
+currents. Each method runs an existing document unchanged, so its result is
+the result of that document; this module adds no numerical path.
+"""
+import dataclasses
+import json
+
+from .document import _keys, _unique_object
+from .line_model import TransmissionLineDocument
+from .panel_line import PanelTransmissionLineDocument
+from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument
+
+
+__all__ = ['MethodTransmissionLineDocument', 'CURRENT_METHODS']
+
+_SCHEMA = 'sipi.method-transmission-line/1'
+CURRENT_METHODS = ('panel', 'volume-p1')
+_PANEL_KEYS = ('panels_per_edge', 'ground_modes', 'interpolation_degree')
+
+
+def _metal(conductor):
+    """The whole-surface metal record equivalent to a ``surface`` conductor."""
+    if 'roughness_rms' in conductor:  # transmission-line/1 Hammerstad RMS, zero included
+        roughness = dict(kind='hammerstad', rms_m=conductor['roughness_rms'])
+    else:
+        roughness = conductor['roughness']
+    return dict(conductivity=conductor['conductivity'],
+                relative_permeability=conductor['relative_permeability'], roughness=roughness)
+
+
+def _boundary_line(line, section):
+    """A line whose conductor is perfect or surface-boundaries, or a refusal."""
+    conductor = line['conductor']
+    if conductor['kind'] in ('perfect', 'surface-boundaries'):
+        return line
+    if conductor['kind'] != 'surface':
+        raise ValueError('panel current method supports perfect, surface and surface-boundaries conductors')
+    metal = _metal(conductor)
+    out = dict(line)
+    if out['schema'] in ('sipi.transmission-line/1', 'sipi.transmission-line/2'):
+        out['schema'] = 'sipi.transmission-line/3'
+    out['conductor'] = dict(kind='surface-boundaries', ground_thickness=conductor['ground_thickness'],
+        conductors={t.name: metal for t in section.traces if not t.ground}, reference=metal)
+    return TransmissionLineDocument.from_dict(out).to_dict()
+
+
+def _two_ground(line, section, panel):
+    conductor = line['conductor']
+    if conductor['kind'] == 'surface':
+        signals = {t.name: _metal(conductor) for t in section.traces if not t.ground}
+        reference = _metal(conductor)
+    elif conductor['kind'] == 'surface-boundaries':
+        signals, reference = conductor['conductors'], conductor['reference']
+    else:
+        raise ValueError('two-ground panel current method requires surface or surface-boundaries conductors')
+    surfaces = dict(kind='surfaces', bottom=reference, top=reference, sides=None,
+                    conductors={t.name: reference for t in section.traces if t.ground})
+    return TwoGroundPanelTransmissionLineDocument.from_dict(dict(
+        schema='sipi.two-ground-panel-transmission-line/1', cross_section=line['cross_section'],
+        frequency_hz=line['frequency_hz'], materials=line['materials'], conductors=signals,
+        reference=surfaces, ground_thickness_m=conductor['ground_thickness'], length_m=line['length_m'],
+        reference_ohms=line['reference_ohms'], panel=panel))
+
+
+def _equivalent(data):
+    """The existing document that performs the selected calculation."""
+    line = TransmissionLineDocument.from_dict(data['line'])
+    if data['current_method'] == 'volume-p1':
+        return line
+    section = line.cross_section.section
+    value = line.to_dict()
+    boundaries = (section.bottom, section.top, section.sides)
+    if boundaries == ('ground', 'open', 'open'):
+        nested = _boundary_line(value, section)
+        version = 2 if nested['schema'] == 'sipi.transmission-line/7' else 1
+        return PanelTransmissionLineDocument.from_dict(dict(
+            schema=f'sipi.panel-transmission-line/{version}', line=nested, panel=data['panel']))
+    if boundaries == ('ground', 'ground', 'open'):
+        return _two_ground(value, section, data['panel'])
+    raise ValueError('panel current method requires a bottom ground with open top and sides, '
+                     'or two grounds with open sides')
+
+
+class MethodTransmissionLineDocument:
+    """Strict saved line whose conductor-current method is explicit.
+
+    ``current_method`` has no default. ``volume-p1`` runs the nested line as
+    it is (the P1 volume-mesh surface currents of transmission-line/1-7).
+    ``panel`` runs the existing panel line: a bottom ground with open top and
+    sides uses ``sipi.panel-transmission-line``; two grounds with open sides use
+    ``sipi.two-ground-panel-transmission-line``. A ``surface`` conductor is
+    passed on as the same metal on every boundary. The three panel controls are
+    required and saved. Anything the panel documents refuse is refused here;
+    there is no fallback to the other method. Normalization performs no field
+    solve; shared panel admission and refinement checks run in analyze().
+    """
+    def __init__(self, line, *, current_method, panel=None):
+        if not isinstance(line, TransmissionLineDocument):
+            raise TypeError('line must be a TransmissionLineDocument')
+        data = dict(schema=_SCHEMA, line=line.to_dict(), current_method=current_method)
+        if panel is not None:
+            data['panel'] = panel
+        self._data = self._validate(data)
+
+    @staticmethod
+    def _validate(data):
+        if not isinstance(data, dict):
+            raise ValueError('method transmission line must be an object')
+        method = data.get('current_method')
+        if not isinstance(method, str) or method not in CURRENT_METHODS:
+            raise ValueError("current_method must be 'panel' or 'volume-p1'")
+        keys = ('schema', 'line', 'current_method') + (('panel',) if method == 'panel' else ())
+        _keys(data, keys, where='method transmission line')
+        if data['schema'] != _SCHEMA:
+            raise ValueError('unsupported method-transmission-line schema')
+        out = dict(schema=_SCHEMA, line=TransmissionLineDocument.from_dict(data['line']).to_dict(),
+                   current_method=method)
+        if method == 'panel':
+            if not isinstance(data['panel'], dict):
+                raise ValueError('panel controls must be an object')
+            _keys(data['panel'], _PANEL_KEYS, where='panel controls')
+            out['panel'] = dict(data['panel'])
+            out['panel'] = _equivalent(out).to_dict()['panel']
+        return out
+
+    @classmethod
+    def from_dict(cls, data):
+        out = cls.__new__(cls)
+        out._data = cls._validate(data)
+        return out
+
+    @classmethod
+    def loads(cls, text):
+        def reject(value):
+            raise ValueError('nonfinite JSON number: ' + value)
+        return cls.from_dict(json.loads(text, object_pairs_hook=_unique_object, parse_constant=reject))
+
+    def dumps(self):
+        return json.dumps(self._data, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False)
+
+    def to_dict(self):
+        return json.loads(self.dumps())
+
+    @property
+    def line(self):
+        return TransmissionLineDocument.from_dict(self.to_dict()['line'])
+
+    @property
+    def current_method(self):
+        return self._data['current_method']
+
+    def equivalent_document(self):
+        """A fresh copy of the existing document that this input runs."""
+        return _equivalent(self.to_dict())
+
+    def analyze(self):
+        """Run the equivalent document; the result retains this input."""
+        return dataclasses.replace(self.equivalent_document().analyze(), input_json=self.dumps())

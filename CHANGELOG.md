@@ -1,5 +1,7 @@
 # Changelog
 
+- Add `sipi.method-transmission-line/1`: a saved line whose conductor-current method (`panel` or `volume-p1`) is required and recorded; it runs the existing panel, two-ground panel or transmission-line document unchanged and refuses rather than falls back. / 도체 전류 방법(`panel` 또는 `volume-p1`)을 반드시 적고 기록하는 저장 선로 `sipi.method-transmission-line/1`을 추가했다. 기존 panel·두 접지 panel·전송선 문서를 그대로 실행하며 대체하지 않고 거절한다.
+
 - Document how to choose the conductor-current method for saved lines: wrap a `surface-boundaries` line in a panel line where the section allows, with a runnable example; existing documents and results are unchanged. / 저장 선로의 도체 전류 방법 고르기를 문서화했다: 단면이 허용하면 `surface-boundaries` 선로를 패널 선로로 감싼다(실행 예제 포함). 기존 문서·결과는 바뀌지 않는다.
 
 - Document that the P1 surface-current loss factor converges slowly (observed order about 0.12) and was 10–20% below the boundary-panel value for the coupled-microstrip refinement case; the 5% mesh-change check does not bound that error. / P1 표면 전류 손실 계수가 느리게 수렴하며(관측 차수 약 0.12) 결합 마이크로스트립 세분 사례에서 경계 패널 값보다 10–20% 낮았고, 5% 메시 변화 검사가 그 오차를 제한하지 않음을 문서화했다.

@@ -77,7 +77,9 @@ For the coupled microstrip above with the mesh shown, `surface-boundaries`
 reproduced the `surface` R to 1.5e-16, and the panel line gave a diagonal R
 1.24 times larger at 1 GHz with the same C. Check panel and volume resolution
 separately, as the panel-line page describes. A two-ground (stripline) section
-uses the [two-ground panel line](two_ground_panel_line.md).
+uses the [two-ground panel line](two_ground_panel_line.md). A
+[method line](method_line.md) saves the choice explicitly (`panel` or
+`volume-p1`) and performs this conversion itself.
 
 ## Input schema
 
