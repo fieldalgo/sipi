@@ -1,5 +1,7 @@
 # Changelog
 
+- Pin the shared revision whose two-ground panel solver repeats a failed one-box interpolation check on plane-scaled boxes: coupled, layered and broadside striplines that were refused now solve, earlier results are bit-identical, and two-ground current diagnostics add `smooth_interpolation_boxes` and `single_box_matrix_error` only when the repeat was used. / 두 접지 패널 해법이 실패한 단일 상자 보간 검사를 평면 거리 기준 상자에서 다시 하는 공유 리비전으로 고정한다: 거절되던 결합·적층·broadside stripline이 계산되고, 이전 결과는 비트 단위로 같으며, 재검사를 쓴 경우에만 두 접지 전류 진단에 두 키가 더해진다.
+
 - Add `sipi.method-transmission-line/1`: a saved line whose conductor-current method (`panel` or `volume-p1`) is required and recorded; it runs the existing panel, two-ground panel or transmission-line document unchanged and refuses rather than falls back. / 도체 전류 방법(`panel` 또는 `volume-p1`)을 반드시 적고 기록하는 저장 선로 `sipi.method-transmission-line/1`을 추가했다. 기존 panel·두 접지 panel·전송선 문서를 그대로 실행하며 대체하지 않고 거절한다.
 
 - Document how to choose the conductor-current method for saved lines: wrap a `surface-boundaries` line in a panel line where the section allows, with a runnable example; existing documents and results are unchanged. / 저장 선로의 도체 전류 방법 고르기를 문서화했다: 단면이 허용하면 `surface-boundaries` 선로를 패널 선로로 감싼다(실행 예제 포함). 기존 문서·결과는 바뀌지 않는다.

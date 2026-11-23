@@ -142,6 +142,9 @@ def _solve_current_factors(checked, count, modes, degree, polygons, solver):
         'current_error', 'matrix_refinement_error', 'ground_refinement_error',
         'minimum_scaled_eigenvalue')}
     diagnostics['ground_voltage_error'] = ground_error
+    if shared.smooth_interpolation_boxes > 1:  # reported only when the one-box check failed
+        diagnostics['smooth_interpolation_boxes'] = shared.smooth_interpolation_boxes
+        diagnostics['single_box_matrix_error'] = shared.single_box_matrix_error
     labels = (tuple('signal:'+s for s in names)+('reference:bottom', 'reference:top')+
               tuple('reference:ground:'+s for s in ground_names))
     return TwoGroundCurrentFactors(names, grouped_parts, grouped_currents, epsilon_0*css,

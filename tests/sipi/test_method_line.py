@@ -139,3 +139,24 @@ def test_execution_records_the_method_and_equivalent_result():
         assert record == dict(method=doc.current_method, equivalent_schema=ref['input']['schema'])
         assert out['status'] == 'complete' and out['result'] == ref['result'] and out['input'] == doc.to_dict()
         json.dumps(out, allow_nan=False)
+
+
+def test_coupled_stripline_panel_uses_plane_scaled_boxes_of_the_pinned_solver():
+    from sipi.templates import coupled_stripline
+    from sipi.two_ground_conductor import two_ground_current_factors
+    section = coupled_stripline(width=.2e-3, gap=.2e-3, plane_spacing=.5e-3, eps_r=4, thickness=17.5e-6)
+    factors = two_ground_current_factors(section, panels_per_edge=64, ground_modes=512, interpolation_degree=14)
+    assert factors.diagnostics['smooth_interpolation_boxes'] > 1
+    assert factors.diagnostics['single_box_matrix_error'] > 1e-10 >= factors.diagnostics['matrix_refinement_error']
+    single = two_ground_current_factors(stripline(width=.2e-3, plane_spacing=.5e-3, eps_r=4, thickness=17.5e-6),
+                                        panels_per_edge=64, ground_modes=512, interpolation_degree=14)
+    assert 'smooth_interpolation_boxes' not in single.diagnostics
+    source = TransmissionLineDocument(CrossSectionDocument(section, mesh=MESH), [2e9], materials={},
+                                      conductor=ROUGH, length=.02, schema='sipi.transmission-line/2')
+    doc = Method(source, current_method='panel', panel=PANEL)
+    result = doc.analyze()
+    same(result, type(doc.equivalent_document()).from_dict(doc.equivalent_document().to_dict()).analyze())
+    out = execute_saved(doc.dumps())
+    assert out['status'] == 'complete' and out['result']['current_method']['equivalent_schema'] == \
+        'sipi.two-ground-panel-transmission-line/1'
+    assert out['result']['current_solver']['diagnostics']['smooth_interpolation_boxes'] > 1

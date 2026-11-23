@@ -209,6 +209,16 @@ in both source orders, with 60/80-digit reference integration and geometric
 invariants. This arithmetic correction does not qualify new physical models,
 arbitrary section accuracy or additional platforms.
 
+## Two-ground interpolation boxes in the pinned dependency
+
+The pinned shared revision repeats a failed one-box interpolation check of the
+two-ground panel solver once on plane-scaled boxes, with the same settings and
+1e-10 limit. Inputs that passed before give bit-identical results; coupled,
+layered and broadside striplines that were refused now solve. SIPI two-ground
+current diagnostics add `smooth_interpolation_boxes` and
+`single_box_matrix_error` only when that repeat was used, so earlier outputs
+keep their keys.
+
 ## Units and naming in the pinned dependency
 
 The pinned shared revision merges OpenPhysics main with the units and naming
