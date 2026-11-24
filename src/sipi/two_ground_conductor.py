@@ -42,8 +42,8 @@ def _section(section):
         raise ValueError('two-ground currents require grounded bottom/top and open sides')
     if not 1 <= len(checked.traces) <= 16 or any(t.thickness <= 0 for t in checked.traces):
         raise ValueError('two-ground currents require 1..16 finite-thickness traces')
-    if not .25 <= checked.width/checked.height <= 16:
-        raise ValueError('two-ground width/height must lie in [0.25, 16]')
+    if not .25 <= checked.width/checked.height <= 64:
+        raise ValueError('two-ground width/height must lie in [0.25, 64]')
     for trace in checked.traces:
         _offset_velocity(trace.corners())
     return checked

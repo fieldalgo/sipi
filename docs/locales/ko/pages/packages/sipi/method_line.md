@@ -46,8 +46,8 @@ result = saved.analyze()
 P1 부피 메시 표면 전류는 느리게 수렴합니다. 두 microstrip, grounded coplanar,
 stripline에서 기본 메시 설정의 P1은 panel 값보다 12–19% 낮았고 C0는 4e-4 안에서
 일치했습니다([도체 손실](conductor.md)). panel 방법은 모든 단면에 쓸 수 있지는 않습니다.
-전형 입력과 템플릿 기본 상자에서 고정한 공유 리비전으로 템플릿 72개 중 51개가 panel
-전류를 계산합니다(보간 상자 변경 전에는 20개였고, 그 변경으로 결합·적층·broadside
-stripline 10종과 벽에 자신의 크기보다 가까운 grounded coplanar·coplanar stripline 21종이
-계산됩니다). 아래 접지가 없는 단면(18)과 가로세로비 범위를 벗어난 적층 coplanar
-stripline 3종은 거절됩니다. 기존 전송선 문서와 결과는 바뀌지 않습니다.
+전형 입력과 템플릿 기본 상자에서 고정한 공유 리비전으로 템플릿 72개 중 54개가 panel
+전류를 계산합니다(보간 상자·범위 변경 전에는 20개였고, 그 변경으로 결합·적층·broadside
+stripline 10종, 벽에 자신의 크기보다 가까운 grounded coplanar·coplanar stripline 21종,
+폭/높이 64까지의 적층 coplanar stripline 3종이 계산됩니다). 아래 접지가 없는 단면 18종은
+거절됩니다. 기존 전송선 문서와 결과는 바뀌지 않습니다.

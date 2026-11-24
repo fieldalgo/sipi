@@ -136,7 +136,7 @@ def test_invalid_inputs_stop_before_dependency(monkeypatch,case):
         sec=CrossSection(sec.layers,sec.traces,sec.width,**kw)
     elif case=="zero":sec=CrossSection(sec.layers,[Trace("signal",0,.001,.0003)],sec.width,top="ground")
     elif case=="concave":sec=CrossSection(sec.layers,[PolygonTrace("signal",[[-.0002,.0009],[.0002,.0009],[0,.001], [.0002,.0011],[-.0002,.0011]])],sec.width,top="ground")
-    elif case=="aspect":sec=CrossSection(sec.layers,sec.traces,.034,top="ground")
+    elif case=="aspect":sec=CrossSection(sec.layers,sec.traces,.13,top="ground")  # width/height 65 > 64
     else:options={dict(count="panels_per_edge",modes="ground_modes",degree="interpolation_degree")[case]:dict(count=0,modes=63,degree=11)[case]}
     with pytest.raises((ValueError,TypeError)):two_ground_current_factors(sec,**options)
 
