@@ -5,6 +5,7 @@ import json
 import numpy as np
 import pytest
 from sipi import CrossSectionDocument
+from sipi.crosssection import CrossSection
 from sipi.templates import microstrip, stripline, unbacked_coplanar, grounded_coplanar
 from sipi.line_model import TransmissionLineDocument
 from sipi.panel_line import PanelTransmissionLineDocument
@@ -90,15 +91,26 @@ def test_equivalent_documents_and_surface_conversion():
         kind='surfaces', bottom=metal, top=metal, sides=None, conductors={})
 
 
-@pytest.mark.parametrize('kind,conductor,match', [
-    ('unbacked', ROUGH, 'bottom ground with open top and sides'),
-    ('flat', dict(kind='perfect'), 'positive conductor thickness'),
-    ('stripline', dict(kind='perfect'), 'surface or surface-boundaries'),
-], ids=['open-bottom', 'zero-thickness', 'two-ground-perfect'])
-def test_panel_refusals_have_no_fallback(kind, conductor, match):
-    source = line(kind, conductor=conductor)
+def grounded_sides():
+    s = microstrip(width=.3e-3, substrate_height=.2e-3, eps_r=4, thickness=35e-6)
+    return CrossSection(s.layers, s.traces, s.width, bottom='ground', top='open', sides='ground')
+
+
+@pytest.mark.parametrize('kind,conductor,match,panel', [
+    ('ground-sides', ROUGH, 'or open bottom, top and sides', PANEL),
+    ('unbacked', ROUGH, 'panel controls', PANEL),
+    ('flat', dict(kind='perfect'), 'positive conductor thickness', PANEL),
+    ('stripline', dict(kind='perfect'), 'surface or surface-boundaries', PANEL),
+], ids=['grounded-sides', 'open-box-with-ground-modes', 'zero-thickness', 'two-ground-perfect'])
+def test_panel_refusals_have_no_fallback(kind, conductor, match, panel):
+    if kind == 'ground-sides':
+        source = TransmissionLineDocument(CrossSectionDocument(grounded_sides(), mesh=MESH), [1e9, 5e9],
+                                          materials={}, conductor=conductor, length=.02,
+                                          schema='sipi.transmission-line/2')
+    else:
+        source = line(kind, conductor=conductor)
     with pytest.raises(ValueError, match=match):
-        Method(source, current_method='panel', panel=PANEL)
+        Method(source, current_method='panel', panel=panel)
     assert Method(source, current_method='volume-p1').equivalent_document().dumps() == source.dumps()
 
 

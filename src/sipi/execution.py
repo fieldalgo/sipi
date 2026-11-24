@@ -30,6 +30,7 @@ from .line_resolution_document import LineResolutionDocument, resolution_record
 from .panel_resolution_document import PanelResolutionDocument
 from .adaptive_panel_resolution_document import AdaptivePanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
+from .open_panel_line import OpenPanelTransmissionLineDocument
 from .method_line import MethodTransmissionLineDocument
 from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeLineError
 from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
@@ -206,6 +207,7 @@ _REGISTRY = {
     'sipi.method-transmission-line/1': MethodTransmissionLineDocument,
     'sipi.panel-transmission-line/1': PanelTransmissionLineDocument,
     'sipi.panel-transmission-line/2': PanelTransmissionLineDocument,
+    'sipi.open-panel-transmission-line/1': OpenPanelTransmissionLineDocument,
     'sipi.shape-panel-transmission-line/1': ShapePanelTransmissionLineDocument,
     'sipi.shape-reference-panel-transmission-line/1': ShapeReferencePanelTransmissionLineDocument,
     'sipi.shape-face-panel-transmission-line/1': ShapeFacePanelTransmissionLineDocument,
@@ -605,7 +607,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     data = doc.to_dict()
     if isinstance(doc, TEMPorts3DDocument) and len(data['frequency_hz']) > budget:
         raise ValueError('saved 3D frequency count exceeds max_evaluations before any field solve')
-    if isinstance(doc, PanelTransmissionLineDocument) and len(data['line']['frequency_hz']) > budget:
+    if isinstance(doc, (PanelTransmissionLineDocument, OpenPanelTransmissionLineDocument)) and len(data['line']['frequency_hz']) > budget:
         raise ValueError('saved panel-line frequency count exceeds max_evaluations before any field solve')
     if isinstance(doc, ShapePanelTransmissionLineDocument) and len(data['line']['line']['frequency_hz']) > budget:
         raise ValueError('saved shape-panel-line frequency count exceeds max_evaluations before any field solve')
@@ -615,7 +617,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         raise ValueError('saved corner FEM line frequency count exceeds max_evaluations before any field solve')
     if isinstance(doc, MethodTransmissionLineDocument):
         return _execute_method(doc, data, max_input_bytes, budget, diagnostics)
-    if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)):
+    if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, OpenPanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line, volume-line or panel-line')
     out = dict(schema='sipi.execution/1', input=data, status='complete', result=None, error=None)
     if isinstance(doc, (MixedBoundaryMulticonductorRLGCLadderDocument, MixedSourceMulticonductorDebyeReactiveLadderDocument, NortonMulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeReactiveLadderDocument, MulticonductorDebyeCapacitiveLadderDocument, PSDMulticonductorDebyeRLGCLadderDocument, MulticonductorDebyeRLGCLadderDocument, MulticonductorRLGCLadderDocument, LosslessStartupDocument, RLGCLadderDocument, CoupledRLGCLadderDocument, MixedBoundaryRLGCLadderDocument, CapacitiveRLGCLadderDocument, ReactiveRLGCLadderDocument, StartupPortWavesDocument, NortonReactiveRLGCLadderDocument, MixedSourceRLGCLadderDocument, DebyeRLGCLadderDocument, CoupledDebyeRLGCLadderDocument, PSDCoupledDebyeRLGCLadderDocument, DebyeCapacitiveLadderDocument, DebyeReactiveLadderDocument)):
@@ -888,12 +890,12 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 C0_f_per_m=_array(line.C0), C_loss_f_per_m=_array(line.C_loss),
                 L_h_per_m=_array(line.L), network=_network(result.network),
                 model='constant diagonal series R; quasi-static C/L and constant-tangent G(f)')
-        elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)):
+        elif isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, OpenPanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)):
             out['result'] = dict(names=list(result.names), frequency_hz=_array(result.frequency),
                 R_ohm_per_m=_array(result.R), L_h_per_m=_array(result.L),
                 G_s_per_m=_array(result.G), C_f_per_m=_array(result.C),
                 network=_network(result.network), diagnostics=_diagnostics(result, diagnostics))
-            if isinstance(doc, (TransmissionLineDocument, PanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss, ShapeReferenceConductorLoss, ShapeFaceConductorLoss, TwoGroundConductorLoss)):
+            if isinstance(doc, (TransmissionLineDocument, PanelTransmissionLineDocument, OpenPanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)) and isinstance(result.conductor, (BoundaryConductorLoss, FaceConductorLoss, ShapeReferenceConductorLoss, ShapeFaceConductorLoss, TwoGroundConductorLoss)):
                 loss = result.conductor
                 out['result']['conductor_boundaries'] = dict(labels=list(loss.boundary_labels),
                     skin_depth_m=_array(loss.skin_depth), roughness_factor=_array(loss.roughness_factor),
@@ -922,10 +924,11 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
                 out['result']['current_solver'] = shape_face_current_record(result.current_factors, result.panel_settings)
             elif isinstance(doc, (ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument)):
                 out['result']['current_solver'] = shape_current_record(result.current_factors, result.panel_settings)
-            elif isinstance(doc, PanelTransmissionLineDocument):
+            elif isinstance(doc, (PanelTransmissionLineDocument, OpenPanelTransmissionLineDocument)):
                 factors = result.current_factors
                 out['result']['current_solver'] = dict(
-                    kind='grounded-rectangle-panels', settings=dict(result.panel_settings),
+                    kind=('open-rectangle-panels' if isinstance(doc, OpenPanelTransmissionLineDocument)
+                          else 'grounded-rectangle-panels'), settings=dict(result.panel_settings),
                     ground_trace_names=list(factors.ground_trace_names),
                     vacuum_capacitance_f_per_m=_array(factors.C0),
                     surface_current_factors_per_m=_array(factors.parts),

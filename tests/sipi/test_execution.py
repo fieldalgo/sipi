@@ -451,6 +451,12 @@ def documents():
     base.append(PanelTransmissionLineDocument(line()))
     from sipi.method_line import MethodTransmissionLineDocument
     base.append(MethodTransmissionLineDocument(line(), current_method='volume-p1'))
+    from sipi.open_panel_line import OpenPanelTransmissionLineDocument
+    from sipi.templates import unbacked_coplanar
+    base.append(OpenPanelTransmissionLineDocument(TransmissionLineDocument(
+        CrossSectionDocument(unbacked_coplanar(width=.3e-3, gap=.2e-3, ground_width=1e-3, substrate_height=.2e-3,
+                                               eps_r=4, thickness=35e-6)), [1e9], materials={},
+        conductor=dict(kind='perfect'), length=.02)))
     from sipi.panel_pair_goal_document import PanelForwardPairDesignDocument
     base.append(PanelForwardPairDesignDocument(next(
         item for item in base if isinstance(item, ForwardPairDesignDocument))))

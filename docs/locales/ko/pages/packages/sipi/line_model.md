@@ -75,7 +75,8 @@ result = panel.analyze()
 위 결합 microstrip과 표시한 메시에서 `surface-boundaries`는 `surface`의 R을 1.5e-16 안에서
 재현했고, 패널 선로의 1 GHz 대각 R은 1.24배 컸으며 C는 같았습니다. 패널 선로 문서대로 패널과
 부피 해상도를 따로 확인하세요. 위아래 접지(stripline) 단면은
-[두 접지 패널 선로](two_ground_panel_line.md)를 씁니다. [방법 선로](method_line.md)는 이 선택(`panel` 또는
+[두 접지 패널 선로](two_ground_panel_line.md)를, 접지 평면이 없는 단면(unbacked coplanar)은
+[open-box 패널 선로](open_panel_line.md)를 씁니다. [방법 선로](method_line.md)는 이 선택(`panel` 또는
 `volume-p1`)을 명시해 저장하고 이 변환을 직접 합니다.
 
 ## 입력 스키마

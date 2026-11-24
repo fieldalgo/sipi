@@ -4,7 +4,8 @@
 canonical [transmission-line document](line_model.md) and states which
 existing calculation supplies the conductor surface currents. Its fields are
 exactly `schema`, `line`, `current_method` and, for the panel method only,
-`panel` with `panels_per_edge`, `ground_modes` and `interpolation_degree`.
+`panel` with `panels_per_edge`, `ground_modes` and `interpolation_degree`
+(without `ground_modes` when bottom, top and sides are all open).
 `current_method` has no default.
 
 | `current_method` | Section | Runs | Conductors |
@@ -12,12 +13,14 @@ exactly `schema`, `line`, `current_method` and, for the panel method only,
 | `volume-p1` | any the line accepts | the nested line unchanged (P1 volume-mesh surface currents) | as the line |
 | `panel` | bottom ground, open top and sides | [`sipi.panel-transmission-line`](panel_line.md) /1 (nested line /1–/6) or /2 (/7) | perfect, surface, surface-boundaries |
 | `panel` | two grounds, open sides | [`sipi.two-ground-panel-transmission-line/1`](two_ground_panel_line.md) | surface, surface-boundaries |
+| `panel` | open bottom, top and sides (grounded traces only) | [`sipi.open-panel-transmission-line/1`](open_panel_line.md) | perfect, surface, surface-boundaries |
 
 For the panel method a `surface` conductor is passed on as the same metal on
 every boundary: `surface-boundaries` with that metal for each signal and the
 reference (transmission-line /1 and /2 become /3; a /1 `roughness_rms` becomes
 `{"kind": "hammerstad", "rms_m": ...}`). For two grounds, the bottom and top
-planes and grounded traces take the reference metal and the open sides none.
+planes and grounded traces take the reference metal and the open sides none;
+with no ground plane the grounded traces share the reference metal.
 `equivalent_document()` returns the document that runs.
 
 ```python
@@ -52,11 +55,12 @@ The P1 volume-mesh surface currents converge slowly. On two microstrips, a
 grounded coplanar line and a stripline, P1 was 12–19% below the panel value
 with default mesh settings while C0 agreed within 4e-4
 ([conductor loss](conductor.md)). The panel method is not available for every
-section: with typical inputs and the templates' default boxes, 54 of 72
-templates compute panel currents with the pinned shared revision (20 before
-its interpolation-box and range changes, which admitted ten coupled, layered
-and broadside striplines, 21 grounded coplanar and coplanar-stripline
-sections nearer the walls than their extent and three layered coplanar
-striplines with width/height up to 64). The 18 sections without a bottom
-ground are refused. Existing transmission-line documents and their results are
-unchanged.
+section, but with typical inputs and the templates' default boxes all 72
+templates compute panel currents with the pinned shared revision. Before its
+interpolation-box and range changes, 20 did. Those changes admitted ten
+coupled, layered and broadside striplines, 21 grounded coplanar and
+coplanar-stripline sections nearer the walls than their extent, and three
+layered coplanar striplines with width/height up to 64. The 18 sections with
+no ground plane use the [open-box panel line](open_panel_line.md). Other
+boundary combinations (for example grounded sides) are refused. Existing
+transmission-line documents and their results are unchanged.

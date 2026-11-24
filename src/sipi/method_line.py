@@ -12,6 +12,7 @@ import json
 
 from .document import _keys, _unique_object
 from .line_model import TransmissionLineDocument
+from .open_panel_line import OpenPanelTransmissionLineDocument
 from .panel_line import PanelTransmissionLineDocument
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument
 
@@ -21,6 +22,8 @@ __all__ = ['MethodTransmissionLineDocument', 'CURRENT_METHODS']
 _SCHEMA = 'sipi.method-transmission-line/1'
 CURRENT_METHODS = ('panel', 'volume-p1')
 _PANEL_KEYS = ('panels_per_edge', 'ground_modes', 'interpolation_degree')
+_OPEN_PANEL_KEYS = ('panels_per_edge', 'interpolation_degree')  # no ground plane, no ground modes
+_OPEN = ('open', 'open', 'open')
 
 
 def _metal(conductor):
@@ -82,8 +85,12 @@ def _equivalent(data):
             schema=f'sipi.panel-transmission-line/{version}', line=nested, panel=data['panel']))
     if boundaries == ('ground', 'ground', 'open'):
         return _two_ground(value, section, data['panel'])
+    if boundaries == _OPEN:
+        return OpenPanelTransmissionLineDocument.from_dict(dict(
+            schema='sipi.open-panel-transmission-line/1', line=_boundary_line(value, section),
+            panel=data['panel']))
     raise ValueError('panel current method requires a bottom ground with open top and sides, '
-                     'or two grounds with open sides')
+                     'two grounds with open sides, or open bottom, top and sides')
 
 
 class MethodTransmissionLineDocument:
@@ -93,9 +100,11 @@ class MethodTransmissionLineDocument:
     it is (the P1 volume-mesh surface currents of transmission-line/1-7).
     ``panel`` runs the existing panel line: a bottom ground with open top and
     sides uses ``sipi.panel-transmission-line``; two grounds with open sides use
-    ``sipi.two-ground-panel-transmission-line``. A ``surface`` conductor is
-    passed on as the same metal on every boundary. The three panel controls are
-    required and saved. Anything the panel documents refuse is refused here;
+    ``sipi.two-ground-panel-transmission-line``; open bottom, top and sides
+    (grounded traces only) use ``sipi.open-panel-transmission-line``. A
+    ``surface`` conductor is passed on as the same metal on every boundary. The
+    panel controls are required and saved: panels_per_edge, ground_modes and
+    interpolation_degree, without ground_modes for an open box. Anything the panel documents refuse is refused here;
     there is no fallback to the other method. Normalization performs no field
     solve; shared panel admission and refinement checks run in analyze().
     """
@@ -123,7 +132,9 @@ class MethodTransmissionLineDocument:
         if method == 'panel':
             if not isinstance(data['panel'], dict):
                 raise ValueError('panel controls must be an object')
-            _keys(data['panel'], _PANEL_KEYS, where='panel controls')
+            section = TransmissionLineDocument.from_dict(data['line']).cross_section.section
+            _keys(data['panel'], _OPEN_PANEL_KEYS if (section.bottom, section.top, section.sides) == _OPEN
+                  else _PANEL_KEYS, where='panel controls')
             out['panel'] = dict(data['panel'])
             out['panel'] = _equivalent(out).to_dict()['panel']
         return out
