@@ -75,6 +75,7 @@ SIPI_PYTHON=python PYTHONPATH=src node workbench/tests/pair-preview-browser.mjs 
 계산된 선폭을 받을 때 증분 단위로 반올림하지 않습니다. 값을 바꾸면
 기존과 같이 현재 결과가 무효화됩니다.
 터치 화면에서는 화살표 버튼이 넓어져 누르기 쉽습니다.
+Tab은 화살표 버튼을 건너뜁니다. 칸에 포커스가 있을 때 ArrowUp/ArrowDown이 같은 일을 합니다.
 
 ## 작업별 결과 표시
 

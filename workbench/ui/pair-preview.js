@@ -178,6 +178,8 @@ function numberControls() {
       const button = document.createElement('button'); button.type = 'button';
       button.dataset.direction = action; button.dataset.increment = String(increment);
       button.setAttribute('aria-controls', id); button.textContent = symbol;
+      // Pointer shortcut only: keyboard users nudge with ArrowUp/ArrowDown in the field.
+      button.tabIndex = -1;
       button.addEventListener('click', () => {nudge(direction); element.focus({preventScroll: true});});
       arrows.append(button);
     }
