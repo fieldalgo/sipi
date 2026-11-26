@@ -231,48 +231,90 @@ Step agreement is distinct from panel and outer-domain convergence.
 ground, *, support_fraction=0.4)` is an **auxiliary** current method. It takes
 the same dielectric-only P1 mesh and conductor node sets as
 `surface_current_factors`, solves the same vacuum basis and returns the same
-C0. Only the surface integrals differ. `surface_current_factors`, the
+C0; only the surface integrals differ. `surface_current_factors`, the
 `volume-p1` method, the panel default and every saved document and result are
-unchanged; this function is not selectable from saved documents.
+unchanged. This function is not yet selectable from saved documents.
 
 The boundary integral of a product of normal derivatives is replaced by its
 domain (Hadamard) form, which is Wheeler's incremental-inductance rule: each
-conductor wall recedes by a unit normal displacement theta, and
+conductor wall moves by a unit normal displacement theta. With n pointing into
+the dielectric and theta.n = 1 on the group's edges,
 
 ```text
-integral_Gamma dn(Va) dn(Vb) ds = integral grad(Va) . (D theta + D theta^T - div(theta) I) grad(Vb) dx
+integral_Gamma dn(Va) dn(Vb) ds = integral grad(Va) . ((div theta) I - D theta - D theta^T) grad(Vb) dx
 ```
 
-for harmonic Va, Vb that are constant on Gamma, with theta supported near
-Gamma. For each surface group (each signal, then all references together)
-theta is a P1 field with unit outward normal component on that group's edges,
-mitred at vertices `(n1+n2)/(1+n1.n2)`, scaled by the C1 cutoff
-`1-3s^2+2s^3` of distance over `w = support_fraction * minimum spacing between
-distinct conductors`, and zero beyond `w`. P1 element gradients are constant,
-so the volume integral is exact per element. Integrated currents use the same
-cutoff as a scalar weight; this consistent flux equals the unit-current target
-to rounding, so `current_error` is **not** an under-resolution signal here.
-`diagnostics['gradient_current_error']` reports the boundary-gradient flux
-discrepancy of the same basis, the quantity the 5% gate of the existing
-adapter checks. Other diagnostics are `support_fraction`, `support_width`,
-`minimum_spacing` (m) and `support_triangles` per surface group.
+for harmonic Va, Vb that are constant on Gamma, with theta zero on every other
+conductor and tangent to insulated walls. P1 element gradients are constant,
+so the volume integral is exact per element. For each surface group (each
+signal, then all references together):
 
-Refused with `ValueError`, before or instead of returning a result:
-`support_fraction` outside (0, 0.5) (supports of different conductors must not
-meet); vertices other than smooth turns (at most 10 degrees, a discretised
-curve) or convex right-angle metal corners, which covers trapezoid, acute and
-re-entrant corners; and a support that reaches an insulated (open) wall with a
-normal displacement component. Very narrow spacings, macOS and Windows are not
-yet characterised.
+1. Each boundary vertex gets a miter m with m.n1 = m.n2 = 1 for its two edge
+   normals (m = n1 when they are parallel within 1e-9, and m = n at an end on
+   an insulated wall). Normals turning by more than 20 degrees make a corner.
+2. Near each corner c, with radius `rc = min(w, half the shorter adjacent
+   side)`, non-corner vertices blend towards the corner miter:
+   `m_v + psi(|v-c|/rc) (m_c - m_v)` summed over the side's two end corners.
+   This keeps theta.n = 1 exactly on every edge.
+3. Each mesh node takes the boundary value at its nearest edge point, linearly
+   interpolated, times `psi(d/w)`, where `psi(s) = (1-s)^2 (1+2s)` for
+   0 <= s <= 1 and 0 beyond, and `w = support_fraction` times the minimum node
+   distance between separate connected conductor boundaries.
 
-An internal study on the same P1 solutions found this recovery within -0.24%
-to -0.34% of the boundary-panel value on five default-mesh sections, where the
-boundary-gradient P1 factor was 12% to 20% low, with observed orders 1.3 to
-2.1 and a recovery cost of 0.3 to 0.9 times the P1 solve. Those are
-observations for those sections, not a general error bound.
+The nearest edge is searched among the 12 nearest edge midpoints; when those
+cannot prove it, every edge close enough to be nearer is checked. Integrated
+currents weight the consistent P1 flux by the same cutoff; this equals the
+unit-current target to rounding, so `current_error` is **not** an
+under-resolution signal here. `diagnostics['gradient_current_error']` reports
+the boundary-gradient flux discrepancy of the same basis, the quantity the 5%
+gate of the existing adapter checks. Other diagnostics are `support_fraction`,
+`support_width` and `clearance` (m), and `support_triangles` and `corners` per
+surface group.
 
-| Check (`tests/sipi/test_recovered_conductor.py`) | Criterion, fixed before the run |
-|---|---|
-| Parallel plate, width 2 mm, height 1 mm | Each surface factor 1/width and currents ±1, 1e-10; C0 identical to `surface_current_factors` |
-| Coax a=.5 mm, b=2 mm, cells 16x64, 32x128, 64x256 | Observed order >= 1.8 on each surface; finest relative error < 1e-3 |
-| Refusals | Fractions 0, .5, negative, boolean, NaN, string; 11.25 degree polygon; partial plate whose support meets the open wall |
+Refused with `ValueError` instead of returning a result: `support_fraction`
+outside (0, 0.5); corners other than convex right angles (trapezoid, acute and
+re-entrant corners have not been characterised); a support that reaches
+another conductor; and a support that meets an insulated (open) wall with a
+normal displacement component. Very narrow spacings, macOS and Windows have
+not been characterised.
+
+### Validation
+
+Linux x86_64, Python 3.13.18, NumPy 2.5.5, SciPy 1.18.1, galerkin and meshine
+at the pinned development commit, `OPENBLAS_NUM_THREADS=1`, 2026-11-26.
+Criteria were fixed before the runs. The panel values are the recorded panel
+path at 256 panels per edge (128 for the grounded coplanar section). Levels
+L0, L1 and L2 use edge 5 µm, far .2 mm and grade .1, each times 2^-L.
+
+| Section | Default mesh | vs panel | L0 | L1 | Extra cost / P1 solve |
+|---|---|---|---|---|---|
+| Coupled microstrip 0.5/0.3/1 mm, 50 µm | 1740.372 /m | -0.257% | -0.257% | -0.119% | 0.37 |
+| Microstrip 0.3/0.2 mm, 35 µm | 2954.613 /m | -0.235% | -0.391% | -0.148% | 0.59 |
+| Microstrip 1/0.5 mm, 17.5 µm | 1176.333 /m | -0.300% | -0.476% | -0.240% | 0.56 |
+| Grounded coplanar 0.3/0.2/1 mm, 35 µm | 3091.705 /m | -0.293% | -0.441% | -0.206% | 0.85 |
+| Stripline 0.2/0.5 mm, 17.5 µm | 4106.478 /m | -0.340% | -0.710% | -0.296% | 0.68 |
+
+The existing boundary-gradient P1 factor on the same default meshes was 12% to
+20% below the panel value (for example 1400.776 /m for the coupled section).
+Coupled L2 gave 1743.728 /m (-0.065%), an observed order of 1.34. The coupled
+off-diagonal 10.802 /m differs from the panel 10.415 /m by 0.022% of the
+diagonal. Every total is symmetric positive definite. These default-mesh
+totals and C0 reproduce an internal study bit for bit in this environment.
+The test compares them to a relative 1e-12 and skips when the mesher produces
+a different triangulation, since the values are defined on the recorded mesh.
+Cost ratios are medians of five runs and vary with the machine.
+
+| Check | Criterion | Result |
+|---|---|---|
+| Parallel plate, width 2 mm, height 1 mm | Each surface factor 1/width and currents ±1, 1e-10; C0 identical to `surface_current_factors` | Passed |
+| Coax a=.5 mm, b=2 mm, cells 16x64, 32x128, 64x256 | Observed order >= 1.8 on each surface; finest relative error < 1e-3 | Order 2.0; total -0.345%, -0.087%, -0.022% |
+| Five sections vs panel [0,0] | Default and L0 within 2%; L1 within 1% | Above table |
+| Coupled refinement | Order >= 0.8, or L1-L2 within 0.5% | 1.34 |
+| Coupled off-diagonal | Within 1% of the largest diagonal | 0.022% |
+| Totals | Symmetric positive semidefinite | Passed |
+| Cost | Recovery beyond the P1 solve at most the solve time | 0.37 to 0.85 |
+| Refusals | Fractions 0, .5, negative, boolean, NaN, string; 22.5 degree polygon; trapezoid trace; support meeting an open wall | Refused |
+
+These are observations for these sections and meshes, not a general error
+bound or a measured reference. Run
+`python -m pytest -q tests/sipi/test_recovered_conductor.py tests/sipi/test_recovered_conductor_sections.py`.
