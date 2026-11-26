@@ -300,9 +300,12 @@ Coupled L2 gave 1743.728 /m (-0.065%), an observed order of 1.34. The coupled
 off-diagonal 10.802 /m differs from the panel 10.415 /m by 0.022% of the
 diagonal. Every total is symmetric positive definite. These default-mesh
 totals and C0 reproduce an internal study bit for bit in this environment.
-The test compares them to a relative 1e-12 and skips when the mesher produces
-a different triangulation, since the values are defined on the recorded mesh.
-Cost ratios are medians of five runs and vary with the machine.
+The test compares them to a relative 1e-12 on the recorded mesh. When the
+mesher produces a different triangulation it compares the diagonal totals to
+a relative 2e-3, below the recorded panel differences, and records which
+comparison ran. Cost ratios are medians of five runs and vary with the
+machine. The test records the ratio and fails only above 4, a regression
+bound for shared runners; the at-most-1 criterion is the measurement above.
 
 | Check | Criterion | Result |
 |---|---|---|
@@ -312,7 +315,7 @@ Cost ratios are medians of five runs and vary with the machine.
 | Coupled refinement | Order >= 0.8, or L1-L2 within 0.5% | 1.34 |
 | Coupled off-diagonal | Within 1% of the largest diagonal | 0.022% |
 | Totals | Symmetric positive semidefinite | Passed |
-| Cost | Recovery beyond the P1 solve at most the solve time | 0.37 to 0.85 |
+| Cost | Recovery beyond the P1 solve at most the solve time (measured; test bound 4) | 0.37 to 0.85 |
 | Refusals | Fractions 0, .5, negative, boolean, NaN, string; 22.5 degree polygon; trapezoid trace; support meeting an open wall | Refused |
 
 These are observations for these sections and meshes, not a general error
