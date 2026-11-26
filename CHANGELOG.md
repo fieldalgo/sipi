@@ -1,5 +1,8 @@
 # Changelog
 
+- Keep keyboard focus during pair-preview tasks: focus moves to Cancel while a calculation, search, save or open runs and returns to the starting button afterwards, instead of falling to the page start. Engine paths and values are unchanged.
+  차동 쌍 미리보기 작업 중 키보드 포커스를 유지합니다. 계산·탐색·저장·열기 중에는 Cancel로, 끝나면 시작한 버튼으로 돌아가며 페이지 처음으로 떨어지지 않습니다. 엔진 경로와 수치는 그대로입니다.
+
 - Align the pair-preview colours and font stack with the full workbench (dark slate header, mint accents, teal actions; text contrast at least 4.5:1) and widen the number arrows on touch screens. Layout, values and engine paths are unchanged.
   차동 쌍 미리보기의 색과 글꼴을 전체 workbench와 맞추고(진한 slate 머리줄, mint 강조, 청록 동작 버튼, 글자 대비 4.5:1 이상) 터치 화면에서 숫자 화살표를 넓혔습니다. 배치, 수치, 엔진 경로는 그대로입니다.
 

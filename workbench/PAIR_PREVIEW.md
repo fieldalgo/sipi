@@ -105,6 +105,10 @@ line after a completed calculation, search, save or open, and a red line
 starting with **Error** when it fails. The boundary table states its width
 unit (mm). The colours repeat the text; they do not replace it.
 
+When you start a calculation, search, save or open from the keyboard, focus moves
+to **Cancel** while the task runs (Enter cancels it). When the task finishes or is
+cancelled, focus returns to the button that started it.
+
 If the target is not bracketed, the width-search panel lists the two actual boundary widths
 in mm and their differential impedances in ohms. It suggests reviewing the range,
 target or stackup without changing your inputs. The two boundary samples do not
