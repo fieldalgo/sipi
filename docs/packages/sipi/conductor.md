@@ -224,3 +224,55 @@ quadratic tool is a test dependency, not a selectable production solver.
 [Explicit capacitance-shape currents](panel_shape_conductor.md) provide a
 separate integrated-current estimate with retained finite-difference samples.
 Step agreement is distinct from panel and outer-domain convergence.
+
+## Auxiliary recovered currents (volume shape derivative)
+
+`sipi.recovered_conductor.recovered_surface_current_factors(mesh, signals,
+ground, *, support_fraction=0.4)` is an **auxiliary** current method. It takes
+the same dielectric-only P1 mesh and conductor node sets as
+`surface_current_factors`, solves the same vacuum basis and returns the same
+C0. Only the surface integrals differ. `surface_current_factors`, the
+`volume-p1` method, the panel default and every saved document and result are
+unchanged; this function is not selectable from saved documents.
+
+The boundary integral of a product of normal derivatives is replaced by its
+domain (Hadamard) form, which is Wheeler's incremental-inductance rule: each
+conductor wall recedes by a unit normal displacement theta, and
+
+```text
+integral_Gamma dn(Va) dn(Vb) ds = integral grad(Va) . (D theta + D theta^T - div(theta) I) grad(Vb) dx
+```
+
+for harmonic Va, Vb that are constant on Gamma, with theta supported near
+Gamma. For each surface group (each signal, then all references together)
+theta is a P1 field with unit outward normal component on that group's edges,
+mitred at vertices `(n1+n2)/(1+n1.n2)`, scaled by the C1 cutoff
+`1-3s^2+2s^3` of distance over `w = support_fraction * minimum spacing between
+distinct conductors`, and zero beyond `w`. P1 element gradients are constant,
+so the volume integral is exact per element. Integrated currents use the same
+cutoff as a scalar weight; this consistent flux equals the unit-current target
+to rounding, so `current_error` is **not** an under-resolution signal here.
+`diagnostics['gradient_current_error']` reports the boundary-gradient flux
+discrepancy of the same basis, the quantity the 5% gate of the existing
+adapter checks. Other diagnostics are `support_fraction`, `support_width`,
+`minimum_spacing` (m) and `support_triangles` per surface group.
+
+Refused with `ValueError`, before or instead of returning a result:
+`support_fraction` outside (0, 0.5) (supports of different conductors must not
+meet); vertices other than smooth turns (at most 10 degrees, a discretised
+curve) or convex right-angle metal corners, which covers trapezoid, acute and
+re-entrant corners; and a support that reaches an insulated (open) wall with a
+normal displacement component. Very narrow spacings, macOS and Windows are not
+yet characterised.
+
+An internal study on the same P1 solutions found this recovery within -0.24%
+to -0.34% of the boundary-panel value on five default-mesh sections, where the
+boundary-gradient P1 factor was 12% to 20% low, with observed orders 1.3 to
+2.1 and a recovery cost of 0.3 to 0.9 times the P1 solve. Those are
+observations for those sections, not a general error bound.
+
+| Check (`tests/sipi/test_recovered_conductor.py`) | Criterion, fixed before the run |
+|---|---|
+| Parallel plate, width 2 mm, height 1 mm | Each surface factor 1/width and currents ±1, 1e-10; C0 identical to `surface_current_factors` |
+| Coax a=.5 mm, b=2 mm, cells 16x64, 32x128, 64x256 | Observed order >= 1.8 on each surface; finest relative error < 1e-3 |
+| Refusals | Fractions 0, .5, negative, boolean, NaN, string; 11.25 degree polygon; partial plate whose support meets the open wall |
