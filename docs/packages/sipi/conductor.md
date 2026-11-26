@@ -170,7 +170,9 @@ value on the two meshes of the refinement test and still 10.0% below it at
 For this rectangular section, the 6% (formerly 5%) mesh-change check therefore does not
 bound the loss error, and the P1 resistance may be 10 to 20% low on
 ordinary meshes. Prefer the [boundary-panel path](panel_conductor.md) where
-its geometry applies, and treat P1 results with this limitation. These are
+its geometry applies, and treat P1 results with this limitation.
+[Transmission-line/8](default_line.md) uses panel currents by default for
+`surface` and `surface-boundaries` conductors. These are
 observations for one geometry, not a general error bound or a measured
 reference; other sections are being compared separately. The original
 tests, meshes and limits are unchanged.

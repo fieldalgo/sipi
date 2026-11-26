@@ -5,7 +5,9 @@
 밝힙니다. 필드는 정확히 `schema`, `line`, `current_method`이고, panel 방법일 때만
 `panel`(`panels_per_edge`, `ground_modes`, `interpolation_degree`; 아래·위·옆이 모두 열린
 단면은 `ground_modes` 없음)이 더해집니다.
-`current_method`에는 기본값이 없습니다.
+`current_method`에는 기본값이 없습니다. [transmission-line/8](default_line.md)은 같은 선택을
+선로 안에 저장하고, `surface`·`surface-boundaries` 도체의 기본값을 `panel`로 하며, 이 문서를
+거쳐 실행됩니다.
 
 | `current_method` | 단면 | 실행하는 문서 | 도체 |
 |---|---|---|---|
