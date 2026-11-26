@@ -1,5 +1,8 @@
 # Changelog
 
+- Align the pair-preview colours and font stack with the full workbench (dark slate header, mint accents, teal actions; text contrast at least 4.5:1) and widen the number arrows on touch screens. Layout, values and engine paths are unchanged.
+  차동 쌍 미리보기의 색과 글꼴을 전체 workbench와 맞추고(진한 slate 머리줄, mint 강조, 청록 동작 버튼, 글자 대비 4.5:1 이상) 터치 화면에서 숫자 화살표를 넓혔습니다. 배치, 수치, 엔진 경로는 그대로입니다.
+
 - Show running, completed and failed states on each pair-preview status line (marker, green line, red line prefixed with Error) and add the mm unit to the boundary-width table. Messages, values and engine paths are unchanged.
   차동 쌍 미리보기의 각 상태 줄에 진행·완료·실패 상태(도는 표시, 초록 줄, Error로 시작하는 빨간 줄)를 표시하고 양 끝 선폭 표에 mm 단위를 붙였습니다. 메시지 문구, 수치, 엔진 경로는 그대로입니다.
 
