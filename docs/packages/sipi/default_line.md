@@ -27,10 +27,18 @@ When `panel` is omitted, the default controls depend on the section:
 | two grounds, open sides | `panels_per_edge` 64, `ground_modes` 512, `interpolation_degree` 14 |
 | open bottom, top and sides | `panels_per_edge` 64, `interpolation_degree` 12 |
 
-These defaults are provisional. A separate measurement of the 64-to-128
-panel change and run time will set the final values; they are kept in one
-constant, `sipi.default_line.DEFAULT_PANEL_CONTROLS`. Saved documents
-record the values they used.
+The defaults are kept in one constant,
+`sipi.default_line.DEFAULT_PANEL_CONTROLS`, and saved documents record the
+values they used. They were chosen from a scan of all 72 templates with
+typical inputs and the templates' default boxes. Going from 64 to 128 panels
+per edge changed C0 by at most 1.5e-6 and each current Gram matrix by at most
+5.2e-3 of its largest entry. The median panel time was 1.05 times the P1
+default-mesh time. Trapezoidal (etched) conductors converge most slowly: their
+remaining Gram error at 64 panels is estimated at about 1–2%. For a precision
+run, write `panels_per_edge: 128` explicitly. It takes about twice as long and
+reduces the Gram change about 2.5 times. Layered coplanar striplines between
+two grounds need 37 interpolation boxes and took about 150–200 s, whatever the
+panel count.
 
 The calculation is the one a [method line](method_line.md) runs with the
 same content: `method_document()` returns that

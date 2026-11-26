@@ -14,7 +14,7 @@ import json
 
 from .document import _keys, _unique_object
 from .line_model import TransmissionLineDocument
-from .method_line import MethodTransmissionLineDocument
+from .method_line import MethodTransmissionLineDocument, CURRENT_METHODS
 
 __all__ = ['DefaultPanelTransmissionLineDocument', 'DEFAULT_PANEL_CONTROLS']
 
@@ -23,10 +23,12 @@ _LINE_KEYS = ('schema', 'cross_section', 'frequency_hz', 'materials', 'conductor
 _DEFAULT_KINDS = ('surface', 'surface-boundaries')
 _VOLUME = "set current_method 'volume-p1' to use the P1 volume-mesh surface currents"
 
-# Default panel controls by boundary combination (bottom, top, sides). These
-# are the candidate values of the default-method design and are not final:
-# a separate measurement of the 64->128 panel change and run time decides
-# them. Every default lives here; saved documents record the values they used.
+# Default panel controls by boundary combination (bottom, top, sides), set
+# from a measurement on all 72 templates with typical inputs: from 64 to 128
+# panels per edge C0 changed by at most 1.5e-6 and the current Gram parts by
+# at most 5.2e-3 of their largest entry, at a median 1.05 times the P1
+# default-mesh time. 128 panels per edge is a precision option, not a default.
+# Every default lives here; saved documents record the values they used.
 DEFAULT_PANEL_CONTROLS = {
     ('ground', 'open', 'open'): dict(panels_per_edge=64, ground_modes=512, interpolation_degree=14),
     ('ground', 'ground', 'open'): dict(panels_per_edge=64, ground_modes=512, interpolation_degree=14),
@@ -93,9 +95,9 @@ class DefaultPanelTransmissionLineDocument:
                 raise ValueError(f'{kind} conductors have no default current_method in transmission-line/8; '
                                  "set current_method 'panel' or 'volume-p1'")
             method = 'panel'
-        if not isinstance(method, str) or method not in ('panel', 'volume-p1'):
-            raise ValueError("current_method must be 'panel' or 'volume-p1'")
-        if method == 'volume-p1':
+        if not isinstance(method, str) or method not in CURRENT_METHODS:
+            raise ValueError('current_method must be ' + ' or '.join(repr(m) for m in CURRENT_METHODS))
+        if method != 'panel':
             if 'panel' in data:
                 raise ValueError("panel controls require current_method 'panel'")
             _method(line, method, None)
