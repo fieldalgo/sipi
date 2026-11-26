@@ -1,5 +1,8 @@
 # Changelog
 
+- Show running, completed and failed states on each pair-preview status line (marker, green line, red line prefixed with Error) and add the mm unit to the boundary-width table. Messages, values and engine paths are unchanged.
+  차동 쌍 미리보기의 각 상태 줄에 진행·완료·실패 상태(도는 표시, 초록 줄, Error로 시작하는 빨간 줄)를 표시하고 양 끝 선폭 표에 mm 단위를 붙였습니다. 메시지 문구, 수치, 엔진 경로는 그대로입니다.
+
 - Place the pair-preview impedance result directly below Calculate impedance and the width search below the drawing; fix the stacked phone title bar and run-together footer text. Values and engine paths are unchanged.
   차동 쌍 미리보기의 임피던스 결과를 Calculate impedance 바로 아래에, 선폭 찾기를 단면도 아래에 두고, 휴대폰 폭의 제목 줄과 붙어 보이던 바닥글 글자를 고쳤습니다. 수치와 엔진 경로는 그대로입니다.
 
