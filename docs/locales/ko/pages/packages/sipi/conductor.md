@@ -181,3 +181,49 @@ OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_conductor.p
 
 [명시 정전용량 형상미분 전류](panel_shape_conductor.md)는 차분 표본을 보존하는
 별도 적분 전류 추정법입니다. 차분폭 일치는 패널·외곽 수렴과 구분합니다.
+
+## 보조 복원 전류(부피형 형상 미분)
+
+`sipi.recovered_conductor.recovered_surface_current_factors(mesh, signals,
+ground, *, support_fraction=0.4)`는 **보조** 전류 방법입니다.
+`surface_current_factors`와 같은 유전체 전용 P1 메시와 도체 절점 집합을 받고,
+같은 진공 기저를 풀며 같은 C0를 돌려줍니다. 다른 것은 표면 적분뿐입니다.
+`surface_current_factors`, `volume-p1` 방법, panel 기본값과 저장된 모든
+문서·결과는 바뀌지 않으며, 이 함수는 저장 문서에서 고를 수 없습니다.
+
+법선 미분 곱의 경계 적분을 영역(Hadamard) 형식으로 바꿉니다. 이는 Wheeler의
+증분 인덕턴스 규칙입니다. 각 도체 벽이 단위 법선 변위 theta만큼 물러날 때
+
+```text
+integral_Gamma dn(Va) dn(Vb) ds = integral grad(Va) . (D theta + D theta^T - div(theta) I) grad(Vb) dx
+```
+
+가 Gamma에서 상수인 조화 함수 Va, Vb와 Gamma 근처에 지지된 theta에 대해
+성립합니다. 각 표면 묶음(신호마다 하나, 이어서 모든 기준 도체 함께)마다 theta는
+그 묶음의 변에서 바깥 법선 성분이 1인 P1 장이고, 꼭짓점에서
+`(n1+n2)/(1+n1.n2)`로 miter하며, `w = support_fraction * 서로 다른 도체 간 최소
+간격`에 대한 거리의 C1 차단 함수 `1-3s^2+2s^3`를 곱하고 `w` 밖에서는 0입니다.
+P1 요소 기울기는 상수라 부피 적분은 요소마다 정확합니다. 적분 전류는 같은 차단
+함수를 스칼라 가중으로 씁니다. 이 일관 플럭스는 반올림 수준에서 단위 전류
+목표와 같으므로 여기서 `current_error`는 해상도 부족 신호가 **아닙니다**.
+`diagnostics['gradient_current_error']`가 같은 기저의 경계 기울기 플럭스
+불일치, 즉 기존 어댑터의 5% 검사가 보는 양을 보고합니다. 다른 진단은
+`support_fraction`, `support_width`, `minimum_spacing`(m)과 표면 묶음별
+`support_triangles`입니다.
+
+다음은 결과를 돌려주지 않고 `ValueError`로 거절합니다: (0, 0.5) 밖의
+`support_fraction`(서로 다른 도체의 지지가 만나면 안 됨), 매끄러운 꺾임(10도
+이하, 이산화된 곡선)이나 볼록 직각 금속 모서리가 아닌 꼭짓점(사다리꼴·예각·
+오목 모서리 포함), 법선 변위 성분을 가진 채 절연(열린) 벽에 닿는 지지.
+아주 좁은 간격과 macOS·Windows는 아직 확인하지 않았습니다.
+
+내부 연구에서 같은 P1 해에 대해 이 복원은 기본 메시 다섯 단면에서 경계 panel
+값과 -0.24%~-0.34% 차이였고(경계 기울기 P1 계수는 12%~20% 낮음), 관측 차수는
+1.3~2.1, 복원 비용은 P1 해의 0.3~0.9배였습니다. 그 단면들에 대한 관측이며
+일반 오차 한계가 아닙니다.
+
+| 검사(`tests/sipi/test_recovered_conductor.py`) | 실행 전에 정한 기준 |
+|---|---|
+| 평행판, 폭 2 mm, 높이 1 mm | 각 표면 계수 1/폭, 전류 ±1, 1e-10; C0가 `surface_current_factors`와 동일 |
+| 동축 a=.5 mm, b=2 mm, 요소 16x64, 32x128, 64x256 | 각 표면 관측 차수 >= 1.8; 가장 고운 상대 오차 < 1e-3 |
+| 거절 | 비율 0, .5, 음수, 불리언, NaN, 문자열; 11.25도 다각형; 지지가 열린 벽에 닿는 부분 평행판 |
