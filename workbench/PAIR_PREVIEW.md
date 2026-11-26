@@ -94,6 +94,11 @@ selected width, refinement and search errors beside the target fields. A success
 search applies its exact selected width to the cross-section inputs; its result
 stays beside the target controls. The file controls have their own status message.
 
+On wide screens **Impedance result** sits directly below **Calculate impedance**
+in the right column, and **Find trace width** sits below the drawing with its
+four target fields in one row. Narrow screens stack drawing, inputs, impedance
+result and width search in that order, so each result follows its button.
+
 If the target is not bracketed, the width-search panel lists the two actual boundary widths
 in mm and their differential impedances in ohms. It suggests reviewing the range,
 target or stackup without changing your inputs. The two boundary samples do not
