@@ -1,5 +1,8 @@
 # Changelog
 
+- Remove the pair-preview number arrow buttons from the Tab order (ArrowUp/ArrowDown in each field still nudge), shortening the keyboard path from presets to Find width from 45 to 23 stops. Increments and values are unchanged.
+  차동 쌍 미리보기의 숫자 화살표 버튼을 Tab 순서에서 뺐습니다(각 칸의 ArrowUp/ArrowDown은 그대로). 프리셋에서 Find width까지 키보드 정지가 45개에서 23개로 줄었습니다. 증분과 수치는 그대로입니다.
+
 - Keep keyboard focus during pair-preview tasks: focus moves to Cancel while a calculation, search, save or open runs and returns to the starting button afterwards, instead of falling to the page start. Engine paths and values are unchanged.
   차동 쌍 미리보기 작업 중 키보드 포커스를 유지합니다. 계산·탐색·저장·열기 중에는 Cancel로, 끝나면 시작한 버튼으로 돌아가며 페이지 처음으로 떨어지지 않습니다. 엔진 경로와 수치는 그대로입니다.
 
