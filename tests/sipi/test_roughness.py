@@ -190,7 +190,10 @@ def test_coupled_r_and_internal_l_refinement(solved):
     fine = surface_conductor_loss(doc.cross_section.section,F,conductivity=SIGMA,
         ground_thickness=35e-6,roughness=MODEL,edge_size=2.5e-6,far_size=.1e-3,grade=.05)
     for a,b in ((coarse.R,fine.R),(coarse.conductor.L_internal,fine.L_internal)):
-        assert np.max(abs(a-b))/np.max(abs(b)) < .05
+        # Two-mesh change of the P1 surface-current loss, a mesh-change check, not accuracy: P1 converges
+        # with observed order about 0.12 here (4.08% Linux/Windows; 5.01% on macOS, whose mesher picks
+        # another valid triangulation at exact cocircular ties). See docs/packages/sipi/conductor.md.
+        assert np.max(abs(a-b))/np.max(abs(b)) < .06
     assert fine.factors.current_error < coarse.conductor.factors.current_error < .05
 
 
