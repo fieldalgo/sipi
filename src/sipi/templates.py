@@ -8,6 +8,8 @@ import math
 from dataclasses import replace
 from numbers import Real
 
+import numpy as np
+
 from .crosssection import CrossSection, Layer, Trace
 
 __all__ = ['split_gap_broadside_stripline', 'tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
@@ -335,10 +337,21 @@ def asymmetric_coupled_grounded_coplanar(*, left_width, right_width, gap,
 def _unbacked_coplanar(base, lower_air_height):
     lower = (10*base.layers[0].thickness if lower_air_height is None else
              _positive('lower_air_height', lower_air_height))
-    section = CrossSection([Layer('lower_air', lower), *base.layers],
-                           [replace(t, y=t.y+lower) for t in base.traces],
-                           base.width, bottom='open',
-                           dielectric_regions=[replace(r, vertices=tuple((x,y+lower) for x,y in r.vertices))
+    layers = [Layer('lower_air', lower), *base.layers]
+    # Raise every height by lower. A height that is a layer interface, trace bottom
+    # or trace top of base maps to the value the new section computes for it
+    # (interfaces are a cumulative sum from the new bottom; a trace top is y plus
+    # thickness). Adding lower afterwards can differ in the last bit, e.g.
+    # (.1e-3 + .1e-3) + 2e-3 != (2e-3 + .1e-3) + .1e-3, and the mesher then sees two
+    # vertices 1e-19 apart on one interface.
+    lifted = dict(zip(base.interfaces().tolist(), np.cumsum([layer.thickness for layer in layers]).tolist()))
+    traces = [replace(t, y=lifted.get(t.y, t.y+lower)) for t in base.traces]
+    for old, new in zip(base.traces, traces):
+        lifted.setdefault(old.y, new.y)
+        lifted.setdefault(old.y+old.thickness, new.y+new.thickness)
+    section = CrossSection(layers, traces, base.width, bottom='open',
+                           dielectric_regions=[replace(r, vertices=tuple((x, lifted.get(y, y+lower))
+                                                                         for x, y in r.vertices))
                                                for r in base.dielectric_regions])
     if section.dielectric_regions:
         _check_conformal_resolution(section)
