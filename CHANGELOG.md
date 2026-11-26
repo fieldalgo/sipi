@@ -1,5 +1,8 @@
 # Changelog
 
+- Place the pair-preview impedance result directly below Calculate impedance and the width search below the drawing; fix the stacked phone title bar and run-together footer text. Values and engine paths are unchanged.
+  차동 쌍 미리보기의 임피던스 결과를 Calculate impedance 바로 아래에, 선폭 찾기를 단면도 아래에 두고, 휴대폰 폭의 제목 줄과 붙어 보이던 바닥글 글자를 고쳤습니다. 수치와 엔진 경로는 그대로입니다.
+
 - Add an original PCB preset library and clickable cross-section dimensions to the pair
   workbench, with a readable dimension inspector and separate calculation/width results.
   PCB 단면 예시 프리셋과 클릭 가능한 치수선을 추가하고 입력·계산·선폭 역산 화면을 재구성합니다.
