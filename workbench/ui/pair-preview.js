@@ -56,9 +56,12 @@ function dimensionState() {
   for (const id of fields) $(id).closest('label').classList.toggle('field-active',id===focusedDimension);
 }
 $('runtime-note').textContent = browser ? 'Calculations run in this browser. Design files are not uploaded. The first calculation loads the local engine assets.' : 'Local review build: calculations run on this computer through the SIPI engine. Design files are not uploaded.';
-function status(message, error = false, area = activeArea) {
+// tone: '' (neutral), 'busy' (task running) or 'success' (task completed); errors use `error`.
+function status(message, error = false, area = activeArea, tone = '') {
   const element = $(area === 'design' ? 'design-status' : area === 'file' ? 'file-status' : 'status');
   element.hidden = !message; element.textContent = message; element.classList.toggle('error', error);
+  element.classList.toggle('busy', !error && tone === 'busy'); element.classList.toggle('success', !error && tone === 'success');
+  element.closest('.panel')?.setAttribute('aria-busy', String(!error && tone === 'busy'));
 }
 function invalidate() {
   latest = null; $('result').hidden = true; $('failure').hidden = true; $('range-feedback').hidden = true;
@@ -268,11 +271,11 @@ async function run(action, extra={}) {
       request.design={target:Number($('target').value),bounds:[Number($('lower').value)*1e-3,Number($('upper').value)*1e-3],tolerance:Number($('tolerance').value)};
       if(request.design.bounds[0]>=request.design.bounds[1]) throw new Error('Minimum width must be below maximum width.');
     }
-    lock(true); status(action==='design'?'Searching widths, then checking a separate refined mesh…':'Working…');
+    lock(true); status(action==='design'?'Searching widths, then checking a separate refined mesh…':'Working…', false, activeArea, 'busy');
     const result=await transport.run(request);
     if(version!==generation) return;
-    if(action==='template-open') {acceptEditable(result); $('material-label').value='Imported design — material not identified'; $('material-note').value=''; status('Design opened. Add material context and calculate to produce a fresh result.');}
-    else if(action==='template-document') {download('sipi-pair-design.json',result.document_text); status('Editable design saved. Target-search settings are not part of this input file.');}
+    if(action==='template-open') {acceptEditable(result); $('material-label').value='Imported design — material not identified'; $('material-note').value=''; status('Design opened. Add material context and calculate to produce a fresh result.', false, activeArea, 'success');}
+    else if(action==='template-document') {download('sipi-pair-design.json',result.document_text); status('Editable design saved. Target-search settings are not part of this input file.', false, activeArea, 'success');}
     else {
       if(![result.line?.z_diff,result.line?.z_common].every(Number.isFinite)) throw new Error('The engine did not return finite symmetric-mode impedances.');
       if(result.design) {
@@ -286,7 +289,7 @@ async function run(action, extra={}) {
       $('width-result').hidden = !result.design;
       if (result.design) $('chosen-width').textContent = String(Number((result.design.width * 1e3).toPrecision(10)));
       $('result').hidden=false;
-      status(result.design ? 'Width found. Initial and refined target checks passed.' : 'Impedance calculated for the current dimensions.');
+      status(result.design ? 'Width found. Initial and refined target checks passed.' : 'Impedance calculated for the current dimensions.', false, activeArea, 'success');
       if (result.design) status('Selected width applied. See the result in Find trace width.', false, 'analysis');
     }
   } catch(error) {
@@ -306,7 +309,7 @@ $('file').addEventListener('change',async()=>{
   const file=$('file').files[0]; $('file').value=''; if(!file || busy) return;
   const version=++generation; invalidate(); activeArea='file';
   if(file.size>200*1024){status('Design files must be at most 200 KiB.',true);return;}
-  status('Reading design…');
+  status('Reading design…', false, activeArea, 'busy');
   try{const text=await file.text();if(version===generation && !busy) await run('template-open',{text});}
   catch(error){if(version===generation){invalidate();status(error.message,true);}}
 });

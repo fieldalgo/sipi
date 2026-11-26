@@ -99,6 +99,11 @@ in the right column, and **Find trace width** sits below the drawing with its
 four target fields in one row. Narrow screens stack drawing, inputs, impedance
 result and width search in that order, so each result follows its button.
 
+Each status line shows its state: a turning marker while a task runs, a green
+line after a completed calculation, search, save or open, and a red line
+starting with **Error** when it fails. The boundary table states its width
+unit (mm). The colours repeat the text; they do not replace it.
+
 If the target is not bracketed, the width-search panel lists the two actual boundary widths
 in mm and their differential impedances in ohms. It suggests reviewing the range,
 target or stackup without changing your inputs. The two boundary samples do not
