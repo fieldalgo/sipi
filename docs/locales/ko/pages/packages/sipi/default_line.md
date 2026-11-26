@@ -25,9 +25,14 @@
 | 위아래 접지, 열린 옆 | `panels_per_edge` 64, `ground_modes` 512, `interpolation_degree` 14 |
 | 아래·위·옆 모두 열림 | `panels_per_edge` 64, `interpolation_degree` 12 |
 
-이 기본값은 잠정값입니다. 패널 64→128 변화와 실행 시간을 따로 측정해 최종값을 정하며,
-값은 상수 `sipi.default_line.DEFAULT_PANEL_CONTROLS` 한 곳에 있습니다. 저장 문서에는 쓴
-값이 기록됩니다.
+기본값은 상수 `sipi.default_line.DEFAULT_PANEL_CONTROLS` 한 곳에 있고, 저장 문서에는 쓴
+값이 기록됩니다. 전형 입력과 템플릿 기본 상자로 템플릿 72개 모두를 측정해 정했습니다.
+변 하나당 패널을 64에서 128로 늘리면 C0는 최대 1.5e-6, 전류 Gram 행렬은 각 최대 원소의
+최대 5.2e-3만큼 바뀌었고, panel 시간 중앙값은 P1 기본 메시 시간의 1.05배였습니다. 사다리꼴
+(식각) 도체가 가장 느리게 수렴하며, 64 패널에서 남은 Gram 오차는 약 1–2%로 추정됩니다.
+정밀 계산에는 `panels_per_edge: 128`을 명시하세요. 시간은 약 2배, Gram 변화는 약 2.5배
+줄어듭니다. 위아래 접지 사이의 적층 coplanar stripline은 보간 상자 37개가 필요해 패널 수와
+상관없이 약 150–200 s 걸렸습니다.
 
 계산은 같은 내용의 [방법 명시 선로](method_line.md)가 하는 계산입니다.
 `method_document()`는 그 `sipi.method-transmission-line/1` 문서를, `equivalent_document()`는
