@@ -93,11 +93,23 @@ function showRangeFailure(error, request) {
   $('range-feedback').hidden = false;
   return true;
 }
+// Disabling the focused control would drop keyboard focus to the page start.
+// While a task runs, focus moves to Cancel; afterwards it returns to the control
+// that started the task, unless the user has already moved focus elsewhere.
+let returnFocus = null;
 function lock(value) {
+  const active = document.activeElement;
+  if (value) returnFocus = active && active !== document.body ? active : null;
   busy = value;
   for (const element of document.querySelectorAll('button,input,select')) element.disabled = value;
   $('cancel').disabled = false; $('cancel').hidden = !value;
   dimensionState(); comparison();
+  if (value && returnFocus) $('cancel').focus({preventScroll: true});
+  else if (!value) {
+    const current = document.activeElement;
+    if (returnFocus?.isConnected && !returnFocus.disabled && (!current || current === document.body || current === $('cancel'))) returnFocus.focus({preventScroll: true});
+    returnFocus = null;
+  }
 }
 function condition(record) {
   const p = {...record.request.parameters};
