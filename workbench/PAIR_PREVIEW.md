@@ -84,6 +84,7 @@ permittivity by 0.1; target impedance by 1 ohm; and target tolerance by 0.01 ohm
 The controls respect each field's minimum. You can still type any valid decimal;
 opening a design or receiving a calculated width does not round it onto a step grid.
 Changing a value invalidates the current result as before.
+On touch screens the arrow buttons are wider so that each is easier to tap.
 
 ## Task-specific results
 
