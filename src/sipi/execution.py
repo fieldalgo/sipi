@@ -32,6 +32,7 @@ from .adaptive_panel_resolution_document import AdaptivePanelResolutionDocument
 from .panel_line import PanelTransmissionLineDocument
 from .open_panel_line import OpenPanelTransmissionLineDocument
 from .method_line import MethodTransmissionLineDocument
+from .default_line import DefaultPanelTransmissionLineDocument
 from .fem_shape_line import FEMShapeTransmissionLineDocument, FEMShapeLineError
 from .corner_fem_line import CornerFEMShapeTransmissionLineDocument
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument, TwoGroundPanelLineError
@@ -276,6 +277,7 @@ _REGISTRY = {
     'sipi.aperture-study/1': ApertureStudyDocument,
     'sipi.aperture-design/1': ApertureDesignDocument,
     **{f'sipi.transmission-line/{v}': TransmissionLineDocument for v in (1, 2, 3, 4, 5, 6, 7)},
+    'sipi.transmission-line/8': DefaultPanelTransmissionLineDocument,
     'sipi.volume-line/1': VolumeLineDocument,
     'sipi.volume-line/2': VolumeLineDocument,
     'sipi.volume-line/3': VolumeLineDocument,
@@ -583,7 +585,8 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
     their separate frequency count is capped at 64 by the saved input contract.
     Bounded TEM-port 3D counts one evaluation per frequency before field work.
     Panel lines count frequencies before any panel or volume field solve.
-    Method lines run the existing document their method selects, with the same limits.
+    Method lines and transmission-line/8 run the existing document their method
+    selects, with the same limits.
     Conductivity profiles count frequencies before constitutive integration.
     Lossless startup counts required forward delay terms before waveforms,
     separately from its saved hard cap and output sample count.
@@ -615,7 +618,7 @@ def execute_saved(text, *, max_input_bytes=262144, max_evaluations=128, diagnost
         raise ValueError('saved shape-reference line frequency count exceeds max_evaluations before any field solve')
     if isinstance(doc, CornerFEMShapeTransmissionLineDocument) and len(data['line']['frequency_hz']) > budget:
         raise ValueError('saved corner FEM line frequency count exceeds max_evaluations before any field solve')
-    if isinstance(doc, MethodTransmissionLineDocument):
+    if isinstance(doc, (MethodTransmissionLineDocument, DefaultPanelTransmissionLineDocument)):
         return _execute_method(doc, data, max_input_bytes, budget, diagnostics)
     if diagnostics and not isinstance(doc, (TransmissionLineDocument, VolumeLineDocument, PanelTransmissionLineDocument, OpenPanelTransmissionLineDocument, ShapePanelTransmissionLineDocument, ShapeReferencePanelTransmissionLineDocument, ShapeFacePanelTransmissionLineDocument, FEMShapeTransmissionLineDocument, CornerFEMShapeTransmissionLineDocument, TwoGroundPanelTransmissionLineDocument)):
         raise ValueError('diagnostics require a top-level transmission-line, volume-line or panel-line')

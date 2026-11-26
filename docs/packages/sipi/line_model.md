@@ -80,7 +80,10 @@ separately, as the panel-line page describes. A two-ground (stripline) section
 uses the [two-ground panel line](two_ground_panel_line.md), and a section
 with no ground plane (unbacked coplanar) the [open-box panel line](open_panel_line.md). A
 [method line](method_line.md) saves the choice explicitly (`panel` or
-`volume-p1`) and performs this conversion itself.
+`volume-p1`) and performs this conversion itself. In
+[transmission-line/8](default_line.md) the panel method is the default for
+`surface` and `surface-boundaries` conductors, and P1 must be named with
+`current_method: "volume-p1"`.
 
 ## Input schema
 

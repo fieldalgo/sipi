@@ -6,7 +6,9 @@ existing calculation supplies the conductor surface currents. Its fields are
 exactly `schema`, `line`, `current_method` and, for the panel method only,
 `panel` with `panels_per_edge`, `ground_modes` and `interpolation_degree`
 (without `ground_modes` when bottom, top and sides are all open).
-`current_method` has no default.
+`current_method` has no default. [Transmission-line/8](default_line.md) saves
+the same choice in the line itself, defaults to `panel` for `surface` and
+`surface-boundaries` conductors and runs through this document.
 
 | `current_method` | Section | Runs | Conductors |
 |---|---|---|---|
