@@ -5,10 +5,13 @@
 Criteria were fixed before the runs: plate factors exact to 1e-10; coax
 observed order >= 1.8 for each surface over three refinements and finest
 relative error < 1e-3; the same P1 basis and C0 as surface_current_factors.
+PCB sections and the preregistered panel comparison are in
+test_recovered_conductor_sections.py.
 """
 import numpy as np
 import pytest
 from galerkin import annulus_mesh, rectangle_mesh
+from sipi import microstrip
 from sipi.conductor import surface_current_factors
 from sipi.recovered_conductor import recovered_surface_current_factors
 
@@ -22,7 +25,8 @@ def test_parallel_plate_exact_and_same_basis():
     np.testing.assert_allclose(result.current_integrals, [[1],[-1]], atol=1e-10, rtol=0)
     assert result.current_error < 1e-10
     np.testing.assert_array_equal(result.C0, surface_current_factors(*args).C0)
-    assert result.diagnostics['minimum_spacing'] == pytest.approx(height, rel=1e-12)
+    assert result.diagnostics['clearance'] == pytest.approx(height, rel=1e-12)
+    assert result.diagnostics['corners'] == (0, 0)
     assert result.diagnostics['support_width'] == pytest.approx(.4*height, rel=1e-12)
     assert result.diagnostics['gradient_current_error'] < 1e-10
     assert not result.parts.flags.writeable
@@ -55,11 +59,16 @@ def test_support_fraction_outside_range_rejected(fraction):
                                           mesh.boundary['bottom'], support_fraction=fraction)
 
 
-def test_unverified_corner_rejected():
-    mesh = annulus_mesh(.5e-3, 2e-3, 8, 32)  # 11.25 degree turns: neither smooth nor right angle
+def test_unverified_corners_rejected():
+    mesh = annulus_mesh(.5e-3, 2e-3, 8, 16)  # 22.5 degree turns: corners, not right angles
     with pytest.raises(ValueError, match='corners'):
         recovered_surface_current_factors(mesh, {'inner': mesh.boundary['inner']},
                                           mesh.boundary['outer'])
+    section = microstrip(width=.3e-3, top_width=.25e-3, substrate_height=.2e-3, eps_r=4,
+                         thickness=35e-6)
+    meshed = section.mesh()
+    with pytest.raises(ValueError, match='trapezoid'):
+        recovered_surface_current_factors(meshed.mesh, meshed.signals, meshed.ground)
 
 
 def test_support_with_normal_displacement_on_insulated_wall_rejected():
