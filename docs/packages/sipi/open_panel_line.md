@@ -28,7 +28,7 @@ result = saved.analyze()
 ```
 
 The vacuum currents come from the shared open-box panel solver
-(`galerkin.laplace_open_box`). It uses zero normal flux on all four box
+(`galerkin.panel_electrostatics.solve_open_rectangle`). It uses zero normal flux on all four box
 walls, the same open boundaries as the volume mesh, and holds every grounded
 trace at zero voltage. They supply the vacuum capacitance and external L. The
 existing dielectric solver supplies C and G on the saved volume mesh, and the

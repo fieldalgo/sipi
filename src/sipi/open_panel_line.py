@@ -38,7 +38,8 @@ class OpenPanelTransmissionLineDocument:
 
     The nested line is transmission-line/1 through /7 with a perfect or
     surface-boundaries conductor; its section has no ground plane, so its
-    grounded traces (CrossSection requires one) are the reference. Panel currents (galerkin.laplace_open_box) supply the
+    grounded traces (CrossSection requires one) are the reference. Panel
+    currents (galerkin.panel_electrostatics) supply the
     vacuum capacitance and external L; the existing dielectric solver supplies
     C/G on one saved volume mesh. The two panel controls are required:
     panels_per_edge and interpolation_degree (there are no ground modes).

@@ -89,7 +89,7 @@ def replay(monkeypatch,observed,alter=None):
     monkeypatch.setattr(implementation,'panel_shape_current_factors',lambda *a,**k:r.base)
     def field(**request):
         i=len(calls);calls.append(request);sample=r.samples[i]
-        assert request==sample.request.arguments()
+        assert request==sample.request.solver_arguments()
         cap=sample.capacitance_per_permittivity.copy()
         if alter is not None:cap=alter(i,cap,r)
         return SimpleNamespace(capacitance_per_permittivity=cap,**dict(sample.diagnostics))
@@ -106,7 +106,7 @@ def test_face_solver_failure_keeps_completed_whole_and_face_samples(observed,mon
     case,r,calls=replay(monkeypatch,observed,change)
     with pytest.raises(PanelShapeFaceCurrentError) as caught:solve(CrossSectionDocument.from_dict(case['cross_section']).section,**case['options'])
     e=caught.value;assert e.base is r.base and e.__cause__ is original and len(e.samples)==index
-    assert e.request.arguments()==calls[-1] and e.step_parts is None
+    assert e.request.solver_arguments()==calls[-1] and e.step_parts is None
     for a,b in zip(e.samples,r.samples):np.testing.assert_array_equal(a.capacitance_per_permittivity,b.capacitance_per_permittivity)
 
 
@@ -129,7 +129,7 @@ def test_numerical_refusal_keeps_original_evidence(observed,monkeypatch,kind):
     match={'two-step':'difference steps','whole-sum':'face sums','reciprocity':'reciprocity','psd':'semidefinite','nonfinite':'nonfinite'}[kind]
     with pytest.raises(PanelShapeFaceCurrentError,match=match) as caught:solve(CrossSectionDocument.from_dict(case['cross_section']).section,**case['options'])
     e=caught.value;assert e.base is r.base
-    if kind=='nonfinite':assert len(e.samples)==0 and e.request.arguments()==calls[0]
+    if kind=='nonfinite':assert len(e.samples)==0 and e.request.solver_arguments()==calls[0]
     else:
         assert len(e.samples)==len(r.samples)
         if kind!='reciprocity':assert e.step_parts.shape==r.step_parts.shape

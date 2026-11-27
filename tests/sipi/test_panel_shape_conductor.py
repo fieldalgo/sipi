@@ -142,7 +142,7 @@ def test_bad_geometry_precedes_solver(monkeypatch,kind):
 
 
 def fake_solver(**kwargs):
-    p=np.array(kwargs['polygons'][0]);width=np.ptp(p[:,0]);c=np.sqrt(width)/kwargs['height']
+    p=np.array(kwargs['polygons'][0]);width=np.ptp(p[:,0]);c=np.sqrt(width)/kwargs['box_size'][1]
     return SimpleNamespace(capacitance_per_permittivity=np.array([[c]]),current_integrals=np.array([[1.],[-1.]]),
         **{key:0. for key in candidate._DIAGNOSTICS})
 
@@ -159,8 +159,8 @@ def test_each_shared_failure_retains_partial_inputs(monkeypatch,index):
         candidate.panel_shape_current_factors(single())
     error=caught.value
     assert len(error.samples)==index and len(calls)==index+1
-    assert error.request.arguments()==calls[-1]
-    for sample,request in zip(error.samples,calls):assert sample.request.arguments()==request
+    assert error.request.solver_arguments()==calls[-1]
+    for sample,request in zip(error.samples,calls):assert sample.request.solver_arguments()==request
     assert isinstance(error.__cause__,ValueError)
 
 
@@ -219,7 +219,7 @@ def test_complete_call_bound_and_no_unrequested_refinement(monkeypatch):
     def solve(**kwargs):
         calls.append(kwargs)
         widths=np.array([np.ptp(np.array(p)[:,0]) for p in kwargs['polygons']])
-        return SimpleNamespace(capacitance_per_permittivity=np.diag(np.sqrt(widths)/kwargs['height']),
+        return SimpleNamespace(capacitance_per_permittivity=np.diag(np.sqrt(widths)/kwargs['box_size'][1]),
             current_integrals=np.vstack((np.eye(16),-np.ones((1,16)))),
             **{key:0. for key in candidate._DIAGNOSTICS})
     monkeypatch.setattr(candidate,'_panel_solver',lambda:solve)

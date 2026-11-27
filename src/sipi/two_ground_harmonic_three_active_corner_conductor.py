@@ -21,7 +21,7 @@ __all__ = ['two_ground_harmonic_three_active_corner_current_factors',
 
 def _solver():
     try:
-        solver = import_module('galerkin.laplace_corner_harmonic_field').solve_two_ground_harmonic_corner_three_active_edges
+        solver = import_module('galerkin.panel_electrostatics').solve_two_ground_harmonic_corner_three_active_edges
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Harmonic corner currents require the exact pinned galerkin development '
                            'wheel providing solve_two_ground_harmonic_corner_three_active_edges') from exc
@@ -50,7 +50,7 @@ def _arguments(section, panels_per_edge, ground_modes, interpolation_degree):
 def _extract(checked, count, modes, degree, polygons):
     solver = _solver()
     def compute():
-        shared = solver(polygons, width=checked.width, height=checked.height,
+        shared = solver(polygons, box_size=(checked.width, checked.height),
             panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
         return _extract_result(checked, polygons, shared, 'two-ground-harmonic-corner-three-active')
     return _reuse_current_factors(checked, polygons,

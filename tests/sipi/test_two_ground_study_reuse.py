@@ -39,15 +39,16 @@ def module(kind):
 
 @pytest.mark.parametrize('kind',['scalar','pair','grid'])
 def test_actual_four_material_rows_keep_full_receipt_with_one_geometry_solve(monkeypatch,kind,record_property):
-    import galerkin.laplace_two_ground as shared
+    import galerkin.panel_electrostatics as shared
     from sipi.two_ground_panel_line import TwoGroundPanelTransmissionLineDocument as Line
     doc=document(kind);request=SavedExecutionRequest(doc.dumps(),max_evaluations=4)
     solve=shared.solve_two_ground_rectangle;generate=CrossSection.mesh;analyze=Line.analyze
     currents=[];meshes=[];fields=[]
-    def current(polygons,*,width,height,panels_per_edge=32,ground_modes=128,interpolation_degree=12):
+    def current(polygons,*,box_size,panels_per_edge=32,ground_modes=128,interpolation_degree=12):
+        width,height=box_size
         currents.append(dict(polygons=[p.tolist() for p in polygons],width=width,height=height,
             panels=panels_per_edge,modes=ground_modes,degree=interpolation_degree))
-        return solve(polygons,width=width,height=height,panels_per_edge=panels_per_edge,
+        return solve(polygons,box_size=box_size,panels_per_edge=panels_per_edge,
             ground_modes=ground_modes,interpolation_degree=interpolation_degree)
     def mesh(self,**options):
         meshes.append(CrossSectionDocument(self,mesh=options).dumps());return generate(self,**options)
@@ -115,15 +116,16 @@ def test_all_failed_rows_are_retained_and_requests_are_separate(monkeypatch,kind
 
 
 def test_actual_geometry_samples_request_distinct_current_and_mesh(monkeypatch,record_property):
-    import galerkin.laplace_two_ground as shared
+    import galerkin.panel_electrostatics as shared
     doc=document('pair');raw=doc.to_dict()
     raw['study']['schema']='sipi.impedance-study/3';raw['study'].pop('material_variables')
     raw['study']['sampling']['variables']=[dict(name='width',lower=.00043,upper=.00044)]
     doc=type(doc).from_dict(raw)
     solve=shared.solve_two_ground_rectangle;generate=CrossSection.mesh;currents=[];meshes=[]
-    def current(polygons,*,width,height,panels_per_edge=32,ground_modes=128,interpolation_degree=12):
+    def current(polygons,*,box_size,panels_per_edge=32,ground_modes=128,interpolation_degree=12):
+        width,height=box_size
         currents.append([p.tolist() for p in polygons])
-        return solve(polygons,width=width,height=height,panels_per_edge=panels_per_edge,
+        return solve(polygons,box_size=box_size,panels_per_edge=panels_per_edge,
             ground_modes=ground_modes,interpolation_degree=interpolation_degree)
     def mesh(self,**options):
         meshes.append(CrossSectionDocument(self,mesh=options).dumps());return generate(self,**options)
