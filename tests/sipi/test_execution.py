@@ -461,6 +461,14 @@ def documents():
         ports=[['far:signal', 'near:signal']])], schema='sipi.network-assembly/2'))
     base.append(NetworkTransformDocument(line8_network, operations=[dict(kind='renormalize', reference_ohms=75)],
         schema='sipi.network-transforms/3'))
+    from sipi.band import NetworkBandDocument
+    from sipi.length_design import LineLengthDesignDocument
+    line8_limits = [dict(name='loss', input_port='near:signal', output_port='far:signal',
+                         frequency_hz=[1e3, 2e3], minimum=.5, maximum=None)]
+    base.append(NetworkBandDocument(line8_network, limits=line8_limits, schema='sipi.network-band/2'))
+    zero = dict(line8_network, document=dict(line8_network['document'], length_m=0.))
+    base.append(LineLengthDesignDocument(zero, bounds=[0, 10], limits=line8_limits,
+                                         schema='sipi.line-length-design/3'))
     surface = dict(kind='surface', conductivity=58e6, ground_thickness=35e-6, relative_permeability=1.,
                    roughness=dict(kind='hammerstad', rms_m=0.))
     surface_line = TransmissionLineDocument(cross(), [1e9, 2e9], materials={}, conductor=surface, length=.1,

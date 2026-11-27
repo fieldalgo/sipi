@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import json
 import numpy as np
 
-from .circuit_document import _json_copy, _network_input
+from .circuit_document import _GATED, _json_copy, _network_input
 from .document import _keys, _unique_object
 from .network import LineNetwork, _real, _references
 
@@ -137,28 +137,38 @@ def assess_band(network, limits):
     return BandAssessment(network, tuple(checks))
 
 
-def _metadata(data):
-    source, canonical, frequency, ports = _network_input(data)
+_SCHEMAS = ('sipi.network-band/1', 'sipi.network-band/2')
+
+
+def _admit(schema):
+    return _GATED if schema == 'sipi.network-band/2' else ()
+
+
+def _metadata(data, admit=()):
+    source, canonical, frequency, ports = _network_input(data, admit=admit)
     references = (source.z_ref if hasattr(source, 'z_ref') else
                   _references(canonical['document']['reference_ohms'], len(ports)))
     return source, canonical, frequency, ports, references
 
 
 class NetworkBandDocument:
-    """sipi.network-band/1: saved source, explicit output basis and magnitude limits.
+    """sipi.network-band/1 or /2: saved source, explicit output basis and magnitude limits.
 
     Field-source normalization never meshes. RLGC, Touchstone and lumped source
     validators can perform small algebra. Existing model gates remain active.
+    Explicit version 2 has the same fields and also admits a nested
+    transmission-line/8, network-assembly/2 or network-transforms/3; version
+    1 keeps refusing them.
     """
-    def __init__(self, network, *, limits, basis='single-ended'):
-        self._assign(dict(schema='sipi.network-band/1', network=network, limits=limits, basis=basis))
+    def __init__(self, network, *, limits, basis='single-ended', schema='sipi.network-band/1'):
+        self._assign(dict(schema=schema, network=network, limits=limits, basis=basis))
 
     def _assign(self, data):
         data = _json_copy(data)
         _keys(data, ('schema', 'network', 'limits', 'basis'), where='network band')
-        if data['schema'] != 'sipi.network-band/1':
+        if data['schema'] not in _SCHEMAS:
             raise ValueError('unsupported network-band schema')
-        source, canonical, frequency, ports, refs = _metadata(data['network'])
+        source, canonical, frequency, ports, refs = _metadata(data['network'], _admit(data['schema']))
         if data['basis'] == 'mixed-mode':
             if len(ports) != 4 or not np.all(refs == refs[0]):
                 raise ValueError('mixed-mode requires four equal-reference single-ended ports')
@@ -185,7 +195,7 @@ class NetworkBandDocument:
         return json.loads(self.dumps())
 
     def analyze(self):
-        source, _, frequency, ports, refs = _metadata(self._data['network'])
+        source, _, frequency, ports, refs = _metadata(self._data['network'], _admit(self._data['schema']))
         extraction = None if isinstance(source, LineNetwork) else source.analyze()
         network = source if extraction is None else extraction.network
         if (network.port_names != ports or not np.array_equal(network.frequency, frequency)
