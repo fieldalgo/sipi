@@ -6,6 +6,7 @@ import json
 import numpy as np
 import pytest
 from sipi import CrossSection
+from resolution_studies import ENABLED as STUDIES, reproduce
 from sipi.line_resolution import ResolutionTolerance
 from sipi.two_ground_harmonic_three_active_corner_face_panel_line import (
     TwoGroundHarmonicThreeActiveCornerFacePanelTransmissionLineDocument as Line,
@@ -129,27 +130,36 @@ def test_interrupt_not_converted(monkeypatch):
 
 
 @pytest.mark.parametrize('index',[0])
-def test_actual_layered_three_signal_finite_comparisons(index,record_property,monkeypatch):
-    import sipi.two_ground_harmonic_three_active_corner_conductor as current
-    original=current._solver();calls=[]
-    def solve(*args,**kwargs):calls.append(kwargs);return original(*args,**kwargs)
-    monkeypatch.setattr(current,"_solver",lambda:solve)
-    base,kw=inputs(index);result=assess(base,**kw);record=result.to_dict()
-    record_property('corner_face_finite_resolution',json.dumps(record,sort_keys=True))
-    assert len(calls)==4  # Six complete lines; exact base/volume and panel/joint current reuse.
-    assert result.completed and result.accepted
-    assert len(result.evaluations)==len(result.comparisons)==6
-    for evaluation in result.evaluations:
-        assert evaluation.result.current_record()['kind']=='two-ground-harmonic-corner-faces-three-active'
-    for row in result.comparisons:
-        a=result.evaluations[row.reference_index].result;b=result.evaluations[row.evaluation_index].result
-        def metric(line,key):
-            if key=='L_internal':return line.conductor.L_internal
-            if key=='L_external':return np.broadcast_to(line.dielectric.L,line.R.shape)
-            if key=='C0':return np.broadcast_to(line.current_factors.C0,line.R.shape)
-            return getattr(line,key)
-        for key in KEYS:
-            expected=abs(metric(b,key)-metric(a,key));allowance=.01*np.maximum(abs(metric(a,key)),abs(metric(b,key)))
-            np.testing.assert_array_equal(row.differences[key],expected)
-            np.testing.assert_array_equal(row.allowances[key],allowance)
-            assert np.all(expected<=allowance)
+def test_base_resolution_reproduces_the_recorded_study(index):
+    """The study below runs only on dispatch (tests/_support/resolution_studies.py); its base
+    line, the resolution the study starts from, must keep the values recorded with it."""
+    reproduce('test_two_ground_harmonic_three_active_corner_face_resolution',index,inputs(index)[0])
+
+
+if STUDIES:  # dispatch-only finite-resolution study (tests/_support/resolution_studies.py)
+    @pytest.mark.slow
+    @pytest.mark.parametrize('index',[0])
+    def test_actual_layered_three_signal_finite_comparisons(index,record_property,monkeypatch):
+        import sipi.two_ground_harmonic_three_active_corner_conductor as current
+        original=current._solver();calls=[]
+        def solve(*args,**kwargs):calls.append(kwargs);return original(*args,**kwargs)
+        monkeypatch.setattr(current,"_solver",lambda:solve)
+        base,kw=inputs(index);result=assess(base,**kw);record=result.to_dict()
+        record_property('corner_face_finite_resolution',json.dumps(record,sort_keys=True))
+        assert len(calls)==4  # Six complete lines; exact base/volume and panel/joint current reuse.
+        assert result.completed and result.accepted
+        assert len(result.evaluations)==len(result.comparisons)==6
+        for evaluation in result.evaluations:
+            assert evaluation.result.current_record()['kind']=='two-ground-harmonic-corner-faces-three-active'
+        for row in result.comparisons:
+            a=result.evaluations[row.reference_index].result;b=result.evaluations[row.evaluation_index].result
+            def metric(line,key):
+                if key=='L_internal':return line.conductor.L_internal
+                if key=='L_external':return np.broadcast_to(line.dielectric.L,line.R.shape)
+                if key=='C0':return np.broadcast_to(line.current_factors.C0,line.R.shape)
+                return getattr(line,key)
+            for key in KEYS:
+                expected=abs(metric(b,key)-metric(a,key));allowance=.01*np.maximum(abs(metric(a,key)),abs(metric(b,key)))
+                np.testing.assert_array_equal(row.differences[key],expected)
+                np.testing.assert_array_equal(row.allowances[key],allowance)
+                assert np.all(expected<=allowance)

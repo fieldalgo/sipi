@@ -155,6 +155,47 @@ PCB 세분 실패 3건이 남았습니다. 실제 메시 재계산과 한계는
 이 결과는 선택한 시험과 정확한 해당 커밋의 근거이며 이후 커밋의 전체 회귀
 상태를 뜻하지 않습니다.
 
+### 유한 해상도 연구(수동 실행 전용)
+
+모서리 면 유한 해상도 연구는 사례마다 완전한 선로 여섯 개(기본, 더 촘촘한 유전체 메시,
+더 촘촘한 패널, 둘 다, 더 넓은 바깥 상자 두 개)를 풀며 러너 한 대에서 사례당 6–60분
+걸렸습니다. 이 연구는 `SIPI_RESOLUTION_STUDIES=1`일 때만 정의되고, 검증 워크플로의 수동
+실행 전용 작업 `resolution-studies`(`gh workflow run validate.yml --ref <브랜치> -f
+resolution_studies=true`)가 Linux·macOS·Windows에서 실행합니다. 평소 분할 실행에서는 각
+연구의 기본 선로를 풀어 `tests/sipi/reference_data/resolution_studies/finite-resolution-studies.json`에
+연구와 함께 기록한 값을 행렬 상대 1e-9 이내로 재현해야 합니다. 메셔가 정확한 cocircular
+동점을 플랫폼마다 다르게 삼각분할할 수 있으므로(기록된 실행에서는 macOS) 기록은 유전체
+메시(절점·삼각형의 SHA-256)마다 변형 하나를 두며, 어느 변형과도 맞지 않는 메시는
+실패입니다. 따라서 정확도·수렴 검사는 연구한 해상도의 재현으로 평소 시험에 남고, 연구 판정
+기준 자체는 바뀌지 않습니다.
+
+| 모듈 | 연구 시험(사례) | Linux CI 시간 | 판정 기준(연구 작업이 돌 때 확인) | 평소 분할 실행 |
+| --- | --- | --- | --- | --- |
+| `test_two_ground_harmonic_three_active_corner_face_resolution` | `test_actual_layered_three_signal_finite_comparisons` [0] | 40.0분 | 선로 여섯 개, 전류 풀이 네 번. 모든 비교에서 각 R, L_internal, L_external, C, G, C0 항목이 모든 주파수에서 큰 쪽 크기의 1% 이내 | 기본 선로가 기록을 재현(1e-9) |
+| `test_two_ground_harmonic_guard_corner_face_resolution` | `test_actual_layered_two_signals_and_guard_finite_comparisons` [0] | 39.3분 | 같음 | 같음 |
+| `test_two_ground_linear_corner_face_resolution` | `test_actual_layered_one_and_two_signal_finite_comparisons` [0], [1] | 5.8, 22.1분 | 같음 | 두 사례 모두 같음 |
+
+`tests/sipi/test_resolution_study_record.py`는 전계 풀이 없이 기록이 모든 사례에 대해 세
+플랫폼 모두의 승인된 결과를 담는지, 기록된 모든 사본이 메시 변형에 배정됐는지, 연구 시험이
+게이트가 켜졌을 때만 있는지 확인합니다. 연구 작업 후에는 그 JUnit XML(또는 게이트를 켠
+Validate 실행의 XML)로 `PYTHONPATH=src python
+tests/sipi/reference_data/resolution_studies/generate_finite_resolution_studies.py --junit
+<플랫폼>/<시험 집합>=<xml> ... --source "<실행>"`을 실행해 기록을 다시 만듭니다. 생성기는 각
+기본 선로를 로컬에서 다시 풀어 자기 메시의 변형과 일치하는지도 요구합니다.
+
+시간 표는 연구 사례 네 개를 뺍니다(지금 수집되는 node ID를 `--collected`로 지정). 기록 시간이
+854분에서 747분, 묶음당 46.7분이 됩니다. 새 재현 시험은 아직 CI 시간이 없으며 로컬에서
+스레드 하나로 모두 합쳐 9분 걸렸습니다.
+
+다음 무거운 시험도 여러 해상도를 비교하지만, 다른 기능도 함께 확인하거나 연구만 하는
+시험인지 분명하지 않아 평소 시험에 남겼습니다:
+`test_two_ground_linear_corner_face_line_study.py::test_actual_scalar_sweep_refinement_and_complex_closed_forms`
+(29.6분, 실제 세 표본 스윕과 닫힌 형태 전파도 확인), three-active·guard
+`*_corner_face_resolution_document.py` 모듈의 `test_actual_saved_finite_resolution_receipt`
+(25.4, 25.0분, 같은 연구의 저장 문서 실행 경로), guard·three-active `*_corner_conductor.py`
+모듈의 `test_real_physical_faces_and_whole_currents_refine_without_floor[0]`(15.2, 11.5분,
+패널 32→48에서 1% 이내와 함께 공유 풀이의 정확한 일치 확인).
+
 ## 명시적 양면 접지 개발 기능
 
 `dependencies.json`의 공유 리비전은 범용 양면 Laplace 경계 기능을 제공합니다.
