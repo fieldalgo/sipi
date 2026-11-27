@@ -26,7 +26,8 @@ _LINE8 = 'sipi.transmission-line/8'
 _ASSEMBLY2 = 'sipi.network-assembly/2'
 _TRANSFORMS3 = 'sipi.network-transforms/3'
 _GATED = (_LINE8, _ASSEMBLY2, _TRANSFORMS3)
-_CONTAINERS = 'circuit/2, network-assembly/2 or network-transforms/3'
+_CONTAINERS = ('circuit/2, network-assembly/2, network-transforms/3, network-band/2 '
+               'or line-length-design/3')
 
 
 def _gate(document, admit):

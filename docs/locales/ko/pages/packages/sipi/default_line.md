@@ -71,4 +71,6 @@ P1을 명시해 고를 수 있다고 알려 줍니다.
 받습니다. [`sipi.circuit/2`](circuit_document.md#버전-2-기본-panel-선로)는 내부
 transmission-line/8을 그대로 실행하며 결과는 선로 단독 결과와 비트 단위로 같습니다.
 [`sipi.network-assembly/2`](network_assembly.md#버전-2-기본-panel-선로)와
-[`sipi.network-transforms/3`](network_document.md#버전-3-기본-panel-선로)도 같습니다.
+[`sipi.network-transforms/3`](network_document.md#버전-3-기본-panel-선로),
+[`sipi.network-band/2`](band.md#버전-2-기본-panel-선로),
+[`sipi.line-length-design/3`](extracted_length.md#버전-3-기본-panel-선로)도 같습니다.

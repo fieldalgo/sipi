@@ -75,3 +75,17 @@ distortionless analytical limit and field-source convergence tests remain separa
 ```sh
 python -m pytest -q tests/sipi/test_extracted_length_design.py tests/sipi/test_length_design.py tests/sipi/test_band.py tests/sipi/test_execution.py
 ```
+
+## Version 3: default panel lines
+
+Explicit `sipi.line-length-design/3` is version 2 whose zero-length source may
+also be a [`sipi.transmission-line/8`](default_line.md) document. Its band is
+normalized as `sipi.network-band/2`. The line is extracted once, unchanged, so
+the resolved R/L/G/C are bit-identical to the line analyzed on its own, and the
+length bracket equals version 1 run on that resolved RLGC. Version 2 is
+unchanged and refuses transmission-line/8 with
+`nested transmission-line/8 requires ...`.
+
+```sh
+python -m pytest -q tests/sipi/test_default_line_containers.py
+```

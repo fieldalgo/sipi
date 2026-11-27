@@ -221,7 +221,7 @@ def test_unaccepted_field_bracket_keeps_resolved_model_and_both_endpoints(monkey
 def test_strict_field_source_normalization_before_any_solve(monkeypatch, case):
     raw = document().to_dict()
     if case == 'old_schema': raw['schema'] = 'sipi.line-length-design/1'
-    if case == 'future_schema': raw['schema'] = 'sipi.line-length-design/3'
+    if case == 'future_schema': raw['schema'] = 'sipi.line-length-design/4'
     if case == 'rlgc':
         from test_length_design import source
         raw['network'] = source()

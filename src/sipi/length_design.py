@@ -7,12 +7,14 @@ import json
 import numpy as np
 
 from .band import NetworkBandDocument, BandAssessment, assess_band
-from .circuit_document import _json_copy, _network_input
+from .circuit_document import _LINE8, _json_copy, _network_input
 from .document import _keys, _unique_object
 from .network import _scalar
 from .sampling import _integer
 
 __all__ = ['LineLengthDesignDocument', 'LineLengthDesign', 'LengthEvaluation', 'LengthGoalError']
+_SCHEMAS = ('sipi.line-length-design/1', 'sipi.line-length-design/2', 'sipi.line-length-design/3')
+_FIELD = ('sipi.line-length-design/2', 'sipi.line-length-design/3')
 
 
 @dataclass(frozen=True)
@@ -75,6 +77,8 @@ class LineLengthDesignDocument:
     extraction attempt and each length-network attempt consume the saved budget.
     An extraction job can contain multiple internal field solves; the budget is
     not a bound on their count, memory or time. Parsing never solves fields.
+    Explicit version 3 is version 2 that also admits a zero-length
+    transmission-line/8 source; version 2 keeps refusing it.
     """
     def __init__(self, network, *, limits, bounds, tolerance=1e-6, max_evaluations=64,
                  basis='single-ended', schema='sipi.line-length-design/1'):
@@ -85,15 +89,19 @@ class LineLengthDesignDocument:
         data = _json_copy(data)
         _keys(data, ('schema', 'network', 'limits', 'bounds_m', 'tolerance_m', 'max_evaluations', 'basis'),
               where='line length design')
-        if data['schema'] not in ('sipi.line-length-design/1', 'sipi.line-length-design/2'):
+        if data['schema'] not in _SCHEMAS:
             raise ValueError('unsupported line-length-design schema')
-        field = data['schema'] == 'sipi.line-length-design/2'
+        field = data['schema'] in _FIELD
         source = data['network']
         kinds = ('transmission-line', 'volume-line') if field else ('rlgc',)
         if not isinstance(source, dict) or source.get('kind') not in kinds:
             raise ValueError('line length design requires '+('a transmission/volume field source' if field else 'explicit RLGC input'))
         # Reuse the existing RLGC, frequency, reference, basis and limit validators.
-        band = NetworkBandDocument(source, limits=data['limits'], basis=data['basis']).to_dict()
+        if data['schema'] == 'sipi.line-length-design/3':
+            band = NetworkBandDocument(source, limits=data['limits'], basis=data['basis'],
+                                       schema='sipi.network-band/2').to_dict()
+        else:
+            band = NetworkBandDocument(source, limits=data['limits'], basis=data['basis']).to_dict()
         baseline = band['network']['document'] if field else band['network']
         if baseline['length_m'] != 0:
             raise ValueError('source length_m must be zero; the design bracket supplies length')
@@ -126,7 +134,7 @@ class LineLengthDesignDocument:
 
     def solve(self):
         data = self.to_dict(); history = []
-        field = data['schema'] == 'sipi.line-length-design/2'
+        field = data['schema'] in _FIELD
         attempts = length_attempts = field_attempts = 0
         source = data['network']; extraction = None; resolved_json = None
 
@@ -140,7 +148,10 @@ class LineLengthDesignDocument:
         if field:
             field_attempts = attempts = 1
             try:
-                document, _, frequency, ports = _network_input(source)
+                if data['schema'] == 'sipi.line-length-design/3':
+                    document, _, frequency, ports = _network_input(source, admit=(_LINE8,))
+                else:
+                    document, _, frequency, ports = _network_input(source)
                 extraction = document.analyze()
                 if (not np.array_equal(extraction.frequency, frequency)
                         or tuple(extraction.network.port_names) != tuple(ports)):
