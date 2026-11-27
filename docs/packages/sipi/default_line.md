@@ -82,4 +82,6 @@ Documents that contain a transmission line (circuits, studies, panel lines,
 method lines and others) accept transmission-line/1 to /7 and refuse /8.
 They are not silently computed with P1. New container versions admit /8
 explicitly: [`sipi.circuit/2`](circuit_document.md#version-2-default-panel-lines)
-runs a nested transmission-line/8 unchanged, bit-identical to the line alone.
+runs a nested transmission-line/8 unchanged, bit-identical to the line alone, as do
+[`sipi.network-assembly/2`](network_assembly.md#version-2-default-panel-lines) and
+[`sipi.network-transforms/3`](network_document.md#version-3-default-panel-lines).

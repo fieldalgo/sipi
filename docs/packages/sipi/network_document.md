@@ -74,5 +74,15 @@ budgets, malformed inputs, removed names and analysis failure are tested.
 These are composition checks; they do not add geometry accuracy, 3D via/stub
 physics, time-domain support, GUI linkage or new platform validation.
 
+## Version 3: default panel lines
+
+Explicit `sipi.network-transforms/3` has the fields and operations of version 2.
+Its base network and fixtures also accept a
+[`sipi.transmission-line/8`](default_line.md) document, and its base may be a
+`sipi.network-assembly/2`. The line runs unchanged, so the source and fixture
+networks are bit-identical to the line alone. Versions 1 and 2 are unchanged
+and refuse both; `sipi.circuit/2` admits a version-3 transformation and
+`sipi.circuit/1` refuses it.
+
 [Port reduction](port_reduction.md) · [Reference changes](network.md) ·
 [한국어](../../locales/ko/pages/packages/sipi/network_document.md)

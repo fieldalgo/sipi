@@ -456,6 +456,11 @@ def documents():
                                                      length=.1, current_method='volume-p1'))
     base.append(CircuitDocument(dict(kind='transmission-line', document=base[-1].to_dict()),
         excitation=dict(kind='sources', voltages={'near:signal': 1}), terminations={}, schema='sipi.circuit/2'))
+    line8_network = base[-1].to_dict()['network']
+    base.append(NetworkAssemblyDocument(line8_network, connections=[dict(network=line8_network,
+        ports=[['far:signal', 'near:signal']])], schema='sipi.network-assembly/2'))
+    base.append(NetworkTransformDocument(line8_network, operations=[dict(kind='renormalize', reference_ohms=75)],
+        schema='sipi.network-transforms/3'))
     from sipi.open_panel_line import OpenPanelTransmissionLineDocument
     from sipi.templates import unbacked_coplanar
     base.append(OpenPanelTransmissionLineDocument(TransmissionLineDocument(

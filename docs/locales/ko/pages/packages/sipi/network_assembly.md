@@ -65,6 +65,15 @@ CircuitDocument와 NetworkTransformDocument 모두
 조립 또는 조립을 포함한 변환 결과가 남습니다. 이전 판독기는 새 kind를 거부합니다.
 기존 스키마 필드의 의미는 유지하며, 결과 영구 저장 형식이 아닌 입력 형식입니다.
 
+## 버전 2: 기본 panel 선로
+
+명시한 `sipi.network-assembly/2`는 버전 1과 필드가 같습니다. `transmission-line`
+구성 요소는 [`sipi.transmission-line/8`](default_line.md) 문서도 받습니다. 정규화는
+필드 해석 없이 선로의 방법과 panel 설정을 적고, 해석은 그 선로를 그대로 실행하므로
+각 원본 네트워크가 선로 단독 결과와 비트 단위로 같습니다. 버전 1은 바뀌지 않으며
+transmission-line/8 구성 요소를 거절합니다. 버전 2 조립은 `sipi.circuit/2`와
+`sipi.network-transforms/3` 안에 넣을 수 있고, 이전 회로·변환은 이를 거절합니다.
+
 ## 검증과 한계
 
 저장형 개방/단락 스텁의 구동 전압·전류를 DC·1/4파장·1/2파장 해석해와 절대

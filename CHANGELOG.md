@@ -1,5 +1,8 @@
 # Changelog
 
+- Add `sipi.network-assembly/2` and `sipi.network-transforms/3`, which admit `sipi.transmission-line/8` components, base networks and fixtures (transforms/3 also takes an assembly/2 base); `sipi.circuit/2` admits both. Fields and operations are those of assembly/1 and transforms/2, and the line runs unchanged, so source networks are bit-identical to the line alone. Earlier versions are unchanged and refuse the new nested schemas; existing documents and results are byte-identical.
+  `sipi.network-assembly/2`와 `sipi.network-transforms/3`을 추가합니다. `sipi.transmission-line/8` 구성 요소·기본 네트워크·fixture를 받고(transforms/3은 assembly/2 기본 네트워크도 받음), `sipi.circuit/2`는 둘 다 받습니다. 필드와 연산은 assembly/1·transforms/2와 같고 선로를 그대로 실행하므로 원본 네트워크가 선로 단독 결과와 비트 단위로 같습니다. 이전 버전은 바뀌지 않고 새 중첩 스키마를 거절하며, 기존 문서와 결과는 바이트 단위로 같습니다.
+
 - Add `sipi.circuit/2`, which admits a nested `sipi.transmission-line/8` (panel conductor currents by default) and otherwise has the fields of circuit/1. The line runs unchanged: the extracted network, R/L/G/C and terminal response are bit-identical to the line analyzed on its own. `sipi.circuit/1` is unchanged and keeps refusing transmission-line/8, also inside a nested assembly or transformation; existing documents and results are byte-identical.
   `sipi.circuit/2`를 추가합니다. 내부에 `sipi.transmission-line/8`(기본 panel 도체 전류)을 받으며 나머지 필드는 circuit/1과 같습니다. 선로는 그대로 실행되어 추출 네트워크·R/L/G/C·단자 응답이 선로 단독 해석과 비트 단위로 같습니다. `sipi.circuit/1`은 바뀌지 않고 중첩 assembly·transformation 안을 포함해 transmission-line/8을 계속 거절하며, 기존 문서와 결과는 바이트 단위로 같습니다.
 

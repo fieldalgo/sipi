@@ -157,7 +157,7 @@ def test_input_and_metadata_snapshots():
 
 
 @pytest.mark.parametrize('mutate',[
-    lambda d:d.update(schema='sipi.network-assembly/2'),lambda d:d.update(extra=1),
+    lambda d:d.update(schema='sipi.network-assembly/3'),lambda d:d.update(extra=1),
     lambda d:d.pop('network'),lambda d:d.pop('connections'),
     lambda d:d.update(connections=[]),lambda d:d.update(connections=None),
     lambda d:d.update(connections=[None]),lambda d:d['connections'][0].update(extra=1),

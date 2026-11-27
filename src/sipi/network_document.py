@@ -8,7 +8,7 @@ import json
 
 import numpy as np
 
-from .circuit_document import _complex_value, _json_copy, _network_input
+from .circuit_document import _ASSEMBLY2, _LINE8, _complex_value, _json_copy, _network_input
 from .connection import _connection_layout, cascade_networks, deembed_network
 from .document import _keys, _unique_object
 from .network import LineNetwork, _references
@@ -17,25 +17,31 @@ from .termination import terminate_ports
 __all__ = ['NetworkTransformDocument', 'NetworkTransformResult']
 _BASE_KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line', 'network-assembly', 'lumped-network')
 _FIXTURE_KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line', 'lumped-network')
+_SCHEMAS = ('sipi.network-transforms/1', 'sipi.network-transforms/2', 'sipi.network-transforms/3')
+_FIXTURE_SCHEMAS = ('sipi.network-transforms/2', 'sipi.network-transforms/3')
 
 
-def _source(value):
+def _admit(schema):
+    return (_LINE8, _ASSEMBLY2) if schema == 'sipi.network-transforms/3' else ()
+
+
+def _source(value, admit=()):
     if not isinstance(value, dict) or value.get('kind') not in _BASE_KINDS:
         raise ValueError('network requires rlgc, touchstone, transmission-line, volume-line, network-assembly or lumped-network')
-    return _network_input(value)
+    return _network_input(value, admit=admit)
 
 
-def _metadata(value):
-    source, canonical, frequency, ports = _source(value)
+def _metadata(value, admit=()):
+    source, canonical, frequency, ports = _source(value, admit)
     references = (source.z_ref if isinstance(source, LineNetwork) or value['kind'] == 'network-assembly'
                   else _references(canonical['document']['reference_ohms'], len(ports)))
     return source, canonical, frequency, ports, references
 
 
-def _fixture(value, frequency, ports):
+def _fixture(value, frequency, ports, admit=()):
     if not isinstance(value, dict) or value.get('kind') not in _FIXTURE_KINDS:
         raise ValueError('fixtures require base networks; assembly and transformation nesting is unsupported')
-    _, canonical, other_f, other_ports, other_refs = _metadata(value)
+    _, canonical, other_f, other_ports, other_refs = _metadata(value, admit)
     if not np.array_equal(frequency, other_f):
         raise ValueError('fixture must have identical frequency samples')
     if len(ports) % 2 or len(other_ports) != len(ports):
@@ -52,11 +58,11 @@ def _output_names(step, defaults):
     return tuple(names)
 
 
-def _cascade_step(step, frequency, ports, references):
+def _cascade_step(step, frequency, ports, references, admit=()):
     _keys(step, ('kind', 'side', 'network'), ('port_names',), where='cascade operation')
     if step['side'] not in ('left', 'right'):
         raise ValueError('cascade side must be left or right')
-    fixture, other_ports, other_refs = _fixture(step['network'], frequency, ports)
+    fixture, other_ports, other_refs = _fixture(step['network'], frequency, ports, admit)
     left_p, left_r, right_p, right_r = ports, references, other_ports, other_refs
     if step['side'] == 'left':
         left_p, left_r, right_p, right_r = other_ports, other_refs, ports, references
@@ -67,7 +73,7 @@ def _cascade_step(step, frequency, ports, references):
     return dict(kind='cascade', side=step['side'], network=fixture, port_names=list(names)), names, refs
 
 
-def _deembed_step(step, frequency, ports, references):
+def _deembed_step(step, frequency, ports, references, admit=()):
     _keys(step, ('kind', 'left', 'right'), ('port_names',), where='deembed operation')
     if len(ports) % 2:
         raise ValueError('fixture operations require single-ended 2N ports ordered near then far')
@@ -80,7 +86,7 @@ def _deembed_step(step, frequency, ports, references):
     for side in ('left', 'right'):
         if step[side] is None:
             continue
-        fixture, other_p, other_r = _fixture(step[side], frequency, ports)
+        fixture, other_p, other_r = _fixture(step[side], frequency, ports, admit)
         outer = slice(None, n) if side == 'left' else slice(n, None)
         inner = slice(n, None) if side == 'left' else slice(None, n)
         if not np.array_equal(references[outer], other_r[outer]):
@@ -133,7 +139,9 @@ class NetworkTransformDocument:
     v1 supports renormalize and terminate-ports; explicit v2 also saves cascade
     and known-fixture removal. No recursive fixtures, file/network I/O or
     expressions. Parsing validates current port metadata without meshing;
-    analysis extracts each geometry occurrence once.
+    analysis extracts each geometry occurrence once. Explicit v3 has the
+    fields and operations of v2 and also admits transmission-line/8 inputs
+    and a network-assembly/2 source; v1 and v2 keep refusing them.
     """
     def __init__(self, network, *, operations, schema='sipi.network-transforms/1'):
         self._assign(dict(schema=schema, network=network,
@@ -142,9 +150,10 @@ class NetworkTransformDocument:
     def _assign(self, data):
         data = _json_copy(data)
         _keys(data, ('schema', 'network', 'operations'), where='network transforms')
-        if data['schema'] not in ('sipi.network-transforms/1', 'sipi.network-transforms/2'):
+        if data['schema'] not in _SCHEMAS:
             raise ValueError('unsupported network-transforms schema')
-        _, source, frequency, ports, references = _metadata(data['network'])
+        admit = _admit(data['schema'])
+        _, source, frequency, ports, references = _metadata(data['network'], admit)
         steps = data['operations']
         if not isinstance(steps, list) or not 1 <= len(steps) <= 32:
             raise ValueError('operations must contain 1..32 steps')
@@ -165,10 +174,10 @@ class NetworkTransformDocument:
                 references = references[[i for i, p in enumerate(ports) if p not in loads]]
                 ports = tuple(p for p in ports if p not in loads)
             elif kind in ('cascade', 'deembed'):
-                if data['schema'] != 'sipi.network-transforms/2':
+                if data['schema'] not in _FIXTURE_SCHEMAS:
                     raise ValueError('fixture operations require sipi.network-transforms/2')
                 operation = _cascade_step if kind == 'cascade' else _deembed_step
-                canonical, ports, references = operation(step, frequency, ports, references)
+                canonical, ports, references = operation(step, frequency, ports, references, admit)
                 operations.append(canonical)
             else:
                 raise ValueError('unsupported network operation')
@@ -213,8 +222,9 @@ class NetworkTransformDocument:
 
     def analyze(self):
         data = self.to_dict()
+        admit = _admit(data['schema'])
         def extract(value):
-            source, _, frequency, ports, references = _metadata(value)
+            source, _, frequency, ports, references = _metadata(value, admit)
             extraction = None if isinstance(source, LineNetwork) else source.analyze()
             network = source if extraction is None else extraction.network
             if (network.port_names != ports or not np.array_equal(network.frequency, frequency)
