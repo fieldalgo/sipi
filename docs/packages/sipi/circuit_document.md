@@ -85,6 +85,31 @@ length-F arrays of the same shape. Booleans, strings and null are not numbers.
 Scalars apply at every frequency. Canonical output writes all complex values as
 explicit real/imag objects; it never serializes language-specific complex syntax.
 
+## Version 2: default panel lines
+
+Explicit `sipi.circuit/2` has exactly the fields of version 1. Its
+`transmission-line` network also accepts a
+[`sipi.transmission-line/8`](default_line.md) document, whose conductor
+currents default to the panel method. Normalization writes the line's
+`current_method` and, for the panel method, its panel controls into the saved
+circuit, without a field solve. Analysis runs that line document unchanged: the
+extracted network, R/L/G/C and terminal response are bit-identical to analyzing
+the same transmission-line/8 on its own and terminating its network.
+
+Version 1 is unchanged and keeps refusing a nested transmission-line/8 with
+`nested transmission-line/8 requires circuit/2`, including inside a nested
+assembly or transformation. A version-2 circuit without transmission-line/8
+normalizes to the version-1 content with only the schema name changed and
+gives the same results. Lines 1 to 7 are accepted by both versions.
+
+```python
+from sipi.circuit_document import CircuitDocument
+
+circuit = CircuitDocument(dict(kind='transmission-line', document=line8.to_dict()),
+    excitation={'kind': 'sources', 'voltages': {'near:signal': 1}},
+    terminations={'far:signal': 100}, schema='sipi.circuit/2')
+```
+
 ## Execution and outputs
 
 `CircuitDocument.from_dict(data)` and `.loads(text)` validate inputs.
@@ -109,6 +134,7 @@ Input identity alone does not make different engine versions bitwise identical.
 
 ```sh
 OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_circuit_document.py
+python -m pytest -q tests/sipi/test_default_line_containers.py
 python examples/sipi/circuit_document.py
 ```
 

@@ -19,8 +19,22 @@ from .touchstone import loads_touchstone
 
 __all__ = ['CircuitDocument', 'CircuitResult']
 
+_SCHEMAS = ('sipi.circuit/1', 'sipi.circuit/2')
+# Nested schemas that only newer container versions admit. Older containers
+# keep refusing them, so a deployed reader never meets a document it rejects.
+_LINE8 = 'sipi.transmission-line/8'
+_GATED = (_LINE8,)
+_CONTAINERS = 'circuit/2'
 
-def _network_input(data):
+
+def _gate(document, admit):
+    schema = document.get('schema') if isinstance(document, dict) else None
+    if schema in _GATED and schema not in admit:
+        raise ValueError(f'nested {schema[5:]} requires {_CONTAINERS}')
+
+
+def _network_input(data, *, admit=()):
+    """Decode one saved network; ``admit`` lists gated nested schemas allowed here."""
     if not isinstance(data, dict):
         raise ValueError('network must be an object')
     kind = data.get('kind')
@@ -50,7 +64,12 @@ def _network_input(data):
         return net, dict(kind=kind, document=doc.to_dict()), net.frequency, net.port_names
     if kind in ('transmission-line', 'volume-line'):
         _keys(data, ('kind', 'document'), where='line extraction network')
-        if kind == 'transmission-line':
+        _gate(data['document'], admit)
+        if kind == 'transmission-line' and isinstance(data['document'], dict) \
+                and data['document'].get('schema') == _LINE8:
+            from .default_line import DefaultPanelTransmissionLineDocument
+            doc = DefaultPanelTransmissionLineDocument.from_dict(data['document'])
+        elif kind == 'transmission-line':
             from .line_model import TransmissionLineDocument
             doc = TransmissionLineDocument.from_dict(data['document'])
         else:
@@ -62,11 +81,13 @@ def _network_input(data):
         return doc, dict(kind=kind, document=canonical), np.array(canonical['frequency_hz']), ports
     if kind == 'network-transform':
         _keys(data, ('kind', 'document'), where='network transformation input')
+        _gate(data['document'], admit)
         from .network_document import NetworkTransformDocument
         doc = NetworkTransformDocument.from_dict(data['document'])
         return doc, dict(kind=kind, document=doc.to_dict()), doc.frequency, doc.port_names
     if kind == 'network-assembly':
         _keys(data, ('kind', 'document'), where='network assembly input')
+        _gate(data['document'], admit)
         from .assembly_document import NetworkAssemblyDocument
         doc = NetworkAssemblyDocument.from_dict(data['document'])
         return doc, dict(kind=kind, document=doc.to_dict()), doc.frequency, doc.port_names
@@ -128,14 +149,16 @@ class CircuitResult:
 
 
 class CircuitDocument:
-    """Strict sipi.circuit/1 input snapshot; SI units and peak phasors.
+    """Strict sipi.circuit/1 or /2 input snapshot; SI units and peak phasors.
 
     Build from JSON-compatible dictionaries; complex numbers use {real,imag}.
     Construction validates all port names and counts without creating a mesh.
     Analyze keeps the nested model's mesh, material and skin-depth gates.
+    Explicit version 2 has the same fields and also admits a nested
+    transmission-line/8; version 1 keeps refusing it.
     """
-    def __init__(self, network, *, excitation, terminations):
-        self._data = self._validate(dict(schema='sipi.circuit/1', network=network,
+    def __init__(self, network, *, excitation, terminations, schema='sipi.circuit/1'):
+        self._data = self._validate(dict(schema=schema, network=network,
                                          excitation=excitation, terminations=terminations))
 
     @staticmethod
@@ -143,9 +166,10 @@ class CircuitDocument:
         # Copies before checking; callers cannot mutate nested documents afterward.
         data = _json_copy(data)
         _keys(data, ('schema', 'network', 'excitation', 'terminations'), where='circuit')
-        if data['schema'] != 'sipi.circuit/1':
+        if data['schema'] not in _SCHEMAS:
             raise ValueError('unsupported circuit schema')
-        _, network, frequency, ports = _network_input(data['network'])
+        admit = _GATED if data['schema'] == 'sipi.circuit/2' else ()
+        _, network, frequency, ports = _network_input(data['network'], admit=admit)
         excitation = data['excitation']
         if not isinstance(excitation, dict):
             raise ValueError('excitation must be an object')
@@ -165,7 +189,7 @@ class CircuitDocument:
         else:
             raise ValueError('unsupported excitation kind')
         _, terminations = _table(data['terminations'], frequency, ports, passive=True)
-        return dict(schema='sipi.circuit/1', network=network,
+        return dict(schema=data['schema'], network=network,
                     excitation=excitation, terminations=terminations)
 
     @classmethod
@@ -188,7 +212,8 @@ class CircuitDocument:
 
     def analyze(self):
         data = self.to_dict()
-        source, _, frequency, ports = _network_input(data['network'])
+        admit = _GATED if data['schema'] == 'sipi.circuit/2' else ()
+        source, _, frequency, ports = _network_input(data['network'], admit=admit)
         extraction = None if isinstance(source, LineNetwork) else source.analyze()
         network = source if extraction is None else extraction.network
         if tuple(network.port_names) != ports or not np.array_equal(network.frequency, frequency):
