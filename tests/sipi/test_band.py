@@ -125,7 +125,7 @@ def test_geometry_source_preserves_field_normalization_and_actual_extraction(mon
 
 
 @pytest.mark.parametrize('edit',[
-    lambda d:d.update(schema='sipi.network-band/2'),lambda d:d.update(extra=0),
+    lambda d:d.update(schema='sipi.network-band/3'),lambda d:d.update(extra=0),
     lambda d:d.update(basis='automatic'),lambda d:d.update(basis='mixed-mode'),
     lambda d:d.update(limits=[]),lambda d:d.update(limits={}),
     lambda d:d['limits'].append(d['limits'][0]),lambda d:d['limits'][0].update(name=''),

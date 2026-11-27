@@ -69,3 +69,16 @@ resolved 재생, 엄격한 내부 입력, 예산·실패 기록을 포함합니�
 ```sh
 python -m pytest -q tests/sipi/test_extracted_length_design.py tests/sipi/test_length_design.py tests/sipi/test_band.py tests/sipi/test_execution.py
 ```
+
+## 버전 3: 기본 panel 선로
+
+명시한 `sipi.line-length-design/3`은 길이 0 원본으로
+[`sipi.transmission-line/8`](default_line.md) 문서도 받는 버전 2입니다. 대역은
+`sipi.network-band/2`로 정규화됩니다. 선로는 그대로 한 번 추출되므로 해결된 R/L/G/C가
+선로 단독 해석과 비트 단위로 같고, 길이 구간은 그 RLGC로 실행한 버전 1과 같습니다.
+버전 2는 바뀌지 않으며 transmission-line/8을 `nested transmission-line/8 requires ...`로
+거절합니다.
+
+```sh
+python -m pytest -q tests/sipi/test_default_line_containers.py
+```

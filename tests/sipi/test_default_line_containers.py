@@ -202,3 +202,75 @@ def test_assembly2_and_transforms3_with_line8_are_the_standalone_line8_bit_for_b
     expected = terminate_network(joined, source_voltages={NEAR: 1}, terminations={FAR: 100})
     for key in ('a', 'b', 'voltage', 'current', 'network_power'):
         np.testing.assert_array_equal(getattr(wrapped.response, key), getattr(expected, key))
+
+
+TWO = (1e9, 3e9)
+LIMITS = [dict(name='loss', input_port=NEAR, output_port=FAR, frequency_hz=list(TWO), minimum=.5, maximum=None)]
+
+
+@pytest.fixture(scope='module')
+def panel2():
+    """A panel-default transmission-line/8 at the two band endpoints and its result."""
+    doc = line8(frequency=TWO)
+    return doc, doc.analyze()
+
+
+def test_band2_and_length_design3_admit_line8_and_old_versions_refuse_it(monkeypatch):
+    from sipi.band import NetworkBandDocument
+    from sipi.length_design import LineLengthDesignDocument
+    monkeypatch.setattr(CrossSection, 'mesh', lambda *a, **k: pytest.fail('validation solved fields'))
+    assert {'sipi.network-band/2', 'sipi.line-length-design/3'} <= set(saved_schemas())
+    raw = line8(frequency=TWO).to_dict()
+    sparse = {k: v for k, v in raw.items() if k not in ('current_method', 'panel')}
+    line, zero = (dict(kind='transmission-line', document=dict(sparse, length_m=x)) for x in (.02, 0.))
+    band = NetworkBandDocument(line, limits=LIMITS, schema='sipi.network-band/2')
+    design = LineLengthDesignDocument(zero, bounds=[0, 10], limits=LIMITS, schema='sipi.line-length-design/3')
+    assert band.to_dict()['network']['document'] == raw
+    assert design.to_dict()['network']['document'] == dict(raw, length_m=0.)
+    for saved in (band, design):
+        text = saved.dumps()
+        assert normalize_saved(text) == text and type(saved).loads(text).dumps() == text
+    with pytest.raises(ValueError, match='nested transmission-line/8 requires'):
+        NetworkBandDocument(line, limits=LIMITS)
+    with pytest.raises(ValueError, match='nested transmission-line/8 requires'):
+        LineLengthDesignDocument(zero, bounds=[0, 10], limits=LIMITS, schema='sipi.line-length-design/2')
+    nested = dict(kind='network-assembly', document=assembly(RLGC).to_dict())
+    with pytest.raises(ValueError, match='nested network-assembly/2 requires'):
+        NetworkBandDocument(nested, limits=[dict(LIMITS[0], frequency_hz=[0, 1e9])])
+    NetworkBandDocument(nested, limits=[dict(LIMITS[0], frequency_hz=[0, 1e9])], schema='sipi.network-band/2')
+    # Without line/8 the new versions are the old ones with a new schema name.
+    rlgc_limits = [dict(LIMITS[0], frequency_hz=[0, 1e9])]
+    old, new = (NetworkBandDocument(RLGC, limits=rlgc_limits, schema=s).to_dict()
+                for s in ('sipi.network-band/1', 'sipi.network-band/2'))
+    assert new == dict(old, schema='sipi.network-band/2')
+    seven = dict(kind='transmission-line', document=dict(line7(frequency=TWO).to_dict(), length_m=0.))
+    old, new = (LineLengthDesignDocument(seven, bounds=[0, 10], limits=LIMITS, schema=s).to_dict()
+                for s in ('sipi.line-length-design/2', 'sipi.line-length-design/3'))
+    assert new == dict(old, schema='sipi.line-length-design/3')
+
+
+def test_band2_with_line8_is_the_standalone_line8_bit_for_bit(panel2):
+    from sipi.band import NetworkBandDocument, assess_band
+    doc, direct = panel2
+    out = NetworkBandDocument(wrap(doc), limits=LIMITS, schema='sipi.network-band/2').analyze()
+    expected = assess_band(direct.network, LIMITS)
+    np.testing.assert_array_equal(out.network.s, direct.network.s)
+    assert out.extraction.input_json == doc.dumps()
+    assert out.checks == expected.checks and out.passed == expected.passed
+
+
+def test_length_design3_with_line8_is_the_standalone_line8_bit_for_bit():
+    from sipi.length_design import LineLengthDesignDocument
+    doc = Line8.from_dict(dict(line8(frequency=TWO).to_dict(), length_m=0.))
+    direct = doc.analyze()
+    design = LineLengthDesignDocument(wrap(doc), bounds=[0, 10], limits=LIMITS,
+                                      schema='sipi.line-length-design/3')
+    out = design.solve()
+    for key in 'RLGC':
+        np.testing.assert_array_equal(getattr(out.extraction, key), getattr(direct, key))
+    resolved = json.loads(out.resolved_network_json)
+    reference = LineLengthDesignDocument(resolved, bounds=[0, 10], limits=LIMITS).solve()
+    assert out.history == reference.history
+    assert (out.feasible_length_m, out.infeasible_length_m) == \
+        (reference.feasible_length_m, reference.infeasible_length_m)
+    assert out.feasible.checks == reference.feasible.checks

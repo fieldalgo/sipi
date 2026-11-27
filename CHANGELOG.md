@@ -1,5 +1,8 @@
 # Changelog
 
+- Add `sipi.network-band/2` and `sipi.line-length-design/3`, which admit a nested `sipi.transmission-line/8` (band/2 also an assembly/2 or transforms/3). The line runs unchanged: the assessed network and checks, and the extracted R/L/G/C of a length design, are bit-identical to the line alone. Band/1 and length-design/2 are unchanged and refuse transmission-line/8; existing documents and results are byte-identical.
+  `sipi.network-band/2`와 `sipi.line-length-design/3`을 추가합니다. 내부 `sipi.transmission-line/8`을 받습니다(band/2는 assembly/2·transforms/3도). 선로를 그대로 실행하므로 평가 네트워크·검사와 길이 설계의 추출 R/L/G/C가 선로 단독 결과와 비트 단위로 같습니다. band/1과 length-design/2는 바뀌지 않고 transmission-line/8을 거절하며, 기존 문서와 결과는 바이트 단위로 같습니다.
+
 - Add `sipi.network-assembly/2` and `sipi.network-transforms/3`, which admit `sipi.transmission-line/8` components, base networks and fixtures (transforms/3 also takes an assembly/2 base); `sipi.circuit/2` admits both. Fields and operations are those of assembly/1 and transforms/2, and the line runs unchanged, so source networks are bit-identical to the line alone. Earlier versions are unchanged and refuse the new nested schemas; existing documents and results are byte-identical.
   `sipi.network-assembly/2`와 `sipi.network-transforms/3`을 추가합니다. `sipi.transmission-line/8` 구성 요소·기본 네트워크·fixture를 받고(transforms/3은 assembly/2 기본 네트워크도 받음), `sipi.circuit/2`는 둘 다 받습니다. 필드와 연산은 assembly/1·transforms/2와 같고 선로를 그대로 실행하므로 원본 네트워크가 선로 단독 결과와 비트 단위로 같습니다. 이전 버전은 바뀌지 않고 새 중첩 스키마를 거절하며, 기존 문서와 결과는 바이트 단위로 같습니다.
 

@@ -76,3 +76,12 @@ python -m pytest -q tests/sipi/test_band.py tests/sipi/test_network_document.py 
 ```
 
 [선로 길이 경계 역산](length_design.md)은 여러 표본별 제한을 균일 RLGC 길이 탐색에 적용합니다.
+
+## 버전 2: 기본 panel 선로
+
+명시한 `sipi.network-band/2`는 버전 1과 필드가 같습니다. 원본 네트워크로
+[`sipi.transmission-line/8`](default_line.md) 문서나, 이를 담은
+[`sipi.network-assembly/2`](network_assembly.md)·[`sipi.network-transforms/3`](network_document.md)도
+받습니다. 선로는 그대로 실행되므로 평가 네트워크와 모든 표본 검사가 선로 단독 해석과
+비트 단위로 같습니다. 버전 1은 바뀌지 않으며 이 중첩 스키마들을 `nested ... requires`
+메시지로 거절합니다.

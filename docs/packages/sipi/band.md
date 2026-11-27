@@ -80,3 +80,13 @@ python -m pytest -q tests/sipi/test_band.py tests/sipi/test_network_document.py 
 ```
 
 [Line-length boundary design](length_design.md) applies several sampled limits to a uniform RLGC length bracket.
+
+## Version 2: default panel lines
+
+Explicit `sipi.network-band/2` has the fields of version 1. Its source also
+accepts a [`sipi.transmission-line/8`](default_line.md) document, or a
+[`sipi.network-assembly/2`](network_assembly.md) or
+[`sipi.network-transforms/3`](network_document.md) that contains one. The line
+runs unchanged, so the assessed network and every sampled check equal those of
+the line analyzed on its own, bit for bit. Version 1 is unchanged and refuses
+these nested schemas with a `nested ... requires` message.
