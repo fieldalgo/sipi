@@ -3,6 +3,7 @@
 """The stored finite-resolution study record and its opt-in gate, without field solves."""
 import importlib
 import json
+from types import SimpleNamespace
 from pathlib import Path
 import numpy as np
 import pytest
@@ -61,3 +62,29 @@ def test_matrix_relative_scale():
     assert support.matrix_relative([1., 2.+4e-9], [1., 2.]) == pytest.approx(2e-9)
     with pytest.raises(AssertionError):
         support.matrix_relative([1.], [1., 2.])
+
+
+def line(variant, mesh, scale=1.):
+    """A stand-in for a solved line carrying a recorded variant's values, scaled."""
+    q = {key: np.asarray(value, dtype=float) * scale for key, value in variant['quantities'].items()}
+    return SimpleNamespace(R=q['R_ohm_per_m'], C=q['C_f_per_m'], G=q['G_s_per_m'],
+        conductor=SimpleNamespace(L_internal=q['L_internal_h_per_m']),
+        dielectric=SimpleNamespace(C0=q['C0_f_per_m'][0], L=q['L_external_h_per_m'][0]),
+        mesh_record=lambda: dict(mesh, signal_nodes=[]))
+
+
+def test_mesh_variants_take_the_exact_path_and_unknown_meshes_the_tolerance_path():
+    name = 'test_two_ground_linear_corner_face_resolution'
+    variants = DATA['modules'][name]['cases'][0]['variants']
+    assert support.MATRIX_RELATIVE < 2.2e-5 < support.MESH_VARIANT_RELATIVE <= .01 / 100
+    for row in variants:
+        path, labels, errors = support.compare(name, 0, line(row, row['dielectric_mesh']))
+        assert path == 'exact' and labels == row['recorded_by'] and max(errors.values()) == 0
+        with pytest.raises(AssertionError):
+            support.compare(name, 0, line(row, row['dielectric_mesh'], 1 + 1e-8))
+    other = dict(nodes_float64_le_sha256='0' * 64, triangles_int64_le_sha256='0' * 64)
+    path, labels, errors = support.compare(name, 0, line(variants[0], other, 1 + 5e-5))
+    assert path == 'tolerance' and labels == variants[0]['recorded_by']
+    assert max(errors.values()) == pytest.approx(5e-5, rel=1e-6)
+    with pytest.raises(AssertionError):
+        support.compare(name, 0, line(variants[0], other, 1 + 2e-4))

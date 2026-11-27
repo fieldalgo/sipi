@@ -195,7 +195,11 @@ regular partitions each study's base line is solved and must reproduce the value
 with the study in `tests/sipi/reference_data/resolution_studies/finite-resolution-studies.json`
 within a matrix-relative 1e-9. The mesher may triangulate exact cocircular ties differently by
 platform (macOS in the recorded runs), so the record keeps one variant per dielectric mesh
-(SHA-256 of nodes and triangles); a mesh matching no variant fails. The accuracy and
+(SHA-256 of nodes and triangles). A mesh equal to a variant must match it within 1e-9; a
+mesh matching no variant, such as a new runner image's triangulation, is compared with the
+closest variant within a matrix-relative 1e-4, above the largest recorded difference between
+the two meshes (2.2e-5) and a hundred times below the 1% study criterion. The JUnit property
+`resolution_study_reproduction` records which path was taken. The accuracy and
 convergence checks therefore stay in the regular suite as reproduction of the studied
 resolution, and the study criteria themselves are unchanged.
 
