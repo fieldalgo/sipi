@@ -290,6 +290,7 @@ _REGISTRY = {
     'sipi.network-assembly/1': NetworkAssemblyDocument,
     **{f'sipi.network-transforms/{v}': NetworkTransformDocument for v in (1, 2)},
     'sipi.circuit/1': CircuitDocument,
+    'sipi.circuit/2': CircuitDocument,
     'sipi.capacitance-3d/1': Capacitance3DDocument,
     'sipi.network-band/1': NetworkBandDocument,
     'sipi.line-length-design/1': LineLengthDesignDocument,

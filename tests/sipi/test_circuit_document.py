@@ -108,7 +108,7 @@ def test_reject_invalid_complex_inputs(value):
 
 
 @pytest.mark.parametrize('edit', [
-    lambda d: d.update(schema='sipi.circuit/2'),
+    lambda d: d.update(schema='sipi.circuit/3'),
     lambda d: d.update(extra=True),
     lambda d: d['network'].update(kind='url'),
     lambda d: d['network'].update(R=[[True]]),

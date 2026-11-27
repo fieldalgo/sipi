@@ -454,6 +454,8 @@ def documents():
     from sipi.default_line import DefaultPanelTransmissionLineDocument
     base.append(DefaultPanelTransmissionLineDocument(cross(), [1e3, 2e3], materials={}, conductor={'kind': 'perfect'},
                                                      length=.1, current_method='volume-p1'))
+    base.append(CircuitDocument(dict(kind='transmission-line', document=base[-1].to_dict()),
+        excitation=dict(kind='sources', voltages={'near:signal': 1}), terminations={}, schema='sipi.circuit/2'))
     surface = dict(kind='surface', conductivity=58e6, ground_thickness=35e-6, relative_permeability=1.,
                    roughness=dict(kind='hammerstad', rms_m=0.))
     surface_line = TransmissionLineDocument(cross(), [1e9, 2e9], materials={}, conductor=surface, length=.1,
