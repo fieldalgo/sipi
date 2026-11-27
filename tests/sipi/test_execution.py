@@ -469,6 +469,16 @@ def documents():
     zero = dict(line8_network, document=dict(line8_network['document'], length_m=0.))
     base.append(LineLengthDesignDocument(zero, bounds=[0, 10], limits=line8_limits,
                                          schema='sipi.line-length-design/3'))
+    surface = dict(kind='surface', conductivity=58e6, ground_thickness=35e-6, relative_permeability=1.,
+                   roughness=dict(kind='hammerstad', rms_m=0.))
+    surface_line = TransmissionLineDocument(cross(), [1e9, 2e9], materials={}, conductor=surface, length=.1,
+                                            schema='sipi.transmission-line/2')
+    from sipi.recovered_line import RecoveredTransmissionLineDocument
+    base.append(RecoveredTransmissionLineDocument(surface_line))
+    base.append(MethodTransmissionLineDocument(surface_line, current_method='volume-p1-recovered',
+        recovery=dict(support_fraction=.4), schema='sipi.method-transmission-line/2'))
+    base.append(DefaultPanelTransmissionLineDocument(cross(), [1e9, 2e9], materials={}, conductor=surface,
+        length=.1, current_method='volume-p1-recovered', schema='sipi.transmission-line/9'))
     from sipi.open_panel_line import OpenPanelTransmissionLineDocument
     from sipi.templates import unbacked_coplanar
     base.append(OpenPanelTransmissionLineDocument(TransmissionLineDocument(

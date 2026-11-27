@@ -57,3 +57,40 @@ stripline 10종, 벽에 자신의 크기보다 가까운 grounded coplanar·copl
 폭/높이 64까지의 적층 coplanar stripline 3종이 계산됩니다). 접지 평면이 없는 단면 18종은
 [open-box panel 선로](open_panel_line.md)를 씁니다. 다른 경계 조합(예: 접지된 옆면)은
 거절됩니다. 기존 전송선 문서와 결과는 바뀌지 않습니다.
+
+## 버전 2: 복원 전류
+
+`sipi.method-transmission-line/2`는 같은 `panel`·`volume-p1` 값을 같은 의미와 같은
+대응 문서로 받고, `volume-p1-recovered`를 더 받습니다. 버전 1은 두 값만 그대로 받고
+세 번째 값은 버전 2를 안내하며 거절합니다. 공개한 스키마는 받는 값을 정합니다. 새
+값을 가진 버전 1 문서는 이미 배포된 읽기에서 거절되고, 스키마만으로는 그 값이 어떤
+계산인지 알 수 없습니다. 그래서 `CURRENT_METHODS`(그대로 `('panel', 'volume-p1')`)를
+넓히지 않고 새 버전으로 값을 늘렸습니다. `METHODS_BY_SCHEMA`에 버전별 값이 있습니다.
+
+`volume-p1-recovered`는 (0, 0.5) 안의 `support_fraction`을 가진 `recovery`가 필요하며
+`sipi.recovered-transmission-line/1`(`sipi.recovered_line`의
+`RecoveredTransmissionLineDocument`)을 실행합니다. 이 문서는 감싼 transmission-line/1–/7과
+그 저장 메시를 그대로 쓰고, 그 메시에서 표면 전류 계수만
+[`recovered_surface_current_factors`](conductor.md)로 바꿉니다(같은 P1 기저와 C0). 그래서
+C, G, 외부 L은 `volume-p1`과 비트 단위로 같고, R과 내부 L은 같은 표면 임피던스 법칙에
+복원 계수를 씁니다.
+
+| 도체 | `volume-p1-recovered` |
+|---|---|
+| `surface` | 모든 표면에 행렬 하나, `volume-p1`과 같은 방식 |
+| `surface-boundaries` | 경계별 계수에 각 신호·기준 금속 |
+| `perfect` | 거절: 표면 전류 손실이 없음, `volume-p1` 사용 |
+| `surface-faces` | 거절: 복원은 면별 계수를 주지 않음 |
+
+볼록 직각이 아닌 모서리(사다리꼴·예각·오목), 다른 도체에 닿거나 법선 성분을 가진 채
+열린 벽에 닿는 지지, 5%를 넘는 경계 기울기 플럭스 오차는 `analyze()`에서 사유와 함께
+거절합니다. 거절을 다른 방법으로 바꾸지 않습니다. `sipi run`과 `execute_saved`는
+`current_method`와 `current_solver`(`kind`, `settings`, `support_width`·`clearance`·
+`support_triangles`·`corners`·`gradient_current_error`가 든 `diagnostics`, 계수와 전류
+적분)를 더합니다.
+
+```python
+saved = MethodTransmissionLineDocument(line, current_method='volume-p1-recovered',
+    recovery=dict(support_fraction=0.4), schema='sipi.method-transmission-line/2')
+result = saved.analyze()
+```

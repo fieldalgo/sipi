@@ -67,10 +67,29 @@ P1을 명시해 고를 수 있다고 알려 줍니다.
   적분 수렴이 그것입니다.
 
 전송선을 담는 문서(회로, 스터디, panel 선로, 방법 명시 선로 등)는 transmission-line/1–/7을
-받고 /8은 거절합니다. P1으로 조용히 계산하지 않습니다. 새 컨테이너 버전은 /8을 명시적으로
+받고 /8·/9는 거절합니다. P1으로 조용히 계산하지 않습니다. 새 컨테이너 버전은 /8을 명시적으로
 받습니다. [`sipi.circuit/2`](circuit_document.md#버전-2-기본-panel-선로)는 내부
 transmission-line/8을 그대로 실행하며 결과는 선로 단독 결과와 비트 단위로 같습니다.
 [`sipi.network-assembly/2`](network_assembly.md#버전-2-기본-panel-선로)와
 [`sipi.network-transforms/3`](network_document.md#버전-3-기본-panel-선로),
 [`sipi.network-band/2`](band.md#버전-2-기본-panel-선로),
 [`sipi.line-length-design/3`](extracted_length.md#버전-3-기본-panel-선로)도 같습니다.
+
+## 버전 9: 이름으로 고르는 복원 방법
+
+`sipi.transmission-line/9`(같은 클래스, `schema='sipi.transmission-line/9'`)는 버전 8의
+필드에 선택 필드 `recovery`를 더합니다. `current_method: "volume-p1-recovered"`도 받지만
+이름을 적을 때만입니다. 기본값은 계속 `panel`이고, panel·`volume-p1` 문서는 버전 8과
+똑같이 실행됩니다. `recovery`(`support_fraction`, 생략하면 `DEFAULT_RECOVERY_CONTROLS`의
+0.4)는 저장 문서에 적힙니다. 다른 방법에서는 `recovery`를, 복원 방법에서는 `panel`을
+거절합니다. 버전 8은 두 값만 받고 `recovery`를 거절합니다. `method_document()`는
+`sipi.method-transmission-line/2` 문서를 돌려주며, 이것이
+[복원 선로](method_line.md#버전-2-복원-전류)를 실행합니다. 복원 방법에서 `perfect`·
+`surface-faces` 도체는 거절합니다.
+
+```python
+saved = DefaultPanelTransmissionLineDocument(geometry, [1e9, 5e9], materials={}, length=.02,
+    conductor=conductor, current_method='volume-p1-recovered',
+    schema='sipi.transmission-line/9')
+saved.to_dict()['recovery']   # {'support_fraction': 0.4}
+```

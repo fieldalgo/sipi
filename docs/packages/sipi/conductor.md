@@ -233,7 +233,10 @@ the same dielectric-only P1 mesh and conductor node sets as
 `surface_current_factors`, solves the same vacuum basis and returns the same
 C0; only the surface integrals differ. `surface_current_factors`, the
 `volume-p1` method, the panel default and every saved document and result are
-unchanged. This function is not yet selectable from saved documents.
+unchanged. Saved lines select it by name as `current_method:
+"volume-p1-recovered"` in `sipi.method-transmission-line/2` or
+`sipi.transmission-line/9` ([method lines](method_line.md#version-2-recovered-currents));
+the default stays panel.
 
 The boundary integral of a product of normal derivatives is replaced by its
 domain (Hadamard) form, which is Wheeler's incremental-inductance rule: each
