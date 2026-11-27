@@ -130,10 +130,10 @@ def test_interrupt_not_converted(monkeypatch):
 
 
 @pytest.mark.parametrize('index',[0])
-def test_base_resolution_reproduces_the_recorded_study(index):
+def test_base_resolution_reproduces_the_recorded_study(index,record_property):
     """The study below runs only on dispatch (tests/_support/resolution_studies.py); its base
     line, the resolution the study starts from, must keep the values recorded with it."""
-    reproduce('test_two_ground_harmonic_guard_corner_face_resolution',index,inputs(index)[0])
+    reproduce('test_two_ground_harmonic_guard_corner_face_resolution',index,inputs(index)[0],record_property)
 
 
 if STUDIES:  # dispatch-only finite-resolution study (tests/_support/resolution_studies.py)
