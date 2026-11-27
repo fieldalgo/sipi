@@ -3,12 +3,21 @@
 """Reject missing, overlapping, incomplete or inconsistent validation partitions."""
 import argparse
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 
+_spec = importlib.util.spec_from_file_location('sipi_pytest_shard', Path(__file__).with_name('pytest_shard.py'))
+shard = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(shard)
 
-def verify(reports, *, collect_only=False):
-    """Require an exact partition and, normally, execution of every collected case."""
+
+def verify(reports, *, collect_only=False, durations=shard.DURATIONS):
+    """Require an exact partition and, normally, execution of every collected case.
+
+    Each selection must equal the assignment ``tools/pytest_shard.py`` computes from the
+    recorded durations table, whose SHA-256 every report must carry.
+    """
     if not reports:
         raise ValueError('no partition reports')
     first = reports[0]
@@ -22,22 +31,21 @@ def verify(reports, *, collect_only=False):
     if not original or len(set(original)) != len(original):
         raise ValueError('empty or duplicate original collection')
     checksum = hashlib.sha256(json.dumps(original, ensure_ascii=True, separators=(',', ':')).encode('ascii')).hexdigest()
+    table = shard.durations_digest(durations)
     union = set()
     sizes = []
     for report in reports:
-        if report['schema'] != 'sipi.pytest-partition/1' or report['count'] != count:
+        if report['schema'] != shard.SCHEMA or report['count'] != count:
             raise ValueError('inconsistent partition contract')
+        if report['durations_sha256'] != table:
+            raise ValueError('partition used a different durations table')
         if report['all_nodeids'] != original or report['collection_sha256'] != checksum:
             raise ValueError('different original collection')
         if report['collection_errors'] != 0 or report['exit_status'] != 0 or report['collect_only'] is not collect_only:
             raise ValueError('failed, interrupted or unexecuted partition')
         selected = report['selected_nodeids']
-        expected = []
-        for nodeid in original:
-            module = nodeid.split('::', 1)[0].replace('\\', '/')
-            assigned = int(hashlib.sha256(module.encode('utf-8')).hexdigest(), 16) % count
-            if assigned == report['index']:
-                expected.append(nodeid)
+        expected = [nodeid for nodeid in original
+                    if shard.partition(nodeid, count, durations) == report['index']]
         if not selected or selected != expected:
             raise ValueError('partition selection differs from its module assignment')
         if union.intersection(selected):

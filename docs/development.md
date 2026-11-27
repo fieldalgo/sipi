@@ -73,9 +73,12 @@ ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 ## Continuous validation
 
 The validation workflow runs source and installed-artifact regression in separate
-Linux, macOS and Windows jobs, with eight partitions per suite. Each job retains
-a six-hour limit. Whole test modules are assigned by a stable SHA-256 of their
-relative path, keeping module fixtures together. All cases are collected before
+Linux, macOS and Windows jobs, with sixteen partitions per suite. Each job retains
+a six-hour limit. Whole test modules are assigned, keeping module fixtures together:
+modules listed in `tools/shards/durations.json` (seconds per module from the JUnit
+XML of a complete CI run) go largest first to the partition with the least recorded
+time; a module missing from the table keeps the stable SHA-256 of its relative path.
+All cases are collected before
 selection; a partition does not relax numerical criteria or mark omitted cases
 as skipped. It runs for ready pull
 requests, main pushes and pushes to the current independent-repository development
@@ -100,16 +103,27 @@ does not establish validation of a newer branch head.
 `tools/pytest_shard.py` is an opt-in validation plugin, not a runtime dependency.
 The ordinary local pytest and installed-check commands remain unpartitioned.
 For an individual source partition, append `-p tools.pytest_shard
---sipi-shard-count=8 --sipi-shard-index=0
+--sipi-shard-count=16 --sipi-shard-index=0
 --sipi-shard-report=.validation/source-shard.json` to the source command above;
-use indices 0 to 7 in separate runs with fresh report paths. For the installed
-runner, use `--shard-count=8 --shard-index=0`; it copies the plugin outside the
-checkout and still audits all four wheels and clears PYTHONPATH.
+use indices 0 to 15 in separate runs with fresh report paths. For the installed
+runner, use `--shard-count=16 --shard-index=0`; it copies the plugin and the
+durations table outside the checkout and still audits all four wheels and clears
+PYTHONPATH.
 
-The manifest retains every original node ID, its collection hash, the selected
+Refresh the durations table when modules are added or their times change much:
+download the `validation-ubuntu-latest-source-<i>` artifacts of one complete run
+(`gh api repos/fieldalgo/sipi/actions/runs/<id>/artifacts`), then from the
+repository root run `python tools/pytest_shard.py --update <every source.xml>
+--source "<run, commit, date, files>"`. The table records its source and command.
+`tools/tests/test_shard_durations.py` checks its format, the deterministic plan, the
+balance bound and that no module exceeds 1.1 times a sixteenth of the recorded suite.
+
+The manifest (`sipi.pytest-partition/2`) retains every original node ID, its
+collection hash, the SHA-256 of the canonical durations table, the selected
 IDs, completed IDs and exit status. Existing manifests are refused, and missing
 or partial execution cannot establish a passing suite. `tools/check_shards.py`
-requires all indices, identical original collections, exact disjoint coverage
+requires all indices, identical original collections, the checkout's durations
+table, selections equal to the plan computed from it, exact disjoint coverage
 and successful completion of every selected case. Its explicit `--collect-only`
 mode verifies discovery only and reports `executed: false`.
 The workflow's final coverage job checks all six platform/suite groups and the
@@ -121,8 +135,12 @@ platform or guarantee that future test growth fits the time limit.
 With three partitions, the largest partition held 4.7 hours of recorded
 test time on Linux, and runner speed varied enough that Linux and Windows
 jobs exceeded six hours and were cancelled. With eight, the same module
-times give at most 2.1 hours per partition; the hash assignment is not
-time-balanced, so later growth must be checked again.
+times give at most 2.1 hours per partition. Validate run 45965021952 recorded
+854 minutes of Linux source test time in eight hash-assigned partitions of 84 to
+148 minutes, and jobs of 72 to 210 minutes across the three platforms. The same
+module times balanced over sixteen partitions give 53 minutes each; runner speed
+still varies, and a module absent from the table is not balanced, so later growth
+must be checked again.
 
 The paired surface-conductor and Cannonball refinement tests record
 `conductor_refinement` JSON in their JUnit testcase properties before checking
