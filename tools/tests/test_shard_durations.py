@@ -116,3 +116,27 @@ def test_update_sums_junit_times_per_module(tmp_path):
                              '--source', 'run 1', '--output', str(output)],
                             cwd=tmp_path, capture_output=True, text=True)
     assert result.returncode != 0 and 'no test module' in result.stderr
+
+
+def test_update_leaves_out_cases_no_longer_collected(tmp_path):
+    (tmp_path / 'tests').mkdir()
+    for name in ('test_a.py', 'test_b.py'):
+        (tmp_path / 'tests' / name).write_text('', encoding='utf-8')
+    xml = tmp_path / 'part.xml'
+    xml.write_text('<testsuites><testsuite>'
+                   '<testcase classname="tests.test_a" name="kept[0]" time="1"/>'
+                   '<testcase classname="tests.test_a" name="moved[0]" time="30"/>'
+                   '<testcase classname="tests.test_a.TestGroup" name="kept" time="2"/>'
+                   '<testcase classname="tests.test_b" name="other" time="4"/>'
+                   '</testsuite></testsuites>', encoding='utf-8')
+    collected = tmp_path / 'collected.txt'
+    collected.write_text('tests/test_a.py::kept[0]\ntests/test_a.py::TestGroup::kept\n\n3 tests collected\n',
+                         encoding='utf-8')
+    output = tmp_path / 'durations.json'
+    result = subprocess.run([sys.executable, str(TOOLS / 'pytest_shard.py'), '--update', str(xml),
+                             '--source', 'run 1', '--output', str(output), '--collected', str(collected)],
+                            cwd=tmp_path, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    # test_b is not in the collection list at all, so its recorded time is kept.
+    assert shard.load_durations(output) == {'tests/test_a.py': 3.0, 'tests/test_b.py': 4.0}
+    assert json.loads(output.read_text())['command'].endswith('--collected <node IDs>')

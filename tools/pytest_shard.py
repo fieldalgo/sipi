@@ -171,19 +171,32 @@ def case_module(classname, root):
     return '/'.join(module) + '.py' if module and module[-1].startswith('test_') else None
 
 
-def update(xml_paths, source, output=DURATIONS, root=Path('.')):
-    """Sum the JUnit test-case times per module and write the table."""
+def case_nodeid(case, module):
+    """The pytest node ID of a JUnit test case in ``module``."""
+    classes = case.get('classname', '').split('.')[len(module[:-3].split('/')):]
+    return '::'.join([module, *classes, case.get('name', '')])
+
+
+def update(xml_paths, source, output=DURATIONS, root=Path('.'), collected=None):
+    """Sum the JUnit test-case times per module and write the table.
+
+    With ``collected`` (a set of node IDs), cases no longer collected are left out, so tests
+    moved out of the regular suite stop counting.
+    """
     seconds = {}
+    modules = None if collected is None else {nodeid.split('::', 1)[0] for nodeid in collected}
     for xml_path in xml_paths:
         for case in ET.parse(xml_path).getroot().iter('testcase'):
             module = case_module(case.get('classname', ''), root)
             if module is None:
                 raise SystemExit(f'{xml_path}: no test module for {case.get("classname")!r}; '
                                  'run from the repository root')
+            if modules is not None and module in modules and case_nodeid(case, module) not in collected:
+                continue
             seconds[module] = seconds.get(module, 0.0) + float(case.get('time', 0) or 0)
     table = dict(source=source,
                  command='python tools/pytest_shard.py --update <source JUnit XML of every partition> '
-                         '--source <run>',
+                         '--source <run>' + (' --collected <node IDs>' if collected is not None else ''),
                  seconds={k: round(v, 1) for k, v in sorted(seconds.items())})
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     Path(output).write_text(json.dumps(table, indent=1) + '\n', encoding='utf-8')
@@ -196,8 +209,15 @@ def main(argv=None):
                         help='source JUnit XML of every partition of one complete run')
     parser.add_argument('--source', required=True, help='where the times come from (run, commit, date)')
     parser.add_argument('--output', type=Path, default=DURATIONS)
+    parser.add_argument('--collected', type=Path, default=None,
+                        help='node IDs collected now, one per line (pytest --collect-only -q); '
+                             'cases of these modules that are not listed are left out')
     args = parser.parse_args(argv)
-    table = update(args.update, args.source, args.output)
+    collected = None
+    if args.collected is not None:
+        collected = {line.strip() for line in args.collected.read_text(encoding='utf-8').splitlines()
+                     if '::' in line}
+    table = update(args.update, args.source, args.output, collected=collected)
     total = sum(table['seconds'].values())
     absent = [name for name in table['seconds'] if not Path(name).is_file()]
     print(f"{len(table['seconds'])} modules, {total / 60:.1f} min, {len(absent)} not in this checkout, "
