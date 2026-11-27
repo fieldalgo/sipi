@@ -11,9 +11,10 @@ Keep the printed token private. This does not publish a website.
 This focused entry reuses the existing engine, LocalTransport/BrowserTransport,
 and `sipi.template-section/1` input format. It offers equal rectangular
 microstrip and centred stripline pairs, constant uniform relative permittivity,
-ideal ground planes and lossless quasi-static differential/common impedances.
-It does not compute conductor loss, manufacturing yield, broadband compliance
-or three-dimensional transitions. The ordinary workbench remains available.
+ideal ground planes and lossless quasi-static differential/common impedances,
+plus per-metre conductor loss (see below). It does not compute manufacturing
+yield, broadband compliance, channel insertion loss or three-dimensional
+transitions. The ordinary workbench remains available.
 
 Enter millimetres, relative permittivity and explicit box/air dimensions.
 Find width holds the edge-to-edge gap fixed and varies both widths together.
@@ -140,3 +141,53 @@ not a scaled layout or a fabrication coupon. W is each trace width, S the edge-t
 gap, H the substrate height or total ground-plane spacing, and T copper thickness.
 For stripline the traces remain centred between the planes. The full workbench
 continues to provide the broader set of supported engine structures.
+
+## Conductor loss
+
+**Conductor loss** sits below the width search. Enter the conductivity in MS/m
+(58 for annealed copper), the surface roughness (smooth, or the empirical
+Hammerstad correction with an RMS height in µm) and up to 16 frequencies in GHz
+separated by commas. **Calculate conductor loss** uses only existing public
+engine paths: it resolves the current cross-section with the ordinary
+`document` action, then runs a saved `sipi.transmission-line/8` line through
+`saved-analyze` with the `modes` diagnostic. Line/8 uses the panel conductor
+currents by default, and the engine saves its default panel controls
+(64 panels per edge, 512 ground modes, interpolation degree 14 for both pair
+structures). The page chooses no numerical settings. Traces and the ground plane
+use one surface metal; the ground thickness is the copper thickness T. The line
+is 1 m long with a 50 Ω port reference, which does not affect the per-metre
+values shown.
+
+For each frequency the table shows the self and mutual resistance in Ω/m, the
+differential and common conductor attenuation in dB/m, and the dielectric
+attenuation of both modes in a separate column. The attenuation is the engine's
+single-mode contribution `alpha_conductor` (Np/m, converted with 20/ln 10);
+the differential mode is the one whose conductor voltages have opposite signs.
+This preview keeps tan δ = 0, so the dielectric column is zero. The values are
+per-metre line properties, not insertion loss of a terminated channel.
+
+A calculation usually takes a few seconds (about 5 s for each preset at three
+frequencies on the local Linux build); some cross-sections take tens of seconds,
+and the first browser-runtime calculation also loads the engine. The status
+line counts the elapsed seconds, and **Cancel** stops the calculation. The
+engine refuses inputs outside its conductor model (for example a skin depth
+too large for the copper thickness, or T = 0); the message appears in red and
+nothing is retained.
+
+A geometry, preset, material-note, open or width-search change, or any change of
+the loss inputs, clears the loss result. Calculating the impedance clears it as
+well; calculating loss keeps the impedance result. **Export loss record**
+downloads `sipi-pair-conductor-loss.json` with the geometry request, the loss
+settings, the exact line/8 text, the engine's `sipi.execution/1` result
+(R, L, G, C, network and modes) and the material labels. `execution.input` is
+the normalized line/8 document and can be run again with `sipi run`. Loss
+settings are not stored in the saved design: its `sipi.template-section/1`
+format is unchanged, and existing design files open as before. The A/B
+comparison still compares impedance only.
+
+The browser acceptance test calculates the Surface pair loss, checks the line/8
+input, panel controls and displayed values against the exported engine result,
+then checks a refused frequency, cancellation and invalidation by an edit.
+These checks ran on Linux Chromium with the local native engine only; the
+staged browser (Pyodide) runtime, other browsers and operating systems were not
+checked.

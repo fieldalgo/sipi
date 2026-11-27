@@ -1,5 +1,8 @@
 # Changelog
 
+- Add per-metre conductor loss to the pair preview: self/mutual R(f), differential and common conductor attenuation in dB/m and a separate dielectric column, from a saved `sipi.transmission-line/8` line (default panel currents) and the existing `modes` diagnostic. Inputs are conductivity, smooth or Hammerstad roughness and up to 16 frequencies; the result can be exported. Engine, schemas, numerical settings and the saved design format are unchanged.
+  차동 쌍 미리보기에 m당 도체 손실을 추가했습니다. 저장형 `sipi.transmission-line/8` 선로(기본 panel 전류)와 기존 `modes` 진단으로 자기·상호 R(f), 차동·공통 도체 감쇠(dB/m), 별도 유전 감쇠 열을 보여 줍니다. 입력은 전도율, 매끈함 또는 Hammerstad 거칠기, 최대 16개 주파수이며 결과를 내보낼 수 있습니다. 엔진, 스키마, 수치 설정, 저장 설계 형식은 그대로입니다.
+
 - Remove the pair-preview number arrow buttons from the Tab order (ArrowUp/ArrowDown in each field still nudge), shortening the keyboard path from presets to Find width from 45 to 23 stops. Increments and values are unchanged.
   차동 쌍 미리보기의 숫자 화살표 버튼을 Tab 순서에서 뺐습니다(각 칸의 ArrowUp/ArrowDown은 그대로). 프리셋에서 Find width까지 키보드 정지가 45개에서 23개로 줄었습니다. 증분과 수치는 그대로입니다.
 
