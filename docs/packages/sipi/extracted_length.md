@@ -78,6 +78,8 @@ python -m pytest -q tests/sipi/test_extracted_length_design.py tests/sipi/test_l
 
 ## Version 3: default panel lines
 
+Each nested `sipi.transmission-line/8` below may also be a [`sipi.transmission-line/9`](default_line.md#version-9-the-recovered-method-by-name), including one that names `volume-p1-recovered`; its recovery controls are written into the saved document and the line runs unchanged, bit-identical to the line alone. Older versions refuse /9 as they refuse /8.
+
 Explicit `sipi.line-length-design/3` is version 2 whose zero-length source may
 also be a [`sipi.transmission-line/8`](default_line.md) document. Its band is
 normalized as `sipi.network-band/2`. The line is extracted once, unchanged, so

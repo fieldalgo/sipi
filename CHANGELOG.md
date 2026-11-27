@@ -1,5 +1,8 @@
 # Changelog
 
+- The new container versions (`sipi.circuit/2`, `sipi.network-assembly/2`, `sipi.network-transforms/3`, `sipi.network-band/2`, `sipi.line-length-design/3`) also admit a nested `sipi.transmission-line/9`, including one that names `volume-p1-recovered`. The line runs unchanged, with its recovery controls written into the saved document, so networks, R/L/G/C, terminal responses, band checks and length brackets are bit-identical to the line alone. Earlier versions refuse /9; existing documents and results are byte-identical.
+  새 컨테이너 버전(`sipi.circuit/2`, `sipi.network-assembly/2`, `sipi.network-transforms/3`, `sipi.network-band/2`, `sipi.line-length-design/3`)이 내부 `sipi.transmission-line/9`(`volume-p1-recovered` 지정 포함)도 받습니다. 선로는 복원 설정이 저장 문서에 적힌 채 그대로 실행되어 네트워크·R/L/G/C·단자 응답·대역 검사·길이 구간이 선로 단독 결과와 비트 단위로 같습니다. 이전 버전은 /9를 거절하며, 기존 문서와 결과는 바이트 단위로 같습니다.
+
 - Add `sipi.network-band/2` and `sipi.line-length-design/3`, which admit a nested `sipi.transmission-line/8` (band/2 also an assembly/2 or transforms/3). The line runs unchanged: the assessed network and checks, and the extracted R/L/G/C of a length design, are bit-identical to the line alone. Band/1 and length-design/2 are unchanged and refuse transmission-line/8; existing documents and results are byte-identical.
   `sipi.network-band/2`와 `sipi.line-length-design/3`을 추가합니다. 내부 `sipi.transmission-line/8`을 받습니다(band/2는 assembly/2·transforms/3도). 선로를 그대로 실행하므로 평가 네트워크·검사와 길이 설계의 추출 R/L/G/C가 선로 단독 결과와 비트 단위로 같습니다. band/1과 length-design/2는 바뀌지 않고 transmission-line/8을 거절하며, 기존 문서와 결과는 바이트 단위로 같습니다.
 
