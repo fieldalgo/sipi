@@ -1,18 +1,85 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Opt-in, module-preserving pytest partitions with complete collection evidence."""
+"""Opt-in, module-preserving, time-balanced pytest partitions with complete collection evidence.
+
+Whole test modules are assigned to partitions. Modules listed in ``shards/durations.json``
+beside this file (recorded seconds per module from the JUnit XML of a complete CI run) are
+assigned largest first, each to the partition with the least recorded time so far (ties go to
+the lower index). A module missing from the table keeps the stable SHA-256 assignment of its
+relative path. The assignment depends only on the table, the partition count and the module
+path, never on platform, collection order or hash seed, so every partition and
+``tools/check_shards.py`` compute the same plan.
+
+Rebuild the table from the source JUnit XML of all partitions of one complete run, from the
+repository root::
+
+    python tools/pytest_shard.py --update source-*.xml --source "<run, commit, date, files>"
+"""
+import argparse
+import functools
 import hashlib
 import json
 from pathlib import Path
-import pytest
+import sys
+import xml.etree.ElementTree as ET
 
-SCHEMA = 'sipi.pytest-partition/1'
+try:
+    import pytest
+except ModuleNotFoundError:  # tools/check_shards.py recomputes the plan without pytest installed
+    pytest = None
+
+SCHEMA = 'sipi.pytest-partition/2'
+DURATIONS = Path(__file__).resolve().with_name('shards') / 'durations.json'
 
 
-def partition(nodeid, count):
-    """Assign a whole module, independently of platform, collection order or hash seed."""
-    module = nodeid.split('::', 1)[0].replace('\\', '/')
+def module_of(nodeid):
+    return nodeid.split('::', 1)[0].replace('\\', '/')
+
+
+def hashed(module, count):
+    """The stable path hash used for modules without a recorded time."""
     return int.from_bytes(hashlib.sha256(module.encode('utf-8')).digest(), 'big') % count
+
+
+def load_durations(path=DURATIONS):
+    data = json.loads(Path(path).read_text(encoding='utf-8'))
+    if set(data) != {'source', 'command', 'seconds'} or not isinstance(data['source'], str) or not data['source']:
+        raise ValueError(f'{path}: expected source, command and seconds')
+    seconds = data['seconds']
+    if not seconds or not all(isinstance(k, str) and k.endswith('.py') and '\\' not in k
+                              and type(v) in (int, float) and v >= 0 for k, v in seconds.items()):
+        raise ValueError(f'{path}: every entry must map a module path to seconds >= 0')
+    return seconds
+
+
+def durations_digest(path=DURATIONS):
+    """SHA-256 of the canonical table content, unchanged by line-ending conversion on checkout."""
+    data = json.loads(Path(path).read_text(encoding='utf-8'))
+    canonical = json.dumps(data, ensure_ascii=True, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canonical.encode('ascii')).hexdigest()
+
+
+def balance(seconds, count):
+    """Largest-first assignment of the recorded modules to the least-loaded partition."""
+    load = [0.0] * count
+    plan = {}
+    for module in sorted(seconds, key=lambda name: (-seconds[name], name)):
+        index = min(range(count), key=lambda i: (load[i], i))
+        plan[module] = index
+        load[index] += seconds[module]
+    return plan
+
+
+@functools.lru_cache(maxsize=None)
+def _plan(path, count):
+    return balance(load_durations(path), count)
+
+
+def partition(nodeid, count, durations=DURATIONS):
+    """Assign a whole module: by recorded time when listed, otherwise by its stable path hash."""
+    module = module_of(nodeid)
+    plan = _plan(str(durations), count)
+    return plan[module] if module in plan else hashed(module, count)
 
 
 def digest(nodeids):
@@ -47,6 +114,7 @@ class PartitionRun:
         self.report = report
         self.completed = []
         self.data = dict(schema=SCHEMA, index=index, count=count,
+                         durations_sha256=durations_digest(),
                          arguments=list(config.invocation_params.args),
                          collect_only=bool(config.getoption('collectonly')),
                          all_nodeids=[], selected_nodeids=[], completed_nodeids=[],
@@ -58,7 +126,7 @@ class PartitionRun:
         temporary.write_text(json.dumps(self.data, ensure_ascii=True, indent=2) + '\n', encoding='utf-8')
         temporary.replace(self.report)
 
-    @pytest.hookimpl(trylast=True)
+    @(pytest.hookimpl(trylast=True) if pytest else (lambda hook: hook))
     def pytest_collection_modifyitems(self, session, config, items):
         all_ids = [item.nodeid for item in items]
         if len(set(all_ids)) != len(all_ids):
@@ -82,3 +150,59 @@ class PartitionRun:
     def pytest_sessionfinish(self, session, exitstatus):
         self.data.update(completed_nodeids=self.completed, exit_status=int(exitstatus))
         self.save()
+
+
+def case_module(classname, root):
+    """The test module of a JUnit classname (dotted path, optionally followed by classes).
+
+    A module absent from this checkout (the run tested another commit) is named by the
+    dotted path up to its first capitalized (class) component.
+    """
+    parts = classname.split('.')
+    for n in range(len(parts), 0, -1):
+        path = Path(root).joinpath(*parts[:n]).with_suffix('.py')
+        if path.is_file():
+            return '/'.join(parts[:n]) + '.py'
+    module = []
+    for part in parts:
+        if not part or part[0].isupper():
+            break
+        module.append(part)
+    return '/'.join(module) + '.py' if module and module[-1].startswith('test_') else None
+
+
+def update(xml_paths, source, output=DURATIONS, root=Path('.')):
+    """Sum the JUnit test-case times per module and write the table."""
+    seconds = {}
+    for xml_path in xml_paths:
+        for case in ET.parse(xml_path).getroot().iter('testcase'):
+            module = case_module(case.get('classname', ''), root)
+            if module is None:
+                raise SystemExit(f'{xml_path}: no test module for {case.get("classname")!r}; '
+                                 'run from the repository root')
+            seconds[module] = seconds.get(module, 0.0) + float(case.get('time', 0) or 0)
+    table = dict(source=source,
+                 command='python tools/pytest_shard.py --update <source JUnit XML of every partition> '
+                         '--source <run>',
+                 seconds={k: round(v, 1) for k, v in sorted(seconds.items())})
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
+    Path(output).write_text(json.dumps(table, indent=1) + '\n', encoding='utf-8')
+    return table
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description='Rebuild the recorded module durations.')
+    parser.add_argument('--update', nargs='+', metavar='JUNIT_XML', required=True,
+                        help='source JUnit XML of every partition of one complete run')
+    parser.add_argument('--source', required=True, help='where the times come from (run, commit, date)')
+    parser.add_argument('--output', type=Path, default=DURATIONS)
+    args = parser.parse_args(argv)
+    table = update(args.update, args.source, args.output)
+    total = sum(table['seconds'].values())
+    absent = [name for name in table['seconds'] if not Path(name).is_file()]
+    print(f"{len(table['seconds'])} modules, {total / 60:.1f} min, {len(absent)} not in this checkout, "
+          f"written to {args.output}")
+
+
+if __name__ == '__main__':
+    sys.exit(main())

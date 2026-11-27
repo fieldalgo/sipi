@@ -55,6 +55,9 @@ def main():
             if args.shard_index is not None:
                 (outside / 'tools').mkdir()
                 shutil.copy2(root / 'tools' / 'pytest_shard.py', outside / 'tools' / 'pytest_shard.py')
+                (outside / 'tools' / 'shards').mkdir()
+                shutil.copy2(root / 'tools' / 'shards' / 'durations.json',
+                             outside / 'tools' / 'shards' / 'durations.json')
                 outcome['partition'] = dict(index=args.shard_index, count=args.shard_count)
                 partition_args = ['-p', 'tools.pytest_shard',
                                   '--sipi-shard-index=' + str(args.shard_index),
