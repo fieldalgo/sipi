@@ -1,0 +1,63 @@
+# Copyright 2026 Yongha Kim (FieldAlgo)
+# SPDX-License-Identifier: Apache-2.0
+"""The stored finite-resolution study record and its opt-in gate, without field solves."""
+import importlib
+import json
+from pathlib import Path
+import numpy as np
+import pytest
+import resolution_studies as support
+
+DATA = json.loads(support.RECORD.read_text(encoding='utf-8'))
+GENERATOR = support.RECORD.with_name('generate_finite_resolution_studies.py')
+PLATFORMS = ('ubuntu-latest', 'macos-15', 'windows-latest')
+
+
+def test_record_contract_and_reproduction_tolerance():
+    assert DATA['schema'] == 'sipi.finite-resolution-studies/1'
+    assert DATA['environment_variable'] == support.ENVIRONMENT == 'SIPI_RESOLUTION_STUDIES'
+    assert DATA['reproduction_matrix_relative'] == support.MATRIX_RELATIVE == 1e-9
+    assert sorted(DATA['quantities']) == sorted(['R_ohm_per_m', 'L_internal_h_per_m', 'L_external_h_per_m',
+                                                 'C_f_per_m', 'G_s_per_m', 'C0_f_per_m'])
+    assert DATA['study_source'] and DATA['product_commit'] and DATA['command'].startswith('PYTHONPATH=src python')
+    text = GENERATOR.read_text(encoding='utf-8')
+    for name in DATA['modules']:
+        assert repr(name) in text
+
+
+@pytest.mark.parametrize('name', sorted(DATA['modules']))
+def test_every_study_was_accepted_on_every_platform_and_suite(name):
+    entry = DATA['modules'][name]
+    assert '0.01 max(|a|, |b|)' in entry['criterion']
+    for case in entry['cases']:
+        labels = set(case['study'])
+        assert {f'{p}/source' for p in PLATFORMS} <= labels
+        for outcome in case['study'].values():
+            assert outcome['completed'] and outcome['accepted']
+            ratios = outcome['worst_difference_over_allowance']
+            assert set(ratios) >= {'volume', 'panel', 'joint:panel', 'joint:volume', 'outer:0', 'outer:1'}
+            assert all(0 <= value <= 1 for value in ratios.values())
+        covered = [label for row in case['variants'] for label in row['recorded_by']]
+        assert sorted(covered) == sorted(labels)
+        assert any('local_check_matrix_relative' in row for row in case['variants'])
+        for row in case['variants']:
+            assert sorted(row['quantities']) == sorted(DATA['quantities'])
+            assert all(np.isfinite(np.asarray(value, dtype=float)).all() for value in row['quantities'].values())
+            assert row.get('local_check_matrix_relative', 0) <= support.MATRIX_RELATIVE
+
+
+@pytest.mark.parametrize('name', sorted(DATA['modules']))
+def test_study_tests_are_defined_only_with_the_gate(name):
+    module = importlib.import_module(name)
+    entry = DATA['modules'][name]
+    assert hasattr(module, entry['test']) is support.ENABLED
+    assert hasattr(module, 'test_base_resolution_reproduces_the_recorded_study')
+    for case in entry['cases']:
+        assert json.loads(module.inputs(case['index'])[0].dumps()) == case['base_input']
+
+
+def test_matrix_relative_scale():
+    assert support.matrix_relative([1., 2.], [1., 2.]) == 0
+    assert support.matrix_relative([1., 2.+4e-9], [1., 2.]) == pytest.approx(2e-9)
+    with pytest.raises(AssertionError):
+        support.matrix_relative([1.], [1., 2.])

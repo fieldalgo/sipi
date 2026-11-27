@@ -184,6 +184,51 @@ See the [conductor observations](packages/sipi/conductor.md) for the actual-mesh
 replay and its limits. These results describe this selected suite and exact
 commit, not the full regression status of later commits.
 
+### Finite-resolution studies (dispatch only)
+
+The corner-face finite-resolution studies solve six complete lines each (base, finer
+dielectric mesh, finer panels, both, and two wider outer boxes) and took 6 to 60 minutes per
+case on one runner. They are defined only with `SIPI_RESOLUTION_STUDIES=1` and run in the
+dispatch-only `resolution-studies` job of the validation workflow (`gh workflow run
+validate.yml --ref <branch> -f resolution_studies=true`) on Linux, macOS and Windows. In the
+regular partitions each study's base line is solved and must reproduce the values recorded
+with the study in `tests/sipi/reference_data/resolution_studies/finite-resolution-studies.json`
+within a matrix-relative 1e-9. The mesher may triangulate exact cocircular ties differently by
+platform (macOS in the recorded runs), so the record keeps one variant per dielectric mesh
+(SHA-256 of nodes and triangles); a mesh matching no variant fails. The accuracy and
+convergence checks therefore stay in the regular suite as reproduction of the studied
+resolution, and the study criteria themselves are unchanged.
+
+| Module | Study test (cases) | Linux CI time | Criterion, checked when the study job runs | Regular partitions |
+| --- | --- | --- | --- | --- |
+| `test_two_ground_harmonic_three_active_corner_face_resolution` | `test_actual_layered_three_signal_finite_comparisons` [0] | 40.0 min | Six lines, four current solves; every comparison: each R, L_internal, L_external, C, G, C0 entry within 1% of the larger magnitude at every frequency | Base line reproduces the record (1e-9) |
+| `test_two_ground_harmonic_guard_corner_face_resolution` | `test_actual_layered_two_signals_and_guard_finite_comparisons` [0] | 39.3 min | Same | Same |
+| `test_two_ground_linear_corner_face_resolution` | `test_actual_layered_one_and_two_signal_finite_comparisons` [0], [1] | 5.8, 22.1 min | Same | Same, for both cases |
+
+`tests/sipi/test_resolution_study_record.py` checks, without field solves, that the record
+holds an accepted outcome for every case on all three platforms, that every recorded copy is
+assigned to a mesh variant, and that the study tests exist only with the gate. After the
+study job, regenerate the record from its JUnit XML (or that of a Validate run with the gate)
+with `PYTHONPATH=src python
+tests/sipi/reference_data/resolution_studies/generate_finite_resolution_studies.py --junit
+<platform>/<suite>=<xml> ... --source "<run>"`; the generator also solves each base line
+locally and requires it to match the variant of its own mesh.
+
+The durations table leaves out the four study cases (`--collected` with the node IDs collected
+now): 747 instead of 854 recorded minutes, 46.7 minutes per partition. The new reproduction
+tests have no CI time yet; locally they took 9 minutes together on one thread.
+
+These heavy tests also compare several resolutions but remain in the regular suite, because
+they also check another function or because it is unclear that they are only studies:
+`test_two_ground_linear_corner_face_line_study.py::test_actual_scalar_sweep_refinement_and_complex_closed_forms`
+(29.6 min; it also checks the actual three-sample sweep and closed-form propagation),
+`test_actual_saved_finite_resolution_receipt` of the three-active and guard
+`*_corner_face_resolution_document.py` modules (25.4 and 25.0 min; the saved-document
+execution path of the same studies) and
+`test_real_physical_faces_and_whole_currents_refine_without_floor[0]` of the guard and
+three-active `*_corner_conductor.py` modules (15.2 and 11.5 min; 32 to 48 panels within 1%,
+together with an exact shared-solve check).
+
 ## Explicit two-ground development capability
 
 The shared revision in `dependencies.json` supplies the generic two-ground
