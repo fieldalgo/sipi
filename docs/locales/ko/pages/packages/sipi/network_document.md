@@ -65,4 +65,12 @@ test_network_document.py는 무손실 개방·단락 선로 반사, 서로 다�
 요구하며 복사·재현·예산·오류 입력·제거한 이름·해석 실패도 검사합니다.
 조합 검증이며 기하 정확도·3D 비아/stub·시간영역·GUI·새 OS 검증을 추가하지 않습니다.
 
+## 버전 3: 기본 panel 선로
+
+명시한 `sipi.network-transforms/3`은 버전 2와 필드·연산이 같습니다. 기본 네트워크와
+fixture는 [`sipi.transmission-line/8`](default_line.md) 문서도 받고, 기본 네트워크는
+`sipi.network-assembly/2`일 수도 있습니다. 선로는 그대로 실행되므로 원본·fixture
+네트워크가 선로 단독 결과와 비트 단위로 같습니다. 버전 1·2는 바뀌지 않으며 둘 다
+거절합니다. `sipi.circuit/2`는 버전 3 변환을 받고 `sipi.circuit/1`은 거절합니다.
+
 [포트 축약](port_reduction.md) · [기준 변경](network.md)

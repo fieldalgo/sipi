@@ -85,13 +85,16 @@ bool·문자열·null은 수치가 아닙니다. 스칼라는 모든 주파수�
 
 명시한 `sipi.circuit/2`는 버전 1과 필드가 같습니다. `transmission-line` 네트워크는
 도체 전류가 기본으로 panel 방법인
-[`sipi.transmission-line/8`](default_line.md) 문서도 받습니다. 정규화는 필드 해석
+[`sipi.transmission-line/8`](default_line.md) 문서도 받고, 이를 담은
+[`sipi.network-assembly/2`](network_assembly.md)나
+[`sipi.network-transforms/3`](network_document.md)도 받습니다. 정규화는 필드 해석
 없이 선로의 `current_method`와 panel 방법일 때의 panel 설정을 저장 회로에 적습니다.
 해석은 그 선로 문서를 그대로 실행하므로, 추출 네트워크·R/L/G/C·단자 응답은 같은
 transmission-line/8을 단독으로 해석하고 그 네트워크를 종단한 결과와 비트 단위로 같습니다.
 
-버전 1은 바뀌지 않으며, 중첩 assembly·transformation 안을 포함해 내부
-transmission-line/8을 `nested transmission-line/8 requires circuit/2`로 계속 거절합니다.
+버전 1은 바뀌지 않으며, 내부 transmission-line/8·network-assembly/2·network-transforms/3을
+`nested ... requires` 메시지로 계속 거절합니다. 버전 1 조립이나 버전 1·2 변환 안의
+transmission-line/8도 마찬가지입니다.
 transmission-line/8이 없는 버전 2 회로는 스키마 이름만 다른 버전 1 내용으로 정규화되고
 결과도 같습니다. 선로 1–7은 두 버전 모두 받습니다.
 

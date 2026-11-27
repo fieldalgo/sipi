@@ -90,15 +90,18 @@ explicit real/imag objects; it never serializes language-specific complex syntax
 Explicit `sipi.circuit/2` has exactly the fields of version 1. Its
 `transmission-line` network also accepts a
 [`sipi.transmission-line/8`](default_line.md) document, whose conductor
-currents default to the panel method. Normalization writes the line's
+currents default to the panel method. It also accepts a nested
+[`sipi.network-assembly/2`](network_assembly.md) or
+[`sipi.network-transforms/3`](network_document.md) that contains one. Normalization writes the line's
 `current_method` and, for the panel method, its panel controls into the saved
 circuit, without a field solve. Analysis runs that line document unchanged: the
 extracted network, R/L/G/C and terminal response are bit-identical to analyzing
 the same transmission-line/8 on its own and terminating its network.
 
-Version 1 is unchanged and keeps refusing a nested transmission-line/8 with
-`nested transmission-line/8 requires circuit/2`, including inside a nested
-assembly or transformation. A version-2 circuit without transmission-line/8
+Version 1 is unchanged and keeps refusing a nested transmission-line/8,
+network-assembly/2 or network-transforms/3 with a `nested ... requires`
+message, including a transmission-line/8 inside a version-1 assembly or a
+version-1 or 2 transformation. A version-2 circuit without transmission-line/8
 normalizes to the version-1 content with only the schema name changed and
 gives the same results. Lines 1 to 7 are accepted by both versions.
 

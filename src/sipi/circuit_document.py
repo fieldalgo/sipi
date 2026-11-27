@@ -23,8 +23,10 @@ _SCHEMAS = ('sipi.circuit/1', 'sipi.circuit/2')
 # Nested schemas that only newer container versions admit. Older containers
 # keep refusing them, so a deployed reader never meets a document it rejects.
 _LINE8 = 'sipi.transmission-line/8'
-_GATED = (_LINE8,)
-_CONTAINERS = 'circuit/2'
+_ASSEMBLY2 = 'sipi.network-assembly/2'
+_TRANSFORMS3 = 'sipi.network-transforms/3'
+_GATED = (_LINE8, _ASSEMBLY2, _TRANSFORMS3)
+_CONTAINERS = 'circuit/2, network-assembly/2 or network-transforms/3'
 
 
 def _gate(document, admit):
@@ -155,7 +157,8 @@ class CircuitDocument:
     Construction validates all port names and counts without creating a mesh.
     Analyze keeps the nested model's mesh, material and skin-depth gates.
     Explicit version 2 has the same fields and also admits a nested
-    transmission-line/8; version 1 keeps refusing it.
+    transmission-line/8, network-assembly/2 or network-transforms/3;
+    version 1 keeps refusing them.
     """
     def __init__(self, network, *, excitation, terminations, schema='sipi.circuit/1'):
         self._data = self._validate(dict(schema=schema, network=network,

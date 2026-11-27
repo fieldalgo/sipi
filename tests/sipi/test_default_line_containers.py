@@ -126,3 +126,79 @@ def test_existing_assembly_and_transformation_keep_refusing_line8(monkeypatch):
             kind = 'network-assembly' if cls is NetworkAssemblyDocument else 'network-transform'
             with pytest.raises(ValueError, match='nested transmission-line/8 requires'):
                 circuit(dict(kind=kind, document=data), schema=schema)
+
+
+def assembly(network, schema='sipi.network-assembly/2', other=None):
+    from sipi.assembly_document import NetworkAssemblyDocument
+    return NetworkAssemblyDocument(network, schema=schema, connections=[dict(
+        network=network if other is None else other, ports=[[FAR, NEAR]])])
+
+
+def transforms(network, schema='sipi.network-transforms/3', operations=None):
+    from sipi.network_document import NetworkTransformDocument
+    return NetworkTransformDocument(network, schema=schema,
+        operations=operations or [dict(kind='renormalize', reference_ohms=75)])
+
+
+def test_new_assembly_and_transformation_versions_admit_line8_without_solving(monkeypatch):
+    monkeypatch.setattr(CrossSection, 'mesh', lambda *a, **k: pytest.fail('validation solved fields'))
+    assert {'sipi.network-assembly/2', 'sipi.network-transforms/3'} <= set(saved_schemas())
+    doc = line8()
+    raw = doc.to_dict()
+    sparse = dict(kind='transmission-line',
+                  document={k: v for k, v in raw.items() if k not in ('current_method', 'panel')})
+    for saved in (assembly(sparse), transforms(sparse),
+                  transforms(dict(kind='network-assembly', document=assembly(sparse).to_dict()))):
+        text = saved.dumps()
+        assert normalize_saved(text) == text and type(saved).loads(text).dumps() == text
+        assert json.loads(text)['schema'] in ('sipi.network-assembly/2', 'sipi.network-transforms/3')
+        assert raw in (json.loads(text)['network'].get('document'),
+                       json.loads(text)['network'].get('document', {}).get('network', {}).get('document'))
+    # Gated schemas stay refused where they were refused before.
+    with pytest.raises(ValueError, match='nested network-assembly/2 requires'):
+        transforms(dict(kind='network-assembly', document=assembly(sparse).to_dict()),
+                   schema='sipi.network-transforms/2')
+    for schema in ('sipi.network-transforms/1', 'sipi.network-transforms/2'):
+        with pytest.raises(ValueError, match='nested transmission-line/8 requires'):
+            transforms(sparse, schema=schema)
+    with pytest.raises(ValueError, match='nested transmission-line/8 requires'):
+        transforms(wrap(line7()), operations=[dict(kind='cascade', side='right', network=sparse)],
+                   schema='sipi.network-transforms/2')
+    for kind, nested in (('network-assembly', assembly(RLGC)), ('network-transform', transforms(RLGC))):
+        with pytest.raises(ValueError, match=f'nested {nested.to_dict()["schema"][5:]} requires'):
+            circuit(dict(kind=kind, document=nested.to_dict()), schema='sipi.circuit/1')
+
+
+def test_new_versions_without_line8_are_the_old_versions_with_a_new_schema_name():
+    pairs = ((assembly(RLGC, schema='sipi.network-assembly/1'), assembly(RLGC)),
+             (transforms(RLGC, schema='sipi.network-transforms/2'), transforms(RLGC)),
+             (transforms(RLGC, schema='sipi.network-transforms/2',
+                         operations=[dict(kind='cascade', side='right', network=RLGC)]),
+              transforms(RLGC, operations=[dict(kind='cascade', side='right', network=RLGC)])))
+    for old, new in pairs:
+        o, n = old.to_dict(), new.to_dict()
+        assert n == dict(o, schema=n['schema'])
+        np.testing.assert_array_equal(old.analyze().network.s, new.analyze().network.s)
+
+
+def test_assembly2_and_transforms3_with_line8_are_the_standalone_line8_bit_for_bit(panel):
+    from sipi.connection import connect_networks
+    doc, direct = panel
+    line = wrap(doc)
+    saved = assembly(line)
+    names = saved.to_dict()['connections'][0]['port_names']
+    joined = connect_networks(direct.network, direct.network, [[FAR, NEAR]], port_names=names)
+    out = type(saved).loads(saved.dumps()).analyze()
+    np.testing.assert_array_equal(out.network.s, joined.s)
+    for network in out.source_networks:
+        np.testing.assert_array_equal(network.s, direct.network.s)
+    assert all(e.input_json == doc.dumps() for e in out.extractions)
+    renormalized = transforms(line).analyze()
+    np.testing.assert_array_equal(renormalized.network.s, direct.network.renormalized(75).s)
+    np.testing.assert_array_equal(renormalized.source_network.s, direct.network.s)
+    nested = transforms(dict(kind='network-assembly', document=saved.to_dict())).analyze()
+    np.testing.assert_array_equal(nested.network.s, joined.renormalized(75).s)
+    wrapped = circuit(dict(kind='network-assembly', document=saved.to_dict())).analyze()
+    expected = terminate_network(joined, source_voltages={NEAR: 1}, terminations={FAR: 100})
+    for key in ('a', 'b', 'voltage', 'current', 'network_power'):
+        np.testing.assert_array_equal(getattr(wrapped.response, key), getattr(expected, key))
