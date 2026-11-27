@@ -454,6 +454,8 @@ def documents():
     from sipi.default_line import DefaultPanelTransmissionLineDocument
     base.append(DefaultPanelTransmissionLineDocument(cross(), [1e3, 2e3], materials={}, conductor={'kind': 'perfect'},
                                                      length=.1, current_method='volume-p1'))
+    base.append(CircuitDocument(dict(kind='transmission-line', document=base[-1].to_dict()),
+        excitation=dict(kind='sources', voltages={'near:signal': 1}), terminations={}, schema='sipi.circuit/2'))
     from sipi.open_panel_line import OpenPanelTransmissionLineDocument
     from sipi.templates import unbacked_coplanar
     base.append(OpenPanelTransmissionLineDocument(TransmissionLineDocument(

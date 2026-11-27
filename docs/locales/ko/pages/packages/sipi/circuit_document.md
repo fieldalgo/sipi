@@ -81,6 +81,28 @@ bool·문자열·null은 수치가 아닙니다. 스칼라는 모든 주파수�
 정규 저장 형식은 모든 값을 명시 real/imag 객체로 쓰며 언어별 복소 구문을
 저장하지 않습니다.
 
+## 버전 2: 기본 panel 선로
+
+명시한 `sipi.circuit/2`는 버전 1과 필드가 같습니다. `transmission-line` 네트워크는
+도체 전류가 기본으로 panel 방법인
+[`sipi.transmission-line/8`](default_line.md) 문서도 받습니다. 정규화는 필드 해석
+없이 선로의 `current_method`와 panel 방법일 때의 panel 설정을 저장 회로에 적습니다.
+해석은 그 선로 문서를 그대로 실행하므로, 추출 네트워크·R/L/G/C·단자 응답은 같은
+transmission-line/8을 단독으로 해석하고 그 네트워크를 종단한 결과와 비트 단위로 같습니다.
+
+버전 1은 바뀌지 않으며, 중첩 assembly·transformation 안을 포함해 내부
+transmission-line/8을 `nested transmission-line/8 requires circuit/2`로 계속 거절합니다.
+transmission-line/8이 없는 버전 2 회로는 스키마 이름만 다른 버전 1 내용으로 정규화되고
+결과도 같습니다. 선로 1–7은 두 버전 모두 받습니다.
+
+```python
+from sipi.circuit_document import CircuitDocument
+
+circuit = CircuitDocument(dict(kind='transmission-line', document=line8.to_dict()),
+    excitation={'kind': 'sources', 'voltages': {'near:signal': 1}},
+    terminations={'far:signal': 100}, schema='sipi.circuit/2')
+```
+
 ## 실행과 출력
 
 `from_dict(data)`와 `loads(text)`는 입력을 검사합니다. `dumps()`는 키를
@@ -103,6 +125,7 @@ bool·문자열·null은 수치가 아닙니다. 스칼라는 모든 주파수�
 
 ```sh
 OPENPHYSICS_REQUIRE_CROSSCHECK=1 python -m pytest -q tests/sipi/test_circuit_document.py
+python -m pytest -q tests/sipi/test_default_line_containers.py
 python examples/sipi/circuit_document.py
 ```
 
