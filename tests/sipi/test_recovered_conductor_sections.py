@@ -13,6 +13,7 @@ The panel values are the recorded panel-path results (256 panels per edge,
 128 for the grounded coplanar section); recorded recovery values reproduce
 an internal study on the same default meshes.
 """
+import hashlib
 import time
 
 import numpy as np
@@ -49,6 +50,16 @@ RECORDED = {
                           [[3.858773711327407e-11]]),
     'stripline': (4448, 9.65e-05, [[4106.47805165869]], [[3.225220070089997e-11]]),
 }
+# SHA-256 of the recorded default meshes (nodes as little-endian float64, then triangles as
+# little-endian int64). A mesher build may pick another valid triangulation at exact
+# cocircular ties with the same node count, so the count does not identify the mesh.
+MESH_SHA256 = {
+    'coupled': '334f08f1829a4742a071d322096e0afd8988075073d817e1e55b143742dae2f8',
+    'microstrip-narrow': '97e7df9dba0a5684f048407ab5cd46b828a9ebc7d44bbd42bb56410a38707941',
+    'microstrip-wide': '1bc669d77a96df6cb1242fcbb3679fc72eaefe7c4c628405edd5af365e463f83',
+    'grounded-coplanar': 'f9c95448b03d9683bc098cea014d4a1ef67372ace40e380bfd1b67e88d63d1c0',
+    'stripline': '2b53cd0c88116bb8cf4f6fd3a8e266c9bccefe8d9f4e6f868fcc2328dc5086b2',
+}
 NAMES = tuple(SECTIONS)
 
 
@@ -76,20 +87,24 @@ def study(request):
 def test_default_mesh_reproduces_recorded_values(study, record_property):
     name, default, result, _ = study
     nodes, width, total, c0 = RECORDED[name]
-    if default.mesh.num_nodes == nodes:
+    mesh = default.mesh
+    digest = hashlib.sha256(np.ascontiguousarray(mesh.nodes, dtype='<f8').tobytes()
+                            + np.ascontiguousarray(mesh.triangles, dtype='<i8').tobytes()).hexdigest()
+    if digest == MESH_SHA256[name]:
         record_property(f'{name}_reproduction', 'recorded mesh, rtol 1e-12')
         assert result.diagnostics['support_width'] == pytest.approx(width, rel=1e-12, abs=0)
         np.testing.assert_allclose(result.total, total, rtol=1e-12, atol=0)
         np.testing.assert_allclose(result.C0, c0, rtol=1e-12, atol=0)
     else:
-        # Some mesher builds choose another valid triangulation at exact ties
-        # (19582 versus 19610 nodes observed for one P1 case). The size of that
-        # change for these sections is unknown; 2e-3 is below the 2.4e-3 to
-        # 3.4e-3 panel differences of the recorded values, so a different
-        # triangulation is still compared, not skipped.
+        # Some mesher builds choose another valid triangulation at exact ties, with
+        # the same or a different node count (19582 versus 19610 nodes observed for
+        # one P1 case; same count and a 3.3e-6 change for microstrip-narrow on
+        # macOS 15). 2e-3 is below the 2.4e-3 to 3.4e-3 panel differences of the
+        # recorded values, so a different triangulation is still compared, not skipped.
         change = np.max(abs(np.diag(result.total)/np.diag(total)-1))
         record_property(f'{name}_reproduction',
-                        f'{default.mesh.num_nodes} nodes, recorded {nodes}; diagonal change {change:.3e}')
+                        f'other triangulation, {mesh.num_nodes} nodes (recorded {nodes}); '
+                        f'diagonal change {change:.3e}')
         assert change <= 2e-3, change
 
 
