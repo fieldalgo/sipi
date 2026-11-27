@@ -91,6 +91,38 @@ try {
   const idle=async()=>until(()=>cdp.evaluate('!document.querySelector("#calculate").disabled'),'calculation complete',300000);
   const readDownload=async name=>until(async()=>{try{return JSON.parse(await readFile(join(downloads,name),'utf8'));}catch{return null;}},'download '+name);
   const records=[];
+  // Conductor loss: a saved transmission-line/8 with default panel currents and
+  // the engine's modes diagnostic; it stays separate from the impedance result.
+  await click('calculate');await idle();
+  await click('loss-run');await idle();
+  assert.ok(await cdp.evaluate('document.querySelector("#loss-status").classList.contains("success")'),await cdp.evaluate('document.querySelector("#loss-status").textContent'));
+  assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),false);
+  const lossRows=await cdp.evaluate('[...document.querySelectorAll("#loss-rows tr")].map(row=>[...row.cells].map(cell=>cell.textContent))');
+  assert.deepEqual(lossRows.map(row=>row[0]),['1','5','10']);
+  await click('loss-export');const loss=await readDownload('sipi-pair-conductor-loss.json');await rm(join(downloads,'sipi-pair-conductor-loss.json'));
+  const lossLine=JSON.parse(loss.line_text),execution=loss.result.execution;
+  assert.equal(lossLine.schema,'sipi.transmission-line/8');assert.equal(lossLine.current_method,undefined);
+  assert.equal(execution.status,'complete');assert.equal(execution.input.current_method,'panel');
+  assert.deepEqual(execution.input.panel,{ground_modes:512,interpolation_degree:14,panels_per_edge:64});
+  assert.deepEqual(execution.input.frequency_hz,[1e9,5e9,10e9]);assert.equal(execution.input.conductor.conductivity,58e6);
+  const modes=execution.result.diagnostics.modes,R=execution.result.R_ohm_per_m;
+  lossRows.forEach((row,i)=>{
+    assert.equal(row[1],((R[i][0][0]+R[i][1][1])/2).toFixed(3));assert.equal(row[2],R[i][0][1].toFixed(3));
+    const shown=[Number(row[3]),Number(row[4])].sort(),expected=modes.alpha_conductor[i].map(a=>Number((a*20/Math.LN10).toFixed(3))).sort();
+    assert.deepEqual(shown,expected);assert.ok(Number(row[3])>Number(row[4]),'differential conductor loss exceeds common for this pair');
+    assert.equal(row[5],'0.000 / 0.000');
+  });
+  await writeFile(join(output,'conductor-loss.json'),JSON.stringify(loss,null,2));
+  await edit('frequencies','5, 0');await click('loss-run');await idle();
+  assert.ok(await cdp.evaluate('document.querySelector("#loss-status").classList.contains("error")'));
+  assert.equal(await cdp.evaluate('document.querySelector("#loss-result").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),false);
+  await edit('frequencies','1, 5, 10');await click('loss-run');await click('cancel');await idle();
+  assert.equal(await cdp.evaluate('document.querySelector("#loss-result").hidden'),true);
+  assert.equal(await cdp.evaluate('document.querySelector("#result").hidden'),false);
+  await click('loss-run');await idle();assert.equal(await cdp.evaluate('document.querySelector("#loss-result").hidden'),false);
+  await edit('gap',.21);assert.equal(await cdp.evaluate('document.querySelector("#loss-result").hidden'),true);
+  await cdp.evaluate('document.querySelector("[data-preset=surface]").click()');
   for(const template of ['coupled_microstrip','coupled_stripline']) {
     if(template==='coupled_stripline') await cdp.evaluate('document.querySelector("#template").value="coupled_stripline";document.querySelector("#template").dispatchEvent(new Event("change"))');
     await click('calculate');await idle();
@@ -184,7 +216,7 @@ try {
   await edit('material-note','Changed after calculation');assert.equal(await cdp.evaluate('document.querySelector("#keep-a").disabled'),true);
   assert.deepEqual(errors,[]);assert.deepEqual(remoteRequests,[]);
   if(webRoot){assert.ok(workerTargets.length);assert.equal(apiRequests.length,0);}
-  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',checks:['two real pair calculations','two 100 ohm goals and independent refined target','exact geometry/mesh save and reopen','identical reopened line','edit invalidation','invalid geometry refusal','cancel and restart','mobile overflow','no external requests'],records:records.length,errors,remoteRequests,workerTargets},null,2));
+  await writeFile(join(output,'report.json'),JSON.stringify({status:'passed',mode:webRoot?'browser-worker':'local-native',checks:['two real pair calculations','conductor loss from transmission-line/8 panel currents and modes diagnostic, failure, cancel and invalidation','two 100 ohm goals and independent refined target','exact geometry/mesh save and reopen','identical reopened line','edit invalidation','invalid geometry refusal','cancel and restart','mobile overflow','no external requests'],records:records.length,errors,remoteRequests,workerTargets},null,2));
   await writeFile(join(output,'comparison-checks.json'),JSON.stringify({status:'passed',checks:['immutable A and exact B exports for both templates','selected search geometry retained','material notes bound to calculation','untrusted labels rendered as text','stale B hidden after edits/failure/cancel','A retained until explicit clear','reopen resets unidentified material context']},null,2));
   console.log('Pair preview browser acceptance passed.');
 } catch(error) {
