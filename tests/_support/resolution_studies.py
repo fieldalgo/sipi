@@ -16,8 +16,10 @@ job runs.
 
 The dielectric mesher may pick another valid triangulation at exact cocircular ties on some
 platforms (macOS in the recorded runs), so the record keeps one variant per dielectric mesh,
-identified by the SHA-256 of its nodes and triangles; the base line must match the variant
-of its own mesh.
+identified by the SHA-256 of its nodes and triangles. A base line whose mesh equals a variant
+must match it within 1e-9; a mesh matching no variant is compared with the closest variant
+within MESH_VARIANT_RELATIVE. The path taken is written to the JUnit property
+``resolution_study_reproduction``.
 """
 import json
 import os
@@ -32,6 +34,12 @@ ENVIRONMENT = 'SIPI_RESOLUTION_STUDIES'
 RECORD = (Path(__file__).resolve().parents[1] / 'sipi' / 'reference_data' / 'resolution_studies'
           / 'finite-resolution-studies.json')
 MATRIX_RELATIVE = 1e-9
+# A mesh matching no recorded variant is compared with the closest variant instead. The
+# recorded platforms' base lines differ by at most 2.2e-5 between the two meshes (run
+# 45965021952: 5.4e-6, 1.0e-6, 1.8e-6 and 2.2e-5 by case), so 1e-4 admits another valid
+# triangulation of the same mesh settings while staying a hundred times below the 1% study
+# criterion; a larger change still fails and needs the study rerun.
+MESH_VARIANT_RELATIVE = 1e-4
 
 # Without the variable the study tests are not defined at all, so they are neither collected
 # nor skipped: the installed run treats a skip as a failure and deselects nothing.
@@ -63,17 +71,41 @@ def recorded_case(module, index):
     return next(case for case in data['modules'][module]['cases'] if case['index'] == index)
 
 
-def reproduce(module, index, document):
-    """Solve the base line of a study and require the recorded variant of its own mesh."""
+def compare(module, index, result):
+    """Compare a solved base line with the record; return (path, variant labels, errors).
+
+    ``exact``: the dielectric mesh equals a recorded variant, and every quantity must agree
+    within MATRIX_RELATIVE. ``tolerance``: no recorded variant has this mesh (for example a
+    new runner image triangulates a cocircular tie another way); the closest variant must
+    agree within MESH_VARIANT_RELATIVE instead of failing until the study is rerun.
+    """
+    case = recorded_case(module, index)
+    values = quantities(result)
+    mesh = mesh_identity(result)
+
+    def errors(row):
+        assert sorted(values) == sorted(row['quantities'])
+        return {key: matrix_relative(values[key], row['quantities'][key]) for key in values}
+
+    same = [row for row in case['variants'] if row['dielectric_mesh'] == mesh]
+    if same:
+        found = errors(same[0])
+        assert max(found.values()) <= MATRIX_RELATIVE, found
+        return 'exact', same[0]['recorded_by'], found
+    rows = [(errors(row), row) for row in case['variants']]
+    found, row = min(rows, key=lambda item: max(item[0].values()))
+    assert max(found.values()) <= MESH_VARIANT_RELATIVE, (mesh, found)
+    return 'tolerance', row['recorded_by'], found
+
+
+def reproduce(module, index, document, record_property=None):
+    """Solve the base line of a study and compare it with the record (see ``compare``)."""
     case = recorded_case(module, index)
     assert json.loads(document.dumps()) == case['base_input'], f'{module}[{index}]: base input changed'
     result = document.analyze()
-    mesh = mesh_identity(result)
-    variants = [row for row in case['variants'] if row['dielectric_mesh'] == mesh]
-    assert variants, (f'{module}[{index}]: dielectric mesh {mesh} matches no recorded variant; '
-                      'run the study (SIPI_RESOLUTION_STUDIES=1) and regenerate the record')
-    values = quantities(result)
-    assert sorted(values) == sorted(variants[0]['quantities'])
-    errors = {key: matrix_relative(values[key], variants[0]['quantities'][key]) for key in values}
-    assert max(errors.values()) <= MATRIX_RELATIVE, errors
-    return errors
+    path, labels, found = compare(module, index, result)
+    if record_property is not None:
+        record_property('resolution_study_reproduction', json.dumps(dict(
+            path=path, closest_variant=labels, dielectric_mesh=mesh_identity(result),
+            matrix_relative=found), sort_keys=True))
+    return path, found
