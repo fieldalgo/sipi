@@ -8,7 +8,7 @@ import json
 
 import numpy as np
 
-from .circuit_document import _LINE8, _json_copy, _network_input
+from .circuit_document import _LINES, _json_copy, _network_input
 from .connection import _connection_layout, connect_networks, ideal_junction
 from .document import _keys, _unique_object
 from .network import LineNetwork, _references
@@ -19,7 +19,7 @@ _SCHEMAS = ('sipi.network-assembly/1', 'sipi.network-assembly/2')
 
 
 def _admit(schema):
-    return (_LINE8,) if schema == 'sipi.network-assembly/2' else ()
+    return _LINES if schema == 'sipi.network-assembly/2' else ()
 
 
 def _component(data, admit=()):
@@ -59,7 +59,7 @@ class NetworkAssemblyDocument:
     transformations, file/network I/O or expressions. Each geometry component
     is extracted once per analysis; existing model validity gates are retained.
     Explicit version 2 has the same fields and also admits transmission-line/8
-    components; version 1 keeps refusing them.
+    and /9 components; version 1 keeps refusing them.
     """
     def __init__(self, network, *, connections, schema='sipi.network-assembly/1'):
         self._assign(dict(schema=schema, network=network,

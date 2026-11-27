@@ -157,8 +157,8 @@ class NetworkBandDocument:
     Field-source normalization never meshes. RLGC, Touchstone and lumped source
     validators can perform small algebra. Existing model gates remain active.
     Explicit version 2 has the same fields and also admits a nested
-    transmission-line/8, network-assembly/2 or network-transforms/3; version
-    1 keeps refusing them.
+    transmission-line/8 or /9, network-assembly/2 or network-transforms/3;
+    version 1 keeps refusing them.
     """
     def __init__(self, network, *, limits, basis='single-ended', schema='sipi.network-band/1'):
         self._assign(dict(schema=schema, network=network, limits=limits, basis=basis))

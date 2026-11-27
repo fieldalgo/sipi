@@ -81,8 +81,8 @@ A refusal never falls back to the P1 method. Each panel refusal says that
 Documents that contain a transmission line (circuits, studies, panel lines,
 method lines and others) accept transmission-line/1 to /7 and refuse /8 and /9.
 They are not silently computed with P1. New container versions admit /8
-explicitly: [`sipi.circuit/2`](circuit_document.md#version-2-default-panel-lines)
-runs a nested transmission-line/8 unchanged, bit-identical to the line alone, as do
+and /9 explicitly: [`sipi.circuit/2`](circuit_document.md#version-2-default-panel-lines)
+runs a nested transmission-line/8 or /9 unchanged, bit-identical to the line alone, as do
 [`sipi.network-assembly/2`](network_assembly.md#version-2-default-panel-lines),
 [`sipi.network-transforms/3`](network_document.md#version-3-default-panel-lines),
 [`sipi.network-band/2`](band.md#version-2-default-panel-lines) and

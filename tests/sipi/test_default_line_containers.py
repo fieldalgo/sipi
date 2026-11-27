@@ -18,7 +18,7 @@ from sipi.default_line import DefaultPanelTransmissionLineDocument as Line8
 from sipi.execution import execute_saved, normalize_saved, saved_schemas
 from sipi.termination import terminate_network
 
-from test_default_line import line7, line8
+from test_default_line import fields, line7, line8
 
 NEAR, FAR = 'near:signal', 'far:signal'
 RLGC = dict(kind='rlgc', frequency_hz=[0, 1e6, 1e9], R=[[10]], L=[[400e-9]], G=[[0]], C=[[100e-12]],
@@ -274,3 +274,90 @@ def test_length_design3_with_line8_is_the_standalone_line8_bit_for_bit():
     assert (out.feasible_length_m, out.infeasible_length_m) == \
         (reference.feasible_length_m, reference.infeasible_length_m)
     assert out.feasible.checks == reference.feasible.checks
+
+
+RECOVERED = 'volume-p1-recovered'
+SURFACE = dict(kind='surface', ground_thickness=35e-6, conductivity=58e6, relative_permeability=1.,
+               roughness=dict(kind='hammerstad', rms_m=0.))
+
+
+def line9(length=.02, **changes):
+    """A transmission-line/9 that names the recovered P1 currents, at the band endpoints."""
+    data = dict(fields(conductor=SURFACE, frequency=TWO), length_m=length,
+                schema='sipi.transmission-line/9', current_method=RECOVERED)
+    data.update(changes)
+    return Line8.from_dict(data)
+
+
+@pytest.fixture(scope='module')
+def recovered():
+    doc = line9()
+    assert doc.to_dict()['recovery'] == dict(support_fraction=.4)
+    return doc, doc.analyze()
+
+
+def test_old_container_versions_refuse_line9_and_new_ones_write_its_defaults(monkeypatch):
+    from sipi.band import NetworkBandDocument
+    from sipi.length_design import LineLengthDesignDocument
+    monkeypatch.setattr(CrossSection, 'mesh', lambda *a, **k: pytest.fail('validation solved fields'))
+    raw = line9().to_dict()
+    sparse = wrap(line9())
+    sparse['document'].pop('recovery')
+    zero = dict(kind='transmission-line', document=dict(sparse['document'], length_m=0.))
+    match = 'nested transmission-line/9 requires'
+    for make in (lambda: circuit(sparse, schema='sipi.circuit/1'),
+                 lambda: assembly(sparse, schema='sipi.network-assembly/1'),
+                 lambda: transforms(sparse, schema='sipi.network-transforms/2'),
+                 lambda: NetworkBandDocument(sparse, limits=LIMITS),
+                 lambda: LineLengthDesignDocument(zero, bounds=[0, 10], limits=LIMITS,
+                                                  schema='sipi.line-length-design/2')):
+        with pytest.raises(ValueError, match=match):
+            make()
+    saved = (circuit(sparse), assembly(sparse), transforms(sparse),
+             NetworkBandDocument(sparse, limits=LIMITS, schema='sipi.network-band/2'),
+             LineLengthDesignDocument(zero, bounds=[0, 10], limits=LIMITS, schema='sipi.line-length-design/3'))
+    for doc in saved:
+        text = doc.dumps()
+        assert normalize_saved(text) == text and type(doc).loads(text).dumps() == text
+        nested = json.loads(text)['network']['document']
+        assert nested == (dict(raw, length_m=0.) if isinstance(doc, LineLengthDesignDocument) else raw)
+
+
+def test_containers_with_line9_are_the_standalone_line9_bit_for_bit(recovered):
+    from sipi.band import NetworkBandDocument, assess_band
+    from sipi.connection import connect_networks
+    doc, direct = recovered
+    line = wrap(doc)
+    out = circuit(line).analyze()
+    expected = terminate_network(direct.network, source_voltages={NEAR: 1}, terminations={FAR: 100})
+    assert out.extraction.input_json == doc.dumps()
+    np.testing.assert_array_equal(out.network.s, direct.network.s)
+    for key in 'RLGC':
+        np.testing.assert_array_equal(getattr(out.extraction, key), getattr(direct, key))
+    for key in ('a', 'b', 'voltage', 'current', 'network_power'):
+        np.testing.assert_array_equal(getattr(out.response, key), getattr(expected, key))
+    joined = assembly(line)
+    names = joined.to_dict()['connections'][0]['port_names']
+    np.testing.assert_array_equal(joined.analyze().network.s, connect_networks(
+        direct.network, direct.network, [[FAR, NEAR]], port_names=names).s)
+    np.testing.assert_array_equal(transforms(line).analyze().network.s, direct.network.renormalized(75).s)
+    band = NetworkBandDocument(line, limits=LIMITS, schema='sipi.network-band/2').analyze()
+    assert band.checks == assess_band(direct.network, LIMITS).checks
+    np.testing.assert_array_equal(band.network.s, direct.network.s)
+    assert execute_saved(circuit(line).dumps())['result']['network'] == \
+        execute_saved(doc.dumps())['result']['network']
+
+
+def test_length_design3_with_line9_is_the_standalone_line9_bit_for_bit():
+    from sipi.length_design import LineLengthDesignDocument
+    doc = line9(length=0.)
+    direct = doc.analyze()
+    out = LineLengthDesignDocument(wrap(doc), bounds=[0, 10], limits=LIMITS,
+                                   schema='sipi.line-length-design/3').solve()
+    for key in 'RLGC':
+        np.testing.assert_array_equal(getattr(out.extraction, key), getattr(direct, key))
+    reference = LineLengthDesignDocument(json.loads(out.resolved_network_json), bounds=[0, 10],
+                                         limits=LIMITS).solve()
+    assert out.history == reference.history
+    assert (out.feasible_length_m, out.infeasible_length_m) == \
+        (reference.feasible_length_m, reference.infeasible_length_m)
