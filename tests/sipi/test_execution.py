@@ -456,6 +456,11 @@ def documents():
                                                      length=.1, current_method='volume-p1'))
     base.append(CircuitDocument(dict(kind='transmission-line', document=base[-1].to_dict()),
         excitation=dict(kind='sources', voltages={'near:signal': 1}), terminations={}, schema='sipi.circuit/2'))
+    line8_network = base[-1].to_dict()['network']
+    base.append(NetworkAssemblyDocument(line8_network, connections=[dict(network=line8_network,
+        ports=[['far:signal', 'near:signal']])], schema='sipi.network-assembly/2'))
+    base.append(NetworkTransformDocument(line8_network, operations=[dict(kind='renormalize', reference_ohms=75)],
+        schema='sipi.network-transforms/3'))
     surface = dict(kind='surface', conductivity=58e6, ground_thickness=35e-6, relative_permeability=1.,
                    roughness=dict(kind='hammerstad', rms_m=0.))
     surface_line = TransmissionLineDocument(cross(), [1e9, 2e9], materials={}, conductor=surface, length=.1,

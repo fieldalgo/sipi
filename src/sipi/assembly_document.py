@@ -8,16 +8,21 @@ import json
 
 import numpy as np
 
-from .circuit_document import _json_copy, _network_input
+from .circuit_document import _LINE8, _json_copy, _network_input
 from .connection import _connection_layout, connect_networks, ideal_junction
 from .document import _keys, _unique_object
 from .network import LineNetwork, _references
 
 __all__ = ['NetworkAssemblyDocument', 'NetworkAssemblyResult']
 _KINDS = ('rlgc', 'touchstone', 'transmission-line', 'volume-line', 'lumped-network')
+_SCHEMAS = ('sipi.network-assembly/1', 'sipi.network-assembly/2')
 
 
-def _component(data):
+def _admit(schema):
+    return (_LINE8,) if schema == 'sipi.network-assembly/2' else ()
+
+
+def _component(data, admit=()):
     if not isinstance(data, dict):
         raise ValueError('assembly component must be an object')
     if data.get('kind') == 'ideal-junction':
@@ -31,7 +36,7 @@ def _component(data):
         return source, canonical, source.frequency, source.port_names, source.z_ref
     if data.get('kind') not in _KINDS:
         raise ValueError('assembly components require base networks or ideal-junction; nesting is unsupported')
-    source, canonical, frequency, ports = _network_input(data)
+    source, canonical, frequency, ports = _network_input(data, admit=admit)
     references = (source.z_ref if isinstance(source, LineNetwork) else
                   _references(canonical['document']['reference_ohms'], len(ports)))
     return source, canonical, frequency, ports, references
@@ -47,23 +52,26 @@ class NetworkAssemblyResult:
 
 
 class NetworkAssemblyDocument:
-    """sipi.network-assembly/1: a starting component and 1..32 ordered joins.
+    """sipi.network-assembly/1 or /2: a starting component and 1..32 ordered joins.
 
     Each join adds a new component through explicit current/new port pairs.
     Parsing validates all metadata without meshing. No nested assemblies,
     transformations, file/network I/O or expressions. Each geometry component
     is extracted once per analysis; existing model validity gates are retained.
+    Explicit version 2 has the same fields and also admits transmission-line/8
+    components; version 1 keeps refusing them.
     """
-    def __init__(self, network, *, connections):
-        self._assign(dict(schema='sipi.network-assembly/1', network=network,
+    def __init__(self, network, *, connections, schema='sipi.network-assembly/1'):
+        self._assign(dict(schema=schema, network=network,
                           connections=connections))
 
     def _assign(self, data):
         data = _json_copy(data)
         _keys(data, ('schema', 'network', 'connections'), where='network assembly')
-        if data['schema'] != 'sipi.network-assembly/1':
+        if data['schema'] not in _SCHEMAS:
             raise ValueError('unsupported network-assembly schema')
-        _, source, frequency, ports, references = _component(data['network'])
+        admit = _admit(data['schema'])
+        _, source, frequency, ports, references = _component(data['network'], admit)
         steps = data['connections']
         if not isinstance(steps, list) or not 1 <= len(steps) <= 32:
             raise ValueError('connections must contain 1..32 joins')
@@ -72,7 +80,7 @@ class NetworkAssemblyDocument:
             _keys(step, ('network', 'ports'), ('port_names',), where='assembly connection')
             if 'port_names' in step and not isinstance(step['port_names'], list):
                 raise ValueError('output port_names must be an explicit array')
-            _, canonical, other_f, other_ports, other_refs = _component(step['network'])
+            _, canonical, other_f, other_ports, other_refs = _component(step['network'], admit)
             if not np.array_equal(frequency, other_f):
                 raise ValueError('assembly components must have identical frequency samples')
             _, _, ports, references = _connection_layout(ports, references, other_ports,
@@ -116,8 +124,9 @@ class NetworkAssemblyDocument:
     def analyze(self):
         data = self.to_dict()
         networks, extractions = [], []
+        admit = _admit(data['schema'])
         def extract(component):
-            source, _, frequency, ports, references = _component(component)
+            source, _, frequency, ports, references = _component(component, admit)
             extraction = None if isinstance(source, LineNetwork) else source.analyze()
             network = source if extraction is None else extraction.network
             if (network.port_names != ports or not np.array_equal(network.frequency, frequency)

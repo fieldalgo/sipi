@@ -70,6 +70,17 @@ The circuit result retains the assembly (or transformation containing it) in
 `extraction`. Older readers reject the new kind. Existing schemas keep their
 previous field meanings; this is an input format, not persistent results.
 
+## Version 2: default panel lines
+
+Explicit `sipi.network-assembly/2` has the fields of version 1. Its
+`transmission-line` components also accept a
+[`sipi.transmission-line/8`](default_line.md) document; normalization writes
+the line's method and panel controls without a field solve, and analysis runs
+that line unchanged, so each source network is bit-identical to the line alone.
+Version 1 is unchanged and refuses transmission-line/8 components. A version-2
+assembly can be nested in `sipi.circuit/2` and `sipi.network-transforms/3`;
+older circuits and transformations refuse it.
+
 ## Checks and limits
 
 Saved open/short shunt stubs reproduce analytic driven voltages and currents at
