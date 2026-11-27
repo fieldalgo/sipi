@@ -79,5 +79,26 @@ A refusal never falls back to the P1 method. Each panel refusal says that
   convergence.
 
 Documents that contain a transmission line (circuits, studies, panel lines,
-method lines and others) accept transmission-line/1 to /7 and refuse /8.
+method lines and others) accept transmission-line/1 to /7 and refuse /8 and /9.
 They are not silently computed with P1.
+
+## Version 9: the recovered method by name
+
+`sipi.transmission-line/9` (the same class, `schema='sipi.transmission-line/9'`)
+has the fields of version 8 plus an optional `recovery`. It also admits
+`current_method: "volume-p1-recovered"`, only when named. The default stays
+`panel`, and panel and `volume-p1` documents run exactly as in version 8.
+`recovery` (`support_fraction`, default 0.4 from
+`DEFAULT_RECOVERY_CONTROLS`) is written into the saved document. It is
+refused with any other method, and `panel` is refused with the recovered
+method. Version 8 keeps its two values and refuses `recovery`.
+`method_document()` returns a `sipi.method-transmission-line/2` document, which
+runs the [recovered line](method_line.md#version-2-recovered-currents).
+`perfect` and `surface-faces` conductors are refused for the recovered method.
+
+```python
+saved = DefaultPanelTransmissionLineDocument(geometry, [1e9, 5e9], materials={}, length=.02,
+    conductor=conductor, current_method='volume-p1-recovered',
+    schema='sipi.transmission-line/9')
+saved.to_dict()['recovery']   # {'support_fraction': 0.4}
+```

@@ -79,7 +79,9 @@ result = panel.analyze()
 [open-box 패널 선로](open_panel_line.md)를 씁니다. [방법 선로](method_line.md)는 이 선택(`panel` 또는
 `volume-p1`)을 명시해 저장하고 이 변환을 직접 합니다.
 [transmission-line/8](default_line.md)에서는 `surface`·`surface-boundaries` 도체의 기본이
-panel 방법이며, P1을 쓰려면 `current_method: "volume-p1"`을 적어야 합니다.
+panel 방법이며, P1을 쓰려면 `current_method: "volume-p1"`을 적어야 합니다. 방법 선로/2와
+transmission-line/9는 복원 P1 전류 `current_method: "volume-p1-recovered"`도 이름을 적을
+때만 받습니다.
 
 ## 입력 스키마
 
