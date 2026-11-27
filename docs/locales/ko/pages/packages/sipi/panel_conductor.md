@@ -1,7 +1,7 @@
 # 명시적 경계 패널 도체 손실
 
-이 명시적 경로는 공유 `galerkin.laplace_boundary` 커널로 진공 완전도체
-전류를 계산합니다. 기존 유한요소 표면 전류 API나 저장된 선로 문서의
+이 명시적 경로는 공유 공개 `galerkin.panel_electrostatics` 해법
+(`solve_grounded_rectangle`)으로 진공 완전도체 전류를 계산합니다. 기존 유한요소 표면 전류 API나 저장된 선로 문서의
 계산 방법을 변경하지 않습니다.
 
 `dependencies.json`의 정확한 커밋에서 만든 휠을 사용해야 합니다. 개발용

@@ -23,7 +23,7 @@ _EDGES = (0, 2, 3, 1)
 
 def _solver():
     try:
-        solver = import_module('galerkin.laplace_two_ground').solve_two_ground_rectangle_edges
+        solver = import_module('galerkin.panel_electrostatics').solve_two_ground_rectangle_edges
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Two-ground face currents require the pinned galerkin '
                            'development wheel with solve_two_ground_rectangle_edges') from exc
@@ -90,7 +90,7 @@ def two_ground_face_current_factors(section, *, panels_per_edge=32,
     """
     checked, count, modes, degree, polygons = _arguments(
         section, panels_per_edge, ground_modes, interpolation_degree)
-    shared = _solver()(polygons, width=checked.width, height=checked.height,
+    shared = _solver()(polygons, box_size=(checked.width, checked.height),
         panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
     # Reuse the original reduction and diagnostics with the already computed
     # whole result; this adapter performs no second field solve.

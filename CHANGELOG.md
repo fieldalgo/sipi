@@ -1,5 +1,7 @@
 # Changelog
 
+- Call the shared boundary-panel solvers through galerkin's public SI module `galerkin.panel_electrostatics` instead of its internal `galerkin.laplace_*` modules. The rectangle is passed as `box_size` (width, height) in m and conductors as `ground_indices` or `signal_indices`; `CrossSection` lengths are already in m, so the numbers are unchanged. All eleven panel routes (grounded, open-box, two-ground, face, corner, linear corner, harmonic three-active, harmonic guard, shape and shape-face) give bit-identical C0, current Gram and RLGC, and the vacuum current factors of all 72 templates with typical inputs are bit-identical. Saved documents, schemas and shape-panel request records (`width`, `height`) are unchanged. / 공유 경계 panel 해법을 galerkin 내부 모듈 `galerkin.laplace_*` 대신 공개 SI 모듈 `galerkin.panel_electrostatics`로 부른다. 직사각형은 `box_size`(폭, 높이, m)로, 도체는 `ground_indices`·`signal_indices`로 넘긴다. `CrossSection` 길이가 이미 m이라 수는 그대로다. panel 경로 11개(한 접지, open-box, 두 접지, 면, 모서리, 선형 모서리, 조화 3-능동, 조화 guard, 형상, 형상-면)의 C0·전류 Gram·RLGC가 비트 단위로 같고, 전형 입력 템플릿 72개의 진공 전류 인자도 비트 단위로 같다. 저장 문서, schema, 형상 panel 요청 기록(`width`, `height`)은 바뀌지 않는다.
+
 - Remove the pair-preview number arrow buttons from the Tab order (ArrowUp/ArrowDown in each field still nudge), shortening the keyboard path from presets to Find width from 45 to 23 stops. Increments and values are unchanged.
   차동 쌍 미리보기의 숫자 화살표 버튼을 Tab 순서에서 뺐습니다(각 칸의 ArrowUp/ArrowDown은 그대로). 프리셋에서 Find width까지 키보드 정지가 45개에서 23개로 줄었습니다. 증분과 수치는 그대로입니다.
 

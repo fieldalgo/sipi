@@ -54,7 +54,7 @@ launch values from complex RLGC matrices. This checks the stated finite-domain
 case; it does not establish outer-boundary convergence, empirical accuracy or
 universal template/frequency coverage. Original criteria remain unchanged.
 
-The explicit shared `galerkin.laplace_two_ground` capability is required. This
+The explicit shared `galerkin.panel_electrostatics` capability is required. This
 uses the exact shared development revision in `dependencies.json`. Missing
 capability fails explicitly; no other current method is substituted. Browser,
 macOS and Windows qualification are separate from these Linux checks.

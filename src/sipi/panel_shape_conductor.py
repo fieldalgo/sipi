@@ -43,10 +43,20 @@ class PanelShapeRequest:
         object.__setattr__(self, 'polygons', tuple(_frozen(p) for p in self.polygons))
 
     def arguments(self):
-        """Return an independent, JSON-compatible public-solver request."""
+        """Return an independent, JSON-compatible request as saved records keep it.
+
+        Saved records keep ``width`` and ``height``; ``solver_arguments`` gives the
+        same numbers in the keywords of ``galerkin.panel_electrostatics``.
+        """
         return dict(polygons=[p.tolist() for p in self.polygons], width=self.width,
                     height=self.height, panels_per_edge=self.panels_per_edge,
                     ground_modes=self.ground_modes, interpolation_degree=self.interpolation_degree)
+
+    def solver_arguments(self):
+        """Return ``arguments()`` as keywords of the public panel solver (``box_size`` in m)."""
+        out = self.arguments()
+        out['box_size'] = [out.pop('width'), out.pop('height')]
+        return out
 
 
 @dataclass(frozen=True)
@@ -208,7 +218,7 @@ def panel_shape_current_factors(section, *, panels_per_edge=32, ground_modes=512
     base = None
     for request in requests:
         try:
-            result = solver(**request.arguments())
+            result = solver(**request.solver_arguments())
             sample = PanelShapeSample(request, result.capacitance_per_permittivity,
                                       {key: getattr(result, key) for key in _DIAGNOSTICS})
         except Exception as exc:

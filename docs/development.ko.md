@@ -52,6 +52,12 @@ provenance.json은 최초 이전 스냅샷의 파일과 상류 SHA-256을 기록
 없으므로 정확한 의존성 커밋으로 빌드하고 wheel 해시를 보존해야 한다. 경계 패널
 API는 공유 galerkin 기능이며, 이 pin 변경만으로 기존 SIPI 계산이 이를 선택하지 않는다.
 
+SIPI는 공유 경계 패널 해법을 공개 모듈 `galerkin.panel_electrostatics`로만 부른다.
+인자는 SI이다: `box_size`는 직사각형의 (폭, 높이)(m)이고, 도체는 `ground_indices`,
+`signal_indices`, `signal_index`로 고른다. `CrossSection` 길이가 이미 m이므로 SIPI는
+같은 수를 변환 없이 넘기며, 결과는 내부 해법의 결과 객체와 비트 단위로 같다. 저장된
+형상 panel 요청은 `width`·`height` 키를 그대로 둔다.
+
 큰 매개변수 시험 입력에는 짧은 `ids`를 명시한다. pytest는 node ID를
 `PYTEST_CURRENT_TEST`에 넣고 Windows 환경변수 값은 32767자로 제한된다.
 실제 큰 입력과 거부 기준은 그대로 유지한다.

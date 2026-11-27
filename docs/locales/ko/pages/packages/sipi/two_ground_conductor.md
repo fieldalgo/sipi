@@ -3,7 +3,7 @@
 [English](../../../../../packages/sipi/two_ground_conductor.md)
 
 이 명시적 소비자는 `dependencies.json`의 정확한 공유 개발 리비전이 제공하는
-`galerkin.laplace_two_ground.solve_two_ground_rectangle`를 사용한다. 기능이 없으면
+`galerkin.panel_electrostatics.solve_two_ground_rectangle`를 사용한다. 기능이 없으면
 대체 계산 없이 RuntimeError를 반환한다. 기존 추출 기본값은 그대로다. 공유 패키지를
 고정 리비전에서 빌드해야 하며 같은 버전 번호만으로 호환 wheel을 식별할 수 없다.
 

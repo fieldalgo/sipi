@@ -76,7 +76,7 @@ def test_ground_trace_is_fixed_potential_and_preserves_surface_partition(guards)
 
 def test_guarded_voltage_constraint_against_public_capacitance(guards):
     shared=candidate._solver()([t.corners()+[.004,0] for t in guarded().traces],
-        width=.008,height=.002,panels_per_edge=16,ground_modes=128,interpolation_degree=14)
+        box_size=(.008,.002),panels_per_edge=16,ground_modes=128,interpolation_degree=14)
     cap=shared.capacitance_per_permittivity
     # Independently prescribe zero potential on the middle trace, then
     # normalize the two signal currents by the principal capacitance block.

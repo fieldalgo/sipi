@@ -19,7 +19,7 @@ __all__ = ['two_ground_corner_current_factors', 'two_ground_corner_face_current_
 
 def _solver():
     try:
-        solver = import_module('galerkin.laplace_two_ground').solve_two_ground_corner_rectangle_edges
+        solver = import_module('galerkin.panel_electrostatics').solve_two_ground_corner_rectangle_edges
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Corner currents require the exact pinned galerkin development '
                            'wheel providing solve_two_ground_corner_rectangle_edges') from exc
@@ -44,7 +44,7 @@ def _arguments(section, panels_per_edge, ground_modes, interpolation_degree):
 
 
 def _extract(checked, count, modes, degree, polygons):
-    shared = _solver()(polygons, width=checked.width, height=checked.height,
+    shared = _solver()(polygons, box_size=(checked.width, checked.height),
         panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
     return _extract_result(checked, polygons, shared, 'two-ground-corner-power-all-active')
 

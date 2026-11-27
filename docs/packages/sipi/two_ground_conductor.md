@@ -3,7 +3,7 @@
 [한국어](../../locales/ko/pages/packages/sipi/two_ground_conductor.md)
 
 This explicit consumer uses the public
-`galerkin.laplace_two_ground.solve_two_ground_rectangle` capability supplied by
+`galerkin.panel_electrostatics.solve_two_ground_rectangle` capability supplied by
 the exact shared development revision in `dependencies.json`. The API raises
 RuntimeError if that capability is absent, without a fallback. Existing extraction
 defaults are unchanged. Build the shared packages from the pinned revision;

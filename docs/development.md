@@ -66,6 +66,14 @@ the exact dependency commit and retain wheel hashes. The boundary-panel API
 is a shared galerkin capability; changing this pin alone does not select it
 for existing SIPI calculations.
 
+SIPI reaches the shared boundary-panel solvers only through the public
+`galerkin.panel_electrostatics` module. Its arguments are SI: `box_size` is the
+rectangle's (width, height) in m, and conductors are selected with
+`ground_indices`, `signal_indices` or `signal_index`. `CrossSection` lengths
+are already in m, so SIPI passes the same numbers without conversion, and the
+results are the internal solvers' result objects, bit for bit. Saved
+shape-panel requests keep their `width` and `height` keys.
+
 Give large parametrized test inputs short explicit `ids`. Pytest puts the node
 ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 32767 characters. Keep the actual large input and its rejection criterion intact.

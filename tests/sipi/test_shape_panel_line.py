@@ -204,7 +204,8 @@ def test_current_failure_keeps_exact_partial_requests(extracted,monkeypatch,inde
     assert error['current_solver'] is None and error['cause_type']=='PanelShapeCurrentError'
     partial=error['partial_current'];assert len(partial['samples'])==index
     assert partial['cause_type']=='ValueError'
-    assert partial['failed_request']['request']==calls[-1]
+    saved=dict(calls[-1]);saved['width'],saved['height']=saved.pop('box_size')  # saved records keep width/height
+    assert partial['failed_request']['request']==saved
     assert partial['samples']==[candidate._sample_record(s) for s in result.current_factors.samples[:index]]
 
 

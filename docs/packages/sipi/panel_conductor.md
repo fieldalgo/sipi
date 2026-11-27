@@ -1,8 +1,9 @@
 # Explicit boundary-panel conductor loss
 
-This explicit path uses the shared `galerkin.laplace_boundary` kernel for
-vacuum perfect-conductor currents. It does not change the existing finite-element
-surface-current APIs or select a new method in saved line documents.
+This explicit path uses the shared public `galerkin.panel_electrostatics`
+solver (`solve_grounded_rectangle`) for vacuum perfect-conductor currents. It
+does not change the existing finite-element surface-current APIs or select a
+new method in saved line documents.
 
 Use wheels built from the exact commit in `dependencies.json`. Development
 wheels may share a version while exposing different APIs. Loading SIPI remains

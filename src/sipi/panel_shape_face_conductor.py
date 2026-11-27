@@ -127,7 +127,7 @@ def panel_shape_face_current_factors(section,*,panels_per_edge=32,ground_modes=5
     solver=_panel_solver();samples=[]
     for request in requests:
         try:
-            result=solver(**request.arguments())
+            result=solver(**request.solver_arguments())
             samples.append(PanelShapeSample(request,result.capacitance_per_permittivity,
                 {key:getattr(result,key) for key in _DIAGNOSTICS}))
         except Exception as exc:

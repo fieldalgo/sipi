@@ -19,7 +19,8 @@ from test_two_ground_conductor import guarded, metals
 
 def fake_solver(monkeypatch, *, failure=None):
     calls=[]
-    def solve(polygons, *, width, height, panels_per_edge, ground_modes, interpolation_degree):
+    def solve(polygons, *, box_size, panels_per_edge, ground_modes, interpolation_degree):
+        width,height=box_size
         calls.append((width,height,panels_per_edge,ground_modes,interpolation_degree))
         if failure is not None and len(calls)==1:raise failure('original current refusal')
         n=len(polygons);eye=np.eye(n)
@@ -165,7 +166,7 @@ def test_concurrent_requests_have_separate_caches(monkeypatch):
 
 @pytest.mark.parametrize('sampled',[False,True],ids=['single','finite-grid'])
 def test_real_selected_goal_keeps_every_value_and_attempt_with_two_solves(monkeypatch,sampled,record_property):
-    import galerkin.laplace_two_ground as shared
+    import galerkin.panel_electrostatics as shared
     import sipi.two_ground_pair_goal as single_module
     import sipi.two_ground_sampled_pair_goal as sampled_module
     from sipi.execution_request import SavedExecutionRequest
@@ -176,10 +177,11 @@ def test_real_selected_goal_keeps_every_value_and_attempt_with_two_solves(monkey
         raw=doc.to_dict();raw.update(initial=list(SELECTED),max_evaluations=4);doc=type(doc).from_dict(raw)
     request=SavedExecutionRequest(doc.dumps(),max_evaluations=4)
     original=shared.solve_two_ground_rectangle;calls=[]
-    def solve(polygons,*,width,height,panels_per_edge=32,ground_modes=128,interpolation_degree=12):
+    def solve(polygons,*,box_size,panels_per_edge=32,ground_modes=128,interpolation_degree=12):
+        width,height=box_size
         calls.append(dict(width=width,height=height,panels=panels_per_edge,modes=ground_modes,degree=interpolation_degree,
             polygon_hashes=[hashlib.sha256(p.tobytes()).hexdigest() for p in polygons]))
-        return original(polygons,width=width,height=height,panels_per_edge=panels_per_edge,
+        return original(polygons,box_size=box_size,panels_per_edge=panels_per_edge,
             ground_modes=ground_modes,interpolation_degree=interpolation_degree)
     monkeypatch.setattr(shared,'solve_two_ground_rectangle',solve)
     with monkeypatch.context() as context:
