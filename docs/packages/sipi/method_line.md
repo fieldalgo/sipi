@@ -66,3 +66,46 @@ layered coplanar striplines with width/height up to 64. The 18 sections with
 no ground plane use the [open-box panel line](open_panel_line.md). Other
 boundary combinations (for example grounded sides) are refused. Existing
 transmission-line documents and their results are unchanged.
+
+## Version 2: recovered currents
+
+`sipi.method-transmission-line/2` admits the same `panel` and `volume-p1`
+values with the same meaning and the same equivalent documents, plus
+`volume-p1-recovered`. Version 1 keeps exactly its two values and refuses the
+third with a pointer to version 2. A published schema names the values it
+accepts: a version-1 document with a new value would be refused by released
+readers, and a reader could not tell from the schema which calculation a
+value means, so the value set is extended by a new version instead of
+widening `CURRENT_METHODS`, which stays `('panel', 'volume-p1')`.
+`METHODS_BY_SCHEMA` lists the values of each version.
+
+`volume-p1-recovered` requires `recovery` with `support_fraction` in
+(0, 0.5) and runs `sipi.recovered-transmission-line/1` (`RecoveredTransmissionLineDocument`
+in `sipi.recovered_line`). That document keeps the nested transmission-line/1
+to /7 and its saved mesh. It replaces only the surface-current factors with
+[`recovered_surface_current_factors`](conductor.md) on that mesh, with the
+same P1 basis and C0. C, G and external L are therefore bit-identical to
+`volume-p1`, and R and internal L use the same surface-impedance laws with the
+recovered factors.
+
+| Conductor | `volume-p1-recovered` |
+|---|---|
+| `surface` | one factor matrix for every surface, as `volume-p1` |
+| `surface-boundaries` | per-boundary factors with each signal's and the reference metal |
+| `perfect` | refused: no surface current loss; use `volume-p1` |
+| `surface-faces` | refused: the recovery has no per-face factors |
+
+Corners other than convex right angles (trapezoid, acute, re-entrant),
+supports reaching another conductor or meeting an open wall with a normal
+component, and a boundary-gradient flux error above 5% are refused by
+`analyze()` with the reason. A refusal is never replaced by another method.
+`sipi run` and `execute_saved` add `current_method` and `current_solver`
+(`kind`, `settings`, `diagnostics` with `support_width`, `clearance`,
+`support_triangles`, `corners` and `gradient_current_error`, the factors and
+current integrals).
+
+```python
+saved = MethodTransmissionLineDocument(line, current_method='volume-p1-recovered',
+    recovery=dict(support_fraction=0.4), schema='sipi.method-transmission-line/2')
+result = saved.analyze()
+```

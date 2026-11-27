@@ -83,7 +83,9 @@ with no ground plane (unbacked coplanar) the [open-box panel line](open_panel_li
 `volume-p1`) and performs this conversion itself. In
 [transmission-line/8](default_line.md) the panel method is the default for
 `surface` and `surface-boundaries` conductors, and P1 must be named with
-`current_method: "volume-p1"`.
+`current_method: "volume-p1"`. Method-line/2 and transmission-line/9 also
+accept the recovered P1 currents, `current_method: "volume-p1-recovered"`,
+only when named.
 
 ## Input schema
 

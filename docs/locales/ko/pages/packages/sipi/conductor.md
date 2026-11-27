@@ -191,7 +191,10 @@ ground, *, support_fraction=0.4)`는 **보조** 전류 방법입니다.
 `surface_current_factors`와 같은 유전체 전용 P1 메시와 도체 절점 집합을 받고,
 같은 진공 기저를 풀어 같은 C0를 돌려주며, 다른 것은 표면 적분뿐입니다.
 `surface_current_factors`, `volume-p1` 방법, panel 기본값과 저장된 모든
-문서·결과는 바뀌지 않습니다. 이 함수는 아직 저장 문서에서 고를 수 없습니다.
+문서·결과는 바뀌지 않습니다. 저장 선로에서는
+`sipi.method-transmission-line/2`나 `sipi.transmission-line/9`에서
+`current_method: "volume-p1-recovered"`로 이름을 적어 고릅니다
+([방법 명시 선로](method_line.md#버전-2-복원-전류)). 기본값은 계속 panel입니다.
 
 법선 미분 곱의 경계 적분을 영역(Hadamard) 형식으로 바꿉니다. 이는 Wheeler의
 증분 인덕턴스 규칙으로, 각 도체 벽이 단위 법선 변위 theta만큼 움직입니다. n이

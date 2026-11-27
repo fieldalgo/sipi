@@ -6,6 +6,9 @@
 document and records which existing calculation supplies the surface
 currents. Each method runs an existing document unchanged, so its result is
 the result of that document; this module adds no numerical path.
+``sipi.method-transmission-line/2`` admits the same methods with the same
+meaning plus ``volume-p1-recovered``, which runs
+``sipi.recovered-transmission-line/1``. Version 1 keeps its two values.
 """
 import dataclasses
 import json
@@ -14,13 +17,17 @@ from .document import _keys, _unique_object
 from .line_model import TransmissionLineDocument
 from .open_panel_line import OpenPanelTransmissionLineDocument
 from .panel_line import PanelTransmissionLineDocument
+from .recovered_line import RecoveredTransmissionLineDocument
 from .two_ground_panel_line import TwoGroundPanelTransmissionLineDocument
 
 
-__all__ = ['MethodTransmissionLineDocument', 'CURRENT_METHODS']
+__all__ = ['MethodTransmissionLineDocument', 'CURRENT_METHODS', 'METHODS_BY_SCHEMA', 'RECOVERED_METHOD']
 
 _SCHEMA = 'sipi.method-transmission-line/1'
-CURRENT_METHODS = ('panel', 'volume-p1')
+CURRENT_METHODS = ('panel', 'volume-p1')  # the values of version 1, unchanged
+RECOVERED_METHOD = 'volume-p1-recovered'
+METHODS_BY_SCHEMA = {_SCHEMA: CURRENT_METHODS,
+                     'sipi.method-transmission-line/2': CURRENT_METHODS+(RECOVERED_METHOD,)}
 _PANEL_KEYS = ('panels_per_edge', 'ground_modes', 'interpolation_degree')
 _OPEN_PANEL_KEYS = ('panels_per_edge', 'interpolation_degree')  # no ground plane, no ground modes
 _OPEN = ('open', 'open', 'open')
@@ -75,6 +82,9 @@ def _equivalent(data):
     line = TransmissionLineDocument.from_dict(data['line'])
     if data['current_method'] == 'volume-p1':
         return line
+    if data['current_method'] == RECOVERED_METHOD:
+        return RecoveredTransmissionLineDocument.from_dict(dict(
+            schema='sipi.recovered-transmission-line/1', line=line.to_dict(), recovery=data['recovery']))
     section = line.cross_section.section
     value = line.to_dict()
     boundaries = (section.bottom, section.top, section.sides)
@@ -107,28 +117,46 @@ class MethodTransmissionLineDocument:
     interpolation_degree, without ground_modes for an open box. Anything the panel documents refuse is refused here;
     there is no fallback to the other method. Normalization performs no field
     solve; shared panel admission and refinement checks run in analyze().
+
+    Version 2 (``schema='sipi.method-transmission-line/2'``) also admits
+    ``volume-p1-recovered`` with required ``recovery`` controls
+    (``support_fraction``); it runs ``sipi.recovered-transmission-line/1`` on the
+    nested line's own mesh. Its refusals (perfect or per-face conductors,
+    uncharacterised corners, supports meeting other conductors or open walls)
+    are not replaced by another method. Version 1 refuses that value.
     """
-    def __init__(self, line, *, current_method, panel=None):
+    def __init__(self, line, *, current_method, panel=None, recovery=None, schema=_SCHEMA):
         if not isinstance(line, TransmissionLineDocument):
             raise TypeError('line must be a TransmissionLineDocument')
-        data = dict(schema=_SCHEMA, line=line.to_dict(), current_method=current_method)
+        data = dict(schema=schema, line=line.to_dict(), current_method=current_method)
         if panel is not None:
             data['panel'] = panel
+        if recovery is not None:
+            data['recovery'] = recovery
         self._data = self._validate(data)
 
     @staticmethod
     def _validate(data):
         if not isinstance(data, dict):
             raise ValueError('method transmission line must be an object')
-        method = data.get('current_method')
-        if not isinstance(method, str) or method not in CURRENT_METHODS:
-            raise ValueError("current_method must be 'panel' or 'volume-p1'")
-        keys = ('schema', 'line', 'current_method') + (('panel',) if method == 'panel' else ())
-        _keys(data, keys, where='method transmission line')
-        if data['schema'] != _SCHEMA:
+        schema = data.get('schema')
+        if not isinstance(schema, str) or schema not in METHODS_BY_SCHEMA:
             raise ValueError('unsupported method-transmission-line schema')
-        out = dict(schema=_SCHEMA, line=TransmissionLineDocument.from_dict(data['line']).to_dict(),
+        method = data.get('current_method')
+        if not isinstance(method, str) or method not in METHODS_BY_SCHEMA[schema]:
+            if schema == _SCHEMA:
+                hint = (f"; {RECOVERED_METHOD!r} requires sipi.method-transmission-line/2"
+                        if method == RECOVERED_METHOD else '')
+                raise ValueError("current_method must be 'panel' or 'volume-p1'" + hint)
+            raise ValueError('current_method must be ' + ', '.join(repr(m) for m in METHODS_BY_SCHEMA[schema]))
+        extra = {'panel': ('panel',), RECOVERED_METHOD: ('recovery',)}.get(method, ())
+        keys = ('schema', 'line', 'current_method') + extra
+        _keys(data, keys, where='method transmission line')
+        out = dict(schema=schema, line=TransmissionLineDocument.from_dict(data['line']).to_dict(),
                    current_method=method)
+        if method == RECOVERED_METHOD:
+            out['recovery'] = data['recovery']
+            out['recovery'] = _equivalent(out).to_dict()['recovery']
         if method == 'panel':
             if not isinstance(data['panel'], dict):
                 raise ValueError('panel controls must be an object')
