@@ -8,17 +8,25 @@ and, for the panel method, the panel controls into the saved document, so a
 stored line never depends on a later change of defaults. Calculation reuses the
 delegation of ``sipi.method-transmission-line/1``; this module adds no
 numerical path. Transmission-line/1-7 documents are not changed.
+
+``sipi.transmission-line/9`` holds the same fields and also admits
+``current_method='volume-p1-recovered'`` when it is named, delegating to
+``sipi.method-transmission-line/2``. The default stays ``panel``; version 8
+keeps its two values.
 """
 import dataclasses
 import json
 
 from .document import _keys, _unique_object
 from .line_model import TransmissionLineDocument
-from .method_line import MethodTransmissionLineDocument, CURRENT_METHODS
+from .method_line import MethodTransmissionLineDocument, METHODS_BY_SCHEMA, RECOVERED_METHOD
 
-__all__ = ['DefaultPanelTransmissionLineDocument', 'DEFAULT_PANEL_CONTROLS']
+__all__ = ['DefaultPanelTransmissionLineDocument', 'DEFAULT_PANEL_CONTROLS', 'DEFAULT_RECOVERY_CONTROLS']
 
 _SCHEMA = 'sipi.transmission-line/8'
+# Each line version and the method-line version its calculation delegates to.
+_METHOD_SCHEMA = {_SCHEMA: 'sipi.method-transmission-line/1',
+                  'sipi.transmission-line/9': 'sipi.method-transmission-line/2'}
 _LINE_KEYS = ('schema', 'cross_section', 'frequency_hz', 'materials', 'conductor', 'length_m', 'reference_ohms')
 _DEFAULT_KINDS = ('surface', 'surface-boundaries')
 _VOLUME = "set current_method 'volume-p1' to use the P1 volume-mesh surface currents"
@@ -34,6 +42,9 @@ DEFAULT_PANEL_CONTROLS = {
     ('ground', 'ground', 'open'): dict(panels_per_edge=64, ground_modes=512, interpolation_degree=14),
     ('open', 'open', 'open'): dict(panels_per_edge=64, interpolation_degree=12),
 }
+# Recovered-current controls written when transmission-line/9 names the method
+# without them; 0.4 is the support fraction the recovery was characterised with.
+DEFAULT_RECOVERY_CONTROLS = dict(support_fraction=0.4)
 
 
 def _line7(data):
@@ -42,10 +53,12 @@ def _line7(data):
     return TransmissionLineDocument.from_dict(dict(line, schema='sipi.transmission-line/7'))
 
 
-def _method(line, method, panel):
-    data = dict(schema='sipi.method-transmission-line/1', line=line.to_dict(), current_method=method)
+def _method(line, method, panel, schema=_SCHEMA, recovery=None):
+    data = dict(schema=_METHOD_SCHEMA[schema], line=line.to_dict(), current_method=method)
     if panel is not None:
         data['panel'] = panel
+    if recovery is not None:
+        data['recovery'] = recovery
     return MethodTransmissionLineDocument.from_dict(data)
 
 
@@ -64,44 +77,64 @@ class DefaultPanelTransmissionLineDocument:
     solve (boundaries, conductor kind, thickness, controls, panel count);
     kernel range and refinement checks run in analyze(). A panel refusal never
     falls back to the P1 method.
+
+    ``schema='sipi.transmission-line/9'`` also admits ``'volume-p1-recovered'``,
+    only when named, with optional ``recovery`` controls (``support_fraction``,
+    written out as ``DEFAULT_RECOVERY_CONTROLS`` when omitted). Its refusals
+    are reported, never replaced by another method.
     """
     def __init__(self, cross_section, frequency, *, materials, conductor, length, z_ref=50.0,
-                 current_method=None, panel=None):
+                 current_method=None, panel=None, recovery=None, schema=_SCHEMA):
         line = TransmissionLineDocument(cross_section, frequency, materials=materials, conductor=conductor,
                                         length=length, z_ref=z_ref, schema='sipi.transmission-line/7')
-        data = dict(line.to_dict(), schema=_SCHEMA)
+        data = dict(line.to_dict(), schema=schema)
         if current_method is not None:
             data['current_method'] = current_method
         if panel is not None:
             data['panel'] = panel
+        if recovery is not None:
+            data['recovery'] = recovery
         self._data = self._validate(data)
 
     @staticmethod
     def _validate(data):
         if not isinstance(data, dict):
             raise ValueError('transmission line must be an object')
-        present = tuple(key for key in ('current_method', 'panel') if key in data)
-        _keys(data, _LINE_KEYS + present, where='transmission line')
-        if data['schema'] != _SCHEMA:
+        schema = data.get('schema')
+        if not isinstance(schema, str) or schema not in _METHOD_SCHEMA:
             raise ValueError('unsupported transmission-line schema')
+        methods = METHODS_BY_SCHEMA[_METHOD_SCHEMA[schema]]
+        controls = ('current_method', 'panel') + (('recovery',) if RECOVERED_METHOD in methods else ())
+        present = tuple(key for key in controls if key in data)
+        _keys(data, _LINE_KEYS + present, where='transmission line')
         line = _line7(data)
         kind = line.to_dict()['conductor']['kind']
         method = data.get('current_method')
         if method is None:
             if kind == 'surface-faces':
-                raise ValueError('surface-faces (per-face metal) has no panel default in transmission-line/8; '
+                raise ValueError(f'surface-faces (per-face metal) has no panel default in {schema[5:]}; '
                                  + _VOLUME + ', or use a face panel line document')
             if kind not in _DEFAULT_KINDS:
-                raise ValueError(f'{kind} conductors have no default current_method in transmission-line/8; '
+                raise ValueError(f'{kind} conductors have no default current_method in {schema[5:]}; '
                                  "set current_method 'panel' or 'volume-p1'")
             method = 'panel'
-        if not isinstance(method, str) or method not in CURRENT_METHODS:
-            raise ValueError('current_method must be ' + ' or '.join(repr(m) for m in CURRENT_METHODS))
+        if not isinstance(method, str) or method not in methods:
+            hint = (f'; {RECOVERED_METHOD!r} requires sipi.transmission-line/9'
+                    if method == RECOVERED_METHOD else '')
+            raise ValueError('current_method must be ' + ' or '.join(repr(m) for m in methods) + hint)
+        if method != RECOVERED_METHOD and 'recovery' in data:
+            raise ValueError(f"recovery controls require current_method {RECOVERED_METHOD!r}")
+        if method == RECOVERED_METHOD:
+            if 'panel' in data:
+                raise ValueError("panel controls require current_method 'panel'")
+            recovery = data['recovery'] if 'recovery' in data else dict(DEFAULT_RECOVERY_CONTROLS)
+            normalized = _method(line, method, None, schema, recovery).to_dict()['recovery']
+            return dict(line.to_dict(), schema=schema, current_method=method, recovery=normalized)
         if method != 'panel':
             if 'panel' in data:
                 raise ValueError("panel controls require current_method 'panel'")
-            _method(line, method, None)
-            return dict(line.to_dict(), schema=_SCHEMA, current_method=method)
+            _method(line, method, None, schema)
+            return dict(line.to_dict(), schema=schema, current_method=method)
         if kind == 'surface-faces':
             raise ValueError('the panel current method does not support surface-faces (per-face metal); '
                              + _VOLUME + ', or use a face panel line document')
@@ -112,10 +145,10 @@ class DefaultPanelTransmissionLineDocument:
                              'two grounds with open sides, or open bottom, top and sides; ' + _VOLUME)
         panel = data['panel'] if 'panel' in data else dict(DEFAULT_PANEL_CONTROLS[boundaries])
         try:
-            normalized = _method(line, method, panel).to_dict()['panel']
+            normalized = _method(line, method, panel, schema).to_dict()['panel']
         except ValueError as error:
             raise ValueError(f'{error}; {_VOLUME}') from error
-        return dict(line.to_dict(), schema=_SCHEMA, current_method=method, panel=normalized)
+        return dict(line.to_dict(), schema=schema, current_method=method, panel=normalized)
 
     @classmethod
     def from_dict(cls, data):
@@ -146,9 +179,10 @@ class DefaultPanelTransmissionLineDocument:
         return _line7(self.to_dict())
 
     def method_document(self):
-        """The ``sipi.method-transmission-line/1`` document with the same content."""
+        """The method-line document (/1 for line/8, /2 for line/9) with the same content."""
         data = self.to_dict()
-        return _method(_line7(data), data['current_method'], data.get('panel'))
+        return _method(_line7(data), data['current_method'], data.get('panel'), data['schema'],
+                       data.get('recovery'))
 
     def equivalent_document(self):
         """A fresh copy of the existing document that this input runs."""
