@@ -10,7 +10,7 @@
 전송선 /1–/7, 도체는 `perfect` 또는 `surface-boundaries`, 도체 두께는 양수여야 합니다.
 사용 예제는 영문 문서와 같습니다.
 
-진공 전류는 공유 open-box panel 해법(`galerkin.laplace_open_box`)이 구합니다. 상자 네
+진공 전류는 공유 open-box panel 해법(`galerkin.panel_electrostatics.solve_open_rectangle`)이 구합니다. 상자 네
 벽 모두 법선 플럭스 0(부피 메시의 열린 경계와 같음)이고 모든 접지 트레이스가 0
 전압입니다. 이 전류가 진공 정전용량과 외부 L을 주고, 기존 유전체 해법이 저장된 부피
 메시에서 C·G를, 기존 경계별 표면 법칙이 R과 내부 L을 줍니다(모든 접지 트레이스가 기준

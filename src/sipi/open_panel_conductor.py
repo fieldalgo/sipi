@@ -20,7 +20,7 @@ __all__ = ['open_panel_surface_current_factors', 'open_panel_conductor_loss_by_b
 
 def _open_solver():
     try:
-        return import_module('galerkin.laplace_open_box').solve_open_rectangle
+        return import_module('galerkin.panel_electrostatics').solve_open_rectangle
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Open-box panel currents require the exact shared development wheel '
                            'identified in dependencies.json') from exc
@@ -51,7 +51,7 @@ def open_panel_surface_current_factors(section, *, panels_per_edge=32, interpola
     polygons = [t.corners()+np.array([checked.width/2, 0.]) for t in checked.traces]
     signal = [i for i, t in enumerate(checked.traces) if not t.ground]
     grounded = [i for i, t in enumerate(checked.traces) if t.ground]
-    shared = _open_solver()(polygons, width=checked.width, height=checked.height, grounds=grounded,
+    shared = _open_solver()(polygons, box_size=(checked.width, checked.height), ground_indices=grounded,
                             panels_per_edge=panels_per_edge, interpolation_degree=interpolation_degree)
     if tuple(shared.signal_indices) != tuple(signal) or tuple(shared.ground_indices) != tuple(grounded):
         raise ValueError('open-box panel solve changed conductor order')

@@ -154,7 +154,8 @@ def test_partial_current_request_survives_common_execution(observed,monkeypatch,
     out=execute_saved(doc.dumps());error=out['error'];partial=error['partial_current']
     assert out['status']=='failed' and out['result'] is None and error['stage']=='current'
     assert error['current_solver'] is None and partial['cause_type']=='ValueError'
-    assert partial['failed_request']['request']==calls[-1]
+    saved=dict(calls[-1]);saved['width'],saved['height']=saved.pop('box_size')  # saved records keep width/height
+    assert partial['failed_request']['request']==saved
     assert partial['samples']==[_sample_record(s) for s in r.current_factors.samples[:index]]
 
 

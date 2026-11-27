@@ -23,10 +23,10 @@ __all__ = ['TwoGroundCurrentFactors', 'TwoGroundConductorLoss',
 
 def _solver():
     try:
-        solver = import_module('galerkin.laplace_two_ground').solve_two_ground_rectangle
+        solver = import_module('galerkin.panel_electrostatics').solve_two_ground_rectangle
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Two-ground currents require the galerkin development wheel '
-                           'providing laplace_two_ground; installed capability is unavailable') from exc
+                           'providing galerkin.panel_electrostatics; installed capability is unavailable') from exc
     if not {'ground_modes', 'interpolation_degree'} <= set(signature(solver).parameters):
         raise RuntimeError('Two-ground currents require explicit ground_modes and interpolation_degree controls')
     return solver
@@ -114,7 +114,7 @@ def two_ground_current_factors(section, *, panels_per_edge=32, ground_modes=128,
 
 def _solve_current_factors(checked, count, modes, degree, polygons, solver):
     """Original vacuum solve, reduction and checks; no material or cache policy."""
-    shared = solver(polygons, width=checked.width, height=checked.height,
+    shared = solver(polygons, box_size=(checked.width, checked.height),
                        panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
     signal = [i for i, t in enumerate(checked.traces) if not t.ground]
     grounded = [i for i, t in enumerate(checked.traces) if t.ground]

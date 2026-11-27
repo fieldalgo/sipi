@@ -164,7 +164,8 @@ def test_partial_current_requests_and_completed_whole_evidence_survive(observed,
     request=SavedExecutionRequest(doc.dumps());receipt=request.run();out=receipt['execution'];error=out['error'];partial=error['partial_current']
     assert out['status']=='failed' and out['result'] is None and error['stage']=='current'
     assert error['current_solver'] is None and partial['kind']==kind and partial['cause_type']=='ValueError'
-    assert partial['failed_request']['request']==calls[-1]
+    saved=dict(calls[-1]);saved['width'],saved['height']=saved.pop('box_size')  # saved records keep width/height
+    assert partial['failed_request']['request']==saved
     assert partial['samples']==[_sample_record(s) for s in samples[:index]]
     if kind=='faces':assert partial['whole_current']==whole_current_record(factors.base,doc.current_options)
     else:assert 'whole_current' not in partial

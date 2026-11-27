@@ -45,7 +45,7 @@ def test_adapter_keeps_failed_solve_out_of_reuse(monkeypatch):
 
 def test_guard_assignment_changes_scoped_identity(monkeypatch):
     calls=[]
-    def solver(*args,**kwargs):calls.append(kwargs['signals']);return object()
+    def solver(*args,**kwargs):calls.append(kwargs['signal_indices']);return object()
     monkeypatch.setattr(module,'_solver',lambda:solver)
     monkeypatch.setattr(module,'_extract_result',lambda checked,polygons,shared,method:shared)
     s=section();traces=[dataclasses.replace(t,ground=(i==1)) for i,t in enumerate(s.traces)]

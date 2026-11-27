@@ -53,7 +53,7 @@ failed goal retains the original `TwoGroundPanelLineError` details and completed
 attempts; interrupts propagate. Requests, records and projects can reopen inputs
 and results without recomputing. No callable or automatic retry is serialized.
 
-The explicit shared `galerkin.laplace_two_ground` capability is supplied by
+The explicit shared `galerkin.panel_electrostatics` capability is supplied by
 the revision in `dependencies.json`. Missing capability produces a failed
 receipt, never a fallback. Existing extraction defaults remain unchanged.
 Finite-domain refinement is not outer-boundary convergence, empirical accuracy,

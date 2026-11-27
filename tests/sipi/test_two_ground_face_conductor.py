@@ -164,7 +164,7 @@ def test_one_shared_field_solve(monkeypatch):
 
 def test_guard_face_reduction_against_prescribed_zero_potential(factors):
     sec=section();shared=module._solver()([t.corners()+[sec.width/2,0.] for t in sec.traces],
-        width=sec.width,height=sec.height,**CONTROLS)
+        box_size=(sec.width,sec.height),**CONTROLS)
     cap=shared.whole.capacitance_per_permittivity
     v=np.zeros((3,2));v[[0,2]]=np.linalg.inv(cap[np.ix_([0,2],[0,2])])
     current=cap@v

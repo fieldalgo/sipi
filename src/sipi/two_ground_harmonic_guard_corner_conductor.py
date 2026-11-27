@@ -25,11 +25,11 @@ __all__ = ['two_ground_harmonic_guard_corner_current_factors',
 
 def _solver():
     try:
-        solver = import_module('galerkin.laplace_corner_harmonic_guard_field').solve_two_ground_harmonic_corner_guard_edges
+        solver = import_module('galerkin.panel_electrostatics').solve_two_ground_harmonic_corner_guard_edges
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Harmonic corner currents require the exact pinned galerkin development '
                            'wheel providing solve_two_ground_harmonic_corner_guard_edges') from exc
-    if not {'signals', 'ground_modes', 'interpolation_degree'} <= set(signature(solver).parameters):
+    if not {'signal_indices', 'ground_modes', 'interpolation_degree'} <= set(signature(solver).parameters):
         raise RuntimeError('Harmonic corner currents require explicit shared resolution controls')
     return solver
 
@@ -54,8 +54,8 @@ def _arguments(section, panels_per_edge, ground_modes, interpolation_degree):
 def _extract(checked, count, modes, degree, polygons):
     solver = _solver()
     def compute():
-        shared = solver(polygons, signals=tuple(i for i,t in enumerate(checked.traces) if not t.ground),
-            width=checked.width, height=checked.height,
+        shared = solver(polygons, signal_indices=tuple(i for i,t in enumerate(checked.traces) if not t.ground),
+            box_size=(checked.width, checked.height),
             panels_per_edge=count, ground_modes=modes, interpolation_degree=degree)
         return _extract_result(checked, polygons, shared, 'two-ground-harmonic-corner-fixed-guard')
     return _reuse_current_factors(checked, polygons,

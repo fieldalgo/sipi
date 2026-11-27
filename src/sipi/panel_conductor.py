@@ -34,7 +34,7 @@ class PanelCurrentFactors(SurfaceCurrentFactors):
 
 def _panel_solver():
     try:
-        solver = import_module('galerkin.laplace_boundary').solve_grounded_rectangle
+        solver = import_module('galerkin.panel_electrostatics').solve_grounded_rectangle
     except (ImportError, AttributeError) as exc:
         raise RuntimeError('Panel currents require the exact shared development wheel identified in dependencies.json') from exc
     if 'interpolation_degree' not in signature(solver).parameters:
@@ -61,7 +61,7 @@ def panel_surface_current_factors(section, *, panels_per_edge=32, ground_modes=5
     if any(t.thickness <= 0 for t in checked.traces):
         raise ValueError('panel current factors require positive conductor thickness')
     polygons = [t.corners()+np.array([checked.width/2, 0.]) for t in checked.traces]
-    shared = _panel_solver()(polygons, width=checked.width, height=checked.height,
+    shared = _panel_solver()(polygons, box_size=(checked.width, checked.height),
                                       panels_per_edge=panels_per_edge, ground_modes=ground_modes,
                                       interpolation_degree=interpolation_degree)
     signal = [i for i,t in enumerate(checked.traces) if not t.ground]

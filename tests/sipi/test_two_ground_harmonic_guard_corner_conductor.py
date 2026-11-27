@@ -61,7 +61,7 @@ def test_one_shared_solve_and_exact_fixed_guard_basis(reused, shared):
     assert np.array_equal(factors.parts[10:],shared.edge_current_gram[[8,10,11,9]])
     assert np.array_equal(factors.parts[8:10],shared.whole.current_gram[3:])
     assert np.max(abs(factors.base.boundary_integrals[-1]))>1e-6
-    assert reused[0][1]['signals']==(0,1)
+    assert reused[0][1]['signal_indices']==(0,1)
     assert factors.names==('left','right') and factors.base.ground_trace_names==('center',)
     assert factors.reference_labels==('reference:bottom','reference:top')+tuple('reference:ground:center:'+face for face in ('bottom','top','left','right'))
     assert factors.base.diagnostics['method']=='two-ground-harmonic-corner-fixed-guard'
@@ -251,7 +251,7 @@ def test_geometry_order_and_active_order_are_distinct(monkeypatch,shared,permuta
     def solver(*args,**kwargs):calls.append(kwargs);return reordered
     monkeypatch.setattr(module,'_solver',lambda:solver)
     result=module.two_ground_harmonic_guard_corner_face_current_factors(changed)
-    assert calls[0]['signals']==tuple(i for i,t in enumerate(traces) if not t.ground)
+    assert calls[0]['signal_indices']==tuple(i for i,t in enumerate(traces) if not t.ground)
     assert result.names==tuple(original.traces[i].name for i in basis)
     assert result.base.ground_trace_names==('center',)
     assert np.array_equal(result.C0,epsilon_0*matrix(shared.whole.capacitance_per_permittivity))
