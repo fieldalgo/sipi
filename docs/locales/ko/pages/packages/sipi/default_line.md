@@ -67,7 +67,13 @@ P1을 명시해 고를 수 있다고 알려 줍니다.
   적분 수렴이 그것입니다.
 
 전송선을 담는 문서(회로, 스터디, panel 선로, 방법 명시 선로 등)는 transmission-line/1–/7을
-받고 /8·/9는 거절합니다. P1으로 조용히 계산하지 않습니다.
+받고 /8·/9는 거절합니다. P1으로 조용히 계산하지 않습니다. 새 컨테이너 버전은 /8·/9를 명시적으로
+받습니다. [`sipi.circuit/2`](circuit_document.md#버전-2-기본-panel-선로)는 내부
+transmission-line/8·/9를 그대로 실행하며 결과는 선로 단독 결과와 비트 단위로 같습니다.
+[`sipi.network-assembly/2`](network_assembly.md#버전-2-기본-panel-선로)와
+[`sipi.network-transforms/3`](network_document.md#버전-3-기본-panel-선로),
+[`sipi.network-band/2`](band.md#버전-2-기본-panel-선로),
+[`sipi.line-length-design/3`](extracted_length.md#버전-3-기본-panel-선로)도 같습니다.
 
 ## 버전 9: 이름으로 고르는 복원 방법
 

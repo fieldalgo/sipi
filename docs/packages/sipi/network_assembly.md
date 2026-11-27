@@ -72,6 +72,8 @@ previous field meanings; this is an input format, not persistent results.
 
 ## Version 2: default panel lines
 
+Each nested `sipi.transmission-line/8` below may also be a [`sipi.transmission-line/9`](default_line.md#version-9-the-recovered-method-by-name), including one that names `volume-p1-recovered`; its recovery controls are written into the saved document and the line runs unchanged, bit-identical to the line alone. Older versions refuse /9 as they refuse /8.
+
 Explicit `sipi.network-assembly/2` has the fields of version 1. Its
 `transmission-line` components also accept a
 [`sipi.transmission-line/8`](default_line.md) document; normalization writes

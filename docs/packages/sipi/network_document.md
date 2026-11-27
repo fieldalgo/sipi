@@ -76,6 +76,8 @@ physics, time-domain support, GUI linkage or new platform validation.
 
 ## Version 3: default panel lines
 
+Each nested `sipi.transmission-line/8` below may also be a [`sipi.transmission-line/9`](default_line.md#version-9-the-recovered-method-by-name), including one that names `volume-p1-recovered`; its recovery controls are written into the saved document and the line runs unchanged, bit-identical to the line alone. Older versions refuse /9 as they refuse /8.
+
 Explicit `sipi.network-transforms/3` has the fields and operations of version 2.
 Its base network and fixtures also accept a
 [`sipi.transmission-line/8`](default_line.md) document, and its base may be a

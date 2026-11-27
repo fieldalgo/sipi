@@ -8,7 +8,7 @@ import json
 
 import numpy as np
 
-from .circuit_document import _ASSEMBLY2, _LINE8, _complex_value, _json_copy, _network_input
+from .circuit_document import _ASSEMBLY2, _LINES, _complex_value, _json_copy, _network_input
 from .connection import _connection_layout, cascade_networks, deembed_network
 from .document import _keys, _unique_object
 from .network import LineNetwork, _references
@@ -22,7 +22,7 @@ _FIXTURE_SCHEMAS = ('sipi.network-transforms/2', 'sipi.network-transforms/3')
 
 
 def _admit(schema):
-    return (_LINE8, _ASSEMBLY2) if schema == 'sipi.network-transforms/3' else ()
+    return (*_LINES, _ASSEMBLY2) if schema == 'sipi.network-transforms/3' else ()
 
 
 def _source(value, admit=()):
@@ -140,7 +140,7 @@ class NetworkTransformDocument:
     and known-fixture removal. No recursive fixtures, file/network I/O or
     expressions. Parsing validates current port metadata without meshing;
     analysis extracts each geometry occurrence once. Explicit v3 has the
-    fields and operations of v2 and also admits transmission-line/8 inputs
+    fields and operations of v2 and also admits transmission-line/8 and /9 inputs
     and a network-assembly/2 source; v1 and v2 keep refusing them.
     """
     def __init__(self, network, *, operations, schema='sipi.network-transforms/1'):

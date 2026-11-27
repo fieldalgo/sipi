@@ -83,6 +83,8 @@ bool·문자열·null은 수치가 아닙니다. 스칼라는 모든 주파수�
 
 ## 버전 2: 기본 panel 선로
 
+아래의 내부 `sipi.transmission-line/8`은 [`sipi.transmission-line/9`](default_line.md#버전-9-이름으로-고르는-복원-방법)일 수도 있습니다(`volume-p1-recovered`를 지정한 것 포함). 복원 설정은 저장 문서에 적히고 선로는 그대로 실행되어 선로 단독 결과와 비트 단위로 같습니다. 이전 버전은 /8처럼 /9도 거절합니다.
+
 명시한 `sipi.circuit/2`는 버전 1과 필드가 같습니다. `transmission-line` 네트워크는
 도체 전류가 기본으로 panel 방법인
 [`sipi.transmission-line/8`](default_line.md) 문서도 받고, 이를 담은
