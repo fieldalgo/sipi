@@ -1,5 +1,8 @@
 # Changelog
 
+- CI: Validate runs sixteen partitions per platform and suite instead of eight, assigning whole test modules by the recorded module times in `tools/shards/durations.json` (largest first to the least-loaded partition; modules not in the table keep the path hash), rebuilt from CI JUnit XML with `python tools/pytest_shard.py --update`. Run 45965021952's 854 min of Linux source tests become 53 min per partition (eight hash partitions held 84–148 min). The partition manifest is now `sipi.pytest-partition/2` with the table's SHA-256, and `tools/check_shards.py` still requires every collected test exactly once. Tests, tolerances and values are unchanged.
+  CI: Validate가 플랫폼·시험 집합마다 여덟이 아닌 열여섯 묶음을 실행하며, `tools/shards/durations.json`에 기록한 모듈별 시간으로 모듈 단위 배정을 합니다(큰 것부터 가장 가벼운 묶음에, 표에 없는 모듈은 경로 해시). 표는 `python tools/pytest_shard.py --update`로 CI JUnit XML에서 다시 만듭니다. 실행 45965021952의 Linux 소스 시험 854분이 묶음당 53분이 됩니다(해시 여덟 묶음은 84–148분). 분할 manifest는 표의 SHA-256을 담는 `sipi.pytest-partition/2`이고, `tools/check_shards.py`는 여전히 모든 수집 시험이 정확히 한 번 실행됐는지 요구합니다. 시험·허용오차·수치는 바뀌지 않습니다.
+
 - Remove the pair-preview number arrow buttons from the Tab order (ArrowUp/ArrowDown in each field still nudge), shortening the keyboard path from presets to Find width from 45 to 23 stops. Increments and values are unchanged.
   차동 쌍 미리보기의 숫자 화살표 버튼을 Tab 순서에서 뺐습니다(각 칸의 ArrowUp/ArrowDown은 그대로). 프리셋에서 Find width까지 키보드 정지가 45개에서 23개로 줄었습니다. 증분과 수치는 그대로입니다.
 

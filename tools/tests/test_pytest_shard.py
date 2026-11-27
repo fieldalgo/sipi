@@ -22,6 +22,8 @@ spec.loader.exec_module(checker)
 def suite(tmp_path):
     (tmp_path / 'tools').mkdir()
     shutil.copy2(TOOLS / 'pytest_shard.py', tmp_path / 'tools/pytest_shard.py')
+    (tmp_path / 'tools/shards').mkdir()
+    shutil.copy2(TOOLS / 'shards/durations.json', tmp_path / 'tools/shards/durations.json')
     (tmp_path / 'tests').mkdir()
     (tmp_path / 'pytest.ini').write_text('[pytest]\n', encoding='utf-8')
     for i in range(12):
@@ -80,7 +82,8 @@ def test_full_collection_and_whole_module_fixtures_are_preserved(completed):
 
 
 @pytest.mark.parametrize('fault', ['missing', 'duplicate', 'changed-collection', 'changed-digest',
-    'overlap', 'omission', 'wrong-module', 'unfinished', 'failed', 'collect-only', 'collection-error'])
+    'overlap', 'omission', 'wrong-module', 'unfinished', 'failed', 'collect-only', 'collection-error',
+    'other-table', 'old-schema'])
 def test_missing_or_incomplete_evidence_never_passes(completed, fault):
     _, reports = completed; reports = copy.deepcopy(reports)
     if fault == 'missing':reports.pop()
@@ -94,6 +97,8 @@ def test_missing_or_incomplete_evidence_never_passes(completed, fault):
     elif fault == 'failed':reports[1]['exit_status'] = 1
     elif fault == 'collect-only':reports[1]['collect_only'] = True
     elif fault == 'collection-error':reports[1]['collection_errors'] = 1
+    elif fault == 'other-table':reports[1]['durations_sha256'] = '0' * 64
+    elif fault == 'old-schema':reports[1]['schema'] = 'sipi.pytest-partition/1'
     with pytest.raises(ValueError):checker.verify(reports)
 
 
