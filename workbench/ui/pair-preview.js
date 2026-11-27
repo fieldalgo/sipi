@@ -6,7 +6,7 @@ const browser = document.documentElement.dataset.runtime === 'browser';
 const transport = browser ? new BrowserTransport() : new LocalTransport();
 const supported = ['coupled_microstrip', 'coupled_stripline'];
 const fields = ['width', 'gap', 'height', 'thickness', 'eps_r', 'box_width', 'air_height'];
-let parameters = null, mesh = null, latest = null, baseline = null, busy = false, generation = 0, activeArea = 'analysis';
+let parameters = null, mesh = null, latest = null, latestLoss = null, baseline = null, busy = false, generation = 0, activeArea = 'analysis';
 const changed = new Set();
 // Original illustrative inputs; these are not vendor grades or impedance guarantees.
 const presets = [
@@ -58,7 +58,7 @@ function dimensionState() {
 $('runtime-note').textContent = browser ? 'Calculations run in this browser. Design files are not uploaded. The first calculation loads the local engine assets.' : 'Local review build: calculations run on this computer through the SIPI engine. Design files are not uploaded.';
 // tone: '' (neutral), 'busy' (task running) or 'success' (task completed); errors use `error`.
 function status(message, error = false, area = activeArea, tone = '') {
-  const element = $(area === 'design' ? 'design-status' : area === 'file' ? 'file-status' : 'status');
+  const element = $(area === 'design' ? 'design-status' : area === 'file' ? 'file-status' : area === 'loss' ? 'loss-status' : 'status');
   element.hidden = !message; element.textContent = message; element.classList.toggle('error', error);
   element.classList.toggle('busy', !error && tone === 'busy'); element.classList.toggle('success', !error && tone === 'success');
   element.closest('.panel')?.setAttribute('aria-busy', String(!error && tone === 'busy'));
@@ -67,7 +67,91 @@ function invalidate() {
   latest = null; $('result').hidden = true; $('failure').hidden = true; $('range-feedback').hidden = true;
   status('Calculate impedance to check the current dimensions.', false, 'analysis');
   status('Set a target and width range, then find width.', false, 'design');
-  status('', false, 'file'); comparison();
+  status('', false, 'file'); clearLoss(); comparison();
+}
+// Conductor loss depends on the geometry and on its own copper and frequency
+// inputs; it is cleared with every geometry edit and on its own input edits.
+function clearLoss() {
+  latestLoss = null; $('loss-result').hidden = true;
+  status('Set the copper and frequencies, then calculate conductor loss.', false, 'loss');
+}
+function frequencies() {
+  const parts = $('frequencies').value.split(/[\s,;]+/).filter(Boolean);
+  const values = parts.map(Number);
+  if (!values.length || values.some(v => !Number.isFinite(v) || v <= 0)) throw new Error('Enter one or more positive frequencies in GHz, separated by commas.');
+  if (values.length > 16) throw new Error('Enter at most 16 frequencies.');
+  const hz = [...new Set(values.map(v => Number((v * 1e9).toPrecision(15))))].sort((a, b) => a - b);
+  if (hz.length !== values.length) throw new Error('Each frequency can be entered only once.');
+  return hz;
+}
+// The engine's sipi.transmission-line/8 contract: one surface metal for both
+// traces and the reference, panel currents by default, the engine's saved panel
+// controls. No numerical settings are chosen here.
+function lossSettings() {
+  if (!$('loss-form').reportValidity()) throw new Error('Check the highlighted conductor-loss input.');
+  const roughness = $('roughness').value === 'hammerstad' ? {kind: 'hammerstad', rms_m: Number($('roughness_rms').value) * 1e-6} : {kind: 'smooth'};
+  return {conductivity: Number($('conductivity').value) * 1e6, roughness, frequency_hz: frequencies()};
+}
+function lineDocument(section, settings, thickness) {
+  return {schema: 'sipi.transmission-line/8', cross_section: section, frequency_hz: settings.frequency_hz, materials: {},
+    conductor: {kind: 'surface', conductivity: settings.conductivity, ground_thickness: thickness, relative_permeability: 1, roughness: settings.roughness},
+    length_m: 1, reference_ohms: 50};
+}
+// Mode columns are tracked by the engine; name them from their conductor voltages.
+function modeColumns(modes, f) {
+  const v = (row, column) => Math.hypot(modes.voltage.real[f][row][column], modes.voltage.imag[f][row][column]);
+  const sum = column => Math.hypot(modes.voltage.real[f][0][column] + modes.voltage.real[f][1][column], modes.voltage.imag[f][0][column] + modes.voltage.imag[f][1][column]);
+  const odd = [0, 1].map(column => sum(column) < .5 * (v(0, column) + v(1, column)));
+  if (odd[0] === odd[1]) throw new Error('The engine modes could not be identified as differential and common.');
+  return odd[0] ? {differential: 0, common: 1} : {differential: 1, common: 0};
+}
+const dbPerNeper = 20 / Math.LN10;
+function showLoss(record) {
+  const result = record.result.execution.result, modes = result.diagnostics?.modes;
+  if (record.result.execution.status !== 'complete' || modes?.status !== 'complete') throw new Error('The engine did not complete the line and its modes diagnostic.');
+  const rows = result.frequency_hz.map((f, i) => {
+    const {differential, common} = modeColumns(modes, i), R = result.R_ohm_per_m[i];
+    const values = [f / 1e9, (R[0][0] + R[1][1]) / 2, R[0][1], modes.alpha_conductor[i][differential] * dbPerNeper,
+      modes.alpha_conductor[i][common] * dbPerNeper, modes.alpha_dielectric[i][differential] * dbPerNeper, modes.alpha_dielectric[i][common] * dbPerNeper];
+    if (!values.every(Number.isFinite)) throw new Error('The engine did not return finite conductor-loss values.');
+    return values;
+  });
+  $('loss-rows').replaceChildren();
+  for (const [f, self, mutual, cd, cc, dd, dc] of rows) {
+    const row = document.createElement('tr');
+    for (const text of [String(Number(f.toPrecision(10))), self.toFixed(3), mutual.toFixed(3), cd.toFixed(3), cc.toFixed(3), `${dd.toFixed(3)} / ${dc.toFixed(3)}`]) {
+      const cell = document.createElement('td'); cell.textContent = text; row.append(cell);
+    }
+    $('loss-rows').append(row);
+  }
+  const execution = record.result.execution;
+  $('loss-details').textContent = JSON.stringify({engine: record.result.engine, current_method: result.current_method, current_solver: result.current_solver?.settings, conductor: execution.input.conductor, frequency_hz: execution.input.frequency_hz}, null, 2);
+  $('loss-result').hidden = false;
+}
+let lossTimer = null;
+async function runLoss() {
+  if (busy) return;
+  const version = ++generation; activeArea = 'loss'; clearLoss(); status('', false, 'file');
+  $('loss-output').prepend($('cancel'));
+  try {
+    const settings = lossSettings(), request = input('document');
+    const count = settings.frequency_hz.length, started = performance.now();
+    const progress = () => status(`Calculating conductor loss with panel currents at ${count} frequenc${count === 1 ? 'y' : 'ies'}… ${Math.round((performance.now() - started) / 1000)} s`, false, 'loss', 'busy');
+    lock(true); progress(); lossTimer = setInterval(() => { if (version === generation) progress(); }, 1000);
+    const geometry = await transport.run(request);
+    if (version !== generation) return;
+    const line = lineDocument(geometry.document, settings, request.parameters.thickness);
+    const text = JSON.stringify(line);
+    const result = await transport.run({action: 'saved-analyze', text, diagnostics: ['modes']});
+    if (version !== generation) return;
+    const record = {geometry_request: request, loss: settings, line_text: text, result,
+      material: {label: $('material-label').value, note: $('material-note').value}};
+    showLoss(record); latestLoss = record;
+    status(`Conductor loss calculated at ${count} frequenc${count === 1 ? 'y' : 'ies'} in ${((performance.now() - started) / 1000).toFixed(1)} s.`, false, 'loss', 'success');
+  } catch (error) {
+    if (version !== generation) return;
+    clearLoss(); status(error.message, true, 'loss');
+  } finally { clearInterval(lossTimer); lossTimer = null; if (version === generation) lock(false); }
 }
 function showRangeFailure(error, request) {
   if (request?.action !== 'design' || !error.message.includes('not bracketed') || !Array.isArray(error.history)) return false;
@@ -156,7 +240,7 @@ function input(action) {
 function numberControls() {
   const increments = {width: .01, gap: .01, height: .01, thickness: .001,
     eps_r: .1, box_width: .1, air_height: .1, lower: .01, upper: .01,
-    target: 1, tolerance: .01};
+    target: 1, tolerance: .01, conductivity: 1, roughness_rms: .1};
   for (const [id, increment] of Object.entries(increments)) {
     const element = $(id), label = element.closest('label');
     const name=label.textContent.replace(/^(W|S|H|T|εr)(?=[A-Z])/,'').trim();
@@ -328,6 +412,10 @@ $('file').addEventListener('change',async()=>{
   catch(error){if(version===generation){invalidate();status(error.message,true);}}
 });
 $('export').addEventListener('click',()=>{if(latest) download('sipi-pair-calculation.json',latest);});
+$('loss-form').addEventListener('submit',event=>{event.preventDefault();runLoss();});
+$('roughness').addEventListener('change',()=>{$('rms-field').hidden=$('roughness').value!=='hammerstad';$('roughness_rms').required=!$('rms-field').hidden;});
+for(const id of ['conductivity','roughness','roughness_rms','frequencies']) $(id).addEventListener(id==='roughness'?'change':'input',()=>{if(busy)return;++generation;clearLoss();status('Loss inputs changed. Calculate conductor loss to update the result.',false,'loss');});
+$('loss-export').addEventListener('click',()=>{if(latestLoss&&!busy) download('sipi-pair-conductor-loss.json',latestLoss);});
 $('keep-a').addEventListener('click',()=>{
   if (!latest || busy) return;
   baseline=structuredClone(latest); invalidate();
@@ -338,7 +426,7 @@ $('export-comparison').addEventListener('click',()=>{
   if (baseline && latest && !busy) download('sipi-pair-comparison.json', {schema:'sipi.preview-comparison/1',a:baseline,b:latest});
 });
 $('cancel').addEventListener('click',async()=>{
-  ++generation; invalidate(); $('cancel').disabled=true;
+  ++generation; clearInterval(lossTimer); if (activeArea === 'loss') clearLoss(); else invalidate(); $('cancel').disabled=true;
   try{await transport.cancel();status('Calculation cancelled. No result retained.');}
   catch(error){status(error.message,true);}finally{lock(false);}
 });
