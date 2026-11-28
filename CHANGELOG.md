@@ -1,5 +1,8 @@
 # Changelog
 
+- When a cross-section mesh passes the mesher's 300,000-point limit, `MeshSizeLimitError` keeps meshine's text and adds the resolved `edge_size`, `corner_size`, `grade`, `far_size`, `min_angle`, the box, the feature that sets the default `edge_size` (or that it was explicit) and what to raise first. Only the message of refused meshes changes; meshes within the limit are bit-identical, and the exception type and its cause are unchanged. Measured: a 35 µm grounded coplanar line grew 19,206 → 73,213 → 287,503 points over two halvings of `edge_size`, `grade` and `far_size`.
+  단면 메시가 메시 생성기의 300,000점 한도를 넘으면 `MeshSizeLimitError`가 meshine 문구를 유지한 채 정해진 `edge_size`·`corner_size`·`grade`·`far_size`·`min_angle`, 상자, 기본 `edge_size`를 정한 치수(또는 명시값이라는 것), 먼저 키울 설정을 덧붙입니다. 거절되는 메시의 메시지만 바뀌며, 한도 안의 메시는 비트 단위로 같고 예외 타입과 원인도 그대로입니다. 측정: 35 µm grounded coplanar 선로는 `edge_size`·`grade`·`far_size`를 두 번 반으로 줄이는 동안 19,206 → 73,213 → 287,503점이었습니다.
+
 - Docs: tabulate microstrip box truncation with open walls (zero thickness, `w/h` 0.25/1/4, `εr` 4.3/9.8, relative to a 160h × 80h box). The 40h × 20h validation box is high by +0.10 to +0.38 % in `eps_eff` (+0.06 to +0.23 % in Z0), matching the 0.1–0.3 % of an independent comparison; the microstrip template's default box (20h × 10h) by +0.40 to +1.60 % (Z0 +0.26 to +1.02 %); 80h × 40h by at most +0.08 %. Template defaults and results are unchanged.
   문서: 열린 벽 마이크로스트립의 상자 절단 오차를 표로 정리했습니다(두께 0, `w/h` 0.25/1/4, `εr` 4.3/9.8, 160h × 80h 상자 대비). 40h × 20h 검증 상자는 `eps_eff`가 +0.10~+0.38 %(Z0 +0.06~+0.23 %) 높아 독립 비교의 0.1–0.3 %와 맞고, 마이크로스트립 템플릿 기본 상자(20h × 10h)는 +0.40~+1.60 %(Z0 +0.26~+1.02 %), 80h × 40h는 최대 +0.08 %입니다. 템플릿 기본값과 결과는 바뀌지 않습니다.
 

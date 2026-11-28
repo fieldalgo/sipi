@@ -133,6 +133,12 @@ N개일 때:
 | `grade` | 0.15 | 트레이스에서 멀어질 때 단위 거리당 변 길이 증가율 |
 | `far_size` | max(width, height) / 24 | 가장 큰 변 길이 |
 
+메시 생성기는 300,000점을 넘는 메시를 `MeshSizeLimitError`로 거절합니다. 단면에서는 메시 생성기의 문구
+(`more than 300000 points ...`)를 그대로 두고, 정해진 `edge_size`·`corner_size`·`grade`·`far_size`, 상자,
+기본 `edge_size`를 정한 치수, 먼저 키울 설정(`edge_size` 또는 `corner_size`, 그다음 `grade`나 `far_size`)을
+덧붙입니다. 세 설정을 함께 반으로 줄이면 문서의 단면들에서 점 수가 약 2.4–4배가 됐고, grounded coplanar
+선로(w 0.3 mm, gap 0.15 mm, h 0.2 mm, 35 µm)는 두 번 반으로 줄이는 동안 19,206 → 73,213 → 287,503점이었습니다.
+
 `mesh()`는 확인용 `MeshedCrossSection`(galerkin 메시, 삼각형별 `eps_r`·`tan_delta`, 도체 절점 집합)을
 돌려줍니다. `line_parameters()`와 `capacitance_matrix()`는 절점 집합을 갖춘 임의의 galerkin 메시를 받으므로,
 예를 들어 meshine으로 직접 만든 동축 메시도 쓸 수 있습니다.
