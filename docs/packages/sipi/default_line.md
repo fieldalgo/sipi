@@ -40,6 +40,18 @@ reduces the Gram change about 2.5 times. Layered coplanar striplines between
 two grounds need 37 interpolation boxes and took about 150–200 s, whatever the
 panel count.
 
+**Precision conductor loss: write `panels_per_edge` 128 to 256.** An
+independent comparison on 2026-11-28 checked the panel conductor loss against
+an independent finite-element solution on two sections. With the default 64
+panels per edge the panel loss was higher by 0.46 % and 0.23 %. At 128 and
+256 panels per edge the difference fell monotonically, and its extrapolation
+to infinitely many panels was +0.008 % and +0.005 %. The default 64 is
+therefore a few tenths of a percent high in loss; 128 to 256 brings it
+closer to the converged value at about two (128) or more (256) times the
+panel time. Saved documents keep the panel controls they were written with,
+so set the value explicitly. These are observations on two sections, not an
+error bound; the default controls are unchanged.
+
 The calculation is the one a [method line](method_line.md) runs with the
 same content: `method_document()` returns that
 `sipi.method-transmission-line/1` document, and `equivalent_document()` the
