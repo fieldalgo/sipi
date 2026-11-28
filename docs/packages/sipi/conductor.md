@@ -175,7 +175,10 @@ its geometry applies, and treat P1 results with this limitation.
 `surface` and `surface-boundaries` conductors. These are
 observations for one geometry, not a general error bound or a measured
 reference; other sections are being compared separately. The original
-tests, meshes and limits are unchanged.
+tests, meshes and limits are unchanged. For precision loss on the panel
+path, write `panels_per_edge` 128 to 256: the default 64 was 0.23–0.46 %
+high against an independent finite-element solution, and 0.005–0.008 %
+when extrapolated in the panel count ([details](default_line.md)).
 
 This common-metal adapter does not model DC/low-frequency transition or
 interior skin/proximity diffusion. Those belong to the separate
