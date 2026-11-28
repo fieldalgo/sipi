@@ -29,7 +29,7 @@ from numbers import Real
 import numpy as np
 
 from galerkin import Mesh, from_mesher
-from meshine import Domain, MeshInputError, generate, rectangle
+from meshine import Domain, MeshInputError, MeshSizeLimitError, generate, rectangle
 
 from .polygons import PolygonTrace, DielectricRegion, trace_shape, check_regions, polygon_domain
 from .quasistatic import LineParameters, line_parameters
@@ -407,6 +407,48 @@ class CrossSection:
                 "within that distance of an inner layer boundary is placed on the boundary; "
                 "these coordinates are not covered by that rule.")
 
+    def _finest_feature(self):
+        """(description, length in m) of the feature that sets the default edge_size."""
+        rows = [(f"layer {lay.name!r} thickness", lay.thickness, 1) for lay in self.layers]
+        for t in self.traces:
+            w = t.minimum_dimension if isinstance(t, PolygonTrace) else min(t.width, t.top_width or t.width)
+            rows.append((f"trace {t.name!r} width", w, 1))
+            if t.thickness > 0:
+                rows.append((f"trace {t.name!r} thickness / 10 cap", t.thickness, 10))
+        rows += [(f"local dielectric {r.name!r}", r.minimum_dimension, 1) for r in self.dielectric_regions]
+        for i, a in enumerate(self.traces):
+            for b in self.traces[i + 1:]:
+                if isinstance(a, PolygonTrace) or isinstance(b, PolygonTrace) or a.tapered or b.tapered:
+                    gap = trace_shape(a).distance(trace_shape(b))
+                else:
+                    gap = max(a.x0 - b.x1, b.x0 - a.x1, a.y - b.y1, b.y - a.y1)
+                rows.append((f"gap between traces {a.name!r} and {b.name!r}", gap, 1))
+        name, length, divisor = min(rows, key=lambda row: row[1] / (100.0 if row[2] == 1 else 10.0))
+        return name, length, (100.0 if divisor == 1 else 10.0)
+
+    def _point_limit_hint(self, settings, explicit) -> str:
+        """Say which setting drives a mesh that passed meshine's point limit and what to change."""
+        edge, far, grade = settings['edge_size'], settings['far_size'], settings['grade']
+        corner = settings.get('corner_size', edge)
+        if explicit:
+            source = "edge_size was given explicitly"
+        else:
+            name, length, divisor = self._finest_feature()
+            source = (f"the default edge_size is {name} ({length:.4g} m) / {divisor:g}; "
+                      "the default takes the smallest layer thickness, trace width or gap / 100, "
+                      "capped at each trace thickness / 10")
+        return (f"SIPI: this cross-section mesh needs more points than the mesher allows, with "
+                f"edge_size {edge:.4g} m, corner_size {corner:.4g} m, grade {grade:g}, "
+                f"far_size {far:.4g} m, min_angle {settings['min_angle']:g} and a "
+                f"{self.width:.4g} m x {self.height:.4g} m box; {source}. The point count grows "
+                "with the trace perimeter / edge_size near the traces and with the box area / "
+                "far_size**2 away from them, and each halving of edge_size, grade and far_size "
+                "together has multiplied it by about 2.4-4 on the documented sections. To fit, "
+                "raise edge_size or corner_size first (an explicit value overrides the default "
+                "rule), then grade or far_size; narrow the box width or air layer only after "
+                "checking truncation; or refine one setting at a time instead of all three. "
+                "Use the boundary-panel method where its geometry applies.")
+
     def mesh(self, *, edge_size: float | None = None, far_size: float | None = None,
              grade: float = 0.15, min_angle: float = 28.0,
              corner_size: float | None = None) -> MeshedCrossSection:
@@ -429,6 +471,7 @@ class CrossSection:
         1.4-1.8 times the default/refined difference (docs: default-mesh).
         Halve edge_size, grade and far_size together to check convergence.
         """
+        edge_size_given = edge_size is not None
         settings = self.mesh_settings(edge_size=edge_size, far_size=far_size,
                                       grade=grade, min_angle=min_angle, corner_size=corner_size)
         edge_size, far_size = settings['edge_size'], settings['far_size']
@@ -480,6 +523,9 @@ class CrossSection:
             if not hint:
                 raise
             raise MeshInputError(f"{error} {hint}") from error
+        except MeshSizeLimitError as error:
+            hint = self._point_limit_hint(settings, edge_size_given)
+            raise MeshSizeLimitError(f"{error}. {hint}") from error
         mesh = from_mesher(tm)
 
         names = mesh.region_names
