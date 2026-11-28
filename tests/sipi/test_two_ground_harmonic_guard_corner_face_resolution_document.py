@@ -11,6 +11,7 @@ from sipi.execution_record import SavedExecutionRecord
 from sipi.project import SavedProject
 from test_two_ground_harmonic_guard_corner_face_resolution import inputs,synthetic
 from test_execution_record import ARTIFACTS
+from resolution_studies import ENABLED as STUDIES,recorded_case
 
 
 def document():
@@ -80,12 +81,26 @@ def test_interrupt_propagates(monkeypatch):
     assert len(calls)==2
 
 
-def test_actual_saved_finite_resolution_receipt(record_property):
-    receipt=SavedExecutionRequest(document().dumps(),max_evaluations=6).run()
-    record_property('two_ground_face_saved_finite_resolution',json.dumps(receipt,sort_keys=True))
-    out=receipt['execution'];assert out['status']=='complete'
-    assert out['result']['completed'] and out['result']['accepted']
-    assert len(out['result']['evaluations'])==len(out['result']['comparisons'])==6
+def test_saved_document_runs_the_recorded_study(monkeypatch):
+    """The saved document's base line is the recorded study's base input, which
+    test_two_ground_harmonic_guard_corner_face_resolution.py reproduces in the regular suite;
+    the other five lines are the study's (inputs()). The actual six-line receipt below runs
+    only with the finite-resolution studies (tests/_support/resolution_studies.py)."""
+    monkeypatch.setattr(Line,'analyze',lambda *a,**k:pytest.fail('field-free check solved'))
+    saved=json.loads(document().dumps());base,kw=inputs()
+    assert saved['line']==recorded_case('test_two_ground_harmonic_guard_corner_face_resolution',0)['base_input']==json.loads(base.dumps())
+    assert [json.loads(Line.from_dict(row).dumps()) for row in saved['outer_lines']]==[json.loads(d.dumps()) for d in kw['outer_documents']]
+    assert saved['refined_panel']==kw['refined_panel_options'] and saved['max_solves']==6
+
+
+if STUDIES:  # dispatch-only: the same six lines as the study, through the saved-document path
+    @pytest.mark.slow
+    def test_actual_saved_finite_resolution_receipt(record_property):
+        receipt=SavedExecutionRequest(document().dumps(),max_evaluations=6).run()
+        record_property('two_ground_face_saved_finite_resolution',json.dumps(receipt,sort_keys=True))
+        out=receipt['execution'];assert out['status']=='complete'
+        assert out['result']['completed'] and out['result']['accepted']
+        assert len(out['result']['evaluations'])==len(out['result']['comparisons'])==6
 
 
 @pytest.mark.parametrize('case',['v1','scope','count','stage','input','prefix','evidence','typed-input','typed-message','typed-kind','untyped-details'])

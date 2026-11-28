@@ -88,3 +88,45 @@ def test_mesh_variants_take_the_exact_path_and_unknown_meshes_the_tolerance_path
     assert max(errors.values()) == pytest.approx(5e-5, rel=1e-6)
     with pytest.raises(AssertionError):
         support.compare(name, 0, line(variants[0], other, 1 + 2e-4))
+
+
+@pytest.mark.parametrize('name', sorted(support.GATED))
+def test_other_study_tests_are_defined_only_with_the_gate(name):
+    module = importlib.import_module(name)
+    assert hasattr(module, support.GATED[name]) is support.ENABLED
+
+
+LINE = json.loads(support.LINE_STUDY_RECORD.read_text(encoding='utf-8'))
+
+
+def test_line_study_base_record_was_accepted_on_every_platform_and_suite():
+    assert LINE['schema'] == 'sipi.linear-line-study-base/1'
+    assert LINE['module'] in support.GATED and support.GATED[LINE['module']] == LINE['test']
+    assert LINE['reproduction_matrix_relative'] == support.MATRIX_RELATIVE
+    assert LINE['quantities'] == ['C0_f_per_m', 'L_h_per_m', 'R_ohm_per_m', 'impedance_real_ohm']
+    assert '0.01' in LINE['criterion'] and LINE['study_source'] and LINE['product_commit']
+    assert [row['index'] for row in LINE['rows']] == [0, 1, 2]
+    for row in LINE['rows']:
+        assert {f'{p}/{s}' for p in PLATFORMS for s in ('source', 'installed')} == set(row['study'])
+        assert all(o['passed'] and 0 <= o['worst_difference_over_allowance'] <= 1 for o in row['study'].values())
+        covered = [label for variant in row['variants'] for label in variant['recorded_by']]
+        assert sorted(covered) == sorted(row['study'])
+        assert any('local_check_matrix_relative' in variant for variant in row['variants'])
+        for variant in row['variants']:
+            assert sorted(variant['quantities']) == LINE['quantities']
+            assert variant.get('local_check_matrix_relative', 0) <= support.MATRIX_RELATIVE
+
+
+def test_line_study_variants_take_the_exact_path_and_unknown_meshes_the_tolerance_path():
+    variants = LINE['rows'][0]['variants']
+    for row in variants:
+        values = {key: np.asarray(value, dtype=float) for key, value in row['quantities'].items()}
+        path, labels, errors = support.compare_variants(values, row['dielectric_mesh'], variants)
+        assert path == 'exact' and labels == row['recorded_by'] and max(errors.values()) == 0
+        with pytest.raises(AssertionError):
+            support.compare_variants({k: v * (1 + 1e-8) for k, v in values.items()}, row['dielectric_mesh'], variants)
+    other = dict(nodes_float64_le_sha256='0' * 64, triangles_int64_le_sha256='0' * 64)
+    values = {key: np.asarray(value, dtype=float) * (1 + 5e-5) for key, value in variants[0]['quantities'].items()}
+    assert support.compare_variants(values, other, variants)[0] == 'tolerance'
+    with pytest.raises(AssertionError):
+        support.compare_variants({k: v * 4 for k, v in values.items()}, other, variants)
