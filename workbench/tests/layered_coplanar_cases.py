@@ -11,4 +11,4 @@ def parameters(name,**changes):
  if name==NAMES[1]:p['ground_gap']=.0002000000000123456
  return {**p,**changes}
 if __name__=='__main__':
- print(json.dumps({name:TemplateSectionDocument(name,parameters(name),mesh=COARSE).to_dict() for name in NAMES}))
+ print(json.dumps({name:TemplateSectionDocument(name,parameters(name),mesh=COARSE, schema='sipi.template-section/1').to_dict() for name in NAMES}))

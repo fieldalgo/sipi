@@ -16,7 +16,7 @@ MESH=dict(edge_size=8e-6,far_size=.3e-3,grade=.25)
 def section(pair=False):
     p=dict(width=.4e-3,plane_spacing=1e-3,eps_r=4.,tan_delta=.01,box_width=6e-3)
     if pair: p['gap']=.3e-3
-    return TemplateSectionDocument('coupled_stripline' if pair else 'stripline',p,mesh=MESH)
+    return TemplateSectionDocument('coupled_stripline' if pair else 'stripline',p,mesh=MESH, schema='sipi.template-section/1')
 
 
 def document(pair=False,**kw):
@@ -112,7 +112,7 @@ def test_zero_length_is_exact_through_and_dc_resistor_contract(pair):
 def test_all_registered_manufacturing_inputs_are_retained_without_field_solve(name,monkeypatch):
     from test_template_document import CASES
     monkeypatch.setattr(CrossSection,'mesh',lambda *a,**k:pytest.fail('Input meshed'))
-    sec=TemplateSectionDocument(name,CASES[name]['supplied_parameters'],mesh=MESH)
+    sec=TemplateSectionDocument(name,CASES[name]['supplied_parameters'],mesh=MESH, schema='sipi.template-section/1')
     saved=QuasistaticLineDocument(sec,[0.,1e8],resistance=1.,length=.1)
     assert QuasistaticLineDocument.loads(saved.dumps()).section.dumps()==sec.dumps()
     assert normalize_saved(saved.dumps())==saved.dumps()

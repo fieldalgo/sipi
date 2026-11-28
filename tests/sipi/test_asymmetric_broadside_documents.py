@@ -40,7 +40,7 @@ def assert_geometry(s, p):
 
 def test_template_and_all_sampling_inputs_roundtrip_without_solving(monkeypatch):
     monkeypatch.setattr(CrossSection, 'mesh', lambda *a, **k: pytest.fail('Input preparation solved fields'))
-    doc = TemplateSectionDocument(NAME, PARAMS, mesh=COARSE)
+    doc = TemplateSectionDocument(NAME, PARAMS, mesh=COARSE, schema='sipi.template-section/1')
     assert normalize_saved(doc.dumps()) == doc.dumps()
     assert TemplateSectionDocument.loads(doc.dumps()).dumps() == doc.dumps()
     assert_geometry(doc.cross_section.section, PARAMS)

@@ -28,7 +28,7 @@ def study(name,kind='sweep',**extra):
 @pytest.mark.parametrize('name',NAMES)
 def test_editable_and_study_documents_load_without_meshing(name,monkeypatch):
     monkeypatch.setattr(CrossSection,'mesh',lambda *a,**k:pytest.fail('Input preparation meshed'))
-    doc=TemplateSectionDocument(name,parameters(name),mesh=COARSE)
+    doc=TemplateSectionDocument(name,parameters(name),mesh=COARSE, schema='sipi.template-section/1')
     assert TemplateSectionDocument.loads(doc.dumps()).dumps()==doc.dumps()
     assert normalize_saved(doc.dumps())==doc.dumps()
     assert doc.cross_section.section.traces[0].y==.001

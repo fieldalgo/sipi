@@ -76,7 +76,7 @@ def test_editable_roundtrip_preserves_direct_geometry_and_hidden_arguments(name,
     monkeypatch.setattr(CrossSection, 'mesh', no_mesh)
     p = parameters(name)
     mesh = dict(edge_size=1e-5, far_size=.001, grade=.2, min_angle=28)
-    direct = TemplateSectionDocument(name, p, mesh=mesh)
+    direct = TemplateSectionDocument(name, p, mesh=mesh, schema='sipi.template-section/1')
     saved = execute(dict(action='template-document', template=name, parameters=p, mesh=mesh))
     opened = execute(dict(action='template-open', text=saved['document_text']))
     assert opened == saved
@@ -94,7 +94,7 @@ def test_open_rejects_bad_or_oversized_text(bad):
 
 
 def test_open_rejects_mismatch_and_unknown_options():
-    doc = TemplateSectionDocument('stripline', parameters('stripline')).to_dict()
+    doc = TemplateSectionDocument('stripline', parameters('stripline'), schema='sipi.template-section/1').to_dict()
     doc['parameters']['width'] *= 2
     with pytest.raises(ValueError, match='do not match'):
         execute(dict(action='template-open', text=json.dumps(doc)))
@@ -106,7 +106,7 @@ def test_open_rejects_mismatch_and_unknown_options():
 def test_no_form_for_valid_disabled_template(monkeypatch):
     # Keep the capability gate test even when every registered template has a form.
     monkeypatch.delitem(TEMPLATES, 'layered_broadside_stripline')
-    doc = TemplateSectionDocument('layered_broadside_stripline', dict(width=.0005, thickness=.000035, gap=.0002, lower_height=.0004, upper_height=.0006, lower_eps_r=4, gap_eps_r=3, upper_eps_r=4))
+    doc = TemplateSectionDocument('layered_broadside_stripline', dict(width=.0005, thickness=.000035, gap=.0002, lower_height=.0004, upper_height=.0006, lower_eps_r=4, gap_eps_r=3, upper_eps_r=4), schema='sipi.template-section/1')
     with pytest.raises(ValueError, match='no editable form'):
         execute(dict(action='template-open', text=doc.dumps()))
 

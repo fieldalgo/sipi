@@ -14,7 +14,7 @@ from asymmetric_pair_cases import NAMES,COARSE,parameters
 def test_independent_dimensions_and_exact_editable_roundtrip(name,zero,monkeypatch):
  monkeypatch.setattr(sipi.CrossSection,'mesh',lambda *a,**k:pytest.fail('Saving solved fields'))
  p=parameters(name,**(dict(left_thickness=0,left_top_width=None) if zero else {}));out=execute(dict(action='template-document',template=name,parameters=p,mesh=COARSE))
- assert out['document_text']==TemplateSectionDocument(name,p,mesh=COARSE).dumps()
+ assert out['document_text']==TemplateSectionDocument(name,p,mesh=COARSE, schema='sipi.template-section/1').dumps()
  assert execute(dict(action='template-open',text=out['document_text']))==out
  d=out['document'];a,b=d['traces'];assert [a['name'],b['name']]==['positive','negative']
  assert a['x']==-(p['gap']+p['right_width'])/2 and b['x']==(p['gap']+p['left_width'])/2
@@ -39,7 +39,7 @@ def test_independent_width_and_thickness_studies_use_forward_quantity(name,mode)
  assert study['quantity']=='z_diff_forward' and study['failed']==0
  assert len(study['rows'])==(4 if mode=='corners' else 2)
  for row in study['rows']:
-  changed={**p,**row['parameters']};assert row['document']==TemplateSectionDocument(name,changed,mesh=COARSE).cross_section.to_dict()
+  changed={**p,**row['parameters']};assert row['document']==TemplateSectionDocument(name,changed,mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict()
   assert row['impedance']==row['line']['z_diff_forward'] and 'z_diff' not in row['line']
   assert row['line']['forward_launch']['condition']=='Icommon=0; I=[Idiff,-Idiff]'
 
@@ -103,7 +103,7 @@ def test_raw_asymmetric_document_keeps_existing_matrix_only_fallback(monkeypatch
  cap=np.array([[120,-30],[-30,150]])*1e-12;ind=np.array([[400,70],[70,350]])*1e-9
  line=sipi.LineParameters(('positive','negative'),cap,np.eye(2)*1e-11,ind,cap*.02)
  monkeypatch.setattr(sipi.CrossSectionDocument,'analyze',lambda *a,**k:line)
- doc=TemplateSectionDocument(NAMES[0],parameters(NAMES[0]),mesh=COARSE).cross_section.to_dict()
+ doc=TemplateSectionDocument(NAMES[0],parameters(NAMES[0]),mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict()
  old=execute(dict(action='analyze',document=doc));extra=execute(dict(action='analyze',document=doc,template=NAMES[0]));assert old==extra
  assert 'scalar_summary_unavailable' in old['line'] and 'z_diff_forward' not in old['line']
  assert serialize_line(line,forward_pair=True)['z_diff_forward']==line.z_diff_forward
@@ -141,7 +141,7 @@ def test_physical_selected_width_target_preserves_other_conductor(name,variable)
     assert d['search_tolerance']==.25 and len(d['history'])<=32
     assert d['history'][-1]['stage']=='refinement'
     changed={**p,variable:d['parameter']};doc=out['document']
-    assert doc==TemplateSectionDocument(name,changed,mesh=doc['mesh']).cross_section.to_dict()
+    assert doc==TemplateSectionDocument(name,changed,mesh=doc['mesh'], schema='sipi.template-section/1').cross_section.to_dict()
     assert out['line']['z_diff_forward']==d['impedance']
     chosen=next(row for row in d['history'] if row['stage']=='search' and row['parameter']==d['parameter'])
     assert chosen['impedance']==d['impedance']

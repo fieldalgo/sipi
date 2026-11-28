@@ -21,7 +21,7 @@ SETTINGS=dict(start_hz=0.,stop_hz=2e8,points=3,length=.075,resistance=5.3,z_ref=
 @pytest.mark.parametrize('name',sorted(TEMPLATES))
 def test_all_forms_full_network_matches_independent_voltage_current_boundary(name):
     req=dict(template=name,parameters=CASES[name],mesh=MESH)
-    doc=TemplateSectionDocument(name,CASES[name],mesh=MESH)
+    doc=TemplateSectionDocument(name,CASES[name],mesh=MESH, schema='sipi.template-section/1')
     line=doc.cross_section.analyze()
     result=execute(dict(**req,action='network',network=SETTINGS))
     assert result['document']==doc.cross_section.to_dict()

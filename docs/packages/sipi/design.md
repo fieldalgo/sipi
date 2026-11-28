@@ -46,8 +46,9 @@ it costs about 5–40 % more mesh nodes. Saved documents keep their boxes: every
 document that rebuilds a template from its name and parameters (template
 section /1, impedance, pair, sampled, corner and line-quantity designs and
 studies, panel forward-pair documents, FEM-shape, yield) and the workbench
-forms still build v1 boxes, so their results are unchanged. Document versions
-that record v2 boxes are separate work.
+forms still build v1 boxes, so their results are unchanged. Only
+[`sipi.template-section/2`](template_document.md#version-2-v2-boxes) records v2
+boxes. New design and study versions with v2 boxes are follow-up work.
 
 These defaults are starting domains, not truncation guarantees. Enlarge the box
 and air independently to check truncation; also enlarge coplanar ground width.

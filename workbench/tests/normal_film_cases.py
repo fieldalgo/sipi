@@ -19,7 +19,7 @@ def parameters(name, *, vacuum=False):
 
 
 def editable(name, *, vacuum=False):
-    return TemplateSectionDocument(name, parameters(name, vacuum=vacuum), mesh=COARSE).to_dict()
+    return TemplateSectionDocument(name, parameters(name, vacuum=vacuum), mesh=COARSE, schema='sipi.template-section/1').to_dict()
 
 
 if __name__ == '__main__':

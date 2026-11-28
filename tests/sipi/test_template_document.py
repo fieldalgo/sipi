@@ -27,7 +27,7 @@ PARAMS = dict(width=.5e-3, plane_spacing=1e-3, eps_r=4.)
 
 
 def stripline(**parameters):
-    return Template('stripline', dict(PARAMS, **parameters), mesh=MESH)
+    return Template('stripline', dict(PARAMS, **parameters), mesh=MESH, schema='sipi.template-section/1')
 
 
 @pytest.mark.parametrize('name', sorted(CASES))
@@ -36,7 +36,7 @@ def test_every_existing_template_matches_frozen_geometry_and_resolved_inputs(nam
         pytest.fail('template preparation performed meshing')
     monkeypatch.setattr(CrossSection, 'mesh', forbidden)
     row = CASES[name]
-    doc = Template(name, row['supplied_parameters'])
+    doc = Template(name, row['supplied_parameters'], schema='sipi.template-section/1')
     assert doc.parameters == row['resolved_parameters']
     assert doc.cross_section.to_dict() == row['cross_section']
     assert hashlib.sha256(doc.cross_section.dumps().encode()).hexdigest() == row['cross_section_sha256']
@@ -64,7 +64,7 @@ def test_reference_preserves_exact42_original_factories_and_surface_extensions()
     'asymmetric_coupled_conformal_coated_unbacked_coplanar'])
 def test_actual_analysis_and_shared_execution_preserve_direct_matrices(name):
     params = CASES[name]['supplied_parameters']
-    wrapped = Template(name, params, mesh=MESH)
+    wrapped = Template(name, params, mesh=MESH, schema='sipi.template-section/1')
     original = CrossSectionDocument(_TEMPLATES[name](**wrapped.parameters), mesh=wrapped.mesh_options)
     direct = original.analyze()
     actual = wrapped.analyze()
@@ -86,13 +86,13 @@ def test_independent_cohn_mesh_and_outer_domain_contract(record_property):
     values = []
     for s in (1, 2, 4):
         mesh = dict(edge_size=8e-6/s**2, grade=.3/s, far_size=b/(4*s))
-        doc = Template('stripline', dict(width=w, plane_spacing=b, eps_r=er, box_width=12*b), mesh=mesh)
+        doc = Template('stripline', dict(width=w, plane_spacing=b, eps_r=er, box_width=12*b), mesh=mesh, schema='sipi.template-section/1')
         line = doc.analyze()
         assert line.eps_eff == pytest.approx(er, rel=1e-12)
         values.append(line.z0)
     errors = np.abs(np.asarray(values)/exact-1)
     assert errors[-1] <= .005 and errors[0] > errors[1] > errors[2]
-    outer = Template('stripline', dict(width=w, plane_spacing=b, eps_r=er, box_width=16*b), mesh=mesh).analyze().z0
+    outer = Template('stripline', dict(width=w, plane_spacing=b, eps_r=er, box_width=16*b), mesh=mesh, schema='sipi.template-section/1').analyze().z0
     change = abs(outer/values[-1]-1)
     assert change <= .001
     record_property('independent_cohn', json.dumps(dict(exact_ohm=exact, values_ohm=values,
@@ -114,7 +114,7 @@ def test_saved_request_record_project_reopen_and_edit_invalidation(monkeypatch):
     reopened = SavedProject.loads(project.dumps())
     recovered = Template.loads(reopened.prepare('a').source_text)
     assert recovered.parameters == doc.parameters and recovered.cross_section.dumps() == doc.cross_section.dumps()
-    edited = Template(recovered.template, dict(recovered.parameters, width=.6e-3), mesh=recovered.mesh_options)
+    edited = Template(recovered.template, dict(recovered.parameters, width=.6e-3), mesh=recovered.mesh_options, schema='sipi.template-section/1')
     changed = reopened.update_design('a', SavedExecutionRequest(edited.dumps()))
     assert changed.current_record('a') is None and changed.design('a')['records'] == [record.to_dict()]
     assert reopened.current_record('a').receipt == receipt
@@ -123,7 +123,7 @@ def test_saved_request_record_project_reopen_and_edit_invalidation(monkeypatch):
 def test_defaults_mesh_options_and_snapshots_are_resolved_and_detached():
     parameters = dict(PARAMS)
     mesh = dict(MESH)
-    doc = Template('stripline', parameters, mesh=mesh)
+    doc = Template('stripline', parameters, mesh=mesh, schema='sipi.template-section/1')
     parameters['width'] = 99
     mesh['edge_size'] = 99
     assert doc.parameters['width'] == PARAMS['width'] and doc.mesh_options['edge_size'] == MESH['edge_size']
@@ -179,13 +179,13 @@ def test_inconsistent_saved_shape_or_template_rejects(where):
     dict(PARAMS, width=-1), dict(PARAMS, width=float('nan')), dict(PARAMS, width=float('inf'))])
 def test_invalid_parameters_reject(parameters):
     with pytest.raises(ValueError):
-        Template('stripline', parameters)
+        Template('stripline', parameters, schema='sipi.template-section/1')
 
 
 @pytest.mark.parametrize('name', ['', 'eval', [], None, True])
 def test_invalid_template_names_reject(name):
     with pytest.raises(ValueError):
-        Template(name, PARAMS)
+        Template(name, PARAMS, schema='sipi.template-section/1')
 
 
 @pytest.mark.parametrize('where', ['root', 'parameters', 'cross_section', 'mesh'])

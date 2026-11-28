@@ -39,7 +39,7 @@ def test_width_goal_against_independent_free_space_reference(explicit_mesh):
     assert result['line']['z_diff']==goal['impedance']
     mesh=VAC_FINE if explicit_mesh else sipi.coupled_unbacked_coplanar(**VACUUM).mesh_settings()
     if not explicit_mesh:mesh['far_size']/=4
-    expected=TemplateSectionDocument('coupled_unbacked_coplanar',{**VACUUM,'width':goal['width']},mesh=mesh)
+    expected=TemplateSectionDocument('coupled_unbacked_coplanar',{**VACUUM,'width':goal['width']},mesh=mesh, schema='sipi.template-section/1')
     assert result['document']==expected.cross_section.to_dict()
     if not explicit_mesh:
         assert abs(goal['refined_impedance']/target-1)<abs(goal['impedance']/target-1)<.02
@@ -71,7 +71,7 @@ def test_gap_ground_studies_freeze_mesh_and_keep_open_domain(mode):
     assert result['failed']==0 and result['status']=='complete' and result['quantity']=='z_diff'
     assert len(result['rows'])==(4 if mode=='corners' else 2)
     for row in result['rows']:
-        doc=TemplateSectionDocument('coupled_unbacked_coplanar',{**PHYSICAL,**row['parameters']},mesh=COARSE)
+        doc=TemplateSectionDocument('coupled_unbacked_coplanar',{**PHYSICAL,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==doc.cross_section.to_dict() and row['impedance']==row['line']['z_diff']
         positive,negative,*grounds=doc.section.traces
         assert all(t.ground and not t.tapered for t in grounds)

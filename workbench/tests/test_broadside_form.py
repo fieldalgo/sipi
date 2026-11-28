@@ -15,7 +15,7 @@ def test_signed_offset_vertical_gap_and_exact_saved_geometry(offset,monkeypatch)
  monkeypatch.setattr(sipi.CrossSection,'mesh',lambda *a,**kw:pytest.fail('Document operation solved'))
  p=parameters(offset=offset);out=execute(dict(action='template-document',template=NAME,parameters=p,mesh=COARSE))
  assert execute(dict(action='template-open',text=out['document_text']))==out
- assert out['parameters']==TemplateSectionDocument(NAME,p,mesh=COARSE).parameters
+ assert out['parameters']==TemplateSectionDocument(NAME,p,mesh=COARSE, schema='sipi.template-section/1').parameters
  lower,upper=out['document']['traces'];assert [lower['name'],upper['name']]==['positive','negative']
  assert lower['x']==-offset/2 and upper['x']==offset/2
  assert lower['y']==p['plane_spacing']/2-p['gap']/2-p['thickness'] and upper['y']==p['plane_spacing']/2+p['gap']/2
@@ -37,7 +37,7 @@ def test_offset_and_vertical_gap_studies_preserve_centres_and_fixed_mesh(mode):
  assert out['status']=='complete' and out['failed']==0 and out['quantity']=='z_diff'
  assert len(out['rows'])==(4 if mode=='corners' else 2)
  for row in out['rows']:
-  expected=TemplateSectionDocument(NAME,parameters(**row['parameters']),mesh=COARSE).cross_section.to_dict();assert row['document']==expected
+  expected=TemplateSectionDocument(NAME,parameters(**row['parameters']),mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict();assert row['document']==expected
   assert row['impedance']==row['line']['z_diff']
   lo,hi=row['document']['traces'];assert lo['x']==-row['parameters']['offset']/2 and hi['x']==row['parameters']['offset']/2
 
