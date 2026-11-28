@@ -35,11 +35,20 @@ print(series.L[:, 0, 0])  # H/m, including internal inductance
 - 아래·위 접지는 폭 `section.width`의 유한 판으로 바꾸며 유전체 상자 바깥으로
   `ground_thickness`만큼 확장합니다.
 - 측면 접지는 같은 두께로 바깥쪽에 놓이며 수평 판과 면적 중복 없이 연결합니다.
+  `low + (high - low)`가 반올림으로 1 ulp 어긋나도 측면 판은 바깥 판 면에서 정확히 끝납니다.
+  이런 닫힌 단면(예: 유전체 0.78 mm, 판 0.1 mm)은 전에는 "zero-length edge"로 거절됐습니다.
 - 이 전체 구성에서 사방으로 `padding`만큼 확장한 자기 상자 외곽에서 Az=0입니다.
   비전도 영역과 금속 내부 모두 정합 P1 삼각형으로 채웁니다. 유전율은 사용하지 않습니다.
 - `metal_size`, `far_size`, `grade`는 목표 메시 크기이며 실제 변 길이나 정확도
   추정치가 아닙니다. `0 < min_angle < 34`, `far_size >= metal_size > 0`,
   `grade >= 0`, 양의 두께·padding이 필요합니다.
+- `dielectric_interfaces=True`이면 직사각형·사다리꼴 trace 면이 안쪽 층 경계와 같지 않지만
+  병합 거리(padding을 포함한 자기 상자 대각선의 1e-9) 안에 있을 때(예: `h + 1e-18`)
+  `CrossSection.mesh`처럼 그 면을 경계 위에 놓습니다. 이런 입력은 전에는 거절됐습니다. 다각형
+  trace와 금속 코어는 기하를 바꾸지 않습니다. 그 밖에 그만큼 가까운 좌표는 해당 좌표와 고칠
+  방법을 밝힌 메시지로 거절됩니다. meshine의 300,000점 한도를 넘으면 메시지가 설정, `metal_size**2`
+  단위의 금속 면적, 먼저 키울 설정(`max_edge_over_skin_depth`가 1 이하인 범위에서 `metal_size`)을
+  밝힙니다. 메시가 만들어지는 입력은 비트 단위로 그대로입니다.
 
 기존 유전체 전용 `CrossSection.mesh()`는 도체를 구멍으로 두므로 금속 부피
 메시로 전달할 수 없습니다. 기존 상자 경계와 위의 유한 판은 물리 경계 계약이

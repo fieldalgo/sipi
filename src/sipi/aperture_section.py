@@ -13,6 +13,8 @@ from shapely.geometry import Point, Polygon
 from meshine import Domain, generate
 from galerkin import from_mesher
 
+from ._mesh_input import close_vertices, coincidence_message, explained, merge_distance
+
 from .document import _keys, _number, _unique_object
 from .quasistatic import capacitance_matrix
 
@@ -126,6 +128,30 @@ class EllipticalAperture:
                 raise ValueError('conductor disk does not fit inside the aperture polygon; check geometry or angular resolution')
         return dict(size=float(size), angular_divisions=n)
 
+    def _coincidence_hint(self, domain, outer, ordered, holes):
+        """Describe distinct polygon vertices closer than the merge distance, or return ''."""
+        scale = max(self.width, self.height)
+        tol = merge_distance(domain.extent())
+        loops = [('aperture polygon', outer), *((f'conductor {c.name!r}', hole)
+                                               for c, hole in zip(ordered, holes))]
+        return coincidence_message(
+            close_vertices(loops, tol, scale), tol*scale, "the aperture's bounding-box diagonal",
+            "Separate the conductors from each other and from the aperture by more than that "
+            "distance, keep each diameter well above it, or lower angular_divisions so that "
+            "neighbouring polygon vertices stay farther apart. The aperture and conductor "
+            "polygons are exact inputs, so SIPI does not move them.")
+
+    def _point_limit_hint(self, options, explicit):
+        """Say which setting drives an aperture mesh that passed meshine's point limit."""
+        source = ('size was given explicitly' if explicit else
+                  'the default size is max(width, height) / 48')
+        return (f"SIPI: this aperture mesh needs more points than the mesher allows, with size "
+                f"{options['size']:.4g} m, angular_divisions {options['angular_divisions']} and a "
+                f"{self.width:.4g} m x {self.height:.4g} m ellipse; {source}. The point count "
+                "grows with the aperture area / size**2 and, on the circles, with "
+                "angular_divisions. To fit, raise size first, then lower angular_divisions after "
+                "checking that the capacitance does not change.")
+
     def mesh(self, *, size=None, angular_divisions=128):
         options = self.mesh_settings(size=size, angular_divisions=angular_divisions)
         scale = max(self.width, self.height)
@@ -139,7 +165,10 @@ class EllipticalAperture:
             index = min(range(len(shapes)), key=lambda i: shapes[i].exterior.distance(p))
             return 'ground' if index == 0 else ordered[index-1].name
 
-        mesh = from_mesher(generate(domain, boundary, candidate_order='stable'))
+        with explained(lambda: self._coincidence_hint(domain, outer, ordered, holes),
+                       lambda: self._point_limit_hint(options, size is not None)):
+            generated = generate(domain, boundary, candidate_order='stable')
+        mesh = from_mesher(generated)
         mesh.nodes *= scale
         with np.errstate(over='ignore', under='ignore', invalid='ignore'):
             areas = mesh.areas()

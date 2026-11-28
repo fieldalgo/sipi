@@ -37,13 +37,26 @@ All ground traces and box grounds belong to one common return group:
 - Bottom/top grounds become finite plates of width `section.width`, extending
   outward from the dielectric box by `ground_thickness`.
 - Side grounds become outward strips of that thickness, joining horizontal
-  plates without overlapping their areas.
+  plates without overlapping their areas. A side strip ends exactly on the
+  outer plate face even where `low + (high - low)` rounds an ulp off it; such
+  closed sections (for example a 0.78 mm dielectric with 0.1 mm plates) used to
+  be refused with "zero-length edge".
 - The magnetic box extends `padding` beyond this construction on each side;
   its exterior nodes fix Az=0. Nonconducting regions and metal interiors both
   have conforming P1 triangles. Dielectric permittivity is not used here.
 - `metal_size`, `far_size` and `grade` control target mesh sizes. They are not
   measured edge lengths or accuracy estimates. `0 < min_angle < 34`,
   `far_size >= metal_size > 0`, `grade >= 0`, positive thickness/padding apply.
+- With `dielectric_interfaces=True`, a rectangular or tapered trace face within
+  the merge distance (1e-9 of the magnetic box diagonal, padding included) of
+  an inner layer boundary, but not on it (for example `h + 1e-18`), is placed on
+  the boundary, as `CrossSection.mesh` does; such inputs were refused. Polygon
+  traces and metal cores keep their geometry. Other coordinates that close are
+  refused with a message naming them and the fix. Above meshine's 300,000-point
+  limit, the message gives the settings, the metal area in units of
+  `metal_size**2` and what to raise first (`metal_size`, while
+  `max_edge_over_skin_depth` stays at most 1). Inputs that mesh are unchanged
+  bit for bit.
 
 The existing dielectric-only `CrossSection.mesh()` has holes for conductors
 and cannot be passed as a metal-volume mesh. Its box boundary and the finite
