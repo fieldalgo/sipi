@@ -27,10 +27,10 @@ jobs:
         os: [ubuntu-latest, macos-15, windows-latest]
         suite: [source, installed]
         # Twenty-four parts balanced by each platform's recorded times in
-        # tools/shards/durations-<linux|darwin|win32>.json (tools/pytest_shard.py): at most 30, 37
-        # and 40 min of recorded test time per part on Linux, macOS and Windows (tables from run
-        # 46146287645, after the openphysics 60322040 pin), whose parts planned from the earlier
-        # tables took up to 42, 60 and 51 min of test time.
+        # tools/shards/durations-<linux|darwin|win32>.json (tools/pytest_shard.py): at most 30, 34
+        # and 39 min of recorded test time per part on Linux, macOS and Windows (tables from runs
+        # 46146287645 and 46152630969, engine pin openphysics 60322040), whose parts planned from
+        # the earlier tables took up to 42, 60 and 51 min of test time.
         shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     runs-on: ${{ matrix.os }}
     env:
