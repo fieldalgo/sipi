@@ -66,10 +66,13 @@ SIPI는 공유 경계 패널 해법을 공개 모듈 `galerkin.panel_electrostat
 
 검증 워크플로는 Linux·macOS·Windows에서 소스 회귀와 설치 산출물 회귀를
 별도 작업으로 실행하며 각 시험 집합을 열여섯 묶음으로 나눕니다. 각 작업의 제한은
-6시간입니다. 모듈 단위로 배정하므로 모듈 fixture는 같은 묶음에 남습니다.
-`tools/shards/durations.json`(완전한 CI 실행의 JUnit XML에서 모은 모듈별 초)에
-있는 모듈은 큰 것부터 기록 시간이 가장 적은 묶음에 넣고, 표에 없는 모듈은
-상대 경로의 SHA-256으로 배정합니다. 모든 시험을 먼저 수집한 뒤 나누며, 수치 기준을 완화하거나
+6시간입니다. 같은 시험도 러너마다 시간이 달라 플랫폼마다 표
+`tools/shards/durations-<linux|darwin|win32>.json`(그 플랫폼에서 완전한 CI 실행의 JUnit
+XML로 모은 단위별 초)을 따로 둡니다. 단위는 모듈 전체여서 모듈 fixture가 같은 묶음에
+남습니다. 다만 표의 `split`에 적힌 모듈은 시험 사례 하나하나가 단위입니다. 비싼 사례들이
+모듈 fixture를 공유하지 않는 모듈만 나눕니다(지금은 harmonic 모서리 면 panel 선로 모듈 둘,
+각각 서로 독립인 5–14분 선로 풀이 여섯 개). 기록된 단위는 큰 것부터 기록 시간이 가장 적은
+묶음에 넣고, 표에 없는 단위는 모듈 경로(나눈 모듈에서는 node ID)의 SHA-256으로 배정합니다. 모든 시험을 먼저 수집한 뒤 나누며, 수치 기준을 완화하거나
 다른 묶음의 시험을 skip으로 처리하지 않습니다. 준비된 PR, main 푸시, 현재
 independent-repository 개발 브랜치의 푸시에서 실행하므로 PR을 만들지 않고도
 병합 전 검증을 할 수 있습니다. 각 작업은 고정된 독립 참조 도구, wheel/sdist
@@ -92,27 +95,35 @@ PR 갱신은 이전 실행을 취소하고 main은 전체 대기열을 유지합
 아닙니다. 기존 로컬 pytest·설치 검사 명령은 기본적으로 분할하지 않습니다.
 소스 명령에 `-p tools.pytest_shard --sipi-shard-count=16 --sipi-shard-index=0
 --sipi-shard-report=.validation/source-shard.json`을 덧붙여 한 묶음을 실행할 수
-있습니다. 0부터 15까지 각각 새 보고서 경로로 실행하세요. 설치 검사 명령에는
-`--shard-count=16 --shard-index=0`을 사용합니다. 플러그인과 시간 표도 체크아웃
-밖으로 복사하며, 네 휠 대조와 PYTHONPATH 제거는 유지합니다.
+있습니다. 0부터 15까지 각각 새 보고서 경로로 실행하세요. 실행 중인 플랫폼의 표를
+쓰며, `--sipi-shard-durations=<linux|darwin|win32>`로 다른 표를 지정할 수 있습니다.
+설치 검사 명령에는 `--shard-count=16 --shard-index=0`을 사용합니다. 플러그인과 시간
+표들도 체크아웃 밖으로 복사하며, 네 휠 대조와 PYTHONPATH 제거는 유지합니다.
 
-모듈이 늘거나 시간이 크게 바뀌면 시간 표를 갱신합니다. 완전한 실행 하나의
-`validation-ubuntu-latest-source-<i>` 아티팩트를 받아
-(`gh api repos/fieldalgo/sipi/actions/runs/<id>/artifacts`) 저장소 루트에서
-`python tools/pytest_shard.py --update <모든 source.xml> --source "<실행, 커밋, 날짜, 파일>"`을
-실행합니다. 표에는 출처와 명령이 남습니다. `tools/tests/test_shard_durations.py`는
-표 형식, 결정적 배정, 균형 상한, 어떤 모듈도 기록 전체의 1/16의 1.1배를 넘지 않음을
-검사합니다.
+모듈이 늘거나 시간이 크게 바뀌면 표를 갱신합니다. 완전한 실행 하나의
+`validation-<os>-<시험 집합>-<i>` 아티팩트를 받고
+(`gh api repos/fieldalgo/sipi/actions/runs/<id>/artifacts`), 지금 수집되는 node ID를
+`PYTHONPATH=src python -m pytest -q --collect-only tests/sipi > collected.txt`로 적은 뒤,
+저장소 루트에서 플랫폼마다(`ubuntu-latest`와 `linux`, `macos-15`와 `darwin`,
+`windows-latest`와 `win32`) `python tools/pytest_shard.py --table <표> --update
+<os>-source-*/source.xml --update <os>-installed-*/installed.xml --split <나눌 모듈>
+--collected collected.txt --source "<실행, 커밋, 날짜, 파일>"`을 실행합니다. `--update`
+하나가 완전한 시험 집합 실행 하나이며, 단위 시간은 그 단위가 있는 실행들의 평균입니다.
+더 이상 수집되지 않는 사례는 뺍니다. 표마다 출처와 명령이 남습니다.
+`tools/tests/test_shard_durations.py`는 형식, 결정적 배정, 균형 상한, 어떤 단위도 자기
+표 전체의 1/16의 1.1배를 넘지 않음을 검사합니다.
 
-manifest(`sipi.pytest-partition/2`)에는 전체 원본 node ID·수집 해시·정규화한
-시간 표의 SHA-256·배정 ID·실행 완료 ID·종료 상태를
+manifest(`sipi.pytest-partition/3`)에는 전체 원본 node ID·수집 해시·사용한 시간 표의
+이름과 정규화한 SHA-256·배정 ID·실행 완료 ID·종료 상태를
 남깁니다. 기존 manifest를 덮어쓰지 않으며 부분 실행을 전체 통과로 인정하지
 않습니다. `tools/check_shards.py`는 모든 분할 번호, 동일한 원본 수집 결과,
-체크아웃의 시간 표와 그 표로 계산한 배정과의 일치, 누락·중복 없는 배정,
-모든 배정 시험의 성공적인 완료를 요구합니다.
+모든 묶음이 같은 표를 쓰고(`--durations-table`이면 그 표) 그것이 체크아웃의 표와 같음,
+그 표로 계산한 배정과의 일치, 누락·중복 없는 배정, 모든 배정 시험의 성공적인 완료를
+요구합니다. 플랫폼마다 배정은 다르지만 플랫폼·시험 집합별 증거는 여전히 수집된 모든
+시험을 정확히 한 번 포함해야 합니다.
 명시적인 `--collect-only` 모드는 수집만 검사하고 `executed: false`를 표시합니다.
-워크플로의 마지막 검사는 여섯 플랫폼·시험 집합과 소스/설치본 공통 제품 시험의
-일치를 대조합니다. 한 묶음이라도 실패하거나 중단되면 나머지가 통과해도 실패입니다.
+워크플로의 마지막 검사는 여섯 플랫폼·시험 집합을 각 플랫폼의 표로 확인하고 소스/설치본
+공통 제품 시험의 일치를 대조합니다. 한 묶음이라도 실패하거나 중단되면 나머지가 통과해도 실패입니다.
 검사 이름에 분할 번호가 추가되므로 통합 전 필수 검사 설정을 검토해야 합니다.
 이 변경은 기존 수치 실패 해결이나 새 플랫폼 지원, 앞으로의 시간 제한 준수를
 보증하지 않습니다. 세 묶음일 때 가장 큰 묶음의 기록된 시험 시간은 Linux에서

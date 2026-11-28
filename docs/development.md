@@ -82,10 +82,16 @@ ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 
 The validation workflow runs source and installed-artifact regression in separate
 Linux, macOS and Windows jobs, with sixteen partitions per suite. Each job retains
-a six-hour limit. Whole test modules are assigned, keeping module fixtures together:
-modules listed in `tools/shards/durations.json` (seconds per module from the JUnit
-XML of a complete CI run) go largest first to the partition with the least recorded
-time; a module missing from the table keeps the stable SHA-256 of its relative path.
+a six-hour limit. Each platform has its own table,
+`tools/shards/durations-<linux|darwin|win32>.json` (seconds per unit from the JUnit XML
+of complete CI runs on that platform), because the same tests take different times on
+each runner. A unit is a whole test module, keeping module fixtures together, except
+in the modules the table lists under `split`, whose cases are separate units; only
+modules whose expensive cases share no module fixture are split (today the two
+harmonic corner-face panel-line modules, six independent 5–14 minute line solves
+each). Recorded units go largest first to the partition with the least recorded time;
+a unit missing from the table keeps the stable SHA-256 of its module path (of its node
+ID in a split module).
 All cases are collected before
 selection; a partition does not relax numerical criteria or mark omitted cases
 as skipped. It runs for ready pull
@@ -113,29 +119,39 @@ The ordinary local pytest and installed-check commands remain unpartitioned.
 For an individual source partition, append `-p tools.pytest_shard
 --sipi-shard-count=16 --sipi-shard-index=0
 --sipi-shard-report=.validation/source-shard.json` to the source command above;
-use indices 0 to 15 in separate runs with fresh report paths. For the installed
-runner, use `--shard-count=16 --shard-index=0`; it copies the plugin and the
-durations table outside the checkout and still audits all four wheels and clears
+use indices 0 to 15 in separate runs with fresh report paths. The running platform's
+table is used unless `--sipi-shard-durations=<linux|darwin|win32>` names another. For the
+installed runner, use `--shard-count=16 --shard-index=0`; it copies the plugin and the
+durations tables outside the checkout and still audits all four wheels and clears
 PYTHONPATH.
 
-Refresh the durations table when modules are added or their times change much:
-download the `validation-ubuntu-latest-source-<i>` artifacts of one complete run
-(`gh api repos/fieldalgo/sipi/actions/runs/<id>/artifacts`), then from the
-repository root run `python tools/pytest_shard.py --update <every source.xml>
---source "<run, commit, date, files>"`. The table records its source and command.
-`tools/tests/test_shard_durations.py` checks its format, the deterministic plan, the
-balance bound and that no module exceeds 1.1 times a sixteenth of the recorded suite.
+Refresh the tables when modules are added or their times change much: download the
+`validation-<os>-<suite>-<i>` artifacts of one complete run
+(`gh api repos/fieldalgo/sipi/actions/runs/<id>/artifacts`), write the node IDs collected
+now with `PYTHONPATH=src python -m pytest -q --collect-only tests/sipi > collected.txt`,
+then from the repository root, for each platform (`ubuntu-latest` and `linux`,
+`macos-15` and `darwin`, `windows-latest` and `win32`), run
+`python tools/pytest_shard.py --table <table> --update <os>-source-*/source.xml
+--update <os>-installed-*/installed.xml --split <the split modules> --collected
+collected.txt --source "<run, commit, date, files>"`. Each `--update` is one complete suite
+run; a unit's time is the mean over the runs that have it. Cases no longer collected are
+left out. Each table records its source and command.
+`tools/tests/test_shard_durations.py` checks the format, the deterministic plan, the
+balance bound and that no unit exceeds 1.1 times a sixteenth of its table.
 
-The manifest (`sipi.pytest-partition/2`) retains every original node ID, its
-collection hash, the SHA-256 of the canonical durations table, the selected
-IDs, completed IDs and exit status. Existing manifests are refused, and missing
+The manifest (`sipi.pytest-partition/3`) retains every original node ID, its
+collection hash, the name and the SHA-256 of the canonical durations table it used, the
+selected IDs, completed IDs and exit status. Existing manifests are refused, and missing
 or partial execution cannot establish a passing suite. `tools/check_shards.py`
-requires all indices, identical original collections, the checkout's durations
-table, selections equal to the plan computed from it, exact disjoint coverage
-and successful completion of every selected case. Its explicit `--collect-only`
+requires all indices, identical original collections, one table named by every
+partition (with `--durations-table`, the expected one) and equal to the checkout's,
+selections equal to the plan computed from it, exact disjoint coverage
+and successful completion of every selected case. The plans of different platforms
+differ, but the evidence of each platform and suite must still cover every collected
+case exactly once. Its explicit `--collect-only`
 mode verifies discovery only and reports `executed: false`.
-The workflow's final coverage job checks all six platform/suite groups and the
-shared source/installed product collection. A failed or interrupted partition
+The workflow's final coverage job checks all six platform/suite groups, each against
+its platform's table, and the shared source/installed product collection. A failed or interrupted partition
 fails that check even when its other partitions pass. Check names include the
 partition index; required-check configuration must be reviewed before integration.
 This scheduling change does not fix existing numerical failures, certify a new
