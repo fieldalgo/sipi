@@ -230,16 +230,27 @@ The durations table leaves out the four study cases (`--collected` with the node
 now): 747 instead of 854 recorded minutes, 46.7 minutes per partition. The new reproduction
 tests have no CI time yet; locally they took 9 minutes together on one thread.
 
-These heavy tests also compare several resolutions but remain in the regular suite, because
-they also check another function or because it is unclear that they are only studies:
-`test_two_ground_linear_corner_face_line_study.py::test_actual_scalar_sweep_refinement_and_complex_closed_forms`
-(29.6 min; it also checks the actual three-sample sweep and closed-form propagation),
-`test_actual_saved_finite_resolution_receipt` of the three-active and guard
-`*_corner_face_resolution_document.py` modules (25.4 and 25.0 min; the saved-document
-execution path of the same studies) and
-`test_real_physical_faces_and_whole_currents_refine_without_floor[0]` of the guard and
-three-active `*_corner_conductor.py` modules (15.2 and 11.5 min; 32 to 48 panels within 1%,
-together with an exact shared-solve check).
+Five further heavy tests compared several resolutions or ran a study through another path.
+Each was read and decided as below. Times are minutes in Validate run 46099046636 (main
+`b2cbb002`), source/installed, on Linux, macOS and Windows.
+
+| Test | What it checks | Time (min) | Decision | Regular suite now |
+| --- | --- | --- | --- | --- |
+| `test_two_ground_linear_corner_face_line_study.py::test_actual_scalar_sweep_refinement_and_complex_closed_forms` | The actual three-sample sweep at 32 panels per edge; for each sample R, L and C0 again at 64 and 128 panels, consecutive levels within rtol 1%; closed-form characteristic impedance and propagation constant at every level (rtol 1e-12); the row value equals Z0 | 20/35, 22/21, 45/35 | Split. The 64/128-panel refinement is a resolution study: the unchanged test runs only with `SIPI_RESOLUTION_STUDIES=1` | `test_actual_scalar_sweep_closed_forms_and_recorded_base`: the same sweep, closed forms and value check at 32 panels, and reproduction of each sample's R, L, C0 and Z0 recorded with the study (`linear-line-study-base.json`; 86 s locally) |
+| `test_two_ground_harmonic_three_active_corner_face_resolution_document.py::test_actual_saved_finite_resolution_receipt` | The recorded three-active study's six lines (same inputs, same 1% criteria) run through `SavedExecutionRequest`; requires a complete, accepted receipt | 39/29, 33/32, 59/51 | Study, run a second time: dispatch-only. The saved path's complete, failed, disagreeing, interrupted, CLI and record behaviour is already checked field-free in the same module | `test_saved_document_runs_the_recorded_study` (field-free): the saved base line is the recorded study's base input, the outer lines, refined panel and budget are the study's; the resolution module reproduces that base line |
+| `test_two_ground_harmonic_guard_corner_face_resolution_document.py::test_actual_saved_finite_resolution_receipt` | The same for the guard study | 25/25, 34/37, 46/30 | Same | Same |
+| `test_two_ground_harmonic_guard_corner_conductor.py::test_real_physical_faces_and_whole_currents_refine_without_floor[0]` | Physical-face and whole current factors (C0, face and whole parts) at 32 and 48 panels per edge within 1%, and the module's own 32-panel path equal to the shared solve | 9/15, 12/12, 23/18 | Kept: the only check of these modules' current path with real fields (the other tests reuse the shared solve through a stub), and nothing recorded to reproduce | Unchanged. Time review: the 32-panel call repeats the module fixture's solve, but that repetition is the exact shared-solve check; the 48-panel level is the criterion. No reduction without changing what is checked |
+| `test_two_ground_harmonic_three_active_corner_conductor.py::test_real_physical_faces_and_whole_currents_refine_without_floor[0]` | The same for three active conductors | 7/10, 30/21, 12/23 | Kept, as above | Unchanged, as above |
+
+The line-study record keeps, per sample, the base level once per dielectric mesh: Linux and
+Windows share one mesh, macOS another (R, L and C0 come from the boundary panels and agree
+within 1.4e-14 across all six copies). The reproduction takes the same exact (1e-9) and
+closest-variant (1e-4) paths as the corner-face studies and writes
+`resolution_study_reproduction`. Regenerate it after a study run with `PYTHONPATH=src python
+tests/sipi/reference_data/resolution_studies/generate_linear_line_study_base.py --junit
+<platform>/<suite>=<xml> ... --source "<run>"`, which also solves the base sweep locally and
+requires it to match the variant of its own mesh. The `resolution-studies` job also runs the
+two saved-document receipts and the line-study refinement.
 
 ## Explicit two-ground development capability
 

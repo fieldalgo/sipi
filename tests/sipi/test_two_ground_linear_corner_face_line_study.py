@@ -17,6 +17,7 @@ from sipi.project import SavedProject
 from test_fem_shape_study import source as original_source
 from test_two_ground_face_panel_line import metal,faces
 from test_execution_record import ARTIFACTS
+import resolution_studies as studies
 
 QUANTITIES=('impedance_real','attenuation','differential_forward_impedance_real','common_forward_impedance_real')
 
@@ -150,25 +151,59 @@ def test_interrupt_propagates(monkeypatch):
     assert len(calls)==2
 
 
-def test_actual_scalar_sweep_refinement_and_complex_closed_forms(record_property):
-    doc=document(physical=True);result=doc.analyze(max_evaluations=3)
+def closed_forms(line):
+    omega=2*np.pi*line.frequency[0];z=line.R[0,0,0]+1j*omega*line.L[0,0,0];y=line.G[0,0,0]+1j*omega*line.C[0,0,0]
+    actual=line.propagation()
+    np.testing.assert_allclose(actual.z_characteristic[0,0],np.sqrt(z/y),rtol=1e-12,atol=0)
+    np.testing.assert_allclose(actual.gamma[0,0],np.sqrt(z*y),rtol=1e-12,atol=0)
+
+
+def base_sweep(result=None):
+    """(quantities, dielectric mesh, input JSON) of each actual sweep row at 32 panels per edge,
+    as linear-line-study-base.json records them."""
+    if result is None:result=document(physical=True).analyze(max_evaluations=3)
     assert not result.failed and len(result.rows)==3
-    records=[]
-    for row in result.rows:
-        levels=[row.result]
-        for count in (64,128):
-            raw=json.loads(row.input_json);raw['panel']['panels_per_edge']=count;levels.append(Line.from_dict(raw).analyze())
-        records.append(dict(input=json.loads(row.input_json),value=row.value,levels=[dict(panel=dict(x.panel_settings),R=x.R.tolist(),L=x.L.tolist(),C0=x.current_factors.C0.tolist(),current=x.current_record(),mesh=x.mesh_record()) for x in levels]))
-        for key in ('R','L','C0'):
-            values=[x.current_factors.C0 if key=='C0' else getattr(x,key) for x in levels]
-            for a,b in zip(values,values[1:]):np.testing.assert_allclose(a,b,rtol=.01,atol=0)
-        for line in levels:
-            omega=2*np.pi*line.frequency[0];z=line.R[0,0,0]+1j*omega*line.L[0,0,0];y=line.G[0,0,0]+1j*omega*line.C[0,0,0]
-            expected_z=np.sqrt(z/y);expected_gamma=np.sqrt(z*y);actual=line.propagation()
-            np.testing.assert_allclose(actual.z_characteristic[0,0],expected_z,rtol=1e-12,atol=0)
-            np.testing.assert_allclose(actual.gamma[0,0],expected_gamma,rtol=1e-12,atol=0)
-        assert row.value==pytest.approx(levels[0].propagation().z_characteristic[0,0].real,rel=1e-14)
-    record_property('two_ground_linear_corner_face_scalar_study',json.dumps(records,sort_keys=True))
+    return [(dict(R_ohm_per_m=row.result.R,L_h_per_m=row.result.L,C0_f_per_m=row.result.current_factors.C0,
+                  impedance_real_ohm=[row.value]),studies.mesh_identity(row.result),row.input_json) for row in result.rows]
+
+
+def test_actual_scalar_sweep_closed_forms_and_recorded_base(record_property):
+    """The actual three-sample sweep at its own resolution: closed-form propagation, the ordered
+    value, and reproduction of the base level of the dispatch-only refinement study below
+    (linear-line-study-base.json; exact path for a recorded mesh, otherwise the closest variant
+    within 1e-4, as tests/_support/resolution_studies.py)."""
+    result=document(physical=True).analyze(max_evaluations=3)
+    data=json.loads(studies.LINE_STUDY_RECORD.read_text(encoding='utf-8'));paths=[]
+    for row,(values,mesh,text) in zip(result.rows,base_sweep(result)):
+        closed_forms(row.result)
+        assert row.value==pytest.approx(row.result.propagation().z_characteristic[0,0].real,rel=1e-14)
+        recorded=data['rows'][row.index];assert json.loads(text)==recorded['input']
+        path,labels,found=studies.compare_variants(values,mesh,recorded['variants'])
+        paths.append(dict(index=row.index,path=path,closest_variant=labels,dielectric_mesh=mesh,matrix_relative=found))
+    record_property('resolution_study_reproduction',json.dumps(paths,sort_keys=True))
+
+
+if studies.ENABLED:  # dispatch-only: the 64 and 128 panel levels (tests/_support/resolution_studies.py)
+    @pytest.mark.slow
+    def test_actual_scalar_sweep_refinement_and_complex_closed_forms(record_property):
+        doc=document(physical=True);result=doc.analyze(max_evaluations=3)
+        assert not result.failed and len(result.rows)==3
+        records=[]
+        for row in result.rows:
+            levels=[row.result]
+            for count in (64,128):
+                raw=json.loads(row.input_json);raw['panel']['panels_per_edge']=count;levels.append(Line.from_dict(raw).analyze())
+            records.append(dict(input=json.loads(row.input_json),value=row.value,levels=[dict(panel=dict(x.panel_settings),R=x.R.tolist(),L=x.L.tolist(),C0=x.current_factors.C0.tolist(),current=x.current_record(),mesh=x.mesh_record()) for x in levels]))
+            for key in ('R','L','C0'):
+                values=[x.current_factors.C0 if key=='C0' else getattr(x,key) for x in levels]
+                for a,b in zip(values,values[1:]):np.testing.assert_allclose(a,b,rtol=.01,atol=0)
+            for line in levels:
+                omega=2*np.pi*line.frequency[0];z=line.R[0,0,0]+1j*omega*line.L[0,0,0];y=line.G[0,0,0]+1j*omega*line.C[0,0,0]
+                expected_z=np.sqrt(z/y);expected_gamma=np.sqrt(z*y);actual=line.propagation()
+                np.testing.assert_allclose(actual.z_characteristic[0,0],expected_z,rtol=1e-12,atol=0)
+                np.testing.assert_allclose(actual.gamma[0,0],expected_gamma,rtol=1e-12,atol=0)
+            assert row.value==pytest.approx(levels[0].propagation().z_characteristic[0,0].real,rel=1e-14)
+        record_property('two_ground_linear_corner_face_scalar_study',json.dumps(records,sort_keys=True))
 
 
 def test_legacy_study_schema_refused_before_any_field(monkeypatch):

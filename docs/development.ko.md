@@ -195,14 +195,26 @@ tests/sipi/reference_data/resolution_studies/generate_finite_resolution_studies.
 854분에서 747분, 묶음당 46.7분이 됩니다. 새 재현 시험은 아직 CI 시간이 없으며 로컬에서
 스레드 하나로 모두 합쳐 9분 걸렸습니다.
 
-다음 무거운 시험도 여러 해상도를 비교하지만, 다른 기능도 함께 확인하거나 연구만 하는
-시험인지 분명하지 않아 평소 시험에 남겼습니다:
-`test_two_ground_linear_corner_face_line_study.py::test_actual_scalar_sweep_refinement_and_complex_closed_forms`
-(29.6분, 실제 세 표본 스윕과 닫힌 형태 전파도 확인), three-active·guard
-`*_corner_face_resolution_document.py` 모듈의 `test_actual_saved_finite_resolution_receipt`
-(25.4, 25.0분, 같은 연구의 저장 문서 실행 경로), guard·three-active `*_corner_conductor.py`
-모듈의 `test_real_physical_faces_and_whole_currents_refine_without_floor[0]`(15.2, 11.5분,
-패널 32→48에서 1% 이내와 함께 공유 풀이의 정확한 일치 확인).
+여러 해상도를 비교하거나 연구를 다른 경로로 다시 실행하던 무거운 시험 다섯 개를 각각 읽고
+아래처럼 정했습니다. 시간은 Validate 실행 46099046636(main `b2cbb002`)의 소스/설치본 분이며
+Linux, macOS, Windows 순입니다.
+
+| 시험 | 검증 내용 | 시간(분) | 결정 | 지금 평소 시험 |
+| --- | --- | --- | --- | --- |
+| `test_two_ground_linear_corner_face_line_study.py::test_actual_scalar_sweep_refinement_and_complex_closed_forms` | 변당 패널 32개에서 실제 세 표본 스윕, 표본마다 패널 64·128개에서 R·L·C0를 다시 풀어 이웃 단계가 상대 1% 이내, 모든 단계의 닫힌 형태 특성 임피던스·전파 상수(상대 1e-12), 행 값이 Z0와 같음 | 20/35, 22/21, 45/35 | 나눔. 패널 64·128 세분은 해상도 연구이므로 바꾸지 않은 시험을 `SIPI_RESOLUTION_STUDIES=1`일 때만 실행 | `test_actual_scalar_sweep_closed_forms_and_recorded_base`: 패널 32개에서 같은 스윕·닫힌 형태·값 검사, 그리고 연구와 함께 기록한 표본별 R·L·C0·Z0 재현(`linear-line-study-base.json`, 로컬 86초) |
+| `test_two_ground_harmonic_three_active_corner_face_resolution_document.py::test_actual_saved_finite_resolution_receipt` | 기록된 three-active 연구의 선로 여섯 개(같은 입력, 같은 1% 기준)를 `SavedExecutionRequest`로 실행해 완료·승인된 receipt 요구 | 39/29, 33/32, 59/51 | 연구를 한 번 더 실행하는 것이므로 수동 실행 전용. 저장 경로의 완료·실패·불일치·중단·CLI·기록 동작은 같은 모듈에서 전계 없이 이미 검사 | `test_saved_document_runs_the_recorded_study`(전계 없음): 저장 문서의 기본 선로가 기록된 연구의 기본 입력이고 바깥 선로·세분 패널·예산이 연구와 같음. 그 기본 선로는 해상도 모듈이 재현 |
+| `test_two_ground_harmonic_guard_corner_face_resolution_document.py::test_actual_saved_finite_resolution_receipt` | guard 연구에 대해 같음 | 25/25, 34/37, 46/30 | 같음 | 같음 |
+| `test_two_ground_harmonic_guard_corner_conductor.py::test_real_physical_faces_and_whole_currents_refine_without_floor[0]` | 패널 32·48개에서 물리 면·전체 전류 인자(C0, 면별·전체 부분)가 1% 이내, 모듈 자체 32개 경로가 공유 풀이와 정확히 같음 | 9/15, 12/12, 23/18 | 남김. 이 모듈들의 전류 경로를 실제 전계로 검사하는 유일한 시험(다른 시험은 stub로 공유 풀이를 재사용)이고 재현할 기록이 없음 | 그대로. 시간 검토: 32개 호출이 모듈 fixture의 풀이를 반복하지만 그 반복이 공유 풀이의 정확한 일치 검사이고, 48개 단계가 판정 기준이므로 검사 내용을 바꾸지 않고는 줄일 수 없음 |
+| `test_two_ground_harmonic_three_active_corner_conductor.py::test_real_physical_faces_and_whole_currents_refine_without_floor[0]` | 능동 도체 셋에 대해 같음 | 7/10, 30/21, 12/23 | 위와 같이 남김 | 위와 같이 그대로 |
+
+선로 연구 기록은 표본마다 기본 단계를 유전체 메시당 한 번 남깁니다. Linux와 Windows가 한
+메시, macOS가 다른 메시입니다(R·L·C0는 경계 패널에서 나오므로 여섯 사본 모두 1.4e-14 이내로
+같음). 재현은 모서리 면 연구와 같은 정확(1e-9)·가장 가까운 변형(1e-4) 경로를 따르고
+`resolution_study_reproduction`을 기록합니다. 연구 실행 뒤 `PYTHONPATH=src python
+tests/sipi/reference_data/resolution_studies/generate_linear_line_study_base.py --junit
+<플랫폼>/<시험 집합>=<xml> ... --source "<실행>"`으로 다시 만들며, 생성기는 기본 스윕을 로컬에서
+풀어 자기 메시의 변형과 일치하는지도 요구합니다. `resolution-studies` 작업은 저장 문서
+receipt 두 개와 선로 연구 세분도 실행합니다.
 
 ## 명시적 양면 접지 개발 기능
 

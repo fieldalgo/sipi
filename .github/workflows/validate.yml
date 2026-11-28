@@ -92,13 +92,16 @@ jobs:
             .validation/*-shard.json
   resolution-studies:
     # The corner-face finite-resolution studies (tests/_support/resolution_studies.py): six
-    # complete lines each with 1% agreement criteria, 6 to 60 min per case on one runner. In
-    # the partitions they are not defined; there each study's base line must reproduce the
-    # values recorded with it (tests/sipi/reference_data/resolution_studies/). Manual dispatch
+    # complete lines each with 1% agreement criteria, 6 to 60 min per case on one runner, the
+    # same six lines through the saved document (the two *_resolution_document modules) and the
+    # 64/128-panel refinement of the linear line study. In the partitions they are not defined;
+    # there each study's base line must reproduce the values recorded with it
+    # (tests/sipi/reference_data/resolution_studies/). Manual dispatch
     # with resolution_studies=true only (gh workflow run validate.yml --ref <branch>
     # -f resolution_studies=true): never on pushes or pull requests, outside the coverage gate.
     # Run it when the corner-face line, current or mesh code changes; regenerate the record from
-    # its JUnit XML with generate_finite_resolution_studies.py beside the record.
+    # its JUnit XML with generate_finite_resolution_studies.py (and the line-study record with
+    # generate_linear_line_study_base.py) beside the record.
     name: resolution-study (${{ matrix.os }} / ${{ matrix.module }})
     if: github.event_name == 'workflow_dispatch' && inputs.resolution_studies
     timeout-minutes: 180
@@ -110,6 +113,9 @@ jobs:
           - test_two_ground_harmonic_three_active_corner_face_resolution
           - test_two_ground_harmonic_guard_corner_face_resolution
           - test_two_ground_linear_corner_face_resolution
+          - test_two_ground_harmonic_three_active_corner_face_resolution_document
+          - test_two_ground_harmonic_guard_corner_face_resolution_document
+          - test_two_ground_linear_corner_face_line_study
     runs-on: ${{ matrix.os }}
     env:
       OPENBLAS_NUM_THREADS: '1'

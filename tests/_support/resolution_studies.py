@@ -41,6 +41,21 @@ MATRIX_RELATIVE = 1e-9
 # criterion; a larger change still fails and needs the study rerun.
 MESH_VARIANT_RELATIVE = 1e-4
 
+# Study tests outside the record above, also defined only with the variable. Each has a
+# regular-suite counterpart: the saved-document receipts run the recorded studies' six lines
+# through the saved-document path, so their base line is checked to be the recorded study's
+# (whose resolution module reproduces it); the linear line study's base sweep reproduces
+# LINE_STUDY_RECORD.
+GATED = {
+    'test_two_ground_harmonic_three_active_corner_face_resolution_document':
+        'test_actual_saved_finite_resolution_receipt',
+    'test_two_ground_harmonic_guard_corner_face_resolution_document':
+        'test_actual_saved_finite_resolution_receipt',
+    'test_two_ground_linear_corner_face_line_study':
+        'test_actual_scalar_sweep_refinement_and_complex_closed_forms',
+}
+LINE_STUDY_RECORD = RECORD.with_name('linear-line-study-base.json')
+
 # Without the variable the study tests are not defined at all, so they are neither collected
 # nor skipped: the installed run treats a skip as a failure and deselects nothing.
 ENABLED = os.environ.get(ENVIRONMENT) == '1'
@@ -80,19 +95,24 @@ def compare(module, index, result):
     agree within MESH_VARIANT_RELATIVE instead of failing until the study is rerun.
     """
     case = recorded_case(module, index)
-    values = quantities(result)
-    mesh = mesh_identity(result)
+    return compare_variants(quantities(result), mesh_identity(result), case['variants'])
 
+
+def compare_variants(values, mesh, variants):
+    """The exact/tolerance comparison of ``compare`` for any recorded mesh variants.
+
+    Each variant holds ``dielectric_mesh``, ``recorded_by`` and ``quantities`` (name to array).
+    """
     def errors(row):
         assert sorted(values) == sorted(row['quantities'])
         return {key: matrix_relative(values[key], row['quantities'][key]) for key in values}
 
-    same = [row for row in case['variants'] if row['dielectric_mesh'] == mesh]
+    same = [row for row in variants if row['dielectric_mesh'] == mesh]
     if same:
         found = errors(same[0])
         assert max(found.values()) <= MATRIX_RELATIVE, found
         return 'exact', same[0]['recorded_by'], found
-    rows = [(errors(row), row) for row in case['variants']]
+    rows = [(errors(row), row) for row in variants]
     found, row = min(rows, key=lambda item: max(item[0].values()))
     assert max(found.values()) <= MESH_VARIANT_RELATIVE, (mesh, found)
     return 'tolerance', row['recorded_by'], found
