@@ -81,7 +81,7 @@ ID in `PYTEST_CURRENT_TEST`; Windows limits an environment-variable value to
 ## Continuous validation
 
 The validation workflow runs source and installed-artifact regression in separate
-Linux, macOS and Windows jobs, with sixteen partitions per suite. Each job retains
+Linux, macOS and Windows jobs, with twenty-four partitions per suite. Each job retains
 a six-hour limit. Each platform has its own table,
 `tools/shards/durations-<linux|darwin|win32>.json` (seconds per unit from the JUnit XML
 of complete CI runs on that platform), because the same tests take different times on
@@ -117,11 +117,11 @@ does not establish validation of a newer branch head.
 `tools/pytest_shard.py` is an opt-in validation plugin, not a runtime dependency.
 The ordinary local pytest and installed-check commands remain unpartitioned.
 For an individual source partition, append `-p tools.pytest_shard
---sipi-shard-count=16 --sipi-shard-index=0
+--sipi-shard-count=24 --sipi-shard-index=0
 --sipi-shard-report=.validation/source-shard.json` to the source command above;
-use indices 0 to 15 in separate runs with fresh report paths. The running platform's
+use indices 0 to 23 in separate runs with fresh report paths. The running platform's
 table is used unless `--sipi-shard-durations=<linux|darwin|win32>` names another. For the
-installed runner, use `--shard-count=16 --shard-index=0`; it copies the plugin and the
+installed runner, use `--shard-count=24 --shard-index=0`; it copies the plugin and the
 durations tables outside the checkout and still audits all four wheels and clears
 PYTHONPATH.
 
@@ -137,7 +137,7 @@ collected.txt --source "<run, commit, date, files>"`. Each `--update` is one com
 run; a unit's time is the mean over the runs that have it. Cases no longer collected are
 left out. Each table records its source and command.
 `tools/tests/test_shard_durations.py` checks the format, the deterministic plan, the
-balance bound and that no unit exceeds 1.1 times a sixteenth of its table.
+balance bound and that no unit exceeds 1.1 times a twenty-fourth of its table.
 
 The manifest (`sipi.pytest-partition/3`) retains every original node ID, its
 collection hash, the name and the SHA-256 of the canonical durations table it used, the
@@ -165,6 +165,18 @@ times give at most 2.1 hours per partition. Validate run 45965021952 recorded
 module times balanced over sixteen partitions give 53 minutes each; runner speed
 still varies, and a module absent from the table is not balanced, so later growth
 must be checked again.
+
+Validate run 46099046636 then took 108 minutes: sixteen parts planned from that Linux table
+gave jobs with median/maximum 50/85, 47/104 and 63/108 minutes on Linux, macOS and Windows,
+because macOS and Windows times differ from Linux and two panel-line modules of 34 to 84
+minutes could not be split. With each platform's own table from that run, the split
+modules and the studies moved to the dispatch-only job, the largest recorded part is
+45/48/57 minutes with sixteen parts and 30/34/38 minutes with twenty-four (twenty: 36/39/45;
+twenty-eight: 25/34/32). Twenty-four is used: the macOS floor is one conductor module of
+33.6 minutes whose module fixture is shared, so more parts no longer help there, and the
+same test varied up to about 1.5 times between runs. The wall time of a run with
+twenty-four parts, and whether all 144 jobs (48 on macOS) start together, are not yet
+measured.
 
 The paired surface-conductor and Cannonball refinement tests record
 `conductor_refinement` JSON in their JUnit testcase properties before checking
