@@ -8,6 +8,9 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'desktop'))
 from engine import execute
 from sipi.templates import coated_microstrip
+# v1 results fixed: the workbench builds v1 template boxes (sipi.templates.box_rule, 2026-11-28).
+from sipi._template_registry import _pinned_v1
+coated_microstrip = _pinned_v1(coated_microstrip)
 from sipi import GoalSeekError
 
 PARAMETERS = dict(width=.5e-3, top_width=.4e-3, thickness=.1e-3,

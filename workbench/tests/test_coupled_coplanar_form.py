@@ -11,6 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]/'tests/sipi'))
 from engine import execute
 from test_coupled_coplanar import PARAMS, COARSE, FINE, reference_modes
 from sipi.template_document import TemplateSectionDocument
+# v1 results fixed: the workbench builds v1 template boxes (sipi.templates.box_rule, 2026-11-28).
+from sipi._template_registry import _pinned_v1
 
 
 @pytest.fixture(scope='module')
@@ -51,7 +53,7 @@ def test_independent_target_requires_both_meshes_and_preserves_requested_mesh():
     goal=result['design']
     assert abs(goal['residual'])<=1.0 and abs(goal['refined_residual'])<=1.0
     assert goal['history'][-1]['stage']=='refinement' and goal['width']==pytest.approx(.0005,rel=.04)
-    assert result['document']['mesh']==sipi.coupled_grounded_coplanar(**PARAMS).mesh_settings(**FINE)
+    assert result['document']['mesh']==_pinned_v1(sipi.coupled_grounded_coplanar)(**PARAMS).mesh_settings(**FINE)
     assert result['line']['z_diff']==goal['impedance']
     print('panel-derived target',target,'design',goal)
 
@@ -131,7 +133,7 @@ def test_default_pair_goal_stays_within_mesh_budget_and_independent_tolerance():
     goal=result['design']
     assert abs(goal['residual'])<=1 and abs(goal['refined_residual'])<=1
     assert goal['width']==pytest.approx(.0005,rel=.04) and goal['history'][-1]['stage']=='refinement'
-    expected=sipi.coupled_grounded_coplanar(**parameters).mesh_settings()
+    expected=_pinned_v1(sipi.coupled_grounded_coplanar)(**parameters).mesh_settings()
     expected['far_size']/=4
     assert result['document']['mesh']==expected and result['line']['z_diff']==goal['impedance']
     print('default-domain automatic goal',goal)
