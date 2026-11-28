@@ -36,7 +36,7 @@ def saved(request):
 @pytest.mark.parametrize('template', ['coplanar_stripline', 'coupled_coplanar_stripline', 'coated_unbacked_coplanar', 'coupled_coated_unbacked_coplanar', 'unbacked_coplanar', 'coupled_unbacked_coplanar', 'microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip', 'coupled_stripline',
                                       'grounded_coplanar', 'coupled_grounded_coplanar', 'coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'])
 def test_forms_create_copy_reopen_without_fields(template, monkeypatch):
-    text = TemplateSectionDocument(template, parameters(template)).dumps()
+    text = TemplateSectionDocument(template, parameters(template), schema='sipi.template-section/1').dumps()
     def forbidden(*a, **kw): raise AssertionError('project edits must not solve')
     monkeypatch.setattr(CrossSection, 'mesh', forbidden)
     monkeypatch.setattr(SavedExecutionRequest, 'run', forbidden)
@@ -142,7 +142,7 @@ def test_growth_tamper_and_invalid_edits_leave_original_intact():
 
 
 def test_readable_supported_core_input_is_preserved():
-    text=TemplateSectionDocument('layered_broadside_stripline',dict(width=.0005,thickness=.000035,gap=.0002,lower_height=.0004,upper_height=.0006,lower_eps_r=4,gap_eps_r=3,upper_eps_r=4)).dumps()
+    text=TemplateSectionDocument('layered_broadside_stripline',dict(width=.0005,thickness=.000035,gap=.0002,lower_height=.0004,upper_height=.0006,lower_eps_r=4,gap_eps_r=3,upper_eps_r=4), schema='sipi.template-section/1').dumps()
     project=saved(create(text))
     assert project.prepare('a').source_text==text
     opened=execute(dict(action='template-open',text=project.prepare('a').source_text))
@@ -153,7 +153,7 @@ def test_readable_core_input_without_a_form_is_preserved():
     text=TemplateSectionDocument('asymmetric_layered_broadside_stripline',dict(
         lower_width=.0004,upper_width=.0007,gap=.00025,lower_height=.00035,
         upper_height=.00055,lower_thickness=.000025,upper_thickness=.000045,
-        offset=.00015,lower_eps_r=3.,gap_eps_r=4.,upper_eps_r=5.)).dumps()
+        offset=.00015,lower_eps_r=3.,gap_eps_r=4.,upper_eps_r=5.), schema='sipi.template-section/1').dumps()
     project=saved(create(text))
     assert project.prepare('a').source_text==text
     with pytest.raises(ValueError,match='no editable form'):

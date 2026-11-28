@@ -20,7 +20,7 @@ def analyzed():
 
 
 def test_same_factory_geometry_and_homogeneous_tem_invariants(analyzed):
-    direct = TemplateSectionDocument('coupled_stripline', PARAMETERS, mesh=MESH)
+    direct = TemplateSectionDocument('coupled_stripline', PARAMETERS, mesh=MESH, schema='sipi.template-section/1')
     assert analyzed['document'] == direct.cross_section.to_dict()
     line = analyzed['line']
     c, c0, inductance = [np.asarray(line[key]) for key in ['C', 'C0', 'L']]

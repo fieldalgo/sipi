@@ -13,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'desktop'))
 from engine import execute
 from main import Server
 import sipi
+# v1 results fixed: the workbench builds v1 template boxes (sipi.templates.box_rule, 2026-11-28).
+from sipi._template_registry import _pinned_v1
 
 UI = Path(__file__).resolve().parents[1] / 'ui'
 INPUT = {'action': 'analyze', 'template': 'stripline',
@@ -120,6 +122,6 @@ def test_import_rejects_duplicate_keys_and_nonfinite_values():
 def test_adapter_templates_match_native(name, parameters):
     options = dict(edge_size=5e-6, far_size=.5e-3, grade=.2)
     result = execute({'action': 'analyze', 'template': name, 'parameters': parameters, 'mesh': options})
-    native = getattr(sipi, name)(**parameters).analyze(**options)
+    native = _pinned_v1(getattr(sipi, name))(**parameters).analyze(**options)
     assert result['line']['C'] == native.C.tolist()
     assert result['line']['L'] == native.L.tolist()

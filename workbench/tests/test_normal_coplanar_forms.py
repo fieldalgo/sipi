@@ -30,7 +30,7 @@ def test_geometry_roundtrip_keeps_normal_film_and_upper_clearance(name, top, mon
     result = execute(dict(action='template-document', template=name, parameters=p, mesh=COARSE))
     assert execute(dict(action='template-open', text=result['document_text'])) == result
     doc = result['document']
-    assert doc == TemplateSectionDocument(name, p, mesh=COARSE).cross_section.to_dict()
+    assert doc == TemplateSectionDocument(name, p, mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict()
     assert doc['schema'] == 'sipi.cross-section/3'
     assert doc['box']['bottom'] == 'ground'
     grounds = [t for t in doc['traces'] if t['ground']]
@@ -54,7 +54,7 @@ def test_auto_width_against_independent_vacuum_panels_and_outer_domain(name):
     assert d['width'] == pytest.approx(.0005, rel=.04)
     assert d['history'][-1]['stage'] == 'refinement' and out['line'][quantity(name)] == d['impedance']
     mesh = getattr(sipi,name)(**p).mesh_settings(); mesh['edge_size'] *= 10; mesh['far_size'] /= 4
-    expected = TemplateSectionDocument(name, {**p, 'width':d['width']}, mesh=mesh)
+    expected = TemplateSectionDocument(name, {**p, 'width':d['width']}, mesh=mesh, schema='sipi.template-section/1')
     assert out['document'] == expected.cross_section.to_dict()
     outer = getattr(sipi,name)(**{**p,'width':d['width'],'box_width':.048,'air_height':.024}).analyze(**mesh)
     value = outer.even_odd()['z_diff'] if name == NAMES[1] else outer.z0
@@ -87,7 +87,7 @@ def test_normal_thickness_studies_preserve_material_and_fixed_mesh(name, mode):
     assert study['failed']==0 and study['status']=='complete' and study['quantity']==quantity(name)
     assert len(study['rows'])==(4 if mode=='corners' else 2)
     for row in study['rows']:
-        direct=TemplateSectionDocument(name,{**p,**row['parameters']},mesh=COARSE)
+        direct=TemplateSectionDocument(name,{**p,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==direct.cross_section.to_dict() and row['impedance']==row['line'][quantity(name)]
 
 

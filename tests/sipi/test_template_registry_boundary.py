@@ -15,7 +15,9 @@ from sipi.template_document import TemplateSectionDocument
 def test_existing_study_catalog_keeps_factory_identity():
     assert study._TEMPLATES is _TEMPLATES
     for name, factory in _TEMPLATES.items():
-        assert factory is getattr(templates, name)
+        # Since 2026-11-28 the catalog wraps the same public factory to keep
+        # the v1 default boxes of saved documents (sipi.templates.box_rule).
+        assert factory.__wrapped__ is getattr(templates, name)
 
 
 def test_section_documents_load_without_study_or_product_modules(tmp_path):
@@ -25,7 +27,7 @@ def test_section_documents_load_without_study_or_product_modules(tmp_path):
     rows = json.loads(reference.read_text())['cases']
     inputs = tmp_path/'inputs.json'
     inputs.write_text(json.dumps(rows))
-    expected = [TemplateSectionDocument(row['template'], row['supplied_parameters']).dumps()
+    expected = [TemplateSectionDocument(row['template'], row['supplied_parameters'], schema='sipi.template-section/1').dumps()
                 for row in rows]
     script = '''
 import importlib.abc, json, pathlib, sys, types
@@ -50,7 +52,7 @@ CrossSection.mesh = forbidden_mesh
 rows = json.loads(pathlib.Path(sys.argv[2]).read_text())
 output = []
 for row in rows:
-    doc = TemplateSectionDocument(row['template'], row['supplied_parameters'])
+    doc = TemplateSectionDocument(row['template'], row['supplied_parameters'], schema='sipi.template-section/1')
     assert doc.cross_section.to_dict() == row['cross_section']
     assert TemplateSectionDocument.loads(doc.dumps()).dumps() == doc.dumps()
     output.append(doc.dumps())

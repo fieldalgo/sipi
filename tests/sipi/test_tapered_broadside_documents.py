@@ -36,7 +36,7 @@ def assert_geometry(s, p):
 
 def test_editable_and_sampling_documents_roundtrip_without_field_solves(monkeypatch):
     monkeypatch.setattr(CrossSection, 'mesh', lambda *a, **k: pytest.fail('Input preparation meshed'))
-    editable = TemplateSectionDocument(NAME, PARAMS, mesh=COARSE)
+    editable = TemplateSectionDocument(NAME, PARAMS, mesh=COARSE, schema='sipi.template-section/1')
     assert normalize_saved(editable.dumps()) == editable.dumps()
     assert TemplateSectionDocument.loads(editable.dumps()).dumps() == editable.dumps()
     for kind in ('sweep', 'corners', 'uniform', 'normal'):

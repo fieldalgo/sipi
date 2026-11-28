@@ -26,9 +26,29 @@ All accept `thickness=0`, `tan_delta=0` and `box_width=None`. Surface templates
 also accept `air_height=None`, defaulting to `10 * substrate_height + thickness`.
 Stripline plane spacing includes the conductor thickness. Every side wall is
 open (zero normal displacement); the stripline top is grounded and other tops
-are open. Default box widths are `max(20*h, 4*w)` for microstrip,
-`max(12*b, 4*w)` for stripline, `max(20*h, 4*(2*w+gap))` for coupled microstrip and
-`max(20*h, 4*w, w+2*gap+2*ground_width+4*h)` for single-signal coplanar geometry.
+are open.
+
+**Default boxes changed on 2026-11-28.** `box_width=None`, `air_height=None` and
+`lower_air_height=None` follow a box rule, `sipi.templates.box_rule('v1' | 'v2')`.
+New calls use **v2**:
+
+| Rule | Surface templates with a ground plane (microstrip, coupled, coated, conformal, grounded coplanar, layered and asymmetric variants) | Unbacked coplanar templates | Stripline families |
+|---|---|---|---|
+| `v1` (before 2026-11-28) | width `max(20*h, 4*w)` (coupled `4*(2*w+gap)`, coplanar `w+2*gap+2*ground_width+4*h` and pair/asymmetric forms also in the max); air `10*h + t` | as grounded coplanar, plus lower air `10*h` | `max(12*b, 4*w)` and pair/offset forms |
+| `v2` (default) | every v1 width term ×4 (microstrip `max(80*h, 16*w)`); air `4*(10*h + t)` | width, air and lower air ×2 | unchanged |
+
+Use `with sipi.templates.box_rule('v1'): ...` to reproduce earlier boxes;
+`sipi.templates.current_box_rule()` reports the active rule. Explicit
+`box_width`, `air_height` and `lower_air_height` are used as given under both
+rules. The rule is chosen so that open-wall truncation stays within about 0.1 %
+in `eps_eff`, Z0 and the common mode on the studied sections (table below);
+it costs about 5–40 % more mesh nodes. Saved documents keep their boxes: every
+document that rebuilds a template from its name and parameters (template
+section /1, impedance, pair, sampled, corner and line-quantity designs and
+studies, panel forward-pair documents, FEM-shape, yield) and the workbench
+forms still build v1 boxes, so their results are unchanged. Only
+[`sipi.template-section/2`](template_document.md#version-2-v2-boxes) records v2
+boxes. New design and study versions with v2 boxes are follow-up work.
 
 These defaults are starting domains, not truncation guarantees. Enlarge the box
 and air independently to check truncation; also enlarge coplanar ground width.
@@ -41,15 +61,23 @@ so that reference may itself be up to about 0.02 % high in `eps_eff`.
 
 | Box (width × air) | `w/h` 0.25 | `w/h` 1 | `w/h` 4 |
 |---|---|---|---|
-| template default, 20h × 10h | `eps_eff` +0.40/+0.45 %, Z0 +0.28/+0.26 % | +0.65/+0.73 %, +0.47/+0.43 % | +1.40/+1.60 %, +1.02/+0.92 % |
+| v1 template default, 20h × 10h | `eps_eff` +0.40/+0.45 %, Z0 +0.28/+0.26 % | +0.65/+0.73 %, +0.47/+0.43 % | +1.40/+1.60 %, +1.02/+0.92 % |
 | 40h × 20h (validation box) | +0.10/+0.11 %, +0.07/+0.06 % | +0.16/+0.18 %, +0.11/+0.10 % | +0.34/+0.38 %, +0.23/+0.21 % |
 | 80h × 40h | +0.02/+0.03 %, +0.01/+0.01 % | +0.03/+0.04 %, +0.03/+0.02 % | +0.07/+0.08 %, +0.05/+0.05 % |
 
 Each cell gives `εr` 4.3/9.8. Open walls make both `eps_eff` and Z0 high,
 growing with `w/h`. An independent comparison found 0.1–0.3 % in `eps_eff`
 for the 40h × 20h box, consistent with this table. The template default box
-is a starting domain; pass `box_width` and `air_height` (for example 80h and
-40h) when truncation must stay below 0.1 %, or compare open and grounded walls.
+v1 row is the old template default; for microstrip the v2 default is the
+80h × 40h row. The v1 box is a starting domain; with v1, pass `box_width` and
+`air_height` (for example 80h and 40h) when truncation must stay below 0.1 %,
+or compare open and grounded walls. Over nine template families, two
+thicknesses and three `w/h` (h = 0.2 mm), v2 boxes left at most +0.10 % in
+`eps_eff` and +0.12 % in the even-mode `eps_eff` of coupled microstrip
+against an extrapolated unbounded box; the differential mode moved by less
+than 0.03 %. Default panel controls were rechecked on v2 boxes: from 64 to
+128 panels per edge C0 changed by at most 1.5e-6 and the current Gram parts by
+at most 4.0e-3, as with v1 boxes.
 Zero thickness is allowed, but width, gap and dielectric dimensions must be
 positive. Invalid or overlapping geometry raises before meshing. Names are
 `signal`, or the ordered pair `positive`, `negative`; coplanar reference traces

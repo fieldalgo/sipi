@@ -11,6 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]/'tests/sipi'))
 from engine import execute
 from test_coupled_coplanar import PARAMS, COARSE, FINE, reference_modes
 from sipi.template_document import TemplateSectionDocument
+# v1 results fixed: the workbench builds v1 template boxes (sipi.templates.box_rule, 2026-11-28).
+from sipi._template_registry import _pinned_v1
 
 
 @pytest.fixture(scope='module')
@@ -19,7 +21,7 @@ def nominal():
 
 
 def test_factory_positions_and_vacuum_invariants(nominal):
-    direct=TemplateSectionDocument('coupled_grounded_coplanar',PARAMS,mesh=COARSE)
+    direct=TemplateSectionDocument('coupled_grounded_coplanar',PARAMS,mesh=COARSE, schema='sipi.template-section/1')
     assert nominal['document']==direct.cross_section.to_dict()
     traces=nominal['document']['traces']
     assert [t['ground'] for t in traces]==[False,False,True,True]
@@ -51,7 +53,7 @@ def test_independent_target_requires_both_meshes_and_preserves_requested_mesh():
     goal=result['design']
     assert abs(goal['residual'])<=1.0 and abs(goal['refined_residual'])<=1.0
     assert goal['history'][-1]['stage']=='refinement' and goal['width']==pytest.approx(.0005,rel=.04)
-    assert result['document']['mesh']==sipi.coupled_grounded_coplanar(**PARAMS).mesh_settings(**FINE)
+    assert result['document']['mesh']==_pinned_v1(sipi.coupled_grounded_coplanar)(**PARAMS).mesh_settings(**FINE)
     assert result['line']['z_diff']==goal['impedance']
     print('panel-derived target',target,'design',goal)
 
@@ -76,7 +78,7 @@ def test_ground_dimensions_in_studies_preserve_nominal_mesh(mode):
     assert result['quantity']=='z_diff' and result['failed']==0 and result['status']=='complete'
     assert len(result['rows'])==(4 if mode=='corners' else 3)
     for row in result['rows']:
-        direct=TemplateSectionDocument('coupled_grounded_coplanar',{**PARAMS,**row['parameters']},mesh=COARSE)
+        direct=TemplateSectionDocument('coupled_grounded_coplanar',{**PARAMS,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==direct.cross_section.to_dict()
         assert row['impedance']==row['line']['z_diff']
 
@@ -131,7 +133,7 @@ def test_default_pair_goal_stays_within_mesh_budget_and_independent_tolerance():
     goal=result['design']
     assert abs(goal['residual'])<=1 and abs(goal['refined_residual'])<=1
     assert goal['width']==pytest.approx(.0005,rel=.04) and goal['history'][-1]['stage']=='refinement'
-    expected=sipi.coupled_grounded_coplanar(**parameters).mesh_settings()
+    expected=_pinned_v1(sipi.coupled_grounded_coplanar)(**parameters).mesh_settings()
     expected['far_size']/=4
     assert result['document']['mesh']==expected and result['line']['z_diff']==goal['impedance']
     print('default-domain automatic goal',goal)

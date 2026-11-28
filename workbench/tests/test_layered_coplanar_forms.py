@@ -15,7 +15,7 @@ def test_interface_and_independent_materials_roundtrip_without_meshing(name,thic
  monkeypatch.setattr(sipi.CrossSection,'mesh',lambda *a,**kw:pytest.fail('Saving solved fields'))
  p=parameters(name,thickness=thickness,top_width=None if thickness==0 else .00025)
  out=execute(dict(action='template-document',template=name,parameters=p,mesh=COARSE))
- assert out['document_text']==TemplateSectionDocument(name,p,mesh=COARSE).dumps()
+ assert out['document_text']==TemplateSectionDocument(name,p,mesh=COARSE, schema='sipi.template-section/1').dumps()
  assert execute(dict(action='template-open',text=out['document_text']))==out
  d=out['document'];assert [x['thickness'] for x in d['layers']]==[p['lower_height'],p['upper_height']]
  assert [x['eps_r'] for x in d['layers']]==[3.8,4.5]
@@ -43,7 +43,7 @@ def test_layer_height_and_permittivity_samples_keep_interface_and_nominal_mesh(n
  assert out['status']=='complete' and out['failed']==0 and out['quantity']==('z_diff' if name==NAMES[1] else 'z0')
  assert len(out['rows'])==(4 if mode=='corners' else 2)
  for row in out['rows']:
-  p=parameters(name,**row['parameters']);assert row['document']==TemplateSectionDocument(name,p,mesh=COARSE).cross_section.to_dict()
+  p=parameters(name,**row['parameters']);assert row['document']==TemplateSectionDocument(name,p,mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict()
   assert row['impedance']==row['line'][out['quantity']]
   assert all(t['y']==p['lower_height'] for t in row['document']['traces'])
 
@@ -109,7 +109,7 @@ def test_ground_clearance_studies_keep_separate_finite_grounds(name,variable):
  out=execute(dict(action='study',template=name,parameters=p,mesh=COARSE,study=dict(mode='sweep',variables=[dict(parameter=variable,lower=value*.9,upper=value*1.1)],points=2,seed=42)))['study']
  assert out['failed']==0 and len(out['rows'])==2
  for row in out['rows']:
-  changed={**p,**row['parameters']};doc=TemplateSectionDocument(name,changed,mesh=COARSE).cross_section.to_dict();assert row['document']==doc
+  changed={**p,**row['parameters']};doc=TemplateSectionDocument(name,changed,mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict();assert row['document']==doc
   signals=[t for t in doc['traces'] if not t['ground']];grounds=[t for t in doc['traces'] if t['ground']]
   assert len(grounds)==2 and all(t['width']==changed['ground_width'] for t in grounds)
   clearance=grounds[1]['x']-grounds[1]['width']/2-(signals[-1]['x']+signals[-1]['width']/2)
@@ -128,6 +128,6 @@ def test_physical_width_target_keeps_interface_and_finite_side_grounds(name):
  for t in doc['traces']:
   assert t['y']==.0004 and t['thickness']==.000035
   assert t['width']==(p['ground_width'] if t['ground'] else d['width'])
- assert doc==TemplateSectionDocument(name,{**p,'width':d['width']},mesh=doc['mesh']).cross_section.to_dict()
+ assert doc==TemplateSectionDocument(name,{**p,'width':d['width']},mesh=doc['mesh'], schema='sipi.template-section/1').cross_section.to_dict()
  assert out['line']['z_diff' if name==NAMES[1] else 'z0']==d['impedance']
  chosen=next(row for row in d['history'] if row['stage']=='search' and row['parameter']==d['width']);assert chosen['impedance']==d['impedance']

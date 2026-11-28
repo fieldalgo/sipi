@@ -5,12 +5,66 @@
 from __future__ import annotations
 
 import math
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import replace
+from functools import wraps
+from inspect import signature
 from numbers import Real
 
 import numpy as np
 
 from .crosssection import CrossSection, Layer, Trace
+
+#: Default-box rules. 'v1' is the box of every template before 2026-11-28.
+#: 'v2' multiplies each default box term and the default air by 4 for surface
+#: templates with a ground plane, and the width, air and lower air by 2 for
+#: unbacked templates; stripline families are the same as in v1.
+BOX_RULES = ('v1', 'v2')
+DEFAULT_BOX_RULE = 'v2'
+_BOX_RULE = ContextVar('sipi_template_box_rule', default=DEFAULT_BOX_RULE)
+_BOX_SCALE = ContextVar('sipi_template_box_scale', default=4)
+_DEFAULTS = ContextVar('sipi_template_box_defaults', default=None)
+
+
+@contextmanager
+def box_rule(rule):
+    """Use one default-box rule for template calls made in this context.
+
+    'v1' (the earlier boxes): a surface template is max(20 h, 4 w) wide with
+    10 h + t of air (pair and coplanar templates widen it to their own extent
+    terms), unbacked templates add 10 h of lower air, stripline families are
+    max(12 b, 4 w) wide. 'v2' (the default): surface templates with a ground
+    plane use 4 times every v1 term and 4 times the air; unbacked templates use
+    2 times the width, air and lower air; stripline families are unchanged.
+    Explicit box_width, air_height and lower_air_height are used as given under
+    both rules. Saved documents that rebuild templates keep the rule of their
+    schema version, whatever this context says.
+    """
+    if rule not in BOX_RULES:
+        raise ValueError(f'box rule must be one of {BOX_RULES}')
+    token = _BOX_RULE.set(rule)
+    try:
+        yield rule
+    finally:
+        _BOX_RULE.reset(token)
+
+
+def current_box_rule():
+    """The default-box rule template calls use here: 'v1' or 'v2'."""
+    return _BOX_RULE.get()
+
+
+def _k():
+    """Multiplier on default box terms: 1 under v1, else 4 (2 for unbacked)."""
+    return 1 if _BOX_RULE.get() == 'v1' else _BOX_SCALE.get()
+
+
+def _note(key, value):
+    defaults = _DEFAULTS.get()
+    if defaults is not None:
+        defaults[key] = value
+    return value
 
 __all__ = ['split_gap_broadside_stripline', 'tapered_layered_broadside_stripline', 'asymmetric_layered_broadside_stripline', 'layered_conformal_coated_grounded_coplanar', 'coupled_layered_conformal_coated_grounded_coplanar', 'asymmetric_coupled_layered_conformal_coated_grounded_coplanar', 'layered_conformal_coated_unbacked_coplanar', 'coupled_layered_conformal_coated_unbacked_coplanar', 'asymmetric_coupled_layered_conformal_coated_unbacked_coplanar', 'layered_conformal_coated_microstrip', 'coupled_layered_conformal_coated_microstrip', 'asymmetric_coupled_layered_conformal_coated_microstrip', 'layered_coated_grounded_coplanar', 'coupled_layered_coated_grounded_coplanar', 'asymmetric_coupled_layered_coated_grounded_coplanar', 'layered_coated_unbacked_coplanar', 'coupled_layered_coated_unbacked_coplanar', 'asymmetric_coupled_layered_coated_unbacked_coplanar', 'layered_coated_microstrip', 'coupled_layered_coated_microstrip', 'asymmetric_coupled_layered_coated_microstrip', 'layered_unbacked_coplanar', 'coupled_layered_unbacked_coplanar', 'asymmetric_coupled_layered_unbacked_coplanar', 'layered_grounded_coplanar', 'coupled_layered_grounded_coplanar', 'asymmetric_coupled_layered_grounded_coplanar', 'microstrip', 'stripline', 'coupled_microstrip', 'grounded_coplanar', 'coated_microstrip',
            'layered_microstrip', 'coupled_layered_microstrip', 'asymmetric_coupled_layered_microstrip',
@@ -52,8 +106,8 @@ def _surface(width, substrate_height, eps_r, thickness, tan_delta, air_height, b
     w = _positive('width', width)
     h = _positive('substrate_height', substrate_height)
     t = _positive('thickness', thickness, zero=True)
-    air = 10*h + t if air_height is None else _positive('air_height', air_height)
-    box = max(20*h, 4*w) if box_width is None else _positive('box_width', box_width)
+    air = _note('air_height', _k()*(10*h + t)) if air_height is None else _positive('air_height', air_height)
+    box = _k()*max(20*h, 4*w) if box_width is None else _positive('box_width', box_width)
     layers = [Layer('substrate', h, _positive('eps_r', eps_r),
                     _positive('tan_delta', tan_delta, zero=True)), Layer('air', air)]
     return w, h, t, box, layers
@@ -89,7 +143,7 @@ def coupled_microstrip(*, width, gap, substrate_height, eps_r, thickness=0.0,
     w, h, t, box, layers = _surface(width, substrate_height, eps_r, thickness,
                                    tan_delta, air_height, box_width)
     if box_width is None:
-        box = max(box, 4*(2*w+gap))
+        box = max(box, _k()*(4*(2*w+gap)))
     offset = (w+gap)/2
     return CrossSection(layers, [Trace('positive', -offset, w, h, t, top_width=top_width),
                                 Trace('negative', offset, w, h, t, top_width=top_width)], box)
@@ -185,7 +239,7 @@ def asymmetric_coupled_microstrip(*, left_width, right_width, gap, substrate_hei
     _, h, _, box, layers = _surface(max(left, right), substrate_height, eps_r,
                                     max(lt, rt), tan_delta, air_height, box_width)
     if box_width is None:
-        box = max(box, 4*(left+gap+right))
+        box = max(box, _k()*(4*(left+gap+right)))
     return CrossSection(layers,
         [Trace('positive', -(gap+right)/2, left, h, lt, top_width=left_top_width),
          Trace('negative', (gap+left)/2, right, h, rt, top_width=right_top_width)], box)
@@ -264,7 +318,7 @@ def grounded_coplanar(*, width, gap, ground_width, substrate_height, eps_r,
     w, h, t, box, layers = _surface(width, substrate_height, eps_r, thickness,
                                    tan_delta, air_height, box_width)
     if box_width is None:
-        box = max(box, w+2*gap+2*gw+4*h)
+        box = max(box, _k()*(w+2*gap+2*gw+4*h))
     offset = (w+gw)/2+gap
     return CrossSection(layers, [Trace('signal', 0.0, w, h, t, top_width=top_width),
                                 Trace('ground_left', -offset, gw, h, t, ground=True),
@@ -288,7 +342,7 @@ def coupled_grounded_coplanar(*, width, gap, ground_gap, ground_width,
     w, h, t, box, layers = _surface(width, substrate_height, eps_r, thickness,
                                    tan_delta, air_height, box_width)
     if box_width is None:
-        box = max(box, 2*w+gap+2*gg+2*gw+4*h)
+        box = max(box, _k()*(2*w+gap+2*gg+2*gw+4*h))
     offset = (w+gap)/2
     ground_offset = w+gap/2+gg+gw/2
     return CrossSection(layers,
@@ -325,7 +379,7 @@ def asymmetric_coupled_grounded_coplanar(*, left_width, right_width, gap,
                                     max(lt, rt, gt), tan_delta, air_height, box_width)
     span = left+right+gap
     if box_width is None:
-        box = max(box, span+2*gg+2*gw+4*h)
+        box = max(box, _k()*(span+2*gg+2*gw+4*h))
     offset = (left+right)/2+gap/2+gg+gw/2
     return CrossSection(layers,
         [Trace('positive', -(gap+right)/2, left, h, lt, top_width=left_top_width),
@@ -335,7 +389,7 @@ def asymmetric_coupled_grounded_coplanar(*, left_width, right_width, gap,
 
 
 def _unbacked_coplanar(base, lower_air_height):
-    lower = (10*base.layers[0].thickness if lower_air_height is None else
+    lower = (_note('lower_air_height', _k()*(10*base.layers[0].thickness)) if lower_air_height is None else
              _positive('lower_air_height', lower_air_height))
     layers = [Layer('lower_air', lower), *base.layers]
     # Raise every height by lower. A height that is a layer interface, trace bottom
@@ -668,7 +722,7 @@ def _conformal_coated(base, coating_thickness, coating_eps_r, coating_tan_delta,
     loss = _positive('coating_tan_delta', coating_tan_delta, zero=True)
     h, half = base.layers[0].thickness, base.width/2
     thickness = max(trace.thickness for trace in base.traces)
-    air = base.layers[1].thickness if air_height is None else _positive('air_height', air_height)
+    air = _note('air_height', base.layers[1].thickness) if air_height is None else _positive('air_height', air_height)
     if not (h+d > h and h+thickness+d > h+thickness):
         raise ValueError('coating_thickness cannot be resolved at the substrate/trace height')
     shapes = [box(-half, h, half, h+d)]
@@ -845,7 +899,7 @@ def coupled_coated_microstrip(*, width, gap, substrate_height, eps_r, coating_he
         box_width=box_width, top_width=top_width)
     trace = base.traces[0]
     offset = (trace.width+gap)/2
-    box = max(base.width,4*(2*trace.width+gap)) if box_width is None else base.width
+    box = max(base.width,_k()*(4*(2*trace.width+gap))) if box_width is None else base.width
     return CrossSection(base.layers,
         [Trace('positive',-offset,trace.width,trace.y,trace.thickness,top_width=top_width),
          Trace('negative',offset,trace.width,trace.y,trace.thickness,top_width=top_width)], box)
@@ -1364,7 +1418,7 @@ def with_surface_mask(section, *, thickness, eps_r, tan_delta=0.0, gap_fill_heig
 def _unbacked_layered_surface(base, lower_air_height):
     # _unbacked_coplanar's legacy default uses its first substrate layer.
     # This family has two substrate layers; preserve their total thickness.
-    lower = (10*sum(layer.thickness for layer in base.layers[:2])
+    lower = (_note('lower_air_height', _k()*(10*sum(layer.thickness for layer in base.layers[:2])))
              if lower_air_height is None else lower_air_height)
     return _unbacked_coplanar(base, lower)
 
@@ -1717,3 +1771,32 @@ Signal widths, thicknesses and tapers are independent; no symmetric modes
 are assumed for the unequal pair."""
     base = asymmetric_coupled_layered_conformal_coated_grounded_coplanar(left_width=left_width, right_width=right_width, gap=gap, ground_gap=ground_gap, ground_width=ground_width, lower_height=lower_height, upper_height=upper_height, lower_eps_r=lower_eps_r, upper_eps_r=upper_eps_r, left_thickness=left_thickness, right_thickness=right_thickness, ground_thickness=ground_thickness, lower_tan_delta=lower_tan_delta, upper_tan_delta=upper_tan_delta, air_height=air_height, box_width=box_width, left_top_width=left_top_width, right_top_width=right_top_width, coating_thickness=coating_thickness, coating_eps_r=coating_eps_r, coating_tan_delta=coating_tan_delta)
     return _unbacked_layered_surface(base, lower_air_height)
+
+
+def _unbacked_scale(factory):
+    """Run an unbacked factory (and the grounded base it builds) with v2 scale 2."""
+    @wraps(factory)
+    def unbacked(*args, **kwargs):
+        token = _BOX_SCALE.set(2)
+        try:
+            return factory(*args, **kwargs)
+        finally:
+            _BOX_SCALE.reset(token)
+    return unbacked
+
+
+for _name in __all__:
+    if 'lower_air_height' in signature(globals()[_name]).parameters:
+        globals()[_name] = _unbacked_scale(globals()[_name])
+del _name
+__all__ += ['BOX_RULES', 'DEFAULT_BOX_RULE', 'box_rule', 'current_box_rule']
+
+
+def _resolved_defaults(factory, kwargs):
+    """Call factory and return (section, the default air and lower air it chose)."""
+    token = _DEFAULTS.set({})
+    try:
+        section = factory(**kwargs)
+        return section, dict(_DEFAULTS.get())
+    finally:
+        _DEFAULTS.reset(token)

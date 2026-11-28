@@ -24,7 +24,7 @@ def study(kind='sweep',**changes):
 
 def test_all_stored_inputs_prepare_without_solving_fields(monkeypatch):
  monkeypatch.setattr(CrossSection,'mesh',lambda *a,**k:pytest.fail('Preparing input solved fields'))
- d=TemplateSectionDocument(NAME,P,mesh=COARSE);assert normalize_saved(d.dumps())==d.dumps()
+ d=TemplateSectionDocument(NAME,P,mesh=COARSE, schema='sipi.template-section/1');assert normalize_saved(d.dumps())==d.dumps()
  assert TemplateSectionDocument.loads(d.dumps()).dumps()==d.dumps()
  for kind in ['sweep','corners','uniform','normal']:
   d=study(kind);assert normalize_saved(d.dumps())==d.dumps()

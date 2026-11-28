@@ -35,6 +35,10 @@ TEMPLATES.update((name, getattr(_templates, name)) for name in LAYERED_SURFACE_T
 PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name.startswith(('coupled_', 'asymmetric_')))
 ASYMMETRIC_PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name.startswith('asymmetric_'))
 FORWARD_PAIR_TEMPLATES = ASYMMETRIC_PAIR_TEMPLATES | {'layered_broadside_stripline'}
+# The workbench forms, saved inputs and goal/study documents use the v1 default
+# boxes; sipi.templates defaults to v2 since 2026-11-28. Keep v1 per call.
+from sipi._template_registry import _pinned_v1
+TEMPLATES.update((name, _pinned_v1(factory)) for name, factory in list(TEMPLATES.items()))
 
 
 def engine_info():
@@ -358,7 +362,7 @@ def saved_controls(request):
             sampling=sampling, quantity=quantity, mesh=doc.mesh_options)
     else:
         settings = network_settings(request['network'])
-        editable = TemplateSectionDocument(request['template'], request['parameters'], mesh=doc.mesh_options)
+        editable = TemplateSectionDocument(request['template'], request['parameters'], mesh=doc.mesh_options, schema='sipi.template-section/1')
         saved = QuasistaticLineDocument(editable, np.linspace(settings['start_hz'], settings['stop_hz'], settings['points']),
             resistance=settings['resistance'], length=settings['length'], z_ref=settings['z_ref'])
     return dict(engine=engine_info(), document=doc.to_dict(), document_text=saved.dumps())
@@ -491,7 +495,7 @@ def execute(request, *, record_provider=None):
             if not required <= request.keys() or not request.keys() <= required | {'mesh'}:
                 raise ValueError('Saving an editable design needs template, parameters and optional mesh.')
             editable = TemplateSectionDocument(request['template'], request['parameters'],
-                                               mesh=request.get('mesh'))
+                                               mesh=request.get('mesh'), schema='sipi.template-section/1')
         if editable.template not in TEMPLATES:
             raise ValueError('This workspace has no editable form for that template; use Saved analysis.')
         return {'engine': engine_info(), 'document_text': editable.dumps(),

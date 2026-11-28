@@ -9,7 +9,7 @@ def parameters(name,*,vacuum=False):
  if name==NAMES[1]:p['ground_gap']=.0003
  if vacuum:p.update(eps_r=1.,tan_delta=0.,top_width=None,thickness=0.)
  return p
-def editable(name,*,vacuum=False):return TemplateSectionDocument(name,parameters(name,vacuum=vacuum),mesh=COARSE).to_dict()
+def editable(name,*,vacuum=False):return TemplateSectionDocument(name,parameters(name,vacuum=vacuum),mesh=COARSE, schema='sipi.template-section/1').to_dict()
 if __name__=='__main__':
  import json
  print(json.dumps({name:editable(name) for name in NAMES}))

@@ -269,6 +269,7 @@ _REGISTRY = {
     'sipi.adaptive-panel-resolution/1': AdaptivePanelResolutionDocument,
     **{f'sipi.cross-section/{v}': CrossSectionDocument for v in (1, 2, 3)},
     'sipi.template-section/1': TemplateSectionDocument,
+    'sipi.template-section/2': TemplateSectionDocument,
     'sipi.corner-cross-section/1': CornerCrossSectionDocument,
     'sipi.corner-impedance-study/1': CornerImpedanceStudyDocument,
     'sipi.corner-impedance-design/1': CornerImpedanceDesignDocument,

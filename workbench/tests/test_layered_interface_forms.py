@@ -15,7 +15,7 @@ def test_interface_and_independent_materials_roundtrip_without_meshing(name,thic
  monkeypatch.setattr(sipi.CrossSection,'mesh',lambda *a,**kw:pytest.fail('Saving solved fields'))
  p=parameters(name,thickness=thickness,top_width=None if thickness==0 else .00025)
  out=execute(dict(action='template-document',template=name,parameters=p,mesh=COARSE))
- assert out['document_text']==TemplateSectionDocument(name,p,mesh=COARSE).dumps()
+ assert out['document_text']==TemplateSectionDocument(name,p,mesh=COARSE, schema='sipi.template-section/1').dumps()
  assert execute(dict(action='template-open',text=out['document_text']))==out
  d=out['document'];assert [x['thickness'] for x in d['layers']]==[p['lower_height'],p['upper_height']]
  assert [x['eps_r'] for x in d['layers']]==[3.8,4.5]
@@ -39,7 +39,7 @@ def test_layer_height_and_permittivity_samples_keep_interface_and_nominal_mesh(n
  assert out['status']=='complete' and out['failed']==0 and out['quantity']==('z_diff' if name==NAMES[1] else 'z0')
  assert len(out['rows'])==(4 if mode=='corners' else 2)
  for row in out['rows']:
-  p=parameters(name,**row['parameters']);assert row['document']==TemplateSectionDocument(name,p,mesh=COARSE).cross_section.to_dict()
+  p=parameters(name,**row['parameters']);assert row['document']==TemplateSectionDocument(name,p,mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict()
   assert row['impedance']==row['line'][out['quantity']]
   assert all(t['y']==p['lower_height'] for t in row['document']['traces'])
 
