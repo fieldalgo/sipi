@@ -14,7 +14,7 @@ ROOT = TOOLS.parent
 spec = importlib.util.spec_from_file_location('pytest_shard_plan', TOOLS / 'pytest_shard.py')
 shard = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(shard)
-COUNT = 16  # .github/workflows/validate.yml matrix and coverage job
+COUNT = 24  # .github/workflows/validate.yml matrix and coverage job
 TABLES = [shard.table_path(name) for name in shard.TABLES]
 WORKFLOW = (ROOT / '.github/workflows/validate.yml').read_text(encoding='utf-8')
 
