@@ -29,8 +29,9 @@ from numbers import Real
 import numpy as np
 
 from galerkin import Mesh, from_mesher
-from meshine import Domain, MeshInputError, MeshSizeLimitError, generate, rectangle
+from meshine import Domain, generate, rectangle
 
+from ._mesh_input import close_coordinates, coincidence_message, explained, merge_distance, snap
 from .polygons import PolygonTrace, DielectricRegion, trace_shape, check_regions, polygon_domain
 from .quasistatic import LineParameters, line_parameters
 
@@ -360,7 +361,7 @@ class CrossSection:
 
     def _merge_distance(self) -> float:
         """meshine's vertex merge distance for this box (m): 1e-9 of its diagonal."""
-        return 1e-9 * float(np.hypot(self.width, self.height))
+        return merge_distance(np.hypot(self.width, self.height))
 
     def _face_y(self, y: float) -> float:
         """Return y, or the inner layer boundary it lies strictly within the merge distance of.
@@ -370,42 +371,32 @@ class CrossSection:
         only inputs that cannot be meshed otherwise are moved. The bottom and
         top of the stack are not targets: a trace there is refused by placement.
         """
-        tol = self._merge_distance()
-        for boundary in self.interfaces()[1:-1]:
-            if 0.0 < abs(y - boundary) < tol:
-                return float(boundary)
-        return y
+        return snap(y, self.interfaces()[1:-1], self._merge_distance())
 
     def _coincidence_hint(self) -> str:
         """Describe distinct coordinates closer than the merge distance, or return ''."""
         tol = self._merge_distance()
         named = [(f"layer boundary {k}", "y", float(v)) for k, v in enumerate(self.interfaces())]
+        # Faces the placement rule already moved are reported where they are meshed.
+        face = (lambda y: y) if self.polygonal else self._face_y
         for t in self.traces:
             if isinstance(t, PolygonTrace):
                 continue
             if t.thickness == 0:
-                named.append((f"trace {t.name!r}", "y", float(t.y)))
+                named.append((f"trace {t.name!r}", "y", float(face(t.y))))
             else:
-                named += [(f"trace {t.name!r} bottom", "y", float(t.y)),
-                          (f"trace {t.name!r} top", "y", float(t.y1))]
+                named += [(f"trace {t.name!r} bottom", "y", float(face(t.y))),
+                          (f"trace {t.name!r} top", "y", float(face(t.y1)))]
             named += [(f"trace {t.name!r} left edge", "x", float(t.xmin)),
                       (f"trace {t.name!r} right edge", "x", float(t.xmax))]
         named += [("left wall", "x", -0.5 * self.width), ("right wall", "x", 0.5 * self.width)]
-        found = []
-        for i, (a, axis_a, va) in enumerate(named):
-            for b, axis_b, vb in named[i + 1:]:
-                if axis_a == axis_b and 0.0 < abs(va - vb) <= tol:
-                    found.append(f"{a} ({axis_a} = {va!r} m) and {b} ({axis_b} = {vb!r} m) "
-                                 f"differ by {abs(va - vb):.3g} m")
-        if not found:
-            return ""
-        return ("SIPI: " + "; ".join(found) + f". Coordinates closer than the mesher's merge "
-                f"distance {tol:.3g} m (1e-9 of the box diagonal) become one point and leave a "
-                "zero-length edge. Make such coordinates exactly equal (for example, compute a "
-                "trace y from the layer thicknesses it sits on) or separate them by more than "
-                "that distance. Without polygon traces or local dielectric regions, a trace face "
-                "within that distance of an inner layer boundary is placed on the boundary; "
-                "these coordinates are not covered by that rule.")
+        return coincidence_message(
+            close_coordinates(named, tol), tol, "the box diagonal",
+            "Make such coordinates exactly equal (for example, compute a trace y from the layer "
+            "thicknesses it sits on) or separate them by more than that distance.",
+            "Without polygon traces or local dielectric regions, a trace face within that "
+            "distance of an inner layer boundary is placed on the boundary; these coordinates "
+            "are not covered by that rule.")
 
     def _finest_feature(self):
         """(description, length in m) of the feature that sets the default edge_size."""
@@ -515,17 +506,10 @@ class CrossSection:
             h = np.minimum(corner_size + grade * d_corner, 3.0 * edge_size + grade * d_trace)
             return np.minimum(h, far_size)
 
-        try:
+        with explained(self._coincidence_hint,
+                       lambda: self._point_limit_hint(settings, edge_size_given)):
             tm = generate(domain, "outer", min_angle=min_angle, size_fn=size_fn,
                           candidate_order="stable")
-        except MeshInputError as error:
-            hint = self._coincidence_hint()
-            if not hint:
-                raise
-            raise MeshInputError(f"{error} {hint}") from error
-        except MeshSizeLimitError as error:
-            hint = self._point_limit_hint(settings, edge_size_given)
-            raise MeshSizeLimitError(f"{error}. {hint}") from error
         mesh = from_mesher(tm)
 
         names = mesh.region_names

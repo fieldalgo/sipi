@@ -156,6 +156,17 @@ count by about 2.4–4 on the documented sections; a grounded coplanar line
 (w 0.3 mm, gap 0.15 mm, h 0.2 mm, 35 µm) went from 19,206 to 73,213 to
 287,503 points over two halvings.
 
+Every other mesh SIPI hands to meshine uses the same rules: the conductor volume
+mesh (`mesh_conductor_section`, also behind `volume_line`), `PowerPlane.mesh`
+and `EllipticalAperture.mesh`. A `MeshSizeLimitError` there keeps meshine's
+text, its type and its cause, and adds that path's settings and what to raise
+first (`metal_size`, `edge_size` or `size`). A `MeshInputError` caused by
+coordinates closer than the merge distance (1e-9 of that mesh's bounding-box
+diagonal) names them, in metres, and says how to fix them. Coordinates are moved
+only where the geometry is built from slabs, as for `CrossSection`; plane
+outlines, holes and aperture polygons are exact inputs and only get the
+message. Inputs that mesh keep every array bit for bit.
+
 `mesh()` returns a `MeshedCrossSection` (galerkin mesh, per-triangle `eps_r` and
 `tan_delta`, conductor node sets) for inspection. `line_parameters()` and
 `capacitance_matrix()` accept any galerkin mesh with node sets, for example a
@@ -263,6 +274,9 @@ prints this plane. The CPU drop is 13.2 mV and the plane loss 0.17 W.
   - `grade`: growth per unit distance from terminals; default 0.2.
   - The peak current density sits at contact edges and depends on the mesh
     there; refine before relying on it.
+  - Above meshine's 300,000-point limit the message names the terminal that
+    sets the default `edge_size`; outline and hole vertices closer than the
+    merge distance are named in the refusal and are not moved.
 
 Not modelled: vias and several layers, temperature-dependent copper
 (galerkin has a [σ(T) Joule iteration](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/packages/galerkin/temperature_joule_heating.md)

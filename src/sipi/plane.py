@@ -31,6 +31,8 @@ from galerkin import Mesh, from_mesher
 from galerkin.electric import solve_steady_electric
 from meshine import Circle, Domain, generate
 
+from ._mesh_input import close_vertices, coincidence_message, explained, merge_distance
+
 __all__ = ["COPPER_CONDUCTIVITY", "circle", "rectangle_outline", "edge", "Source", "Sink",
            "PowerPlane", "IRDropResult"]
 
@@ -231,6 +233,50 @@ class PowerPlane:
     def _edge_terminals(self):
         return [(t.name, t.shape) for t in (*self.sources, *self.sinks) if _is_edge(t.shape)]
 
+    def _loops(self):
+        """(label, vertices) for the outline and every hole, as handed to the mesher."""
+        loops = [("outline", _vertices(self.outline))]
+        cutouts = 0
+        for name, shape in self._shapes():
+            if name == "cutout":
+                label, cutouts = f"cutout {cutouts}", cutouts + 1
+            else:
+                label = f"terminal {name!r}"
+            loops.append((label, _vertices(shape)))
+        return loops
+
+    def _coincidence_hint(self, domain) -> str:
+        """Describe distinct vertices closer than the merge distance, or return ''."""
+        tol = merge_distance(domain.extent())
+        return coincidence_message(
+            close_vertices(self._loops(), tol), tol, "the outline's bounding-box diagonal",
+            "Make such vertices exactly equal or separate them by more than that distance "
+            "(for example, keep a hole at least that far inside the outline and away from "
+            "other holes, and give a circle a radius well above it). The plane outline and "
+            "holes are free polygons, so SIPI does not move them.")
+
+    def _point_limit_hint(self, settings, scales, explicit) -> str:
+        """Say which setting drives a plane mesh that passed meshine's point limit."""
+        names = [n for n, _ in self._shapes() if n != "cutout"]
+        if self._outline_name() != "outline":
+            names.append(self._outline_name())
+        names += [n for n, _ in self._edge_terminals()]
+        if explicit:
+            source = "edge_size was given explicitly"
+        else:
+            k = int(np.argmin(scales))
+            source = (f"the default edge_size is the size of terminal {names[k]!r} "
+                      f"({scales[k]:.4g} m) / 12; the default takes the smallest terminal size / 12")
+        extent = np.ptp(_vertices(self.outline), axis=0)
+        return (f"SIPI: this plane mesh needs more points than the mesher allows, with "
+                f"edge_size {settings['edge_size']:.4g} m, far_size {settings['far_size']:.4g} m, "
+                f"grade {settings['grade']:g}, min_angle {settings['min_angle']:g} and a "
+                f"{extent[0]:.4g} m x {extent[1]:.4g} m outline; {source}. The point count grows "
+                "with the terminal perimeters / edge_size near the terminals and with the copper "
+                "area / far_size**2 away from them. To fit, raise edge_size first (an explicit "
+                "value overrides the default rule), then grade or far_size, and compare the "
+                "terminal voltages before and after.")
+
     def mesh(self, *, edge_size: float | None = None, far_size: float | None = None,
              grade: float = 0.2, min_angle: float = 28.0) -> Mesh:
         """Mesh the copper, refined toward the terminals.
@@ -250,6 +296,7 @@ class PowerPlane:
             raise ValueError("edge terminals need a polygon outline")
         scales = [_scale(s) for s in terminals] + [
             float(np.hypot(*np.subtract(e.p1, e.p0))) for _, e in edge_terms]
+        edge_size_given = edge_size is not None
         if edge_size is None:
             edge_size = min(scales) / 12.0
         if far_size is None:
@@ -277,8 +324,12 @@ class PowerPlane:
             dist = [float(_distance_to_shape(s, p)[0]) for _, s in candidates]
             return candidates[int(np.argmin(dist))][0]
 
-        mesh = from_mesher(generate(domain, namer, min_angle=min_angle, size_fn=size_fn,
-                                    candidate_order="stable"))
+        settings = dict(edge_size=edge_size, far_size=far_size, grade=grade, min_angle=min_angle)
+        with explained(lambda: self._coincidence_hint(domain),
+                       lambda: self._point_limit_hint(settings, scales, edge_size_given)):
+            generated = generate(domain, namer, min_angle=min_angle, size_fn=size_fn,
+                                 candidate_order="stable")
+        mesh = from_mesher(generated)
         for name in [t.name for t in (*self.sources, *self.sinks)]:
             if name not in mesh.boundary_edges:
                 raise RuntimeError(f"terminal {name!r} received no boundary edges; "

@@ -75,6 +75,10 @@ condition can reject a circle that fits the exact ellipse; increase angular
 resolution. It also rejects circles whose centres fit but circumferences do not.
 No field solve occurs before preflight. Near-contact, extreme aspect ratios and
 very small conductors still require case-specific convergence evidence.
+Polygon vertices closer than meshine's merge distance (1e-9 of the aperture's
+bounding-box diagonal) are refused with a message naming them in metres; above
+the 300,000-point limit the message gives `size`, `angular_divisions` and what
+to raise first. Neither changes a mesh that is built.
 
 Holes are sorted by geometry for meshing, independently of names or output order.
 Swapping the requested conductor order therefore permutes C without selecting a
