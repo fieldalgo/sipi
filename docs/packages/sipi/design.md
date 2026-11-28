@@ -32,6 +32,24 @@ are open. Default box widths are `max(20*h, 4*w)` for microstrip,
 
 These defaults are starting domains, not truncation guarantees. Enlarge the box
 and air independently to check truncation; also enlarge coplanar ground width.
+
+Measured microstrip truncation (zero thickness, `h = 1 mm`, open walls; mesh
+`edge_size = min(w, h) / 100`, `grade = 0.15`, `far_size = 2 h`; Linux,
+Python 3.13, NumPy 2.5.5, SciPy 1.18.1). Values are relative to a
+160h-wide box with 80h of air. Both shrink four- to fivefold per doubling,
+so that reference may itself be up to about 0.02 % high in `eps_eff`.
+
+| Box (width × air) | `w/h` 0.25 | `w/h` 1 | `w/h` 4 |
+|---|---|---|---|
+| template default, 20h × 10h | `eps_eff` +0.40/+0.45 %, Z0 +0.28/+0.26 % | +0.65/+0.73 %, +0.47/+0.43 % | +1.40/+1.60 %, +1.02/+0.92 % |
+| 40h × 20h (validation box) | +0.10/+0.11 %, +0.07/+0.06 % | +0.16/+0.18 %, +0.11/+0.10 % | +0.34/+0.38 %, +0.23/+0.21 % |
+| 80h × 40h | +0.02/+0.03 %, +0.01/+0.01 % | +0.03/+0.04 %, +0.03/+0.02 % | +0.07/+0.08 %, +0.05/+0.05 % |
+
+Each cell gives `εr` 4.3/9.8. Open walls make both `eps_eff` and Z0 high,
+growing with `w/h`. An independent comparison found 0.1–0.3 % in `eps_eff`
+for the 40h × 20h box, consistent with this table. The template default box
+is a starting domain; pass `box_width` and `air_height` (for example 80h and
+40h) when truncation must stay below 0.1 %, or compare open and grounded walls.
 Zero thickness is allowed, but width, gap and dielectric dimensions must be
 positive. Invalid or overlapping geometry raises before meshing. Names are
 `signal`, or the ordered pair `positive`, `negative`; coplanar reference traces
