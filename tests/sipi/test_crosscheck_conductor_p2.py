@@ -14,6 +14,11 @@ from sipi.conductor import surface_current_factors
 from quadratic_conductor import quadratic_surface_factors
 from crosscheck import Stopwatch, emit, make_record, observable, relative_difference
 
+# v1 results fixed: these checks were recorded with the v1 default template
+# boxes (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+coupled_microstrip = _pinned_v1(coupled_microstrip)
+
 
 def _record_vacuum_mesh(field, factor, record_property):
     """Opt-in snapshot of the actual solve inputs, without remeshing or pickle."""

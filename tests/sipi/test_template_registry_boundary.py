@@ -15,7 +15,9 @@ from sipi.template_document import TemplateSectionDocument
 def test_existing_study_catalog_keeps_factory_identity():
     assert study._TEMPLATES is _TEMPLATES
     for name, factory in _TEMPLATES.items():
-        assert factory is getattr(templates, name)
+        # Since 2026-11-28 the catalog wraps the same public factory to keep
+        # the v1 default boxes of saved documents (sipi.templates.box_rule).
+        assert factory.__wrapped__ is getattr(templates, name)
 
 
 def test_section_documents_load_without_study_or_product_modules(tmp_path):

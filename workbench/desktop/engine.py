@@ -35,6 +35,10 @@ TEMPLATES.update((name, getattr(_templates, name)) for name in LAYERED_SURFACE_T
 PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name.startswith(('coupled_', 'asymmetric_')))
 ASYMMETRIC_PAIR_TEMPLATES.update(name for name in LAYERED_SURFACE_TEMPLATES if name.startswith('asymmetric_'))
 FORWARD_PAIR_TEMPLATES = ASYMMETRIC_PAIR_TEMPLATES | {'layered_broadside_stripline'}
+# The workbench forms, saved inputs and goal/study documents use the v1 default
+# boxes; sipi.templates defaults to v2 since 2026-11-28. Keep v1 per call.
+from sipi._template_registry import _pinned_v1
+TEMPLATES.update((name, _pinned_v1(factory)) for name, factory in list(TEMPLATES.items()))
 
 
 def engine_info():

@@ -13,6 +13,11 @@ from sipi.two_ground_panel_line import TwoGroundPanelTransmissionLineDocument
 from sipi.method_line import MethodTransmissionLineDocument as Method
 from sipi.execution import execute_saved, normalize_saved, saved_schemas
 
+# v1 results fixed: these checks were recorded with the v1 default template
+# boxes (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+microstrip, stripline, unbacked_coplanar, grounded_coplanar = map(_pinned_v1, (microstrip, stripline, unbacked_coplanar, grounded_coplanar))
+
 MESH = dict(edge_size=2.5e-6, far_size=.1e-3, grade=.05)
 PANEL = dict(panels_per_edge=64, ground_modes=512, interpolation_degree=14)
 ROUGH = dict(kind='surface', conductivity=58e6, ground_thickness=35e-6, relative_permeability=1.,

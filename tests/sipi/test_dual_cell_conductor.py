@@ -18,6 +18,11 @@ from sipi.panel_conductor import panel_surface_current_factors
 from test_layered_metal import LAYERS, transfer
 from crosscheck import require_tool
 
+# v1 results fixed: these checks were recorded with the v1 default template
+# boxes (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+coupled_microstrip = _pinned_v1(coupled_microstrip)
+
 MESH = dict(edge_size=5e-6, far_size=.2e-3, grade=.1)
 
 
