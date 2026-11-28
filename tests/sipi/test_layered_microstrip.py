@@ -5,6 +5,7 @@ from dataclasses import replace
 from importlib import metadata
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 from sipi import (layered_microstrip, coupled_layered_microstrip, microstrip,
                   coupled_microstrip, CrossSectionDocument, seek_impedance)
 from sipi.constants import epsilon_0
@@ -32,7 +33,8 @@ def test_explicit_surface_geometry_and_json(pair,thickness,top):
     if pair:assert s.traces[1].x0-s.traces[0].x1==pytest.approx(.3e-3,rel=1e-12)
     doc=CrossSectionDocument(s,mesh=COARSE)
     assert CrossSectionDocument.loads(doc.dumps()).dumps()==doc.dumps()
-    auto=section(pair,air_height=None,box_width=None)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        auto=section(pair,air_height=None,box_width=None)
     assert auto.layers[-1].thickness==pytest.approx(.010035,rel=1e-15)
     assert auto.width==pytest.approx(.02,rel=1e-15)
 

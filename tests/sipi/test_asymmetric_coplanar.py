@@ -7,6 +7,7 @@ import json
 
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 
 from sipi import (asymmetric_coupled_grounded_coplanar, CrossSection,
                   CrossSectionDocument, ImpedanceDesignDocument)
@@ -56,7 +57,8 @@ def test_explicit_geometry_ground_clearance_taper_and_json():
     assert s.top=='open' and s.bottom=='ground' and s.sides=='open'
     doc=CrossSectionDocument(s,mesh=COARSE)
     assert CrossSectionDocument.loads(doc.dumps()).dumps()==doc.dumps()
-    auto=section(box_width=None,air_height=None)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        auto=section(box_width=None,air_height=None)
     assert auto.width==pytest.approx(.010,rel=1e-15)
     assert auto.layers[1].thickness==pytest.approx(.005+50e-6,rel=1e-15)
     # Explicit ground thickness does not follow signal thickness.

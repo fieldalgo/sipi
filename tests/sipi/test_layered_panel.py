@@ -12,6 +12,12 @@ from sipi.line_model import TransmissionLineDocument
 from sipi.panel_line import PanelTransmissionLineDocument
 from sipi.execution import normalize_saved, execute_saved
 from sipi.constants import mu_0, epsilon_0
+
+# v1 results fixed: these checks were recorded with the v1 default template boxes
+# (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+coupled_microstrip, asymmetric_coupled_microstrip = map(_pinned_v1, (coupled_microstrip, asymmetric_coupled_microstrip))
+
 from test_layered_study import material
 from test_layered_metal import transfer
 from test_execution import line as inexpensive_line, network_equal

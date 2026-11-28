@@ -7,6 +7,7 @@ import json
 
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 
 from sipi import asymmetric_coupled_conformal_coated_microstrip
 from sipi import (CrossSection,
@@ -75,7 +76,8 @@ def test_explicit_geometry_ground_clearance_taper_and_json():
     doc=CrossSectionDocument(cs,mesh=COARSE)
     assert doc.to_dict()['schema']=='sipi.cross-section/3'
     assert CrossSectionDocument.loads(doc.dumps()).dumps()==doc.dumps()
-    auto=section(box_width=None,air_height=None)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        auto=section(box_width=None,air_height=None)
     assert auto.width==pytest.approx(.010,rel=1e-15)
     assert auto.height-auto.dielectric_regions[0]._shape.bounds[3]==pytest.approx(.005+50e-6,rel=1e-15)
 

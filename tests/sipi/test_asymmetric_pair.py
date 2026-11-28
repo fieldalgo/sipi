@@ -4,6 +4,7 @@
 import importlib.metadata as metadata
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 from scipy.constants import c,epsilon_0
 from crosscheck import Stopwatch,emit,make_record,observable,require_tool
 from sipi import (asymmetric_coupled_microstrip,coupled_microstrip,CrossSectionDocument,
@@ -24,7 +25,8 @@ def section(**changes):return asymmetric_coupled_microstrip(**dict(PARAMS,**chan
 
 
 def test_geometry_dimensions_positions_and_v2_replay():
-    cs=section();left,right=cs.traces
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        cs=section();left,right=cs.traces
     assert (left.name,right.name)==('positive','negative')
     assert right.x-right.width/2-(left.x+left.width/2)==pytest.approx(PARAMS['gap'],rel=1e-12)
     assert left.x-left.width/2==pytest.approx(-(right.x+right.width/2),rel=1e-12)
@@ -34,8 +36,9 @@ def test_geometry_dimensions_positions_and_v2_replay():
     doc=CrossSectionDocument(cs,mesh=COARSE)
     assert doc.to_dict()['schema']=='sipi.cross-section/2'
     assert CrossSectionDocument.loads(doc.dumps()).dumps()==doc.dumps()
-    defaults=asymmetric_coupled_microstrip(left_width=.4e-3,right_width=.65e-3,gap=.25e-3,
-        substrate_height=.5e-3,eps_r=4,left_thickness=35e-6,right_thickness=50e-6)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        defaults=asymmetric_coupled_microstrip(left_width=.4e-3,right_width=.65e-3,gap=.25e-3,
+            substrate_height=.5e-3,eps_r=4,left_thickness=35e-6,right_thickness=50e-6)
     assert defaults.layers[1].thickness==pytest.approx(5e-3+50e-6)
     assert defaults.width==pytest.approx(max(10e-3,4*1.3e-3))
 

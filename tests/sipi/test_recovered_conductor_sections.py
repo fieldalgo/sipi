@@ -22,6 +22,12 @@ from sipi import coupled_microstrip, grounded_coplanar, microstrip, stripline
 from sipi.conductor import _surface_current_basis
 from sipi.recovered_conductor import recovered_surface_current_factors
 
+# v1 results fixed: these checks were recorded with the v1 default template boxes
+# (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+coupled_microstrip, grounded_coplanar, microstrip, stripline = map(_pinned_v1, (coupled_microstrip, grounded_coplanar, microstrip, stripline))
+
+
 SECTIONS = {
     'coupled': lambda: coupled_microstrip(width=.5e-3, gap=.3e-3, substrate_height=1e-3,
                                           thickness=.05e-3, eps_r=4),

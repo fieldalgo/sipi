@@ -5,6 +5,7 @@
 
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 from scipy.optimize import brentq
 
 from sipi import (CrossSection, CrossSectionDocument, Layer, Trace, GoalSeekError,
@@ -32,7 +33,8 @@ from sipi import (CrossSection, CrossSectionDocument, Layer, Trace, GoalSeekErro
 ])
 def test_templates_match_explicit_geometry_and_document_roundtrip(factory, kwargs, explicit):
     options = dict(edge_size=5e-6, far_size=.5e-3, grade=.2)
-    doc = CrossSectionDocument(factory(**kwargs), mesh=options)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        doc = CrossSectionDocument(factory(**kwargs), mesh=options)
     direct = CrossSectionDocument(explicit, mesh=options)
     # Floats that have distinct arithmetic spellings need numeric comparison.
     a, b = doc.section, direct.section

@@ -7,6 +7,7 @@ import json
 
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 
 from sipi import asymmetric_coupled_conformal_coated_unbacked_coplanar
 from sipi import (CrossSection,
@@ -78,7 +79,8 @@ def test_explicit_geometry_ground_clearance_taper_and_json():
     doc=CrossSectionDocument(cs,mesh=COARSE)
     assert doc.to_dict()['schema']=='sipi.cross-section/3'
     assert CrossSectionDocument.loads(doc.dumps()).dumps()==doc.dumps()
-    auto=section(box_width=None,air_height=None)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        auto=section(box_width=None,air_height=None)
     assert auto.width==pytest.approx(.010,rel=1e-15)
     assert auto.height-auto.dielectric_regions[0]._shape.bounds[3]==pytest.approx(.005+50e-6,rel=1e-15)
 
@@ -390,7 +392,8 @@ def test_ground_thickness_is_independent_and_sets_highest_air_surface(ground_thi
 
 def test_lower_air_translates_all_metal_and_local_film_without_a_backing_plane():
     from shapely.affinity import translate
-    a,b=section(lower_air_height=3e-3),section(lower_air_height=6e-3)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        a,b=section(lower_air_height=3e-3),section(lower_air_height=6e-3)
     for x,y in zip(a.traces,b.traces):
         assert y.y-x.y==pytest.approx(3e-3,rel=1e-12)
         assert (x.x,x.width,x.thickness,x.top_width,x.ground)==(y.x,y.width,y.thickness,y.top_width,y.ground)

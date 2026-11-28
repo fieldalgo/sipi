@@ -4,6 +4,7 @@
 from dataclasses import replace
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 from sipi import templates, CrossSectionDocument
 from sipi.constants import epsilon_0
 from crosscheck import require_tool
@@ -64,7 +65,8 @@ def test_invalid_layers_and_clipped_copper_reject(i,change):
 
 @pytest.mark.parametrize('i',[3,4,5],ids=NAMES[3:])
 def test_lower_air_default_and_translation(i):
- a=section(i,lower_air_height=None);b=section(i,lower_air_height=.02)
+ with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+  a=section(i,lower_air_height=None);b=section(i,lower_air_height=.02)
  assert a.layers[0].thickness==.01 and b.layers[0].thickness==.02
  assert a.layers[1:]==b.layers[1:]
  for t,u in zip(a.traces,b.traces):

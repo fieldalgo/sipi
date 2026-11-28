@@ -1,5 +1,8 @@
 # Changelog
 
+- Tests: thirteen more modules that check automatic template boxes or reproduce values recorded on v1 boxes pin those calls to v1 (`test_asymmetric_coated_coplanar`, `test_asymmetric_coated_unbacked_coplanar`, `test_asymmetric_conformal_coplanar`, `test_asymmetric_conformal_microstrip`, `test_asymmetric_conformal_unbacked`, `test_asymmetric_coplanar`, `test_asymmetric_pair`, `test_design_documents`, `test_layered_microstrip`, `test_layered_conformal_coplanar`, `test_layered_unbacked_coplanar`, `test_recovered_conductor_sections`, `test_layered_panel`). Values and tolerances are unchanged.
+  시험: 자동 템플릿 상자를 확인하거나 v1 상자에서 기록한 값을 재현하는 모듈 열세 개는 해당 호출을 v1로 고정합니다(`test_asymmetric_coated_coplanar`, `test_asymmetric_coated_unbacked_coplanar`, `test_asymmetric_conformal_coplanar`, `test_asymmetric_conformal_microstrip`, `test_asymmetric_conformal_unbacked`, `test_asymmetric_coplanar`, `test_asymmetric_pair`, `test_design_documents`, `test_layered_microstrip`, `test_layered_conformal_coplanar`, `test_layered_unbacked_coplanar`, `test_recovered_conductor_sections`, `test_layered_panel`). 값과 허용오차는 그대로입니다.
+
 - Tests: five more modules that check the automatic template box or mesh a template with fixed absolute mesh sizes pin the call to the v1 boxes they were written for (`test_asymmetric_unbacked_coplanar`, `test_asymmetric_coated_microstrip`, `test_coated_unbacked`, `test_layered_coated_coplanar`, `test_boundary_conductor`). Values and tolerances are unchanged.
   시험: 자동 템플릿 상자를 확인하거나 고정 절대 메시 크기로 템플릿을 메시하는 모듈 다섯 개(`test_asymmetric_unbacked_coplanar`, `test_asymmetric_coated_microstrip`, `test_coated_unbacked`, `test_layered_coated_coplanar`, `test_boundary_conductor`)는 작성 기준인 v1 상자로 호출을 고정합니다. 값과 허용오차는 그대로입니다.
 
