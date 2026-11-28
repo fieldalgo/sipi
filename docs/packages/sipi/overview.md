@@ -126,6 +126,15 @@ separately; the coaxial example below also has polygonal-geometry error.
   each box side is either a ground (`"ground"`) or an insulating wall
   (`"open"`, zero normal D). Traces must lie strictly inside the box and must
   not touch each other.
+- The mesher merges coordinates closer than 1e-9 of the box diagonal
+  (`hypot(width, height)`). A `Trace` face whose `y` is that close to an inner
+  layer boundary, but not equal to it (for example `h + 1e-18` from a sum of
+  thicknesses), is placed on the boundary; such inputs used to be refused with
+  "zero-length edge" and nothing that meshed before is moved. With polygon
+  traces or local dielectric regions this rule does not apply. Other
+  coordinates that close together (two trace faces, a trace and the bottom of
+  the stack) are refused with a message naming them and the merge distance:
+  make them exactly equal or move them further apart.
 - A microstrip is `bottom="ground"` with a substrate and an air layer; a
   stripline adds `top="ground"`.
 
