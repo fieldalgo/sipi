@@ -16,6 +16,11 @@ from sipi.constants import mu_0
 from sipi.roughness import CausalHuray
 from test_layered_metal import transfer, LAYERS, SIGMA
 
+# v1 results fixed: these checks were recorded with the v1 default template
+# boxes (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+microstrip = _pinned_v1(microstrip)
+
 F = np.array([1e9, 4e9, 1e10])
 COARSE = dict(edge_size=5e-6, far_size=.2e-3, grade=.1)
 FINE = dict(edge_size=2.5e-6, far_size=.1e-3, grade=.05)

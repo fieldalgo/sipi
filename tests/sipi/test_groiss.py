@@ -15,6 +15,11 @@ from sipi.conductor import surface_impedance, surface_current_factors, surface_c
 from sipi.line_model import TransmissionLineDocument
 from sipi.roughness import GroissRMS
 
+# v1 results fixed: these checks were recorded with the v1 default template
+# boxes (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+microstrip = _pinned_v1(microstrip)
+
 SIGMA=58e6
 F=np.array([1e9,4e9,10e9])
 MESH=dict(edge_size=5e-6,far_size=.2e-3,grade=.1)

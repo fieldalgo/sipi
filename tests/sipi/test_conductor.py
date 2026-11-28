@@ -12,6 +12,11 @@ from galerkin import annulus_mesh, rectangle_mesh
 from sipi import CrossSection, coupled_microstrip, microstrip
 from sipi.conductor import surface_impedance, surface_current_factors, surface_conductor_loss
 
+# v1 results fixed: these checks were recorded with the v1 default template
+# boxes (sipi.templates.box_rule, 2026-11-28); values and tolerances are unchanged.
+from sipi._template_registry import _pinned_v1
+coupled_microstrip, microstrip = map(_pinned_v1, (coupled_microstrip, microstrip))
+
 SIGMA = 58e6
 F = np.array([1e9, 4e9, 10e9])
 
