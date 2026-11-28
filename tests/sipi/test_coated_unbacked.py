@@ -4,6 +4,7 @@
 import importlib.metadata as metadata
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 from scipy.constants import c, epsilon_0
 from crosscheck import Stopwatch, emit, make_record, observable, require_tool
 from sipi import (coated_unbacked_coplanar, coupled_coated_unbacked_coplanar,
@@ -118,7 +119,8 @@ def test_geometry_area_and_json(factory):
     assert (section.bottom,section.top,section.sides)==('open','open','open')
     assert [l.name for l in section.layers]==['lower_air','substrate','coating','air']
     assert all(t.y==pytest.approx(.0065) for t in section.traces)
-    automatic=factory(**dict(params(factory),lower_air_height=None))
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        automatic=factory(**dict(params(factory),lower_air_height=None))
     assert automatic.layers[0].thickness==pytest.approx(.005)
     doc=CrossSectionDocument(section,mesh=COARSE)
     restored=CrossSectionDocument.loads(doc.dumps())

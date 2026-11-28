@@ -14,6 +14,10 @@ from sipi.constants import mu_0
 from sipi.roughness import CausalHuray, CannonballHuray, GroissRMS
 from crosscheck import require_tool, Stopwatch, emit, make_record, observable
 
+# v1 results fixed: these checks were recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+from sipi._template_registry import _pinned_v1
+coupled_microstrip, microstrip = map(_pinned_v1, (coupled_microstrip, microstrip))
+
 F = np.array([1e9, 4e9, 10e9])
 
 
