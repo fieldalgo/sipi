@@ -17,6 +17,7 @@ from galerkin import from_mesher
 from meshine import Domain, generate
 
 from .crosssection import CrossSection, Trace
+from ._mesh_input import close_coordinates, coincidence_message, explained, merge_distance, snap
 from .polygons import PolygonTrace, polygon_domain, trace_shape
 from .conductor_diffusion import conductor_impedance, _indices
 from .network import _scalar
@@ -80,6 +81,53 @@ def _metal_cores(section, metal_cores):
     return cores
 
 
+_PLATES = {'_bottom':'bottom plate','_top':'top plate'}
+
+
+def _coincidence_hint(solids, layer_heights, dielectric_interfaces, faces, bounds, tol):
+    """Describe distinct construction coordinates closer than the merge distance, or ''."""
+    named = ([(f"layer boundary {k}","y",float(v)) for k,v in enumerate(layer_heights)]
+             if dielectric_interfaces else [])
+    for trace in solids:
+        if isinstance(trace,PolygonTrace):
+            continue
+        label = _PLATES.get(trace.name) or (
+            ('left' if trace.x < 0 else 'right')+' side plate' if trace.name == '_side'
+            else f"trace {trace.name!r}")
+        y0,y1 = faces(trace)
+        named += [(f"{label} bottom","y",float(y0)),(f"{label} top","y",float(y1)),
+                  (f"{label} left edge","x",float(trace.xmin)),(f"{label} right edge","x",float(trace.xmax))]
+    xmin,ymin,xmax,ymax = bounds
+    named += [("magnetic box left","x",float(xmin)),("magnetic box right","x",float(xmax)),
+              ("magnetic box bottom","y",float(ymin)),("magnetic box top","y",float(ymax))]
+    rule = ("With dielectric_interfaces=True and rectangular or tapered traces without metal "
+            "cores, a trace face within that distance of an inner layer boundary is placed on "
+            "the boundary; these coordinates are not covered by that rule.")
+    return coincidence_message(
+        close_coordinates(named,tol),tol,"the magnetic box diagonal, padding included",
+        "Make such coordinates exactly equal (for example, compute a trace y from the layer "
+        "thicknesses it sits on) or separate them by more than that distance.",rule)
+
+
+def _point_limit_hint(solids, values, grade, bounds):
+    """Say which setting drives a volume mesh that passed meshine's point limit."""
+    xmin,ymin,xmax,ymax = bounds
+    metal = sum(float(trace_shape(trace).area) for trace in solids)
+    size = values['metal_size']
+    return (f"SIPI: this conductor volume mesh needs more points than the mesher allows, with "
+            f"metal_size {size:.4g} m, far_size {values['far_size']:.4g} m, grade {grade:g}, "
+            f"min_angle {values['min_angle']:g}, ground_thickness "
+            f"{values['ground_thickness']:.4g} m, padding {values['padding']:.4g} m and a "
+            f"{xmax-xmin:.4g} m x {ymax-ymin:.4g} m magnetic box. Every metal triangle, plates "
+            f"included, has the target metal_size: the metal area is {metal:.4g} m^2, "
+            f"{metal/size**2:.4g} times metal_size**2, and the point count grows with that "
+            "ratio and with the box area / far_size**2 away from the metal. To fit, raise "
+            "metal_size first, checking that max_edge_over_skin_depth stays at most 1 at the "
+            "highest frequency (the impedance solve refuses larger metal edges); then raise "
+            "far_size or grade; reduce ground_thickness or padding only after checking their "
+            "effect on R and L.")
+
+
 def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
                            far_size, grade=.2, min_angle=28.0,
                            dielectric_interfaces=False, metal_cores=None):
@@ -123,9 +171,19 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
         solids.append(Trace('_bottom',0,w,-thickness,thickness,ground=True))
     if top:
         solids.append(Trace('_top',0,w,h,thickness,ground=True))
+    sides = []
     if section.sides == 'ground':
+        # low + (high - low) can round an ulp off high, which leaves a sliver
+        # below the merge distance that meshine refuses. The side plates are
+        # then meshed to end exactly on high (slabs: their top face; polygon
+        # domains: an exact rectangle). Plates that already end on high are kept.
         for side in (-1,1):
-            solids.append(Trace('_side',side*(w+thickness)/2,thickness,low,high-low,ground=True))
+            plate = Trace('_side',side*(w+thickness)/2,thickness,low,high-low,ground=True)
+            if plate.y1 != high and (section.polygonal or cores):
+                plate = PolygonTrace('_side',[(plate.xmin,low),(plate.xmax,low),
+                                              (plate.xmax,high),(plate.xmin,high)],ground=True)
+            sides.append(plate)
+    solids += sides
     if not any(trace.ground for trace in solids):
         raise ValueError('at least one finite reference conductor is required')
     names = tuple(trace.name for trace in solids if not trace.ground)
@@ -136,7 +194,25 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
     xmax = max(w/2,*(trace.xmax for trace in solids))+padding
     ymin,ymax = low-padding,high+padding
     layer_heights = np.r_[0.,np.cumsum([layer.thickness for layer in section.layers])]
-    ys = {ymin,ymax,*(trace.y for trace in solids),*(trace.y1 for trace in solids)}
+    merge = merge_distance(np.hypot(xmax-xmin,ymax-ymin))
+    polygonal = section.polygonal or bool(cores)
+
+    def faces(trace):
+        """Bottom and top y at which a slab-built solid is meshed.
+
+        With the layers resolved, a rectangular or tapered face strictly within
+        the merge distance of an inner layer boundary would leave a refused
+        sliver slab; it is placed on the boundary, as in CrossSection.
+        """
+        if polygonal:
+            return trace.y,trace.y1
+        if any(trace is plate for plate in sides):
+            return trace.y,high
+        if not dielectric_interfaces:
+            return trace.y,trace.y1
+        return tuple(snap(y,layer_heights[1:-1],merge) for y in (trace.y,trace.y1))
+
+    ys = {ymin,ymax,*(y for trace in solids for y in faces(trace))}
     if dielectric_interfaces:
         ys.update(layer_heights)
     ys = sorted(ys)
@@ -165,7 +241,7 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
             if np.max(hi-lo) > tolerance:
                 region(name,lo,hi,y0,y1)
 
-    if section.polygonal or cores:
+    if polygonal:
         domain = polygon_domain(section, far_size, solids=solids, metal_size=metal_size,
                                 bounds=(xmin,ymin,xmax,ymax),
                                 dielectric_interfaces=dielectric_interfaces,
@@ -176,7 +252,8 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
         # T-junctions. Unlike holes, the metal interiors are themselves regions.
         for y0,y1 in zip(ys[:-1],ys[1:]):
             midpoint = (y0+y1)/2
-            active = sorted((trace for trace in solids if trace.y < midpoint < trace.y1),key=lambda t:t.x)
+            active = sorted((trace for trace in solids if faces(trace)[0] < midpoint < faces(trace)[1]),
+                            key=lambda t:t.x)
             left = np.array([xmin,xmin])
             for trace in active:
                 halfwidth = trace.width_at(np.array([y0,y1]))/2
@@ -190,7 +267,11 @@ def mesh_conductor_section(section, *, ground_thickness, padding, metal_size,
         distance = np.min(np.stack([trace.distance(x,y) for trace in solids]),axis=0)
         return np.minimum(metal_size+grade*distance,far_size)
 
-    mesh = from_mesher(generate(domain,'outer',size_fn=size_fn,min_angle=min_angle,candidate_order='stable'))
+    with explained(lambda: _coincidence_hint(solids,layer_heights,dielectric_interfaces,faces,
+                                             (xmin,ymin,xmax,ymax),merge),
+                   lambda: _point_limit_hint(solids,values,grade,(xmin,ymin,xmax,ymax))):
+        generated = generate(domain,'outer',size_fn=size_fn,min_angle=min_angle,candidate_order='stable')
+    mesh = from_mesher(generated)
     labels = np.asarray(mesh.region_names)[mesh.regions]
     if section.polygonal or cores:
         signals = {trace.name:np.flatnonzero(np.isin(labels,[f'__sipi_metal_{i}',f'__sipi_core_{i}']))

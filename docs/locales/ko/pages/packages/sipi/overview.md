@@ -139,6 +139,14 @@ N개일 때:
 덧붙입니다. 세 설정을 함께 반으로 줄이면 문서의 단면들에서 점 수가 약 2.4–4배가 됐고, grounded coplanar
 선로(w 0.3 mm, gap 0.15 mm, h 0.2 mm, 35 µm)는 두 번 반으로 줄이는 동안 19,206 → 73,213 → 287,503점이었습니다.
 
+SIPI가 meshine에 넘기는 다른 메시도 같은 규칙을 씁니다: 도체 부피 메시(`mesh_conductor_section`,
+`volume_line`도 이것을 씀), `PowerPlane.mesh`, `EllipticalAperture.mesh`. 여기서 `MeshSizeLimitError`는
+meshine 문구·예외 타입·원인을 유지한 채 그 경로의 설정과 먼저 키울 설정(`metal_size`, `edge_size`,
+`size`)을 덧붙입니다. 병합 거리(그 메시 경계 상자 대각선의 1e-9)보다 가까운 좌표 때문에 생긴
+`MeshInputError`는 그 좌표를 미터 단위로 밝히고 고칠 방법을 덧붙입니다. 좌표를 옮기는 것은 `CrossSection`처럼
+수평 띠(slab)로 기하를 만드는 경로뿐입니다. 전원면 외곽·구멍과 개구 다각형은 정확한 입력이므로 메시지만
+덧붙입니다. 메시가 만들어지는 입력의 모든 배열은 비트 단위로 같습니다.
+
 `mesh()`는 확인용 `MeshedCrossSection`(galerkin 메시, 삼각형별 `eps_r`·`tan_delta`, 도체 절점 집합)을
 돌려줍니다. `line_parameters()`와 `capacitance_matrix()`는 절점 집합을 갖춘 임의의 galerkin 메시를 받으므로,
 예를 들어 meshine으로 직접 만든 동축 메시도 쓸 수 있습니다.
@@ -223,6 +231,8 @@ CPU 강하는 13.2 mV, 판 손실은 0.17 W입니다.
   - `far_size`: 가장 큰 변 길이, 기본값은 외곽 크기 / 30.
   - `grade`: 단자에서 멀어질 때 단위 거리당 증가율, 기본값 0.2.
   - 최대 전류밀도는 접촉부 가장자리에서 나오고 그곳 메시에 따라 달라집니다. 믿기 전에 세분하세요.
+  - meshine의 300,000점 한도를 넘으면 메시지가 기본 `edge_size`를 정한 단자를 밝힙니다. 병합 거리보다
+    가까운 외곽·구멍 꼭짓점은 거절 메시지에 밝히며 옮기지 않습니다.
 
 모델에 없는 것: 비아와 여러 층, 온도 의존 구리(galerkin에는 [σ(T) Joule 반복](https://github.com/fieldalgo/openphysics/blob/b8f7c0427b75362ed5e8298bc81682e7076abe4e/docs/locales/ko/pages/packages/galerkin/temperature_joule_heating.md)이
 있지만 이 API는 아직 쓰지 않음), 두께 방향 전류, 교류 효과.
