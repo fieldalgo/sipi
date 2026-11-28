@@ -1,5 +1,8 @@
 # Changelog
 
+- Docs: recommend `panels_per_edge` 128 to 256 for precision conductor loss on the panel path. In an independent comparison on two sections the default 64 panels per edge gave loss 0.46 % and 0.23 % above an independent finite-element solution; the difference fell monotonically at 128 and 256 and extrapolated to +0.008 % and +0.005 %. Default controls, saved documents and recorded values are unchanged.
+  문서: panel 경로의 정밀 도체 손실에는 `panels_per_edge` 128–256을 권장합니다. 두 단면의 독립 비교에서 기본값 변당 64 패널의 손실은 독립 유한요소 해보다 0.46 %, 0.23 % 높았고, 128·256에서 차이가 단조롭게 줄어 외삽값은 +0.008 %, +0.005 %였습니다. 기본 설정, 저장 문서, 기록값은 바뀌지 않습니다.
+
 - Docs: the default-mesh pages now separate the 0.5 % default/refined sensitivity check from accuracy against independent references. An independent comparison found the default Z0 low by 0.13–0.52 % (about 1.4–1.8 times the default/refined difference), above 0.5 % for three zero-thickness sections; a reproduction on seven Cohn striplines gave −0.18 to −0.44 % and ratios 1.47–1.67. `corner_size = edge_size / 4` at the strip ends is documented as a proposal (error roughly halved for 1.2–1.6× nodes). Defaults, saved document versions and recorded values are unchanged.
   문서: 기본 메시 문서에서 기본/세분 0.5 % 민감도 검사와 독립 기준 대비 정확도를 구분했습니다. 독립 비교에서 기본 Z0는 0.13–0.52 % 낮았고(기본/세분 차이의 약 1.4–1.8배) 두께 0 단면 세 개에서 0.5 %를 넘었습니다. Cohn 스트립라인 일곱 개 재현에서는 −0.18~−0.44 %, 비율 1.47–1.67이었습니다. 스트립 끝 `corner_size = edge_size / 4`를 제안으로 적었습니다(절점 1.2–1.6배로 오차 약 절반). 기본값, 저장 문서 버전, 기록값은 바뀌지 않습니다.
 
