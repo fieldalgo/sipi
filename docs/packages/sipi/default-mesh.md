@@ -63,6 +63,53 @@ Differences across those ten cases: Z0 −0.194 to +0.123 %, εeff +0.233 to
 thickness approximations. The analytical acceptance tests are independent of
 these values. These checks do not establish accuracy outside the tested cases.
 
+## Default mesh against independent references
+
+The 0.5 % default/refined criterion above is a **sensitivity** check: it
+bounds how much the answer moves when the mesh is refined, not how far the
+default answer is from the exact one.
+
+An independent comparison on 2026-11-28 ran the default mesh against an
+independent scikit-fem 12.0.2 P2 solution and against Cohn's exact conformal
+maps. The default Z0 was **low in every case, by 0.13 to 0.52 %**. Three
+zero-thickness sections exceeded 0.5 %: a stripline Z0 (−0.513 %) and the
+Zdiff of two coupled sections (−0.511 % and −0.520 %). In those comparisons
+the error against the reference was about **1.4 to 1.8 times** the
+default/refined difference.
+
+A reproduction for this page on Cohn's zero-thickness striplines (`b = 1 mm`
+between two grounds, trace at `b/2`, box width `12 b`; single lines with
+`εr = 4` and `w/b` 0.25, 0.5, 1, 2; coupled pairs with `εr = 3.5` and
+`(w/b, s/b)` (0.4, 0.3), (0.2, 0.1), (1, 0.2)) gave, with the default mesh,
+Z0 or Zdiff −0.18 to −0.44 % against default/refined differences of 0.12 to
+0.29 %: ratios 1.47 to 1.67, all low. Linux, Python 3.13, NumPy 2.5.5,
+SciPy 1.18.1, one OpenBLAS thread.
+
+Read the default/refined difference as a lower estimate of the error, not as
+the error. For zero-thickness strips expect the default Z0 to be low by up to
+about twice that difference, and refine or use the option below when that is
+too much. These are observations on the listed sections, not an error bound.
+
+### Option for zero-thickness strip ends (not the default)
+
+The error is concentrated at the strip edges, where the field is singular.
+The existing `corner_size` option refines only at trace corners. Measured on
+the same seven sections (nodes relative to the default mesh):
+
+| Mesh options | Z0 / Zdiff error | Nodes |
+|---|---:|---:|
+| default | −0.18 to −0.44 % | 1 |
+| `edge_size`, `grade`, `far_size` halved | −0.06 to −0.17 % | 3.7–3.9× |
+| `corner_size = edge_size / 4` | −0.08 to −0.22 % | 1.2–1.6× |
+| `corner_size = edge_size / 8` | −0.06 to −0.19 % | 1.4–1.9× |
+| `corner_size = edge_size / 4`, `grade = 0.075` | −0.04 to −0.11 % | 3.1–4.6× |
+
+`edge_size` is the resolved default (`cs.mesh_settings()["edge_size"]`).
+`corner_size = edge_size / 4` roughly halves the error for less than half the
+cost of a full refinement step. This is a proposal: the default mesh, saved
+document versions and recorded values are unchanged, and the option has not
+been checked on finite-thickness traces, microstrip or other templates.
+
 For new geometries, check mesh refinement and box truncation independently.
 The rule is not an adaptive error estimator and does not cover every clearance,
 material contrast or fabrication geometry.
