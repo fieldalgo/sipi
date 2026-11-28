@@ -12,11 +12,12 @@ shard = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(shard)
 
 
-def verify(reports, *, collect_only=False, durations=shard.DURATIONS):
+def verify(reports, *, collect_only=False, table=None, durations=None):
     """Require an exact partition and, normally, execution of every collected case.
 
     Each selection must equal the assignment ``tools/pytest_shard.py`` computes from the
-    recorded durations table, whose SHA-256 every report must carry.
+    durations table the reports name, whose SHA-256 every report must carry. With ``table``,
+    that name must be ``table`` (the platform of the run); ``durations`` overrides the path.
     """
     if not reports:
         raise ValueError('no partition reports')
@@ -31,13 +32,17 @@ def verify(reports, *, collect_only=False, durations=shard.DURATIONS):
     if not original or len(set(original)) != len(original):
         raise ValueError('empty or duplicate original collection')
     checksum = hashlib.sha256(json.dumps(original, ensure_ascii=True, separators=(',', ':')).encode('ascii')).hexdigest()
-    table = shard.durations_digest(durations)
+    name = first.get('durations_table')
+    if name not in shard.TABLES or (table is not None and name != table):
+        raise ValueError(f'partition used durations table {name!r}, expected {table or shard.TABLES}')
+    durations = durations or shard.table_path(name)
+    digest = shard.durations_digest(durations)
     union = set()
     sizes = []
     for report in reports:
-        if report['schema'] != shard.SCHEMA or report['count'] != count:
+        if report['schema'] != shard.SCHEMA or report['count'] != count or report.get('durations_table') != name:
             raise ValueError('inconsistent partition contract')
-        if report['durations_sha256'] != table:
+        if report['durations_sha256'] != digest:
             raise ValueError('partition used a different durations table')
         if report['all_nodeids'] != original or report['collection_sha256'] != checksum:
             raise ValueError('different original collection')
@@ -60,16 +65,18 @@ def verify(reports, *, collect_only=False, durations=shard.DURATIONS):
     if union != set(original):
         raise ValueError('partition union differs from original collection')
     return dict(cases=len(original), partitions=count, sizes=sizes, collection_sha256=checksum,
-                executed=not collect_only)
+                durations_table=name, executed=not collect_only)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reports', type=Path, nargs='+')
     parser.add_argument('--collect-only', action='store_true', help='validate discovery only, not executed regression')
+    parser.add_argument('--durations-table', choices=shard.TABLES, default=None,
+                        help='require this durations table (the platform of the run)')
     args = parser.parse_args()
     print(json.dumps(verify([json.loads(p.read_text(encoding='utf-8')) for p in args.reports],
-                            collect_only=args.collect_only), indent=2))
+                            collect_only=args.collect_only, table=args.durations_table), indent=2))
 
 
 if __name__ == '__main__':

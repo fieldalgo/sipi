@@ -22,8 +22,7 @@ spec.loader.exec_module(checker)
 def suite(tmp_path):
     (tmp_path / 'tools').mkdir()
     shutil.copy2(TOOLS / 'pytest_shard.py', tmp_path / 'tools/pytest_shard.py')
-    (tmp_path / 'tools/shards').mkdir()
-    shutil.copy2(TOOLS / 'shards/durations.json', tmp_path / 'tools/shards/durations.json')
+    shutil.copytree(TOOLS / 'shards', tmp_path / 'tools/shards')
     (tmp_path / 'tests').mkdir()
     (tmp_path / 'pytest.ini').write_text('[pytest]\n', encoding='utf-8')
     for i in range(12):
@@ -75,6 +74,11 @@ def test_full_collection_and_whole_module_fixtures_are_preserved(completed):
     root, reports = completed
     result = checker.verify(reports)
     assert result['cases'] == 36 and result['executed'] and result['partitions'] == 3
+    # Unnamed, each part uses the running platform's table, which the coverage job requires.
+    assert result['durations_table'] == reports[0]['durations_table'] == checker.shard.platform_table()
+    assert checker.verify(reports, table=checker.shard.platform_table()) == result
+    other = next(name for name in checker.shard.TABLES if name != checker.shard.platform_table())
+    with pytest.raises(ValueError, match='expected'):checker.verify(reports, table=other)
     with pytest.raises(ValueError):checker.verify(reports, collect_only=True)
     command = subprocess.run([sys.executable, str(TOOLS / 'check_shards.py'),
                               *[str(root / f'{i}.json') for i in range(3)]], capture_output=True, text=True)
@@ -83,7 +87,7 @@ def test_full_collection_and_whole_module_fixtures_are_preserved(completed):
 
 @pytest.mark.parametrize('fault', ['missing', 'duplicate', 'changed-collection', 'changed-digest',
     'overlap', 'omission', 'wrong-module', 'unfinished', 'failed', 'collect-only', 'collection-error',
-    'other-table', 'old-schema'])
+    'other-table', 'old-schema', 'mixed-tables', 'unknown-table'])
 def test_missing_or_incomplete_evidence_never_passes(completed, fault):
     _, reports = completed; reports = copy.deepcopy(reports)
     if fault == 'missing':reports.pop()
@@ -98,8 +102,46 @@ def test_missing_or_incomplete_evidence_never_passes(completed, fault):
     elif fault == 'collect-only':reports[1]['collect_only'] = True
     elif fault == 'collection-error':reports[1]['collection_errors'] = 1
     elif fault == 'other-table':reports[1]['durations_sha256'] = '0' * 64
-    elif fault == 'old-schema':reports[1]['schema'] = 'sipi.pytest-partition/1'
+    elif fault == 'old-schema':reports[1]['schema'] = 'sipi.pytest-partition/2'
+    elif fault == 'mixed-tables':reports[1]['durations_table'] = next(t for t in checker.shard.TABLES if t != reports[0]['durations_table'])
+    elif fault == 'unknown-table':
+        for report in reports:report['durations_table'] = 'durations'
     with pytest.raises(ValueError):checker.verify(reports)
+
+
+@pytest.mark.parametrize('table', ['linux', 'darwin', 'win32'])
+def test_a_named_table_is_used_and_recorded(suite, table):
+    """Each platform's job may use its own plan; the evidence names the table it used."""
+    reports = []
+    for i in range(3):
+        result = shard(suite, i, '--collect-only', f'--sipi-shard-durations={table}')
+        assert result.returncode == 0, result.stdout + result.stderr
+        reports.append(json.loads((suite / f'{i}.json').read_text()))
+    assert {r['durations_table'] for r in reports} == {table}
+    assert checker.verify(reports, collect_only=True, table=table)['durations_table'] == table
+    assert shard(suite, 0, '--collect-only', '--sipi-shard-durations=durations').returncode != 0
+
+
+def test_split_module_cases_are_separate_units(suite):
+    """A split module's cases go to parts of their own; the evidence still covers each case once."""
+    table = json.loads((suite / 'tools/shards/durations-linux.json').read_text())
+    table.update(split=['tests/test_module_0.py'], seconds={
+        'tests/test_module_0.py::test_case[zero]': 30., 'tests/test_module_0.py::test_case[one]': 20.,
+        'tests/test_module_0.py::test_case[two]': 10., 'tests/test_module_1.py': 1.})
+    (suite / 'tools/shards/durations-linux.json').write_text(json.dumps(table), encoding='utf-8')
+    reports = []
+    for i in range(3):
+        result = shard(suite, i, '--sipi-shard-durations=linux')
+        assert result.returncode == 0, result.stdout + result.stderr
+        reports.append(json.loads((suite / f'{i}.json').read_text()))
+    path = suite / 'tools/shards/durations-linux.json'
+    assert checker.verify(reports, table='linux', durations=path)['cases'] == 36
+    with pytest.raises(ValueError, match='different durations table'):checker.verify(reports, table='linux')
+    parts = [[n for n in r['selected_nodeids'] if n.startswith('tests/test_module_0.py')] for r in reports]
+    assert parts == [['tests/test_module_0.py::test_case[zero]'], ['tests/test_module_0.py::test_case[one]'],
+                     ['tests/test_module_0.py::test_case[two]']]
+    # The module fixture then runs once in each part that holds one of its cases.
+    assert (suite / 'fixtures.txt').read_text().splitlines().count('test_module_0') == 3
 
 
 def test_discovery_only_never_claims_execution(suite):

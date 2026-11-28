@@ -26,9 +26,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-15, windows-latest]
         suite: [source, installed]
-        # Sixteen parts balanced by the recorded module times in tools/shards/durations.json
-        # (tools/pytest_shard.py): about 53 min of recorded Linux test time each, against 84-148
-        # min in the eight hash-assigned parts of run 45965021952.
+        # Sixteen parts balanced by each platform's recorded times in
+        # tools/shards/durations-<linux|darwin|win32>.json (tools/pytest_shard.py): at most 45, 48
+        # and 57 min of recorded test time per part on Linux, macOS and Windows, against 85, 104
+        # and 108 min jobs with one Linux table in run 46099046636.
         shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     runs-on: ${{ matrix.os }}
     env:
@@ -180,11 +181,12 @@ jobs:
         run: |
           import json, os, pathlib, subprocess, sys
           root = pathlib.Path('.validation/partitions')
-          for platform in ('ubuntu-latest', 'macos-15', 'windows-latest'):
+          tables = {'ubuntu-latest': 'linux', 'macos-15': 'darwin', 'windows-latest': 'win32'}
+          for platform, table in tables.items():
               collections = {}
               for suite in ('source', 'installed'):
                   paths = [root / f'validation-{platform}-{suite}-{i}' / f'{suite}-shard.json' for i in range(16)]
-                  subprocess.run([sys.executable, 'tools/check_shards.py', *map(str, paths)], check=True)
+                  subprocess.run([sys.executable, 'tools/check_shards.py', '--durations-table', table, *map(str, paths)], check=True)
                   collections[suite] = json.loads(paths[0].read_text(encoding='utf-8'))['all_nodeids']
               assert collections['source'] == [node for node in collections['installed'] if node.startswith('tests/sipi/')], platform
           assert os.environ['VALIDATION_RESULT'] == 'success', 'validation matrix did not succeed'

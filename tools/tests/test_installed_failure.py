@@ -63,8 +63,7 @@ def test_partition_runner_keeps_external_import_environment_and_fresh_reports(tm
     tools = Path(__file__).resolve().parents[1]
     for name in ('check_installed.py', 'verify_install.py', 'pytest_shard.py'):
         shutil.copy2(tools / name, root / 'tools' / name)
-    (root / 'tools/shards').mkdir()
-    shutil.copy2(tools / 'shards/durations.json', root / 'tools/shards/durations.json')
+    shutil.copytree(tools / 'shards', root / 'tools/shards')
     monkeypatch.setenv('PYTHONPATH', str(root / 'poison-source'))
     monkeypatch.setattr(sys, 'argv', ['check_installed.py', '--wheels', str(tmp_path),
                                     '--shard-index', '1', '--shard-count', '3'])
@@ -77,7 +76,9 @@ def test_partition_runner_keeps_external_import_environment_and_fresh_reports(tm
         if len(calls) == 1:
             return subprocess.CompletedProcess(command, 0, stdout='[]')
         assert (cwd / 'tools/pytest_shard.py').read_bytes() == (tools / 'pytest_shard.py').read_bytes()
-        assert (cwd / 'tools/shards/durations.json').read_bytes() == (tools / 'shards/durations.json').read_bytes()
+        for table in ('linux', 'darwin', 'win32'):
+            name = f'tools/shards/durations-{table}.json'
+            assert (cwd / name).read_bytes() == (tools / name[len('tools/'):]).read_bytes()
         assert (cwd / 'tests').is_dir() and (cwd / 'integration').is_dir()
         assert '-p' in command and 'tools.pytest_shard' in command
         assert '--sipi-shard-index=1' in command and '--sipi-shard-count=3' in command
