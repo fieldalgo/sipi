@@ -89,7 +89,10 @@ each runner. A unit is a whole test module, keeping module fixtures together, ex
 in the modules the table lists under `split`, whose cases are separate units; only
 modules whose expensive cases share no module fixture are split (today the two
 harmonic corner-face panel-line modules, six independent 5–14 minute line solves
-each). Recorded units go largest first to the partition with the least recorded time;
+each). The guard corner-conductor module stays one unit: its module fixture is one 32-panel
+field solve, and its refinement test solves the same 32-panel field again and a 48-panel one
+(about 1, 1 and 2.5 fixture times, nearly all of the module), so any split recomputes the
+fixture and adds time without shortening the unit that holds the refinement test. Recorded units go largest first to the partition with the least recorded time;
 a unit missing from the table keeps the stable SHA-256 of its module path (of its node
 ID in a split module).
 All cases are collected before
