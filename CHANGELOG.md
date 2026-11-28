@@ -1,5 +1,8 @@
 # Changelog
 
+- A rectangular or trapezoidal `Trace` face whose `y` lies within the mesher's merge distance (1e-9 of the box diagonal) of an inner layer boundary without equalling it, for example `h + 1e-18`, is now placed on that boundary instead of failing with `MeshInputError: zero-length edge`. Only inputs that were refused change: seven meshable sections (microstrip strip and 35 µm, tapered, polygonal, coupled stripline, inner stripline, coplanar) give bit-identical meshes, C and L. Coordinates the rule does not cover (two trace faces, the stack bottom, polygonal sections) are still refused, now with a message naming the coordinates, their distance and the fix.
+  사각형·사다리꼴 `Trace` 면의 `y`가 안쪽 층 경계와 같지 않지만 메시 생성기의 병합 거리(상자 대각선의 1e-9) 안에 있으면(예: `h + 1e-18`) `MeshInputError: zero-length edge`로 실패하지 않고 그 경계 위에 놓습니다. 거절되던 입력만 바뀝니다. 메시가 만들어지는 단면 7개(마이크로스트립 띠·35 µm, 사다리꼴, 다각형, 결합 스트립라인, 내부 스트립라인, coplanar)의 메시·C·L은 비트 단위로 같습니다. 이 규칙 밖의 좌표(두 트레이스 면, 적층 바닥, 다각형 단면)는 계속 거절되며, 이제 메시지가 해당 좌표·거리·고칠 방법을 밝힙니다.
+
 - Add per-metre conductor loss to the pair preview: self/mutual R(f), differential and common conductor attenuation in dB/m and a separate dielectric column, from a saved `sipi.transmission-line/8` line (default panel currents) and the existing `modes` diagnostic. Inputs are conductivity, smooth or Hammerstad roughness and up to 16 frequencies; the result can be exported. Engine, schemas, numerical settings and the saved design format are unchanged.
   차동 쌍 미리보기에 m당 도체 손실을 추가했습니다. 저장형 `sipi.transmission-line/8` 선로(기본 panel 전류)와 기존 `modes` 진단으로 자기·상호 R(f), 차동·공통 도체 감쇠(dB/m), 별도 유전 감쇠 열을 보여 줍니다. 입력은 전도율, 매끈함 또는 Hammerstad 거칠기, 최대 16개 주파수이며 결과를 내보낼 수 있습니다. 엔진, 스키마, 수치 설정, 저장 설계 형식은 그대로입니다.
 
