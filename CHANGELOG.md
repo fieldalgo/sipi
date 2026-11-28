@@ -1,5 +1,8 @@
 # Changelog
 
+- CI: the per-platform partition tables are rebuilt from Validate runs 46146287645 and 46152630969 (the tests and sources of main `2fa6518`, engine pin openphysics `60322040`), because parts planned from the earlier run took up to 42/60/51 min of test time on Linux/macOS/Windows. The largest recorded part with twenty-four parts is now 30/34/39 min; the macOS floor is the guard corner-conductor module (31.6 min mean, 25–38 min per suite run, shared module fixture), and the three-active one fell from 33.6 to 20.0 min. Tests, tolerances, partition count and values are unchanged.
+  CI: 플랫폼별 분할 시간 표를 Validate 실행 46146287645와 46152630969(main `2fa6518`의 시험·소스, 엔진 고정점 openphysics `60322040`)로 다시 만듭니다. 이전 실행으로 정한 묶음의 시험 시간이 Linux/macOS/Windows에서 최대 42/60/51분이었기 때문입니다. 스물네 묶음에서 기록 기준 가장 큰 묶음은 이제 30/34/39분입니다. macOS 하한은 guard 모서리 도체 모듈(평균 31.6분, 시험 실행마다 25–38분, 모듈 fixture 공유)이고, three-active 모듈은 33.6분에서 20.0분이 되었습니다. 시험·허용오차·묶음 수·수치는 바뀌지 않습니다.
+
 - Tests: three workbench checks that compare the engine (v1 boxes) with direct `sipi` template calls (`test_desktop` adapter-vs-native, `test_geometry` coated taper, `test_coupled_coplanar_form` mesh settings) pin the direct call to v1. Values and tolerances are unchanged.
   시험: 엔진(v1 상자)을 직접 `sipi` 템플릿 호출과 비교하는 workbench 검사 세 개(`test_desktop` adapter 대 native, `test_geometry` coated taper, `test_coupled_coplanar_form` 메시 설정)는 직접 호출을 v1로 고정합니다. 값과 허용오차는 그대로입니다.
 
