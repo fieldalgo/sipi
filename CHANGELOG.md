@@ -1,5 +1,8 @@
 # Changelog
 
+- Pin the browser and Windows workbench candidates to engine `bcff695` (shared packages `e7526cd`) instead of `75417d1` (shared `625d9f74`), which predates `sipi.transmission-line/8` and `galerkin.panel_electrostatics`. A browser runtime staged from the old pin calculated impedance but refused the pair-preview conductor loss (`unsupported saved schema`). The stager, its hash checks and all engine code, schemas and numerical settings are unchanged. Checked only with a locally staged Pyodide 0.29.5 Worker in Linux Chromium; the Windows candidate has not been rebuilt with this pin.
+  브라우저·Windows workbench 후보의 엔진 고정점을 `75417d1`(공유 패키지 `625d9f74`)에서 `bcff695`(공유 패키지 `e7526cd`)로 옮깁니다. 이전 고정점은 `sipi.transmission-line/8`과 `galerkin.panel_electrostatics`보다 오래되어, 그것으로 준비한 브라우저 런타임은 임피던스는 계산하지만 차동 쌍 미리보기 도체 손실을 거절했습니다(`unsupported saved schema`). 준비 도구와 해시 검사, 엔진 코드·스키마·수치 설정은 그대로입니다. 로컬에서 준비한 Pyodide 0.29.5 Worker를 Linux Chromium에서만 확인했으며, Windows 후보는 이 고정점으로 다시 빌드하지 않았습니다.
+
 - Add per-metre conductor loss to the pair preview: self/mutual R(f), differential and common conductor attenuation in dB/m and a separate dielectric column, from a saved `sipi.transmission-line/8` line (default panel currents) and the existing `modes` diagnostic. Inputs are conductivity, smooth or Hammerstad roughness and up to 16 frequencies; the result can be exported. Engine, schemas, numerical settings and the saved design format are unchanged.
   차동 쌍 미리보기에 m당 도체 손실을 추가했습니다. 저장형 `sipi.transmission-line/8` 선로(기본 panel 전류)와 기존 `modes` 진단으로 자기·상호 R(f), 차동·공통 도체 감쇠(dB/m), 별도 유전 감쇠 열을 보여 줍니다. 입력은 전도율, 매끈함 또는 Hammerstad 거칠기, 최대 16개 주파수이며 결과를 내보낼 수 있습니다. 엔진, 스키마, 수치 설정, 저장 설계 형식은 그대로입니다.
 
