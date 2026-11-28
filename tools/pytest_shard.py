@@ -1,19 +1,25 @@
 # Copyright 2026 Yongha Kim (FieldAlgo)
 # SPDX-License-Identifier: Apache-2.0
-"""Opt-in, module-preserving, time-balanced pytest partitions with complete collection evidence.
+"""Opt-in, time-balanced pytest partitions with complete collection evidence.
 
-Whole test modules are assigned to partitions. Modules listed in ``shards/durations.json``
-beside this file (recorded seconds per module from the JUnit XML of a complete CI run) are
-assigned largest first, each to the partition with the least recorded time so far (ties go to
-the lower index). A module missing from the table keeps the stable SHA-256 assignment of its
-relative path. The assignment depends only on the table, the partition count and the module
-path, never on platform, collection order or hash seed, so every partition and
-``tools/check_shards.py`` compute the same plan.
+Each platform has its own table, ``shards/durations-<platform>.json`` beside this file
+(``linux``, ``darwin`` or ``win32``, as ``sys.platform``), of recorded seconds per unit from
+the JUnit XML of complete CI runs on that platform. A unit is a whole test module, keeping its
+module fixtures together, except for the modules the table lists under ``split``: their cases
+are separate units (node IDs). Only modules whose expensive cases do not share a module fixture
+are split. Recorded units are assigned largest first, each to the partition with the least
+recorded time so far (ties go to the lower index). A module missing from the table keeps the
+stable SHA-256 assignment of its relative path (a missing case of a split module, of its node
+ID). The assignment depends only on the table, the partition count and the node ID, never on
+collection order or hash seed, so every partition and ``tools/check_shards.py`` compute the
+same plan; the manifest names the table it used.
 
-Rebuild the table from the source JUnit XML of all partitions of one complete run, from the
-repository root::
+Rebuild a table from the source and installed JUnit XML of all partitions of complete runs on
+one platform, from the repository root (one ``--update`` per complete suite run; a unit's time
+is the mean over the runs that have it)::
 
-    python tools/pytest_shard.py --update source-*.xml --source "<run, commit, date, files>"
+    python tools/pytest_shard.py --table linux --update source-*.xml --update installed-*.xml \
+        --split <module> ... --collected <node IDs> --source "<run, commit, date, files>"
 """
 import argparse
 import functools
@@ -28,12 +34,32 @@ try:
 except ModuleNotFoundError:  # tools/check_shards.py recomputes the plan without pytest installed
     pytest = None
 
-SCHEMA = 'sipi.pytest-partition/2'
-DURATIONS = Path(__file__).resolve().with_name('shards') / 'durations.json'
+SCHEMA = 'sipi.pytest-partition/3'
+SHARDS = Path(__file__).resolve().with_name('shards')
+TABLES = ('linux', 'darwin', 'win32')
+
+
+def table_path(name):
+    if name not in TABLES:
+        raise ValueError(f'unknown durations table {name!r}; expected one of {TABLES}')
+    return SHARDS / f'durations-{name}.json'
+
+
+def platform_table():
+    """The table of the running platform."""
+    return {'linux': 'linux', 'darwin': 'darwin', 'win32': 'win32'}[sys.platform]
+
+
+DURATIONS = table_path(platform_table()) if sys.platform in TABLES else None
 
 
 def module_of(nodeid):
     return nodeid.split('::', 1)[0].replace('\\', '/')
+
+
+def normalized(nodeid):
+    module, sep, rest = nodeid.partition('::')
+    return module.replace('\\', '/') + sep + rest
 
 
 def hashed(module, count):
@@ -41,15 +67,28 @@ def hashed(module, count):
     return int.from_bytes(hashlib.sha256(module.encode('utf-8')).digest(), 'big') % count
 
 
-def load_durations(path=DURATIONS):
+def load_table(path=DURATIONS):
+    """(seconds per unit, split modules) of a table, after checking its format."""
     data = json.loads(Path(path).read_text(encoding='utf-8'))
-    if set(data) != {'source', 'command', 'seconds'} or not isinstance(data['source'], str) or not data['source']:
-        raise ValueError(f'{path}: expected source, command and seconds')
+    if set(data) != {'source', 'command', 'split', 'seconds'} or not isinstance(data['source'], str) \
+            or not data['source']:
+        raise ValueError(f'{path}: expected source, command, split and seconds')
+    split = data['split']
+    if not isinstance(split, list) or len(set(split)) != len(split) or not all(
+            isinstance(k, str) and k.endswith('.py') and '\\' not in k for k in split):
+        raise ValueError(f'{path}: split must list distinct module paths')
     seconds = data['seconds']
-    if not seconds or not all(isinstance(k, str) and k.endswith('.py') and '\\' not in k
+    if not seconds or not all(isinstance(k, str) and '\\' not in k.split('::', 1)[0] and module_of(k).endswith('.py')
                               and type(v) in (int, float) and v >= 0 for k, v in seconds.items()):
-        raise ValueError(f'{path}: every entry must map a module path to seconds >= 0')
-    return seconds
+        raise ValueError(f'{path}: every entry must map a module path or node ID to seconds >= 0')
+    for key in seconds:
+        if ('::' in key) != (module_of(key) in split):
+            raise ValueError(f'{path}: {key!r}: node IDs exactly for the split modules')
+    return seconds, split
+
+
+def load_durations(path=DURATIONS):
+    return load_table(path)[0]
 
 
 def durations_digest(path=DURATIONS):
@@ -60,7 +99,7 @@ def durations_digest(path=DURATIONS):
 
 
 def balance(seconds, count):
-    """Largest-first assignment of the recorded modules to the least-loaded partition."""
+    """Largest-first assignment of the recorded units to the least-loaded partition."""
     load = [0.0] * count
     plan = {}
     for module in sorted(seconds, key=lambda name: (-seconds[name], name)):
@@ -72,14 +111,21 @@ def balance(seconds, count):
 
 @functools.lru_cache(maxsize=None)
 def _plan(path, count):
-    return balance(load_durations(path), count)
+    seconds, split = load_table(path)
+    return balance(seconds, count), frozenset(split)
+
+
+def unit_of(nodeid, split):
+    """The node ID itself in a split module, otherwise its module."""
+    module = module_of(nodeid)
+    return normalized(nodeid) if module in split else module
 
 
 def partition(nodeid, count, durations=DURATIONS):
-    """Assign a whole module: by recorded time when listed, otherwise by its stable path hash."""
-    module = module_of(nodeid)
-    plan = _plan(str(durations), count)
-    return plan[module] if module in plan else hashed(module, count)
+    """Assign a unit: by recorded time when listed, otherwise by its stable path hash."""
+    plan, split = _plan(str(durations), count)
+    unit = unit_of(nodeid, split)
+    return plan[unit] if unit in plan else hashed(unit, count)
 
 
 def digest(nodeids):
@@ -92,6 +138,8 @@ def pytest_addoption(parser):
     group.addoption('--sipi-shard-index', type=int, default=None)
     group.addoption('--sipi-shard-count', type=int, default=None)
     group.addoption('--sipi-shard-report', type=Path, default=None)
+    group.addoption('--sipi-shard-durations', choices=TABLES, default=None,
+                    help='durations table (default: the running platform)')
 
 
 def pytest_configure(config):
@@ -106,15 +154,17 @@ def pytest_configure(config):
         raise pytest.UsageError('partition report already exists; use a fresh report path')
     if config.getoption('keyword') or config.getoption('markexpr') or config.getoption('deselect'):
         raise pytest.UsageError('partition collection must not use -k, -m or --deselect')
-    config.pluginmanager.register(PartitionRun(index, count, report, config), 'sipi-partition-run')
+    table = config.getoption('--sipi-shard-durations') or platform_table()
+    config.pluginmanager.register(PartitionRun(index, count, report, config, table), 'sipi-partition-run')
 
 
 class PartitionRun:
-    def __init__(self, index, count, report, config):
+    def __init__(self, index, count, report, config, table):
         self.report = report
         self.completed = []
-        self.data = dict(schema=SCHEMA, index=index, count=count,
-                         durations_sha256=durations_digest(),
+        self.durations = table_path(table)
+        self.data = dict(schema=SCHEMA, index=index, count=count, durations_table=table,
+                         durations_sha256=durations_digest(self.durations),
                          arguments=list(config.invocation_params.args),
                          collect_only=bool(config.getoption('collectonly')),
                          all_nodeids=[], selected_nodeids=[], completed_nodeids=[],
@@ -133,7 +183,8 @@ class PartitionRun:
             raise pytest.UsageError('duplicate collected node IDs cannot establish partition coverage')
         selected, omitted = [], []
         for item in items:
-            (selected if partition(item.nodeid, self.data['count']) == self.data['index'] else omitted).append(item)
+            (selected if partition(item.nodeid, self.data['count'], self.durations) == self.data['index']
+             else omitted).append(item)
         self.data.update(all_nodeids=all_ids, collection_sha256=digest(all_ids),
                          selected_nodeids=[item.nodeid for item in selected],
                          collection_errors=session.testsfailed)
@@ -177,38 +228,58 @@ def case_nodeid(case, module):
     return '::'.join([module, *classes, case.get('name', '')])
 
 
-def update(xml_paths, source, output=DURATIONS, root=Path('.'), collected=None):
-    """Sum the JUnit test-case times per module and write the table.
-
-    With ``collected`` (a set of node IDs), cases no longer collected are left out, so tests
-    moved out of the regular suite stop counting.
-    """
+def unit_seconds(xml_paths, root=Path('.'), split=(), collected=None):
+    """Sum the JUnit test-case times of one complete suite run per unit."""
     seconds = {}
-    modules = None if collected is None else {nodeid.split('::', 1)[0] for nodeid in collected}
+    modules = None if collected is None else {module_of(nodeid) for nodeid in collected}
     for xml_path in xml_paths:
         for case in ET.parse(xml_path).getroot().iter('testcase'):
             module = case_module(case.get('classname', ''), root)
             if module is None:
                 raise SystemExit(f'{xml_path}: no test module for {case.get("classname")!r}; '
                                  'run from the repository root')
-            if modules is not None and module in modules and case_nodeid(case, module) not in collected:
+            nodeid = case_nodeid(case, module)
+            if modules is not None and module in modules and nodeid not in collected:
                 continue
-            seconds[module] = seconds.get(module, 0.0) + float(case.get('time', 0) or 0)
-    table = dict(source=source,
-                 command='python tools/pytest_shard.py --update <source JUnit XML of every partition> '
-                         '--source <run>' + (' --collected <node IDs>' if collected is not None else ''),
-                 seconds={k: round(v, 1) for k, v in sorted(seconds.items())})
+            unit = nodeid if module in split else module
+            seconds[unit] = seconds.get(unit, 0.0) + float(case.get('time', 0) or 0)
+    return seconds
+
+
+def update(groups, source, output, root=Path('.'), split=(), collected=None):
+    """Write the table: per unit, the mean over the suite runs (groups of XML) that have it.
+
+    Each group is the XML of every partition of one complete suite run. With ``collected`` (a
+    set of node IDs), cases no longer collected are left out, so tests moved out of the regular
+    suite stop counting. Cases of the ``split`` modules are separate units.
+    """
+    runs = [unit_seconds(paths, root, set(split), collected) for paths in groups]
+    seconds = {}
+    for unit in sorted(set().union(*runs)):
+        found = [run[unit] for run in runs if unit in run]
+        seconds[unit] = round(sum(found) / len(found), 1)
+    command = 'python tools/pytest_shard.py --table <platform> ' + ' '.join(
+        ['--update <JUnit XML of every partition of one suite run>'] * len(groups))
+    if split:
+        command += ' --split ' + ' '.join(sorted(split))
+    if collected is not None:
+        command += ' --collected <node IDs>'
+    table = dict(source=source, command=command + ' --source <runs>', split=sorted(split), seconds=seconds)
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     Path(output).write_text(json.dumps(table, indent=1) + '\n', encoding='utf-8')
+    load_table(output)
     return table
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='Rebuild the recorded module durations.')
-    parser.add_argument('--update', nargs='+', metavar='JUNIT_XML', required=True,
-                        help='source JUnit XML of every partition of one complete run')
-    parser.add_argument('--source', required=True, help='where the times come from (run, commit, date)')
-    parser.add_argument('--output', type=Path, default=DURATIONS)
+    parser = argparse.ArgumentParser(description='Rebuild the recorded durations of one platform.')
+    parser.add_argument('--table', choices=TABLES, required=True, help='platform of the runs')
+    parser.add_argument('--update', nargs='+', action='append', metavar='JUNIT_XML', required=True,
+                        help='JUnit XML of every partition of one complete suite run; repeat per run')
+    parser.add_argument('--source', required=True, help='where the times come from (runs, commit, date)')
+    parser.add_argument('--output', type=Path, default=None, help='default: shards/durations-<table>.json')
+    parser.add_argument('--split', nargs='*', default=[], metavar='MODULE',
+                        help='modules whose cases are separate units (no shared expensive module fixture)')
     parser.add_argument('--collected', type=Path, default=None,
                         help='node IDs collected now, one per line (pytest --collect-only -q); '
                              'cases of these modules that are not listed are left out')
@@ -217,11 +288,12 @@ def main(argv=None):
     if args.collected is not None:
         collected = {line.strip() for line in args.collected.read_text(encoding='utf-8').splitlines()
                      if '::' in line}
-    table = update(args.update, args.source, args.output, collected=collected)
+    output = args.output or table_path(args.table)
+    table = update(args.update, args.source, output, split=args.split, collected=collected)
     total = sum(table['seconds'].values())
-    absent = [name for name in table['seconds'] if not Path(name).is_file()]
-    print(f"{len(table['seconds'])} modules, {total / 60:.1f} min, {len(absent)} not in this checkout, "
-          f"written to {args.output}")
+    absent = [name for name in table['seconds'] if not Path(module_of(name)).is_file()]
+    print(f"{len(table['seconds'])} units, {total / 60:.1f} min, {len(absent)} not in this checkout, "
+          f"written to {output}")
 
 
 if __name__ == '__main__':
