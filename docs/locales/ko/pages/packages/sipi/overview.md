@@ -151,7 +151,9 @@ N개일 때:
    [독립 기준 대비 기본 메시](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/default-mesh.md#독립-기준-대비-기본-메시)를 참고하세요.
 2. **상자 절단.** `"open"` 벽은 절연체, `"ground"` 벽은 도체이며 열린 공간의 선로는 둘 사이에 있습니다. 둘 다
    풀거나 벽을 바깥으로 옮기세요. 예제 마이크로스트립에서 상자 폭과 공기 층을 두 배로 하면 `z0`가 0.14 %
-   바뀌었고, 열린 벽과 접지 벽의 차이는 0.4 %였습니다.
+   바뀌었고, 열린 벽과 접지 벽의 차이는 0.4 %였습니다. 열린 벽은 마이크로스트립의 `eps_eff`와 Z0를 높게
+   만듭니다. `eps_eff` 기준 40h × 20h 상자에서 약 +0.1~+0.4 %, 마이크로스트립 템플릿 기본 상자에서
+   +0.4~+1.6 %입니다. [측정 표](https://github.com/fieldalgo/sipi/blob/main/docs/locales/ko/pages/packages/sipi/design.md)를 참고하세요.
 
 ## 검증
 

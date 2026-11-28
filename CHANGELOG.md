@@ -1,5 +1,8 @@
 # Changelog
 
+- Docs: tabulate microstrip box truncation with open walls (zero thickness, `w/h` 0.25/1/4, `εr` 4.3/9.8, relative to a 160h × 80h box). The 40h × 20h validation box is high by +0.10 to +0.38 % in `eps_eff` (+0.06 to +0.23 % in Z0), matching the 0.1–0.3 % of an independent comparison; the microstrip template's default box (20h × 10h) by +0.40 to +1.60 % (Z0 +0.26 to +1.02 %); 80h × 40h by at most +0.08 %. Template defaults and results are unchanged.
+  문서: 열린 벽 마이크로스트립의 상자 절단 오차를 표로 정리했습니다(두께 0, `w/h` 0.25/1/4, `εr` 4.3/9.8, 160h × 80h 상자 대비). 40h × 20h 검증 상자는 `eps_eff`가 +0.10~+0.38 %(Z0 +0.06~+0.23 %) 높아 독립 비교의 0.1–0.3 %와 맞고, 마이크로스트립 템플릿 기본 상자(20h × 10h)는 +0.40~+1.60 %(Z0 +0.26~+1.02 %), 80h × 40h는 최대 +0.08 %입니다. 템플릿 기본값과 결과는 바뀌지 않습니다.
+
 - Docs: recommend `panels_per_edge` 128 to 256 for precision conductor loss on the panel path. In an independent comparison on two sections the default 64 panels per edge gave loss 0.46 % and 0.23 % above an independent finite-element solution; the difference fell monotonically at 128 and 256 and extrapolated to +0.008 % and +0.005 %. Default controls, saved documents and recorded values are unchanged.
   문서: panel 경로의 정밀 도체 손실에는 `panels_per_edge` 128–256을 권장합니다. 두 단면의 독립 비교에서 기본값 변당 64 패널의 손실은 독립 유한요소 해보다 0.46 %, 0.23 % 높았고, 128·256에서 차이가 단조롭게 줄어 외삽값은 +0.008 %, +0.005 %였습니다. 기본 설정, 저장 문서, 기록값은 바뀌지 않습니다.
 
