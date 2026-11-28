@@ -1,5 +1,8 @@
 # Changelog
 
+- Pin the browser and Windows workbench candidates to engine `bcff695` (shared packages `e7526cd`) instead of `75417d1` (shared `625d9f74`), which predates `sipi.transmission-line/8` and `galerkin.panel_electrostatics`. A browser runtime staged from the old pin calculated impedance but refused the pair-preview conductor loss (`unsupported saved schema`). The stager, its hash checks and all engine code, schemas and numerical settings are unchanged. Checked only with a locally staged Pyodide 0.29.5 Worker in Linux Chromium; the Windows candidate has not been rebuilt with this pin.
+  브라우저·Windows workbench 후보의 엔진 고정점을 `75417d1`(공유 패키지 `625d9f74`)에서 `bcff695`(공유 패키지 `e7526cd`)로 옮깁니다. 이전 고정점은 `sipi.transmission-line/8`과 `galerkin.panel_electrostatics`보다 오래되어, 그것으로 준비한 브라우저 런타임은 임피던스는 계산하지만 차동 쌍 미리보기 도체 손실을 거절했습니다(`unsupported saved schema`). 준비 도구와 해시 검사, 엔진 코드·스키마·수치 설정은 그대로입니다. 로컬에서 준비한 Pyodide 0.29.5 Worker를 Linux Chromium에서만 확인했으며, Windows 후보는 이 고정점으로 다시 빌드하지 않았습니다.
+
 - CI: Validate runs twenty-four partitions per platform and suite instead of sixteen. With the per-platform tables the largest recorded part drops from 45/48/57 to 30/34/38 min on Linux/macOS/Windows (run 46099046636 took 108 min with sixteen parts on one Linux table); the macOS floor is one 33.6 min conductor module with a shared module fixture. 144 jobs instead of 96. Tests, tolerances and values are unchanged.
   CI: Validate가 플랫폼·시험 집합마다 열여섯이 아닌 스물네 묶음을 실행합니다. 플랫폼별 표에서 기록 기준 가장 큰 묶음이 Linux/macOS/Windows 45/48/57분에서 30/34/38분으로 줄어듭니다(실행 46099046636은 Linux 표 하나와 열여섯 묶음으로 108분). macOS 하한은 모듈 fixture를 공유하는 33.6분짜리 도체 모듈 하나입니다. 작업은 96개에서 144개가 됩니다. 시험·허용오차·수치는 바뀌지 않습니다.
 
