@@ -146,6 +146,16 @@ separately; the coaxial example below also has polygonal-geometry error.
 | `grade` | 0.15 | Growth of the edge length per unit distance from the traces |
 | `far_size` | max(width, height) / 24 | Largest edge length |
 
+The mesher refuses a mesh of more than 300,000 points with
+`MeshSizeLimitError`. For a cross-section the message keeps the mesher's text
+(`more than 300000 points ...`) and adds the resolved `edge_size`,
+`corner_size`, `grade`, `far_size`, the box, which feature sets the default
+`edge_size`, and what to raise first (`edge_size` or `corner_size`, then
+`grade` or `far_size`). Halving all three settings multiplied the point
+count by about 2.4–4 on the documented sections; a grounded coplanar line
+(w 0.3 mm, gap 0.15 mm, h 0.2 mm, 35 µm) went from 19,206 to 73,213 to
+287,503 points over two halvings.
+
 `mesh()` returns a `MeshedCrossSection` (galerkin mesh, per-triangle `eps_r` and
 `tan_delta`, conductor node sets) for inspection. `line_parameters()` and
 `capacitance_matrix()` accept any galerkin mesh with node sets, for example a
