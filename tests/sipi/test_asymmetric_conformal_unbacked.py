@@ -400,5 +400,6 @@ def test_lower_air_translates_all_metal_and_local_film_without_a_backing_plane()
     assert b.dielectric_regions[0]._shape.symmetric_difference(translate(a.dielectric_regions[0]._shape,yoff=3e-3)).area<1e-12*b.dielectric_regions[0]._shape.area
     assert b.height-a.height==pytest.approx(3e-3,rel=1e-12)
     assert a.bottom==b.bottom=='open'
-    auto=section(lower_air_height=None)
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        auto=section(lower_air_height=None)
     assert auto.layers[0].thickness==pytest.approx(10*PARAMS['substrate_height'],rel=1e-15)
