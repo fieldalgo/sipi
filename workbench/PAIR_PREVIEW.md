@@ -188,6 +188,23 @@ comparison still compares impedance only.
 The browser acceptance test calculates the Surface pair loss, checks the line/8
 input, panel controls and displayed values against the exported engine result,
 then checks a refused frequency, cancellation and invalidation by an edit.
-These checks ran on Linux Chromium with the local native engine only; the
-staged browser (Pyodide) runtime, other browsers and operating systems were not
-checked.
+These checks ran on Linux Chromium only, with the local native engine and with
+a browser runtime staged locally from `packaging/engine-ref.txt` (Pyodide 0.29.5
+Worker, numpy 2.2.5, scipy 1.14.1, shapely 2.0.7). The full acceptance passed in
+both modes. A runtime staged from an engine older than `sipi.transmission-line/8`
+refuses the loss calculation, so stage from the current pin.
+
+In the Worker the panel path runs unchanged. For each of the four presets at
+1, 5 and 10 GHz the loss step took about 3.3–3.7 s (native, same package
+versions, one BLAS thread: 1.6–2.1 s), plus about 7.5 s to load the engine on
+the first calculation of a page; the WebAssembly heap was 188–270 MB afterwards.
+The displayed tables were identical to the native ones. With the same engine and
+package versions the values are not bit-identical: R differed by at most
+1.4e-13 relative to the largest entry of its matrix (1.7e-12 elementwise),
+the attenuations by at most 1.5e-13, C by at most 1.3e-15 and the impedances by
+at most one unit in the last place. Forcing the generic native BLAS kernel narrowed the R
+difference, so the remaining difference is attributed to the different BLAS
+kernels and math libraries; it was not traced further. A width search took
+about 1.5 times as long as natively (about 2 min per template) and left a
+WebAssembly heap of about 1.3 GB, which the page keeps until it is reloaded.
+Other browsers, operating systems and phones were not checked.
