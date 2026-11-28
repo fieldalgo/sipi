@@ -1,0 +1,652 @@
+{
+ "schema": "sipi.linear-line-study-base/1",
+ "description": "Base sweep (32 panels per edge) of the dispatch-only linear corner-face line study, reproduced by the regular suite. Recorded from the study XML; one variant per dielectric mesh.",
+ "module": "test_two_ground_linear_corner_face_line_study",
+ "test": "test_actual_scalar_sweep_refinement_and_complex_closed_forms",
+ "criterion": "three sweep samples; for each, R, L and C0 at 32, 64 and 128 panels per edge with consecutive levels within rtol 0.01 (atol 0), and the closed-form characteristic impedance and propagation constant within rtol 1e-12 at every level",
+ "environment_variable": "SIPI_RESOLUTION_STUDIES",
+ "reproduction_matrix_relative": 1e-09,
+ "quantities": [
+  "C0_f_per_m",
+  "L_h_per_m",
+  "R_ohm_per_m",
+  "impedance_real_ohm"
+ ],
+ "study_source": "Validate run 46099046636 (main b2cbb002, 2026-11-28), source and installed partition 1 on ubuntu-latest, macos-15 and windows-latest: property two_ground_linear_corner_face_scalar_study",
+ "generated_utc": "2026-11-28T08:32:52+00:00",
+ "product_commit": "bcff6950ad4fbbe39126cd38398a1a800bb8221b",
+ "local_check": {
+  "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39",
+  "python": "3.13.18"
+ },
+ "command": "PYTHONPATH=src python tests/sipi/reference_data/resolution_studies/generate_linear_line_study_base.py --junit <platform>/<suite>=<xml> ... --source \"<run>\"",
+ "rows": [
+  {
+   "index": 0,
+   "input": {
+    "conductors": {
+     "signal": {
+      "bottom": {
+       "conductivity": 58000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "left": {
+       "conductivity": 21000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "right": {
+       "conductivity": 45000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "top": {
+       "conductivity": 35000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      }
+     }
+    },
+    "cross_section": {
+     "box": {
+      "bottom": "ground",
+      "sides": "open",
+      "top": "ground",
+      "width": 0.008
+     },
+     "layers": [
+      {
+       "eps_r": 4.0,
+       "name": "dielectric",
+       "tan_delta": 0.003,
+       "thickness": 0.002
+      }
+     ],
+     "length_unit": "m",
+     "mesh": {
+      "edge_size": 5e-06,
+      "far_size": 0.0001,
+      "grade": 0.05,
+      "min_angle": 28.0
+     },
+     "schema": "sipi.cross-section/1",
+     "traces": [
+      {
+       "ground": false,
+       "name": "signal",
+       "thickness": 5e-05,
+       "width": 0.00055,
+       "x": 0.0,
+       "y": 0.0007
+      }
+     ]
+    },
+    "frequency_hz": [
+     2000000000.0
+    ],
+    "ground_thickness_m": 3.5e-05,
+    "length_m": 0.0,
+    "materials": {},
+    "panel": {
+     "ground_modes": 256,
+     "interpolation_degree": 24,
+     "panels_per_edge": 32
+    },
+    "reference": {
+     "bottom": {
+      "conductivity": 58000000.0,
+      "relative_permeability": 1.0,
+      "roughness": {
+       "kind": "smooth"
+      }
+     },
+     "conductors": {},
+     "kind": "surfaces",
+     "sides": null,
+     "top": {
+      "conductivity": 21000000.0,
+      "relative_permeability": 1.0,
+      "roughness": {
+       "kind": "smooth"
+      }
+     }
+    },
+    "reference_ohms": 50.0,
+    "schema": "sipi.two-ground-linear-corner-face-panel-transmission-line/1"
+   },
+   "input_sha256": "84be08f415c376823f28dbd72c8651a55597039b974407477c991075272acdd5",
+   "study": {
+    "ubuntu-latest/source": {
+     "passed": true,
+     "seconds_whole_test": 1220.87,
+     "worst_difference_over_allowance": 0.0016585064784304811
+    },
+    "ubuntu-latest/installed": {
+     "passed": true,
+     "seconds_whole_test": 2106.822,
+     "worst_difference_over_allowance": 0.0016585064784304811
+    },
+    "macos-15/source": {
+     "passed": true,
+     "seconds_whole_test": 1302.109,
+     "worst_difference_over_allowance": 0.0016585064770536717
+    },
+    "macos-15/installed": {
+     "passed": true,
+     "seconds_whole_test": 1256.789,
+     "worst_difference_over_allowance": 0.0016585064770536717
+    },
+    "windows-latest/source": {
+     "passed": true,
+     "seconds_whole_test": 2718.603,
+     "worst_difference_over_allowance": 0.001658506478345495
+    },
+    "windows-latest/installed": {
+     "passed": true,
+     "seconds_whole_test": 2080.342,
+     "worst_difference_over_allowance": 0.001658506478328498
+    }
+   },
+   "variants": [
+    {
+     "dielectric_mesh": {
+      "nodes_float64_le_sha256": "04dac063fcbe22814904df8bf3308fec149a8fe043bec722c08180a15863f3a0",
+      "triangles_int64_le_sha256": "3b977699f0ebb2d2d04b7b94ce27d30cf3a55334ab8d73b471f1843e7c99bd1b"
+     },
+     "recorded_by": [
+      "ubuntu-latest/source",
+      "ubuntu-latest/installed",
+      "windows-latest/source",
+      "windows-latest/installed"
+     ],
+     "quantities": {
+      "R_ohm_per_m": [
+       [
+        [
+         20.902243709830405
+        ]
+       ]
+      ],
+      "L_h_per_m": [
+       [
+        [
+         3.994013362572247e-07
+        ]
+       ]
+      ],
+      "C0_f_per_m": [
+       [
+        2.7974447703685623e-11
+       ]
+      ],
+      "impedance_real_ohm": [
+       59.74407381701221
+      ]
+     },
+     "local_check_matrix_relative": 3.3993610715864403e-16
+    },
+    {
+     "dielectric_mesh": {
+      "nodes_float64_le_sha256": "9669051a0d1509abd87da2eabcc89ad9018c7199746944657525284a32d0c8d8",
+      "triangles_int64_le_sha256": "1169eaca93135ad9ea9dcf8424f43a81514c2c96f26eb0fafeb15063630e367e"
+     },
+     "recorded_by": [
+      "macos-15/source",
+      "macos-15/installed"
+     ],
+     "quantities": {
+      "R_ohm_per_m": [
+       [
+        [
+         20.90224370983069
+        ]
+       ]
+      ],
+      "L_h_per_m": [
+       [
+        [
+         3.994013362572253e-07
+        ]
+       ]
+      ],
+      "C0_f_per_m": [
+       [
+        2.797444770368559e-11
+       ]
+      ],
+      "impedance_real_ohm": [
+       59.74407381701229
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "index": 1,
+   "input": {
+    "conductors": {
+     "signal": {
+      "bottom": {
+       "conductivity": 58000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "left": {
+       "conductivity": 21000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "right": {
+       "conductivity": 45000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "top": {
+       "conductivity": 35000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      }
+     }
+    },
+    "cross_section": {
+     "box": {
+      "bottom": "ground",
+      "sides": "open",
+      "top": "ground",
+      "width": 0.008
+     },
+     "layers": [
+      {
+       "eps_r": 4.0,
+       "name": "dielectric",
+       "tan_delta": 0.003,
+       "thickness": 0.002
+      }
+     ],
+     "length_unit": "m",
+     "mesh": {
+      "edge_size": 5e-06,
+      "far_size": 0.0001,
+      "grade": 0.05,
+      "min_angle": 28.0
+     },
+     "schema": "sipi.cross-section/1",
+     "traces": [
+      {
+       "ground": false,
+       "name": "signal",
+       "thickness": 5e-05,
+       "width": 0.0006000000000000001,
+       "x": 0.0,
+       "y": 0.0007
+      }
+     ]
+    },
+    "frequency_hz": [
+     2000000000.0
+    ],
+    "ground_thickness_m": 3.5e-05,
+    "length_m": 0.0,
+    "materials": {},
+    "panel": {
+     "ground_modes": 256,
+     "interpolation_degree": 24,
+     "panels_per_edge": 32
+    },
+    "reference": {
+     "bottom": {
+      "conductivity": 58000000.0,
+      "relative_permeability": 1.0,
+      "roughness": {
+       "kind": "smooth"
+      }
+     },
+     "conductors": {},
+     "kind": "surfaces",
+     "sides": null,
+     "top": {
+      "conductivity": 21000000.0,
+      "relative_permeability": 1.0,
+      "roughness": {
+       "kind": "smooth"
+      }
+     }
+    },
+    "reference_ohms": 50.0,
+    "schema": "sipi.two-ground-linear-corner-face-panel-transmission-line/1"
+   },
+   "input_sha256": "818a975537c25a6542b056d3cdd6dc6e08945054487a3957268e151510473098",
+   "study": {
+    "ubuntu-latest/source": {
+     "passed": true,
+     "seconds_whole_test": 1220.87,
+     "worst_difference_over_allowance": 0.0021054746878642317
+    },
+    "ubuntu-latest/installed": {
+     "passed": true,
+     "seconds_whole_test": 2106.822,
+     "worst_difference_over_allowance": 0.0021054746878642317
+    },
+    "macos-15/source": {
+     "passed": true,
+     "seconds_whole_test": 1302.109,
+     "worst_difference_over_allowance": 0.002105474686085002
+    },
+    "macos-15/installed": {
+     "passed": true,
+     "seconds_whole_test": 1256.789,
+     "worst_difference_over_allowance": 0.002105474686085002
+    },
+    "windows-latest/source": {
+     "passed": true,
+     "seconds_whole_test": 2718.603,
+     "worst_difference_over_allowance": 0.002105474687882388
+    },
+    "windows-latest/installed": {
+     "passed": true,
+     "seconds_whole_test": 2080.342,
+     "worst_difference_over_allowance": 0.002105474687882388
+    }
+   },
+   "variants": [
+    {
+     "dielectric_mesh": {
+      "nodes_float64_le_sha256": "8594ec383f4165a6945ae20f9d950071a73130e7237cc8facdcd0686f77dd2c2",
+      "triangles_int64_le_sha256": "94f98820a11560d3bced9a6b3936a0f2aac74f4fed49cca69f63040ff863e62a"
+     },
+     "recorded_by": [
+      "ubuntu-latest/source",
+      "ubuntu-latest/installed",
+      "windows-latest/source",
+      "windows-latest/installed"
+     ],
+     "quantities": {
+      "R_ohm_per_m": [
+       [
+        [
+         19.569487244963902
+        ]
+       ]
+      ],
+      "L_h_per_m": [
+       [
+        [
+         3.8480375721111166e-07
+        ]
+       ]
+      ],
+      "C0_f_per_m": [
+       [
+        2.9032232575149347e-11
+       ]
+      ],
+      "impedance_real_ohm": [
+       57.56389609986376
+      ]
+     },
+     "local_check_matrix_relative": 1.8154352407545945e-16
+    },
+    {
+     "dielectric_mesh": {
+      "nodes_float64_le_sha256": "a107437b6498062384747f096ce74f158884998cb8692209259cef9386c92762",
+      "triangles_int64_le_sha256": "3624506a1909c60d55a1213e0c79ddccc66e306866f1e40fd34fd3cb1e64fbb0"
+     },
+     "recorded_by": [
+      "macos-15/source",
+      "macos-15/installed"
+     ],
+     "quantities": {
+      "R_ohm_per_m": [
+       [
+        [
+         19.569487244964165
+        ]
+       ]
+      ],
+      "L_h_per_m": [
+       [
+        [
+         3.84803757211112e-07
+        ]
+       ]
+      ],
+      "C0_f_per_m": [
+       [
+        2.9032232575149318e-11
+       ]
+      ],
+      "impedance_real_ohm": [
+       57.56389609986382
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "index": 2,
+   "input": {
+    "conductors": {
+     "signal": {
+      "bottom": {
+       "conductivity": 58000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "left": {
+       "conductivity": 21000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "right": {
+       "conductivity": 45000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      },
+      "top": {
+       "conductivity": 35000000.0,
+       "relative_permeability": 1.0,
+       "roughness": {
+        "kind": "smooth"
+       }
+      }
+     }
+    },
+    "cross_section": {
+     "box": {
+      "bottom": "ground",
+      "sides": "open",
+      "top": "ground",
+      "width": 0.008
+     },
+     "layers": [
+      {
+       "eps_r": 4.0,
+       "name": "dielectric",
+       "tan_delta": 0.003,
+       "thickness": 0.002
+      }
+     ],
+     "length_unit": "m",
+     "mesh": {
+      "edge_size": 5e-06,
+      "far_size": 0.0001,
+      "grade": 0.05,
+      "min_angle": 28.0
+     },
+     "schema": "sipi.cross-section/1",
+     "traces": [
+      {
+       "ground": false,
+       "name": "signal",
+       "thickness": 5e-05,
+       "width": 0.00065,
+       "x": 0.0,
+       "y": 0.0007
+      }
+     ]
+    },
+    "frequency_hz": [
+     2000000000.0
+    ],
+    "ground_thickness_m": 3.5e-05,
+    "length_m": 0.0,
+    "materials": {},
+    "panel": {
+     "ground_modes": 256,
+     "interpolation_degree": 24,
+     "panels_per_edge": 32
+    },
+    "reference": {
+     "bottom": {
+      "conductivity": 58000000.0,
+      "relative_permeability": 1.0,
+      "roughness": {
+       "kind": "smooth"
+      }
+     },
+     "conductors": {},
+     "kind": "surfaces",
+     "sides": null,
+     "top": {
+      "conductivity": 21000000.0,
+      "relative_permeability": 1.0,
+      "roughness": {
+       "kind": "smooth"
+      }
+     }
+    },
+    "reference_ohms": 50.0,
+    "schema": "sipi.two-ground-linear-corner-face-panel-transmission-line/1"
+   },
+   "input_sha256": "c4231ce42943a0e970f71f07f6706b4b6de1d6ca34220acc513bc5b498e2355a",
+   "study": {
+    "ubuntu-latest/source": {
+     "passed": true,
+     "seconds_whole_test": 1220.87,
+     "worst_difference_over_allowance": 0.0025528739419797847
+    },
+    "ubuntu-latest/installed": {
+     "passed": true,
+     "seconds_whole_test": 2106.822,
+     "worst_difference_over_allowance": 0.0025528739419797847
+    },
+    "macos-15/source": {
+     "passed": true,
+     "seconds_whole_test": 1302.109,
+     "worst_difference_over_allowance": 0.0025528739404935075
+    },
+    "macos-15/installed": {
+     "passed": true,
+     "seconds_whole_test": 1256.789,
+     "worst_difference_over_allowance": 0.0025528739404935075
+    },
+    "windows-latest/source": {
+     "passed": true,
+     "seconds_whole_test": 2718.603,
+     "worst_difference_over_allowance": 0.0025528739419604846
+    },
+    "windows-latest/installed": {
+     "passed": true,
+     "seconds_whole_test": 2080.342,
+     "worst_difference_over_allowance": 0.002552873941921881
+    }
+   },
+   "variants": [
+    {
+     "dielectric_mesh": {
+      "nodes_float64_le_sha256": "165b3d138330f45d9c0458708a506826f8d512b546591c678e9d3ff8ca177c62",
+      "triangles_int64_le_sha256": "31e6abd648cb1605716012a88ad86b651106fee7ecb0a9b0704beaf460928a4f"
+     },
+     "recorded_by": [
+      "ubuntu-latest/source",
+      "ubuntu-latest/installed",
+      "windows-latest/source",
+      "windows-latest/installed"
+     ],
+     "quantities": {
+      "R_ohm_per_m": [
+       [
+        [
+         18.406989975738007
+        ]
+       ]
+      ],
+      "L_h_per_m": [
+       [
+        [
+         3.7137531126628897e-07
+        ]
+       ]
+      ],
+      "C0_f_per_m": [
+       [
+        3.0078896575958245e-11
+       ]
+      ],
+      "impedance_real_ohm": [
+       55.557952486794555
+      ]
+     },
+     "local_check_matrix_relative": 1.9300894298759778e-16
+    },
+    {
+     "dielectric_mesh": {
+      "nodes_float64_le_sha256": "a91ed67a229d2924c3682c682f5be72999c0935bf2265c2fd8b287aa74603ce2",
+      "triangles_int64_le_sha256": "e2de4dc93908cf14aa3833dcfc260e7cc62cf398f1221518175fa53eaab75321"
+     },
+     "recorded_by": [
+      "macos-15/source",
+      "macos-15/installed"
+     ],
+     "quantities": {
+      "R_ohm_per_m": [
+       [
+        [
+         18.40698997573824
+        ]
+       ]
+      ],
+      "L_h_per_m": [
+       [
+        [
+         3.713753112662894e-07
+        ]
+       ]
+      ],
+      "C0_f_per_m": [
+       [
+        3.007889657595821e-11
+       ]
+      ],
+      "impedance_real_ohm": [
+       55.557952486794626
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}
