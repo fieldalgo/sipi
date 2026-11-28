@@ -362,7 +362,7 @@ def saved_controls(request):
             sampling=sampling, quantity=quantity, mesh=doc.mesh_options)
     else:
         settings = network_settings(request['network'])
-        editable = TemplateSectionDocument(request['template'], request['parameters'], mesh=doc.mesh_options)
+        editable = TemplateSectionDocument(request['template'], request['parameters'], mesh=doc.mesh_options, schema='sipi.template-section/1')
         saved = QuasistaticLineDocument(editable, np.linspace(settings['start_hz'], settings['stop_hz'], settings['points']),
             resistance=settings['resistance'], length=settings['length'], z_ref=settings['z_ref'])
     return dict(engine=engine_info(), document=doc.to_dict(), document_text=saved.dumps())
@@ -495,7 +495,7 @@ def execute(request, *, record_provider=None):
             if not required <= request.keys() or not request.keys() <= required | {'mesh'}:
                 raise ValueError('Saving an editable design needs template, parameters and optional mesh.')
             editable = TemplateSectionDocument(request['template'], request['parameters'],
-                                               mesh=request.get('mesh'))
+                                               mesh=request.get('mesh'), schema='sipi.template-section/1')
         if editable.template not in TEMPLATES:
             raise ValueError('This workspace has no editable form for that template; use Saved analysis.')
         return {'engine': engine_info(), 'document_text': editable.dumps(),

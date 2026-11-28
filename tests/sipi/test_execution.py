@@ -530,7 +530,9 @@ def documents():
         relaxation_hz=[1e6], angles_rad=[0.], max_error=.01))
     from sipi.template_document import TemplateSectionDocument
     base.append(TemplateSectionDocument('stripline',
-        dict(width=.5e-3, plane_spacing=1e-3, eps_r=4)))
+        dict(width=.5e-3, plane_spacing=1e-3, eps_r=4), schema='sipi.template-section/1'))
+    base.append(TemplateSectionDocument('microstrip',
+        dict(width=.3e-3, substrate_height=.2e-3, eps_r=4), schema='sipi.template-section/2'))
     refined_goal = goals()[0].to_dict()
     refined_goal.update(schema='sipi.impedance-design/4', search_tolerance_ohm=.25)
     base.append(ImpedanceDesignDocument.from_dict(refined_goal))

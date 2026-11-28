@@ -6,7 +6,7 @@ def parameters(**changes):
  return dict(dict(width=.0003000000000123456,gap=.0002000000000123456,
   plane_spacing=.001,thickness=.000035,offset=-.0001000000000123456,
   eps_r=4.,tan_delta=.02,box_width=.006),**changes)
-def editable(**changes):return TemplateSectionDocument(NAME,parameters(**changes),mesh=COARSE).to_dict()
+def editable(**changes):return TemplateSectionDocument(NAME,parameters(**changes),mesh=COARSE, schema='sipi.template-section/1').to_dict()
 if __name__=='__main__':
  import json
  print(json.dumps(editable()))

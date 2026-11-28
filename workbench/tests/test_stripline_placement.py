@@ -38,7 +38,7 @@ def test_independent_target_retains_placement_and_both_mesh_residuals(explicit_m
     assert all(t['y'] == PARAMS['trace_height'] for t in result['document']['traces'])
     assert result['line']['z_diff'] == design['impedance']
     if explicit_mesh:
-        assert result['document']['mesh'] == TemplateSectionDocument('coupled_stripline', PARAMS, mesh=FINE).cross_section.to_dict()['mesh']
+        assert result['document']['mesh'] == TemplateSectionDocument('coupled_stripline', PARAMS, mesh=FINE, schema='sipi.template-section/1').cross_section.to_dict()['mesh']
 
 
 @pytest.mark.parametrize('mode', ['sweep', 'corners', 'monte_carlo'])
@@ -50,7 +50,7 @@ def test_explicit_height_study_preserves_spacing_and_mesh(mode):
     assert result['failed'] == 0 and result['status'] == 'complete' and result['quantity'] == 'z_diff'
     assert len(result['rows']) == (4 if mode == 'corners' else 3)
     for row in result['rows']:
-        expected = TemplateSectionDocument('coupled_stripline', {**PARAMS, **row['parameters']}, mesh=COARSE)
+        expected = TemplateSectionDocument('coupled_stripline', {**PARAMS, **row['parameters']}, mesh=COARSE, schema='sipi.template-section/1')
         assert row['document'] == expected.cross_section.to_dict()
         assert all(t['y'] == row['parameters']['trace_height'] for t in row['document']['traces'])
         assert row['impedance'] == row['line']['z_diff']

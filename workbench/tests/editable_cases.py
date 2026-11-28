@@ -19,7 +19,7 @@ for name in ('microstrip', 'stripline', 'offset_stripline', 'coupled_microstrip'
     if name in ('coupled_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(ground_gap=.0002500000000123456, thickness=.000035, top_width=.0004)
     if name in ('coated_microstrip', 'coupled_coated_microstrip', 'coated_grounded_coplanar', 'coupled_coated_grounded_coplanar'): p.update(thickness=.000035, top_width=.0004,
         coating_height=.0002, coating_eps_r=3, coating_tan_delta=.02)
-    doc = TemplateSectionDocument(name, p, mesh=dict(edge_size=8e-6, far_size=.00025, grade=.3))
+    doc = TemplateSectionDocument(name, p, mesh=dict(edge_size=8e-6, far_size=.00025, grade=.3), schema='sipi.template-section/1')
     cases.append(doc.to_dict())
 # Keep a valid engine document whose editable form is not yet implemented.
 # Fail while generating fixtures if the workspace gains that form; otherwise
@@ -28,12 +28,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'desktop'))
 from engine import TEMPLATES
 unsupported = TemplateSectionDocument('layered_broadside_stripline', dict(
     width=.0005, gap=.0002, thickness=.000035, lower_height=.0003,
-    upper_height=.0004, lower_eps_r=3, gap_eps_r=4, upper_eps_r=5))
+    upper_height=.0004, lower_eps_r=3, gap_eps_r=4, upper_eps_r=5), schema='sipi.template-section/1')
 assert unsupported.template not in TEMPLATES, 'Choose a still-unsupported editable form fixture.'
 unsupported_project = SavedProject(SavedExecutionRequest(unsupported.dumps()),
     project_id='unsupported', design_id='a', title='Unsupported form', label='A')
 base = TemplateSectionDocument('stripline',dict(width=.0005,plane_spacing=.001,eps_r=4),
-    mesh=dict(edge_size=16e-6,far_size=.0005,grade=.3))
+    mesh=dict(edge_size=16e-6,far_size=.0005,grade=.3), schema='sipi.template-section/1')
 request = SavedExecutionRequest(base.dumps())
 # Synthetic artifact declaration for a browser fixture, not runtime provenance.
 record = SavedExecutionRecord(request, request.run(), run_id='fixture:run', artifacts=[

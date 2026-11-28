@@ -92,6 +92,23 @@ assert study.to_dict()['parameters'] == edited.parameters
 python -m pytest -q tests/sipi/test_template_document.py tests/sipi/test_execution_request.py tests/sipi/test_execution_record.py tests/sipi/test_project.py
 ```
 
+## 버전 2: v2 상자
+
+새 문서는 버전 2입니다(2026-11-28부터). `TemplateSectionDocument(template, parameters)`는
+`TemplateSectionDocument(template, parameters, schema='sipi.template-section/2')`와 같고
+[v2 기본 상자](design.md)로 단면을 만들고, 해석된 `box_width`·`air_height`·`lower_air_height`(템플릿에 있는 것)를
+`parameters`에 적어 이후 어떤 상자 규칙에서도 같은 기하로 다시 열리게 합니다. `box_rule: "v2"`를 더하며,
+열 때 다른 규칙이나 null 상자 인자는 거부합니다. 기존 버전 1 문서는 그대로 열리고 결과도 같으며, 버전 1을
+새로 만들려면 `schema='sipi.template-section/1'`을 주세요. 버전 1은 네 필드를 유지하고 `sipi.templates.box_rule`과
+관계없이 v1 상자로 만듭니다. 동결한 42개 fixture는 바뀌지 않습니다. 공통 실행은 두 버전을 모두 받으며,
+`sipi.quasistatic-line/1` 문서에는 버전 1만 넣을 수 있습니다. workbench는 계속 v1 상자의 버전 1 문서를 만들고 엽니다.
+
+```python
+from sipi.template_document import TemplateSectionDocument
+doc = TemplateSectionDocument('microstrip', dict(width=.3e-3, substrate_height=.2e-3, eps_r=4.))
+doc.to_dict()['schema'], doc.parameters['box_width'], doc.parameters['air_height']   # 'sipi.template-section/2'; 0.016, 0.008 (80 h, 40 h)
+```
+
 동결한 42개 fixture는 기존 factory의 기본 인자·정확한 기하·메시를 기록하며
 사다리꼴·층상·코팅·유한 ground 사례를 포함합니다. 이는 **기존 기하 회귀 기준**이며
 독립 물리 정답은 아닙니다. 별도로 직접·저장 실행의 실제 행렬, 독립 Cohn

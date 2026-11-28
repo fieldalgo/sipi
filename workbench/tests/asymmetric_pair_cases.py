@@ -16,4 +16,4 @@ def parameters(name,**changes):
  if not buried:p['air_height']=.0060000000000123456
  return {**p,**changes}
 if __name__=='__main__':
- print(json.dumps({n:TemplateSectionDocument(n,parameters(n),mesh=COARSE).to_dict() for n in NAMES}))
+ print(json.dumps({n:TemplateSectionDocument(n,parameters(n),mesh=COARSE, schema='sipi.template-section/1').to_dict() for n in NAMES}))

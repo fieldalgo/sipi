@@ -16,7 +16,7 @@ for row in cases:
  name=row['template']
  if name not in LAYERED_SURFACE_TEMPLATES: continue
  p=row['resolved_parameters'];base=dict(template=name,parameters=p,mesh=mesh)
- doc=TemplateSectionDocument(name,p,mesh=mesh);path=root/(name+'.json');path.write_text(doc.dumps())
+ doc=TemplateSectionDocument(name,p,mesh=mesh, schema='sipi.template-section/1');path=root/(name+'.json');path.write_text(doc.dumps())
  network=execute(dict(**base,action='network-document',network=settings))['document_text']
  network_path=root/(name+'-network.json');network_path.write_text(network)
  direct=execute(dict(**base,action='network',network=settings))

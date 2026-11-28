@@ -44,7 +44,7 @@ def test_automatic_width_goal_against_independent_free_space_reference(factory):
     assert goal['width']==pytest.approx(.5e-3,rel=.04) and goal['history'][-1]['stage']=='refinement'
     assert result['line'][quantity(factory)]==goal['impedance']
     mesh=factory(**p).mesh_settings();mesh['far_size']/=4
-    expected=TemplateSectionDocument(factory.__name__,{**p,'width':goal['width']},mesh=mesh)
+    expected=TemplateSectionDocument(factory.__name__,{**p,'width':goal['width']},mesh=mesh, schema='sipi.template-section/1')
     assert result['document']==expected.cross_section.to_dict()
     assert abs(goal['refined_impedance']/target-1)<abs(goal['impedance']/target-1)<.02
     outer=factory(**{**p,'width':goal['width'],'air_height':.024,
@@ -80,7 +80,7 @@ def test_coating_studies_keep_domain_grounds_and_nominal_mesh(factory,mode):
     assert result['failed']==0 and result['status']=='complete' and result['quantity']==quantity(factory)
     assert len(result['rows'])==(4 if mode=='corners' else 2)
     for row in result['rows']:
-        direct=TemplateSectionDocument(factory.__name__,{**p,**row['parameters']},mesh=COARSE)
+        direct=TemplateSectionDocument(factory.__name__,{**p,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==direct.cross_section.to_dict() and row['impedance']==row['line'][quantity(factory)]
         signals=[t for t in direct.section.traces if not t.ground];grounds=[t for t in direct.section.traces if t.ground]
         assert len(grounds)==2 and all(not t.tapered for t in grounds)

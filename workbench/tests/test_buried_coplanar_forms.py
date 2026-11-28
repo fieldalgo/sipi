@@ -17,7 +17,7 @@ def test_explicit_height_ground_geometry_and_precise_saved_roundtrip(name,top,mo
  monkeypatch.setattr(sipi.CrossSection,'mesh',lambda *a,**kw:pytest.fail('Document operation solved'))
  p={**parameters(name),'top_width':top};result=execute(dict(action='template-document',template=name,parameters=p,mesh=COARSE))
  assert execute(dict(action='template-open',text=result['document_text']))==result
- assert result['parameters']==TemplateSectionDocument(name,p,mesh=COARSE).to_dict()['parameters']
+ assert result['parameters']==TemplateSectionDocument(name,p,mesh=COARSE, schema='sipi.template-section/1').to_dict()['parameters']
  d=result['document'];assert d['box']==dict(width=.006,bottom='ground',top='ground',sides='open')
  assert len(d['layers'])==1 and d['layers'][0]['name']=='dielectric'
  traces=d['traces'];grounds=[t for t in traces if t['ground']];signals=[t for t in traces if not t['ground']]
@@ -58,7 +58,7 @@ def test_height_and_gap_studies_preserve_fixed_mesh_and_all_ground_heights(name,
  assert s['status']=='complete' and s['failed']==0 and s['quantity']==quantity(name)
  assert len(s['rows'])==(4 if mode=='corners' else 2)
  for row in s['rows']:
-  d=TemplateSectionDocument(name,{**p,**row['parameters']},mesh=COARSE).cross_section.to_dict()
+  d=TemplateSectionDocument(name,{**p,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1').cross_section.to_dict()
   assert row['document']==d and row['impedance']==row['line'][quantity(name)]
   assert all(t['y']==row['parameters']['trace_height'] for t in d['traces'])
 
@@ -82,7 +82,7 @@ def test_automatic_width_target_retains_height_and_outer_convergence(name):
  assert d['history'][-1]['stage']=='refinement' and .00015<=d['width']<=.00065
  assert out['line'][quantity(name)]==d['impedance']
  chosen={**p,'width':d['width']};mesh=getattr(sipi,name)(**p).mesh_settings();mesh['edge_size']/=2;mesh['far_size']/=4
- assert out['document']==TemplateSectionDocument(name,chosen,mesh=mesh).cross_section.to_dict()
+ assert out['document']==TemplateSectionDocument(name,chosen,mesh=mesh, schema='sipi.template-section/1').cross_section.to_dict()
  outer=getattr(sipi,name)(**{**chosen,'box_width':.012}).analyze(**mesh)
  value=outer.even_odd()['z_diff'] if name==NAMES[1] else outer.z0
  assert value==pytest.approx(d['impedance'],rel=.005)

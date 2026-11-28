@@ -98,6 +98,28 @@ input byte limits and saved request/project identity remain in force.
 python -m pytest -q tests/sipi/test_template_document.py tests/sipi/test_execution_request.py tests/sipi/test_execution_record.py tests/sipi/test_project.py
 ```
 
+## Version 2: v2 boxes
+
+New documents are version 2 (since 2026-11-28):
+`TemplateSectionDocument(template, parameters)` equals
+`TemplateSectionDocument(template, parameters, schema='sipi.template-section/2')` and
+builds the section with the [v2 default boxes](design.md) and writes the
+resolved `box_width`, `air_height` and `lower_air_height` (those the template
+has) into `parameters`, so the saved document rebuilds the same geometry under
+any later box rule. It adds `box_rule: "v2"`, and loading refuses a different
+rule or a null box parameter. Existing version 1 documents load and give the
+same results; pass `schema='sipi.template-section/1'` to create one. Version 1
+keeps its four fields and builds v1 boxes whatever `sipi.templates.box_rule`
+says; the frozen 42-case fixture is unchanged. Shared execution accepts both
+versions; a `sipi.quasistatic-line/1` document nests version 1 only. The
+workbench still creates and opens version 1 documents with v1 boxes.
+
+```python
+from sipi.template_document import TemplateSectionDocument
+doc = TemplateSectionDocument('microstrip', dict(width=.3e-3, substrate_height=.2e-3, eps_r=4.))
+doc.to_dict()['schema'], doc.parameters['box_width'], doc.parameters['air_height']   # 'sipi.template-section/2'; 0.016, 0.008 (80 h, 40 h)
+```
+
 The frozen 42-case fixture records the preceding factories' exact defaults,
 geometry and mesh, including tapered, layered, coated and finite-ground cases.
 It is an **existing-geometry regression reference**, not independent physical

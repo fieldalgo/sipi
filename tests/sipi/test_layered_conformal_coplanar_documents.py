@@ -44,7 +44,7 @@ def study(i,kind='sweep',**changes):
 @pytest.mark.parametrize('i',range(6),ids=NAMES)
 def test_prepare_all_saved_sampling_without_solving(i,monkeypatch):
  monkeypatch.setattr(CrossSection,'mesh',lambda *a,**k:pytest.fail('Preparing input solved fields'))
- d=TemplateSectionDocument(NAMES[i],parameters(i),mesh=COARSE)
+ d=TemplateSectionDocument(NAMES[i],parameters(i),mesh=COARSE, schema='sipi.template-section/1')
  assert normalize_saved(d.dumps())==d.dumps() and TemplateSectionDocument.loads(d.dumps()).dumps()==d.dumps()
  for kind in ['sweep','corners','uniform','normal']:
   d=study(i,kind);assert normalize_saved(d.dumps())==d.dumps()

@@ -21,7 +21,7 @@ def test_coating_parameters_mesh_and_editable_roundtrip_without_solving(taper, m
     parameters={**PHYSICAL, 'top_width':taper, 'coating_height':.0001000000000123456}
     result=execute(dict(action='template-document',template='coupled_coated_grounded_coplanar',parameters=parameters,mesh=COARSE))
     assert execute(dict(action='template-open',text=result['document_text']))==result
-    assert result['parameters']==TemplateSectionDocument('coupled_coated_grounded_coplanar',parameters,mesh=COARSE).parameters
+    assert result['parameters']==TemplateSectionDocument('coupled_coated_grounded_coplanar',parameters,mesh=COARSE, schema='sipi.template-section/1').parameters
     edited=execute(dict(action='template-document',template='coupled_coated_grounded_coplanar',parameters={**parameters,'width':.55e-3},mesh=COARSE))
     assert edited['document']['mesh']==result['document']['mesh']
     assert edited['parameters']['coating_height']==parameters['coating_height']
@@ -37,7 +37,7 @@ def test_independent_width_target_preserves_coating_and_both_residuals(explicit_
     assert abs(goal['residual'])<=1 and abs(goal['refined_residual'])<=1
     assert goal['width']==pytest.approx(.5e-3,rel=.04) and goal['history'][-1]['stage']=='refinement'
     assert result['line']['z_diff']==goal['impedance']
-    expected=TemplateSectionDocument('coupled_coated_grounded_coplanar',{**VACUUM,'width':goal['width']},mesh=result['document']['mesh'])
+    expected=TemplateSectionDocument('coupled_coated_grounded_coplanar',{**VACUUM,'width':goal['width']},mesh=result['document']['mesh'], schema='sipi.template-section/1')
     assert result['document']==expected.cross_section.to_dict()
     if explicit_mesh:assert result['document']['mesh']==sipi.coupled_coated_grounded_coplanar(**VACUUM).mesh_settings(**VACUUM_FINE)
 
@@ -51,7 +51,7 @@ def test_coating_study_preserves_geometry_and_frozen_nominal_mesh(mode):
     assert result['failed']==0 and result['status']=='complete' and result['quantity']=='z_diff'
     assert len(result['rows'])==(4 if mode=='corners' else 3)
     for row in result['rows']:
-        expected=TemplateSectionDocument('coupled_coated_grounded_coplanar',{**PHYSICAL,**row['parameters']},mesh=COARSE)
+        expected=TemplateSectionDocument('coupled_coated_grounded_coplanar',{**PHYSICAL,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==expected.cross_section.to_dict()
         assert row['impedance']==row['line']['z_diff']
         assert row['document']['layers'][1]['tan_delta']==PHYSICAL['coating_tan_delta']
@@ -85,7 +85,7 @@ def test_finite_ground_studies_retain_rectangular_ground_geometry(parameter,lowe
         study=dict(mode='sweep',variables=[dict(parameter=parameter,lower=lower,upper=upper)],points=2,seed=42)))['study']
     assert result['failed']==0 and result['quantity']=='z_diff'
     for row in result['rows']:
-        doc=TemplateSectionDocument('coupled_coated_grounded_coplanar',{**PHYSICAL,**row['parameters']},mesh=COARSE)
+        doc=TemplateSectionDocument('coupled_coated_grounded_coplanar',{**PHYSICAL,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==doc.cross_section.to_dict()
         signals=[t for t in doc.section.traces if not t.ground]
         grounds=[t for t in doc.section.traces if t.ground]

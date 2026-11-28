@@ -19,7 +19,7 @@ def nominal():
 
 
 def test_factory_positions_and_vacuum_invariants(nominal):
-    direct=TemplateSectionDocument('coupled_grounded_coplanar',PARAMS,mesh=COARSE)
+    direct=TemplateSectionDocument('coupled_grounded_coplanar',PARAMS,mesh=COARSE, schema='sipi.template-section/1')
     assert nominal['document']==direct.cross_section.to_dict()
     traces=nominal['document']['traces']
     assert [t['ground'] for t in traces]==[False,False,True,True]
@@ -76,7 +76,7 @@ def test_ground_dimensions_in_studies_preserve_nominal_mesh(mode):
     assert result['quantity']=='z_diff' and result['failed']==0 and result['status']=='complete'
     assert len(result['rows'])==(4 if mode=='corners' else 3)
     for row in result['rows']:
-        direct=TemplateSectionDocument('coupled_grounded_coplanar',{**PARAMS,**row['parameters']},mesh=COARSE)
+        direct=TemplateSectionDocument('coupled_grounded_coplanar',{**PARAMS,**row['parameters']},mesh=COARSE, schema='sipi.template-section/1')
         assert row['document']==direct.cross_section.to_dict()
         assert row['impedance']==row['line']['z_diff']
 
