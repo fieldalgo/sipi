@@ -423,8 +423,11 @@ class CrossSection:
         far_size:  largest edge length (default: max(width, height) / 24)
         grade:     growth of the edge length per unit distance from the traces
 
-        The defaults stayed within 0.5 % in impedance on the validation cases;
-        halve edge_size, grade and far_size together to check convergence.
+        Default and refined impedances stayed within 0.5 % of each other on
+        the validation cases; that is a sensitivity, not the error. Against
+        independent references the default Z0 was 0.13-0.52 % low, about
+        1.4-1.8 times the default/refined difference (docs: default-mesh).
+        Halve edge_size, grade and far_size together to check convergence.
         """
         settings = self.mesh_settings(edge_size=edge_size, far_size=far_size,
                                       grade=grade, min_angle=min_angle, corner_size=corner_size)
