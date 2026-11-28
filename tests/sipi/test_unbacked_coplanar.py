@@ -4,6 +4,7 @@
 import importlib.metadata as metadata
 import numpy as np
 import pytest
+from sipi.templates import box_rule
 from scipy.constants import epsilon_0,c
 from scipy.integrate import quad
 from scipy.linalg import solve
@@ -166,7 +167,8 @@ def test_geometry_material_areas_open_boundaries_and_json(factory):
     assert all(t.y==pytest.approx(.0065) for t in section.traces)
     assert sum(t.ground for t in section.traces)==2
     assert all(t.top_width is None for t in section.traces if t.ground)
-    automatic=factory(**dict(params(factory),lower_air_height=None))
+    with box_rule('v1'):  # v1 results fixed: recorded with the v1 default template boxes (sipi.templates.box_rule, 2026-11-28).
+        automatic=factory(**dict(params(factory),lower_air_height=None))
     assert automatic.layers[0].thickness==pytest.approx(.005)
     doc=CrossSectionDocument(section,mesh=COARSE)
     restored=CrossSectionDocument.loads(doc.dumps())

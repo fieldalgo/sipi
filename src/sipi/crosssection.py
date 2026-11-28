@@ -428,7 +428,7 @@ class CrossSection:
             source = (f"the default edge_size is {name} ({length:.4g} m) / {divisor:g}; "
                       "the default takes the smallest layer thickness, trace width or gap / 100, "
                       "capped at each trace thickness / 10")
-        return (f"SIPI: this cross-section mesh needs more points than the mesher allows, with "
+        hint = (f"SIPI: this cross-section mesh needs more points than the mesher allows, with "
                 f"edge_size {edge:.4g} m, corner_size {corner:.4g} m, grade {grade:g}, "
                 f"far_size {far:.4g} m, min_angle {settings['min_angle']:g} and a "
                 f"{self.width:.4g} m x {self.height:.4g} m box; {source}. The point count grows "
@@ -439,6 +439,19 @@ class CrossSection:
                 "rule), then grade or far_size; narrow the box width or air layer only after "
                 "checking truncation; or refine one setting at a time instead of all three. "
                 "Use the boundary-panel method where its geometry applies.")
+        default_far = max(self.width, self.height) / 24.0
+        if far < 0.5 * default_far:
+            # A fixed far_size on a large box fills the far field first; say so
+            # before the general advice (only then, so other messages are unchanged).
+            hint = hint.replace("SIPI: ", (
+                f"SIPI: far_size {far:.4g} m is small for this {self.width:.4g} m x "
+                f"{self.height:.4g} m box (the default rule would use max(width, height) / 24 = "
+                f"{default_far:.4g} m), so the far field takes most points. Template boxes are "
+                "larger since 2026-11-28 (box rule v2: up to 4 times wider and higher), and a "
+                "fixed far_size grows that part with the box area, up to 16 times. Raise far_size "
+                "in proportion to the box, pass box_width and air_height, or build the template "
+                "under sipi.templates.box_rule('v1'). Otherwise: "), 1)
+        return hint
 
     def mesh(self, *, edge_size: float | None = None, far_size: float | None = None,
              grade: float = 0.15, min_angle: float = 28.0,

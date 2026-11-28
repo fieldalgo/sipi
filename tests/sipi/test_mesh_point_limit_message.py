@@ -47,3 +47,23 @@ def test_thickness_cap_and_explicit_edge_size(monkeypatch):
     with pytest.raises(MeshSizeLimitError, match='edge_size was given explicitly'):
         _section().mesh(edge_size=H / 50)
 
+
+
+def test_small_fixed_far_size_on_a_large_box_is_named_first(monkeypatch):
+    # A v2 template box with a fixed absolute far_size: the far field dominates.
+    _limited(monkeypatch, 50)
+    from sipi import templates
+    section = templates.microstrip(width=.3e-3, substrate_height=.2e-3, eps_r=4.)
+    with pytest.raises(MeshSizeLimitError) as caught:
+        section.mesh(edge_size=2.5e-6, far_size=.1e-3, grade=.05)
+    message = str(caught.value)
+    assert message.startswith('more than 50 points')
+    default = max(section.width, section.height)/24
+    assert f"SIPI: far_size 0.0001 m is small for this {section.width:.4g} m x" in message
+    assert f"max(width, height) / 24 = {default:.4g} m" in message
+    assert "box_rule('v1')" in message and 'Otherwise: this cross-section mesh needs more points' in message
+    # Default far_size (or one at least half of it) keeps the earlier message.
+    with pytest.raises(MeshSizeLimitError) as caught:
+        section.mesh(far_size=default/2)
+    assert 'is small for this' not in str(caught.value)
+    assert 'SIPI: this cross-section mesh needs more points' in str(caught.value)

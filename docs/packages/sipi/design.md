@@ -50,6 +50,24 @@ forms still build v1 boxes, so their results are unchanged. Only
 [`sipi.template-section/2`](template_document.md#version-2-v2-boxes) records v2
 boxes. New design and study versions with v2 boxes are follow-up work.
 
+**Fixed mesh sizes on v2 boxes.** With the default mesh rule (`far_size` =
+max(width, height) / 24) the far field scales with the box, so v2 adds few
+points. A caller that passes an absolute `far_size` and `grade` meshes up to
+16 times the far-field area at that size, and refinement studies that were
+near the 300,000-point mesher limit can pass it. Measured nodes (v1 → v2;
+one thread, openphysics 60322040):
+
+| Section | Default mesh | Default halved | Halved twice | `edge_size` 2.5 µm, `far_size` 0.1 mm, `grade` 0.05 |
+|---|---:|---:|---:|---:|
+| microstrip, w 0.3, h 0.2 mm, 35 µm | 4,099 → 5,500 | 15,441 → 17,979 | 60,627 → 67,871 | 15,891 → 40,204 |
+| coupled microstrip, w 0.5, gap 0.3, h 1 mm, 35 µm | 10,573 → 21,200 | 32,601 → 44,055 | 120,874 → 136,703 | 75,572 → over the limit |
+| grounded coplanar, w 0.3, gap 0.15, h 0.2 mm, 35 µm | 19,206 → 21,073 | 73,213 → 77,191 | 287,503 → over the limit | 41,846 → 66,946 |
+| unbacked coplanar, same dimensions | 20,501 → 21,598 | 78,429 → 81,813 | over the limit under both | 50,321 → 61,420 |
+
+Raise `far_size` in proportion to the box, pass `box_width` and `air_height`,
+or build the template under `box_rule('v1')`. When `far_size` is below half of
+the default rule's value, the point-limit error names this first.
+
 These defaults are starting domains, not truncation guarantees. Enlarge the box
 and air independently to check truncation; also enlarge coplanar ground width.
 
