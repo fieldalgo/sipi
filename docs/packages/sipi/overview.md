@@ -171,7 +171,10 @@ Two errors remain in every result and both are the user's to check:
    conductor; an open-space line lies between the two. Solve both or move the
    walls outward. For the example microstrip, doubling the box width and the
    air layer changed `z0` by 0.14 %, and open and grounded walls differed by
-   0.4 %.
+   0.4 %. Open walls bias microstrip `eps_eff` and Z0 high: about +0.1 to
+   +0.4 % in `eps_eff` with a 40h × 20h box and +0.4 to +1.6 % with the
+   microstrip template's default box; see the
+   [measured table](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/design.md).
 
 ## Validation
 
