@@ -162,7 +162,11 @@ Two errors remain in every result and both are the user's to check:
 
 1. **Discretization.** Halve `edge_size`, `grade` and `far_size` together and
    compare. With the default options, impedance errors on the V3–V5 geometries
-   below were 0.07–0.44 %.
+   below were 0.07–0.44 %. The default/refined difference is a sensitivity,
+   not the error: against independent references the default Z0 was low by
+   0.13–0.52 %, about 1.4–1.8 times that difference, and above 0.5 % for
+   three zero-thickness sections. See
+   [default mesh against independent references](https://github.com/fieldalgo/sipi/blob/main/docs/packages/sipi/default-mesh.md#default-mesh-against-independent-references).
 2. **Box truncation.** An `"open"` wall is an insulator, a `"ground"` wall a
    conductor; an open-space line lies between the two. Solve both or move the
    walls outward. For the example microstrip, doubling the box width and the
