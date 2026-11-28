@@ -29,7 +29,7 @@ from numbers import Real
 import numpy as np
 
 from galerkin import Mesh, from_mesher
-from meshine import Domain, generate, rectangle
+from meshine import Domain, MeshInputError, generate, rectangle
 
 from .polygons import PolygonTrace, DielectricRegion, trace_shape, check_regions, polygon_domain
 from .quasistatic import LineParameters, line_parameters
@@ -349,7 +349,7 @@ class CrossSection:
                         continue
                     for y, values, lo, hi in ((y0, bottom_x, left[0], right[0]),
                                               (y1, top_x, left[1], right[1])):
-                        if thin.y == y:
+                        if self._face_y(thin.y) == y:
                             values.extend(x for x in (thin.x0, thin.x1) if lo < x < hi)
                 polygon = [(x, y0) for x in sorted(set(bottom_x))]
                 polygon += [(x, y1) for x in sorted(set(top_x), reverse=True)]
@@ -357,6 +357,55 @@ class CrossSection:
                 if trace is not None:
                     left = (trace.x+float(trace.width_at(y0))/2, trace.x+float(trace.width_at(y1))/2)
         return domain
+
+    def _merge_distance(self) -> float:
+        """meshine's vertex merge distance for this box (m): 1e-9 of its diagonal."""
+        return 1e-9 * float(np.hypot(self.width, self.height))
+
+    def _face_y(self, y: float) -> float:
+        """Return y, or the inner layer boundary it lies strictly within the merge distance of.
+
+        meshine merges vertices closer than ``_merge_distance`` and then refuses
+        the slab between such a y and the boundary as a zero-length edge, so
+        only inputs that cannot be meshed otherwise are moved. The bottom and
+        top of the stack are not targets: a trace there is refused by placement.
+        """
+        tol = self._merge_distance()
+        for boundary in self.interfaces()[1:-1]:
+            if 0.0 < abs(y - boundary) < tol:
+                return float(boundary)
+        return y
+
+    def _coincidence_hint(self) -> str:
+        """Describe distinct coordinates closer than the merge distance, or return ''."""
+        tol = self._merge_distance()
+        named = [(f"layer boundary {k}", "y", float(v)) for k, v in enumerate(self.interfaces())]
+        for t in self.traces:
+            if isinstance(t, PolygonTrace):
+                continue
+            if t.thickness == 0:
+                named.append((f"trace {t.name!r}", "y", float(t.y)))
+            else:
+                named += [(f"trace {t.name!r} bottom", "y", float(t.y)),
+                          (f"trace {t.name!r} top", "y", float(t.y1))]
+            named += [(f"trace {t.name!r} left edge", "x", float(t.xmin)),
+                      (f"trace {t.name!r} right edge", "x", float(t.xmax))]
+        named += [("left wall", "x", -0.5 * self.width), ("right wall", "x", 0.5 * self.width)]
+        found = []
+        for i, (a, axis_a, va) in enumerate(named):
+            for b, axis_b, vb in named[i + 1:]:
+                if axis_a == axis_b and 0.0 < abs(va - vb) <= tol:
+                    found.append(f"{a} ({axis_a} = {va!r} m) and {b} ({axis_b} = {vb!r} m) "
+                                 f"differ by {abs(va - vb):.3g} m")
+        if not found:
+            return ""
+        return ("SIPI: " + "; ".join(found) + f". Coordinates closer than the mesher's merge "
+                f"distance {tol:.3g} m (1e-9 of the box diagonal) become one point and leave a "
+                "zero-length edge. Make such coordinates exactly equal (for example, compute a "
+                "trace y from the layer thicknesses it sits on) or separate them by more than "
+                "that distance. Without polygon traces or local dielectric regions, a trace face "
+                "within that distance of an inner layer boundary is placed on the boundary; "
+                "these coordinates are not covered by that rule.")
 
     def mesh(self, *, edge_size: float | None = None, far_size: float | None = None,
              grade: float = 0.15, min_angle: float = 28.0,
@@ -387,7 +436,10 @@ class CrossSection:
         ys = set(self.interfaces().tolist())
         for t in self.traces:
             xs.update((t.xmin, t.xmax))
-            ys.update((t.y, t.y1))
+            if self.polygonal:
+                ys.update((t.y, t.y1))
+            else:
+                ys.update((self._face_y(t.y), self._face_y(t.y1)))
         xs, ys = np.array(sorted(xs)), np.array(sorted(ys))
         solids = [t for t in self.traces if t.thickness > 0]
 
@@ -417,8 +469,14 @@ class CrossSection:
             h = np.minimum(corner_size + grade * d_corner, 3.0 * edge_size + grade * d_trace)
             return np.minimum(h, far_size)
 
-        tm = generate(domain, "outer", min_angle=min_angle, size_fn=size_fn,
-                      candidate_order="stable")
+        try:
+            tm = generate(domain, "outer", min_angle=min_angle, size_fn=size_fn,
+                          candidate_order="stable")
+        except MeshInputError as error:
+            hint = self._coincidence_hint()
+            if not hint:
+                raise
+            raise MeshInputError(f"{error} {hint}") from error
         mesh = from_mesher(tm)
 
         names = mesh.region_names
